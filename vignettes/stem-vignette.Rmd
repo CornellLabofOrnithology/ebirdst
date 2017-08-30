@@ -56,7 +56,7 @@ devtools::load_all()
 ```
 
 
-```{r, warning=FALSE, message=FALSE}
+```{r show_template_raster, warning=FALSE, message=FALSE}
 template_raster
 ```
 
@@ -64,10 +64,10 @@ template_raster
 
 Once you have accessed and downloaded a set of STEM results, the first task is to load them into R in a way that they can be used easily. To save space on disk, each individual raster (e.g., abundance mean for Wood Thrush for January 4) has had NA values trimmed before saving (using the raster package trim() function). While this saves space on disk, it means that the rasters are not immediately comparable and trying to use the raster `stack()` function will fail. 
 
-```{r}
+```{r load_single_raster, cache=TRUE}
 # To load a single raster file and extend it to the full analysis extent
 # Note that the template_raster object is included with this package
-tif_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/woothr/tifs/all_layers/pat_mean"
+tif_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/woothr/tifs/presentation/abundance_umean"
 
 # TODO set this up to do a curl of the example results first
 # change to a different variable
@@ -80,13 +80,12 @@ r
 
 To assist with the loading of rasters, we have provided a helper function, `stack_stem()`, which uses the `template_raster` object to extend each input raster in a directory to the full extent of analysis and then returns a `RasterStack` object.
 
-```{r}
+```{r stack_abundance, cache=TRUE}
 # TODO set this up to do a curl of the example results first
-# change to a different variable
 
 # load a stack of rasters with the helper function stack_stem()
-pat_mean_stack <- stack_stem(tif_path)
-pat_mean_stack
+abund_stack <- stack_stem(tif_path)
+abund_stack
 ```
 
 In most use cases, this function will be used to stack the 52 weeks of a single 
@@ -95,3 +94,37 @@ rasters were re-arranged, the function could be used to, for example, stack
 single weeks for a single variable across multiple species.
 
 # 3. Mapping Occurrence and Abundance
+
+One of the most common activities with STEM results is to make plots of occurrence and abundance. It is fast and easy to make plots immediately, but to get ideal plotting behavior takes a little bit of preparation. This sections describes some helper functions intended to assist with mapping.
+
+## Projections
+
+The sinusoidal projection that NASA provides MODIS data in, while functional because of its equal-area property, is not good for mapping because of the significant distortion of land masses across the globe. There are few global equal-area projections, including, but not limited to, Lambert Azimuthal Equal Area, Goode Homolosine, Mollweide, and Equal Area Cylindrical. Of these, we have selected Mollweide, used in the remainder of this section, for its pleasing conformal properties across the globe, ease of projection configuration within R and the proj4string construction, and the ease of setting central meridians that best display the Western Hemisphere. It is worth noting that while projecting to a more visually appealing projection is ideal for mapping, it is not necessary for quantitative analysis of STEM results, for which purposes the results can be left in the sinusoidal projection.
+
+```{r project_stack, cache=TRUE}
+# define mollweide projection
+mollweide <- sp::CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
+
+# project abundance stack to mollweide
+# this can take a little while
+abund_stack_moll <- raster::projectRaster(abund_stack, crs=mollweide)
+```
+
+## Calculating Extent
+
+The process of building the stack unifies the extent of all layers in the stack. However, this also means that plotting happens at the full spatial extent of the area of analysis (the Western Hemisphere). For example:
+
+```{r plot_stack_first, fig.width=10, fig.height=8}
+raster::plot(abund_stack_moll[[1]], xaxt='n', yaxt='n')
+```
+
+
+
+What am I trying to do here?
+
+- projecting cub
+- create function for extracting extent
+- create function for calculating bins on abundance
+- plot abundance
+- plot occurrence
+- plot confidence bands
