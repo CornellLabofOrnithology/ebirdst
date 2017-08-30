@@ -1,0 +1,97 @@
+---
+title: "stemhelper: STEM Use and Helper Functions"
+author: "Tom Auer & Daniel Fink"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Outline
+
+1. Background
+2. Projections and Loading Rasters
+3. Mapping Occurrence and Abundance
+3. Extracting Trajectories with Uncertainty
+4. Mapping Quality Information
+5. Creating Habitat Importance Plots
+
+# 1. Background
+
+Many ecological and conservation problems require comprehensive, high-resolution information about the spatial and temporal distribution and abundance of species’ populations. This poses a challenge because observations of species are often sparsely and irregularly distributed, especially for widely distributed species. To address this challenge, species distribution models are used to estimate species’ distributions in unobserved locations and times. By associating local environmental characteristics with observed patterns of species occurrence and abundance statistical models provide a framework to harness available data and make estimates in unobserved areas. Additionally, these models can be used to control for known sources of biases that arise from the observation process.
+
+The relative abundance estimates described here were based on bird observation data from [eBird](www.ebird.org), a citizen-science program administered by Cornell Lab of Ornithology, and local land cover descriptions derived from NASA MODIS and other remote sensing data. Individual species’ distributions and abundance were modeled using a spatio-temporal ensemble of boosted regression using the Spatio-Temporal Exploratory Model (STEM) framework (see Fink et al. 2010, 2014 and Johnston et al. 2015).
+
+These models were then used to produce one daily abundance and occurrence estimate per week for all 52 weeks of the year. For each week, estimates were made across a regular grid of ~4 million locations that cover the terrestrial Western Hemisphere at a resolution of 2.8km x 2.8km. Variation in detectability associated with the search effort is controlled by standardizing the estimates to be the expected count of the species on a search conducted from 7-8AM while traveling 1 km on the given day at the given location by a typical eBirder.
+
+Each relative abundance estimate was computed as an ensemble average of up to 100 randomized base models. Averaging across an ensemble of base model estimates, each trained on random subsample of the data, produces a smoothed bootstrap (Efron 2014) or a bagged estimator. For each abundance estimate we also computed upper and lower limits as the 10th and 90th percentiles across the ensemble. These limits are conservative estimates of the sampling variation of the smoothed bootstrap estimator, for the reasons discussed in Efron (2014), and because they are based on subsamples of the full data set.
+
+## Data access
+
+To access STEM results, begin by [creating an eBird account and signing in](https://secure.birds.cornell.edu/cassso/login). The visit the [Download Data](http://ebird.org/ebird/data/download) page. STEM data access is free; however, you will need to [request access](http://ebird.org/ebird/data/request) in order to obtain access to the STEM data. Filling out the access request form allows eBird to keep track of the number of people using the data and obtain information on the applications for which the data are used.
+
+Once you have access to the data, proceed to the [download page](http://ebird.org/ebird/data/download/ebd). Here you will be able to download data for all species or for a list of 225 individual species. TBD...
+
+## Data Structure and Types
+
+Estimates from STEM are currently provided in the widely used GeoTiff raster format. These are easily opened with the raster package in R, as well as with a variety of GIS software tools. 
+
+TODO: Revisit this section
+The results are organized by species and each species has two groupings of results: "all\_layers" and "presentation". The "all\_layers" group contains the raw data layers about estimates and have not been thresholded. The "presentation" group contains data layers that have been thresholded. For each week, thresholded estimates have been restricted to locations that meet two criteria. First, each location was estimated to be occupied by the species, and, second, the location had sufficient eBird data to support non-zero abundance estimates for at least 50 of the 100 base models. 
+
+
+The animated GIFs distributed with the data are generated using the "presentation" abundance estimates. It is highly suggested to use this GIF visualization as a means for sanity checking.
+
+# 2. Projection and Loading Rasters
+
+## Projection
+
+The GeoTiffs use the same Sinusoidal projection that the MODIS data uses. As part of this package, we provide a template raster, that contains the spatial extent, resolution, and land water definition (as a 0 value) for our modeled region. To access, call the `template_raster` object after loading the package.
+
+
+```{r, echo=FALSE, message=FALSE}
+devtools::load_all()
+```
+
+
+```{r, warning=FALSE, message=FALSE}
+template_raster
+```
+
+## Loading Rasters
+
+Once you have accessed and downloaded a set of STEM results, the first task is to load them into R in a way that they can be used easily. To save space on disk, each individual raster (e.g., abundance mean for Wood Thrush for January 4) has had NA values trimmed before saving (using the raster package trim() function). While this saves space on disk, it means that the rasters are not immediately comparable and trying to use the raster `stack()` function will fail. 
+
+```{r}
+# To load a single raster file and extend it to the full analysis extent
+# Note that the template_raster object is included with this package
+tif_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/woothr/tifs/all_layers/pat_mean"
+
+# TODO set this up to do a curl of the example results first
+# change to a different variable
+r <- raster::extend(raster::raster(paste(tif_path, "/", 
+                                         list.files(tif_path)[1], 
+                                         sep = "")),
+                    template_raster)
+r
+```
+
+To assist with the loading of rasters, we have provided a helper function, `stack_stem()`, which uses the `template_raster` object to extend each input raster in a directory to the full extent of analysis and then returns a `RasterStack` object.
+
+```{r}
+# TODO set this up to do a curl of the example results first
+# change to a different variable
+
+# load a stack of rasters with the helper function stack_stem()
+pat_mean_stack <- stack_stem(tif_path)
+pat_mean_stack
+```
+
+In most use cases, this function will be used to stack the 52 weeks of a single 
+variable (e.g., abundance mean) for a single species. However, if the STEM .tif
+rasters were re-arranged, the function could be used to, for example, stack 
+single weeks for a single variable across multiple species.
+
+# 3. Mapping Occurrence and Abundance
