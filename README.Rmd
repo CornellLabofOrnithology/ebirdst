@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 
 # stemhelper
 
-The goal of stemhelper is to ...
+The goal of stemhelper is to provide help...
 
 ## Installation
 
