@@ -97,6 +97,24 @@ single weeks for a single variable across multiple species.
 
 One of the most common activities with STEM results is to make plots of occurrence and abundance. It is fast and easy to make plots immediately, but to get ideal plotting behavior takes a little bit of preparation. This sections describes some helper functions intended to assist with mapping.
 
+## Calculating Extent
+
+The process of building the stack unifies the extent of all layers in the stack. However, this also means that plotting happens at the full spatial extent of the area of analysis (the Western Hemisphere). For example:
+
+```{r plot_stack_first, cache=TRUE, fig.width=8, fig.height=6}
+library(viridis)
+raster::plot(abund_stack[[1]], xaxt='n', yaxt='n', col=viridis(20))
+```
+
+If we calculate the full extent for the species and then plot, we get a plotted
+extent that works for the entire full-annual cycle.
+
+```{r plot_stack_extent, cache=TRUE, fig.width=8, fig.height=6}
+sp_ext <- calc_full_extent(abund_stack)
+
+raster::plot(abund_stack[[1]], xaxt='n', yaxt='n', ext=sp_ext, col=viridis(20))
+```
+
 ## Projections
 
 The sinusoidal projection that NASA provides MODIS data in, while functional because of its equal-area property, is not good for mapping because of the significant distortion of land masses across the globe. There are few global equal-area projections, including, but not limited to, Lambert Azimuthal Equal Area, Goode Homolosine, Mollweide, and Equal Area Cylindrical. Of these, we have selected Mollweide, used in the remainder of this section, for its pleasing conformal properties across the globe, ease of projection configuration within R and the proj4string construction, and the ease of setting central meridians that best display the Western Hemisphere. It is worth noting that while projecting to a more visually appealing projection is ideal for mapping, it is not necessary for quantitative analysis of STEM results, for which purposes the results can be left in the sinusoidal projection.
@@ -105,26 +123,85 @@ The sinusoidal projection that NASA provides MODIS data in, while functional bec
 # define mollweide projection
 mollweide <- sp::CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
 
-# project abundance stack to mollweide
-# this can take a little while
-abund_stack_moll <- raster::projectRaster(abund_stack, crs=mollweide)
+# projecting entire raster stacks is slow
+# so ideally, project individual rasters as you plot them
+# to do this, you'll want to convert the ext object to your plotting projection
+extent_raster <- raster::raster(ext=sp_ext, 
+                                crs=sp::proj4string(template_raster))
+extent_raster[is.na(extent_raster)] <- 1
+sp_ext_moll <- raster::extent(raster::projectRaster(extent_raster, 
+                                                    crs=mollweide))
+
+# project single layer from stack to mollweide
+week1_moll <- raster::projectRaster(abund_stack[[1]], crs=mollweide)
+
+# plot single layer with full annual extent
+raster::plot(week1_moll, xaxt='n', yaxt='n', ext=sp_ext_moll, col=viridis(20))
+
+# optionally, you can project an entire stack, but it takes much longer
+#abund_stack_moll <- raster::projectRaster(abund_stack, crs=mollweide)
 ```
 
-## Calculating Extent
+## Calculating Abundance Bins
 
-The process of building the stack unifies the extent of all layers in the stack. However, this also means that plotting happens at the full spatial extent of the area of analysis (the Western Hemisphere). For example:
+Mapping species abundnace across the full-annual cycle presents a challenge, in that patterns of concentration and dispersion in abundance change throughout the year, making it difficult to define color bins that suit all seasons and accurately reflect the detail of abundance predictions. To address this, we selected a method (described by Maciejewski et al. 2013) that log transforms the entire year of data, constructs bins with the log-transformed data using standard-deviations, and then untransforms the bins.
 
-```{r plot_stack_first, fig.width=10, fig.height=8}
-raster::plot(abund_stack_moll[[1]], xaxt='n', yaxt='n')
+Here, we scale the colors linearlly, based on the maximum from the entire year. 
+
+```{r plot_linear, cache=TRUE}
+year_max <- max(raster::maxValue(abund_stack), na.rm = TRUE)
+
+week26_moll <- raster::projectRaster(abund_stack[[26]], crs = mollweide)
+
+par(mfrow=c(1,2))
+raster::plot(week1_moll, 
+             xaxt='n', 
+             yaxt='n', 
+             ext=sp_ext_moll, 
+             zlim=c(0, year_max),
+             col=viridis(20))
+raster::plot(week26_moll, 
+             xaxt='n', 
+             yaxt='n', 
+             ext=sp_ext_moll, 
+             zlim=c(0, year_max),
+             col=viridis(20))
 ```
 
+We can compare this with plots made using the binning method provided here.
 
+```{r plot_bins, cache=TRUE}
+year_bins <- calc_bins(abund_stack)
+
+# create a thinner set of labels
+bin_labels <- format(round(year_bins, 2), nsmall = 2)
+bin_labels[!(bin_labels %in% c(bin_labels[1], 
+                    bin_labels[round((length(bin_labels)/4))+1], 
+                    bin_labels[round((length(bin_labels)/2))+1],
+                    bin_labels[length(bin_labels) - round((length(bin_labels)/4))+1],
+                    bin_labels[length(bin_labels)]))] <- ""
+
+par(mfrow=c(1,2))
+raster::plot(week1_moll, 
+             xaxt='n', 
+             yaxt='n', 
+             ext=sp_ext_moll, 
+             breaks=year_bins,
+             lab.breaks=bin_labels,
+             col=viridis(length(year_bins)-1))
+raster::plot(week26_moll, 
+             xaxt='n', 
+             yaxt='n', 
+             ext=sp_ext_moll, 
+             breaks=year_bins,
+             lab.breaks=bin_labels,
+             col=viridis(length(year_bins)-1))
+```
+
+## Mapping Abundance and Occurrence
 
 What am I trying to do here?
-
-- projecting cub
-- create function for extracting extent
-- create function for calculating bins on abundance
+- add reference data
 - plot abundance
 - plot occurrence
 - plot confidence bands

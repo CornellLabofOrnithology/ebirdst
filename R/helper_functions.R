@@ -116,3 +116,57 @@ calc_full_extent <- function(stack) {
 
   return(map_extent)
 }
+
+#' Calculates bins based on standard deviations of log-transformed data
+#'
+#' Mapping species abundnace across the full-annual cycle presents a challenge, in that patterns of concentration and dispersion in abundance change throughout the year, making it difficult to define color bins that suit all seasons and accurately reflect the detail of abundance predictions. To address this, we selected a method (described by Maciejewski et al. 2013) that log transforms the entire year of data, constructs bins with the log-transformed data using standard-deviations, and then untransforms the bins.
+#'
+#' @usage \code{calc_bins(stack)}
+#'
+#' @param stack A RasterStack object, of abundance results.
+#'
+#' @return vector containing break points of bins
+#'
+#' @examples
+#' tif_path <- "~"
+#' raster_stack <- stack_stem(tif_path)
+#' year_bins <- calc_bins(raster_stack)
+#'
+#' raster::plot(raster_stack[[1]], xaxt='n', yaxt='n', breaks=year_bins)
+calc_bins <- function(stack) {
+  zrv <- raster::getValues(stack)
+  lzwk <- log(zrv[!is.na(zrv)])
+
+  # LOG SD
+  mdl <- mean(lzwk)
+  sdl <- sd(lzwk)
+  log_sd <- c(mdl-(3.00*sdl),mdl-(2.50*sdl),mdl-(2.00*sdl),mdl-(1.75*sdl),
+              mdl-(1.50*sdl),mdl-(1.25*sdl),mdl-(1.00*sdl),mdl-(0.75*sdl),
+              mdl-(0.50*sdl),mdl-(0.25*sdl),mdl-(0.125*sdl),
+              mdl,
+              mdl+(0.125*sdl),mdl+(0.25*sdl),mdl+(0.50*sdl),mdl+(0.75*sdl),
+              mdl+(1.00*sdl),mdl+(1.25*sdl),mdl+(1.50*sdl),mdl+(1.75*sdl),
+              mdl+(2.00*sdl),mdl+(2.50*sdl),mdl+(3.00*sdl))
+
+  if(max(lzwk) > mdl+(3.00*sdl)) {
+    log_sd <- append(log_sd, max(lzwk))
+  }
+
+  if(max(lzwk) < mdl+(3.00*sdl)) {
+    log_sd <- log_sd[1:length(log_sd)-1]
+  }
+
+  if(min(lzwk) < mdl-(3.00*sdl)) {
+    log_sd <- append(log_sd, min(lzwk), after=0)
+  }
+
+  if(min(lzwk) > mdl-(3.00*sdl)) {
+    log_sd <- log_sd[2:length(log_sd)]
+  }
+
+  rm(lzwk)
+
+  bins <- exp(log_sd)
+
+  return(bins)
+}
