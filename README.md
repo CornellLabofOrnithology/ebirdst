@@ -12,7 +12,7 @@ You can install stemhelper from github with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("tomauer/stemhelper")
+devtools::install_github("CornellLabofOrnithology/stemhelper")
 ```
 
 Example
