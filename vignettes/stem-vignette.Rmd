@@ -198,10 +198,54 @@ raster::plot(week26_moll,
              col=viridis(length(year_bins)-1))
 ```
 
-## Mapping Abundance and Occurrence
+Now that we're plotting abundance with a decent full-annual extent and bins that accurately represent the data distribution, we can add in other pieces of data that represent projected and assumed zeroes, that help display the extent of estimation.
+
+```{r plot_es, cache=TRUE}
+# pull in species-specific ensemble support, represent predicted 0s where there is no abundance value
+pos_es_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/woothr/tifs/presentation/abundance_ensemble_support"
+pos_es_stack <- stack_stem(pos_es_path)
+week26_pes <- raster::projectRaster(pos_es_stack[[26]], crs=mollweide)
+
+# pull in checklist-level ensemble support, represent assummed 0s
+zero_es_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/zero_es"
+zero_es_stack <- stack_stem(zero_es_path)
+week26_zes <- raster::projectRaster(raster::mask(zero_es_stack[[26]], 
+                                                 template_raster), 
+                                    crs=mollweide)
+week26_zes[week26_zes < 99] <- NA
+
+# if we layer these, we can map where the models are predicting 0
+
+raster::plot(week26_zes,
+             xaxt='n',
+             yaxt='n',
+             ext=sp_ext_moll,
+             col=viridis(length(year_bins)-1)[1],
+             legend=FALSE)
+
+raster::plot(week26_pes,
+             xaxt='n',
+             yaxt='n',
+             ext=sp_ext_moll,
+             col=viridis(length(year_bins)-1)[1],
+             legend=FALSE,
+             add=TRUE)
+
+raster::plot(week26_moll, 
+             xaxt='n', 
+             yaxt='n', 
+             ext=sp_ext_moll, 
+             breaks=year_bins,
+             lab.breaks=bin_labels,
+             col=viridis(length(year_bins)-1),
+             legend=FALSE,
+             add=TRUE)
+
+```
+
 
 What am I trying to do here?
-- add reference data
 - plot abundance
 - plot occurrence
 - plot confidence bands
+- do I want to add ensemble support, probably

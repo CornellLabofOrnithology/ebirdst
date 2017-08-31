@@ -136,6 +136,7 @@ calc_full_extent <- function(stack) {
 calc_bins <- function(stack) {
   zrv <- raster::getValues(stack)
   lzwk <- log(zrv[!is.na(zrv)])
+  rm(zrv)
 
   # LOG SD
   mdl <- mean(lzwk)
