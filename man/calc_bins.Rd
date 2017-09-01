@@ -4,7 +4,7 @@
 \alias{calc_bins}
 \title{Calculates bins based on standard deviations of log-transformed data}
 \usage{
-\code{calc_bins(stack))}
+\code{calc_bins(stack)}
 }
 \arguments{
 \item{stack}{A RasterStack object, of abundance results.}
