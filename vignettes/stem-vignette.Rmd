@@ -102,6 +102,8 @@ One of the most common activities with STEM results is to make plots of occurren
 The sinusoidal projection that NASA provides MODIS data in, while functional because of its equal-area property, is not good for mapping because of the significant distortion of land masses across the globe. There are few global equal-area projections, including, but not limited to, Lambert Azimuthal Equal Area, Goode Homolosine, Mollweide, and Equal Area Cylindrical. Of these, we have selected Mollweide, used in the remainder of this section, for its pleasing conformal properties across the globe, ease of projection configuration within R and the proj4string construction, and the ease of setting central meridians that best display the Western Hemisphere. It is worth noting that while projecting to a more visually appealing projection is ideal for mapping, it is not necessary for quantitative analysis of STEM results, for which purposes the results can be left in the sinusoidal projection.
 
 ```{r project_stack, cache=TRUE}
+library(viridis)
+
 # define mollweide projection
 mollweide <- sp::CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
 
@@ -176,7 +178,7 @@ raster::plot(occ_week26,
 
 Mapping species abundance across the full-annual cycle presents a challenge, in that patterns of concentration and dispersion in abundance change throughout the year, making it difficult to define color bins that suit all seasons and accurately reflect the detail of abundance predictions. To address this, we selected a method (described by Maciejewski et al. 2013) that log transforms the entire year of data, constructs bins with the log-transformed data using standard deviations, and then un-transforms the bins for plotting.
 
-To comapre, we first scale the colors linearly, based on the maximum from the entire year. 
+To compare, we first scale the colors linearly, based on the maximum from the entire year. 
 
 ```{r plot_linear, cache=TRUE}
 year_max <- max(raster::maxValue(abund_stack), na.rm = TRUE)
@@ -242,9 +244,9 @@ raster::plot(week26_moll,
 
 ## Mapping Abundance
 
-Now that we're plotting abundance with a decent full-annual extent and bins that accurately represent the data distribution, we can add in other pieces of data that represent projected and assumed zeroes, that help display the extent of estimation.
+With a good full-annual extent and color bins, that accurately represent the data distribution, we can add in other pieces of data that represent predicted and assumed zeroes, which help display the extent of estimation.
 
-```{r plot_es, cache=TRUE, eval=FALSE}
+```{r plot_es, cache=TRUE}
 # pull in species-specific ensemble support, represent predicted 0s where there is no abundance value
 pos_es_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/woothr/tifs/presentation/abundance_ensemble_support"
 pos_es_stack <- stack_stem(pos_es_path)
@@ -253,45 +255,37 @@ week26_pes <- raster::projectRaster(pos_es_stack[[26]], crs=mollweide)
 # pull in checklist-level ensemble support, represent assummed 0s
 zero_es_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/zero_es"
 zero_es_stack <- stack_stem(zero_es_path)
-week26_zes <- raster::projectRaster(raster::mask(zero_es_stack[[26]], 
+week26_zes_vals <- raster::projectRaster(raster::mask(zero_es_stack[[26]], 
                                                  template_raster), 
                                     crs=mollweide)
-week26_zes[week26_zes < 99] <- NA
 
-# if we layer these, we can map where the models are predicting 0
+# we'll combine the two types of zeroes with the positive prediction for plotting
+week26_pes[week26_pes] <- 0
+week26_zes <- week26_zes_vals >= 99
+week26_zes[week26_zes == 0] <- NA
+week26_zes[week26_zes == 1] <- 0
 
-raster::plot(week26_zes,
-             xaxt='n',
-             yaxt='n',
-             ext=sp_ext_moll,
-             col=viridis(length(year_bins)-1)[1],
-             legend=FALSE)
+week26s <- stack(week26_pes, week26_zes, week26_moll)
+week26c <- calc(week26s, max, na.rm=TRUE)
 
-raster::plot(week26_pes,
-             xaxt='n',
-             yaxt='n',
-             ext=sp_ext_moll,
-             col=viridis(length(year_bins)-1)[1],
-             legend=FALSE,
-             add=TRUE)
-
-raster::plot(week26_moll, 
+par(mar=c(0,0,0,2))
+raster::plot(week26c, 
              xaxt='n', 
-             yaxt='n', 
+             yaxt='n',
+             bty='n',
              ext=sp_ext_moll, 
              breaks=year_bins,
              lab.breaks=bin_labels,
              col=viridis(length(year_bins)-1),
-             legend=FALSE,
-             add=TRUE)
-
+             maxpixels=raster::ncell(week26c),
+             legend=TRUE)
 ```
 
 ## Mapping Abundance Confidence Intervals
 
 In addition to occurrence and abundance predictions, we also provide confidence intervals at an upper value of 90% and lower value of 10%. These can be used to calculate and map a confidence band width.
 
-```{r plot_confidence, cache=TRUE, eval=FALSE}
+```{r plot_confidence, cache=TRUE}
 # load lower and upper stacks
 lower_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/woothr/tifs/presentation/abundance_lower"
 lower_stack <- stack_stem(lower_path)
@@ -303,11 +297,13 @@ conf_band <- upper_stack - lower_stack
 
 conf_week26 <- raster::projectRaster(conf_band[[26]], crs=mollweide)
 
+par(mar=c(0,0,0,2))
 raster::plot(conf_week26, 
              xaxt='n', 
-             yaxt='n', 
+             yaxt='n',
+             bty='n',
              ext=sp_ext_moll,
-             col=viridis(20),
+             col=magma(20),
              maxpixel=raster::ncell(conf_week26))
 
 ```

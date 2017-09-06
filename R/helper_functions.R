@@ -165,6 +165,10 @@ calc_bins <- function(stack) {
     log_sd <- log_sd[2:length(log_sd)]
   }
 
+  if(exp(min(lzwk)) > 0) {
+    log_sd <- append(log_sd, -Inf, after=0)
+  }
+
   rm(lzwk)
 
   bins <- exp(log_sd)
