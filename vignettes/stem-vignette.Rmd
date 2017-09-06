@@ -2,7 +2,7 @@
 title: "stemhelper: STEM Use and Helper Functions"
 author: "Tom Auer & Daniel Fink"
 date: "`r Sys.Date()`"
-output: word_document
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
