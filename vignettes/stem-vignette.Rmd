@@ -2,7 +2,7 @@
 title: "stemhelper: STEM Use and Helper Functions"
 author: "Tom Auer & Daniel Fink"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: word_document
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
@@ -23,6 +23,7 @@ devtools::load_all()
 4. Extracting Trajectories with Uncertainty
 5. Mapping Quality Information
 6. Creating Habitat Importance Plots
+7. Conversion
 
 # 1. Background
 
@@ -246,7 +247,7 @@ raster::plot(week26_moll,
 
 With a good full-annual extent and color bins, that accurately represent the data distribution, we can add in other pieces of data that represent predicted and assumed zeroes, which help display the extent of estimation.
 
-```{r plot_es, cache=TRUE}
+```{r plot_es, cache=TRUE, warnings=FALSE}
 # pull in species-specific ensemble support, represent predicted 0s where there is no abundance value
 pos_es_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/woothr/tifs/presentation/abundance_ensemble_support"
 pos_es_stack <- stack_stem(pos_es_path)
@@ -265,8 +266,8 @@ week26_zes <- week26_zes_vals >= 99
 week26_zes[week26_zes == 0] <- NA
 week26_zes[week26_zes == 1] <- 0
 
-week26s <- stack(week26_pes, week26_zes, week26_moll)
-week26c <- calc(week26s, max, na.rm=TRUE)
+week26s <- raster::stack(week26_pes, week26_zes, week26_moll)
+week26c <- raster::calc(week26s, max, na.rm=TRUE)
 
 par(mar=c(0,0,0,2))
 raster::plot(week26c, 
@@ -309,3 +310,100 @@ raster::plot(conf_week26,
 ```
 
 # 4. Extracting Trajectories with Uncertainty
+
+With raster stacks for abundance, upper, and lower confidence intervals, we can extract an abundnace trajectory, with uncertainty intervals and plot them across the year for a single location.
+
+```{r trajectories, cache=TRUE, warnings=FALSE}
+
+# set a point
+coords <- cbind(-76.5, 42.5)
+pt <- sp::SpatialPoints(coords, proj4string = sp::CRS("+init=epsg:4326"))
+pt_prj <- sp::spTransform(pt, sp::CRS(sp::proj4string(template_raster)))
+
+# extract
+abund_traj <- unlist(raster::extract(abund_stack, pt_prj, fun=mean, na.rm=TRUE))
+upper_traj <- unlist(raster::extract(upper_stack, pt_prj, fun=mean, na.rm=TRUE))
+lower_traj <- unlist(raster::extract(lower_stack, pt_prj, fun=mean, na.rm=TRUE))
+
+# Plot trajectories
+library(ggplot2)
+
+plot_frame <- data.frame(x=1:length(abund_traj),
+                         y=c(unname(abund_traj)),
+                         upper=c(unname(upper_traj)),
+                         lower=c(unname(lower_traj)))
+
+g <- ggplot(plot_frame, aes(x, y)) +
+     geom_line(data=plot_frame) +
+     geom_ribbon(data=plot_frame, aes(ymin=lower, ymax=upper), alpha = 0.3) +
+     ylab("Expected Count (count/(km hr))") +
+     xlab("Week")
+g
+
+```
+
+It is also possible to extract trajectories for regions, but it takes a little more data work.
+
+```{r trajectories_region, cache=TRUE, warnings=FALSE}
+
+# set a point
+coords <- cbind(-76.5, 42.5)
+pt <- sp::SpatialPoints(coords, proj4string = sp::CRS("+init=epsg:4326"))
+pt_prj <- sp::spTransform(pt, sp::CRS(sp::proj4string(template_raster)))
+
+# set an e
+library(rnaturalearthdata)
+
+states50prj <- sp::spTransform(states50, sp::CRS(sp::proj4string(template_raster)))
+wv <- states50prj[states50prj@data$name == "West Virginia",]
+
+# extract
+# because we're using regions, we get lots of values that we need to average together
+abund_traj <- raster::extract(abund_stack, wv, fun=mean, na.rm=TRUE)
+abund_traj <- apply(abund_traj, 2, mean, na.rm=TRUE)
+
+upper_traj <- raster::extract(upper_stack, wv, fun=mean, na.rm=TRUE)
+upper_traj <- apply(upper_traj, 2, mean, na.rm=TRUE)
+
+lower_traj <- raster::extract(lower_stack, wv, fun=mean, na.rm=TRUE)
+lower_traj <- apply(lower_traj, 2, mean, na.rm=TRUE)
+
+# Plot trajectories
+library(ggplot2)
+
+plot_frame <- data.frame(x=1:length(abund_traj),
+                         y=c(unname(abund_traj)),
+                         upper=c(unname(upper_traj)),
+                         lower=c(unname(lower_traj)))
+
+g <- ggplot(plot_frame, aes(x, y)) +
+     geom_line(data=plot_frame) +
+     geom_ribbon(data=plot_frame, aes(ymin=lower, ymax=upper), alpha = 0.3) +
+     ylab("Expected Count (count/(km hr))") +
+     xlab("Week")
+g
+
+```
+
+# 7. Conversion
+
+The `raster` package has a lot of functionality and the RasterLayer format is useful for spatial analysis and mapping, but some users do not have GIS experience or want the data in a simpler format for their preferred method of analysis. There are multiple ways to get more basic representations of the data.
+
+```{r conversion, warning=FALSE, cache=TRUE}
+# To convert the data to a simpler geographic format and access tabularly	
+# reproject into geographic (decimal degrees) 
+abund_stack_ll <- raster::projectRaster(abund_stack[[26]], crs=sp::CRS("+init=epsg:4326"))
+
+# Convert raster object into a matrix
+p <- raster::rasterToPoints(abund_stack_ll)
+head(p)
+```
+
+```{r conversion_write, warning=FALSE, eval=FALSE}
+# Write a CSV file of the matrix
+write.csv(p, 
+          file = paste(raster_dir, "/woothr_week26.csv", sep=""),
+          row.names = FALSE)
+```
+
+### References
