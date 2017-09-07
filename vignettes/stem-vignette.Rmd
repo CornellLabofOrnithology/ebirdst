@@ -122,6 +122,7 @@ raster::plot(week1_moll,
              bty='n',
              col=viridis(20),
              maxpixels=raster::ncell(week1_moll))
+sp::plot(countries110_prj, add=TRUE)
 ```
 
 Plotting the layer at the full spatial extent of the analysis area makes for a small map. The process of building the stack unifies the extent of all layers in the stack. However, this also means that plotting happens at the full spatial extent of the area of analysis, the Western Hemisphere, as seen above. If we calculate the full annual spatial extent for the species, project to Mollwide, and then map, we get an extent that works for the entire full-annual cycle of the species.
@@ -269,6 +270,18 @@ week26_zes[week26_zes == 1] <- 0
 week26s <- raster::stack(week26_pes, week26_zes, week26_moll)
 week26c <- raster::calc(week26s, max, na.rm=TRUE)
 
+# to add context, let's pull in some reference data to add
+# need to select countries from naturalearthdata before 
+# projecting to mollweide
+library(rnaturalearthdata)
+
+countries110_prj <- sp::spTransform(countries110,
+                                    sp::CRS(sp::proj4string(template_raster)))
+e <- as(sp_ext, "SpatialPolygons")
+sp::proj4string(e) <- sp::CRS(sp::proj4string(template_raster))
+wh <- countries110_prj[!is.na(sp::over(countries110_prj, e)),]
+wh_moll <- sp::spTransform(wh, mollweide)
+
 par(mar=c(0,0,0,2))
 raster::plot(week26c, 
              xaxt='n', 
@@ -280,6 +293,7 @@ raster::plot(week26c,
              col=viridis(length(year_bins)-1),
              maxpixels=raster::ncell(week26c),
              legend=TRUE)
+sp::plot(wh_moll, add=TRUE, border='gray')
 ```
 
 ## Mapping Abundance Confidence Intervals
