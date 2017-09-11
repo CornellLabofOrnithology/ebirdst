@@ -21,9 +21,8 @@ devtools::load_all()
 2. Projections and Loading Rasters
 3. Mapping Occurrence and Abundance
 4. Extracting Trajectories with Uncertainty
-5. Mapping Quality Information
-6. Creating Habitat Importance Plots
-7. Conversion
+5. Plotting Predictor Importance and Partial Dependencies
+6. Conversion
 
 # 1. Background
 
@@ -399,7 +398,22 @@ g
 
 ```
 
-# 7. Conversion
+# 5. Plotting Predictor Importance and Partial Dependencies
+
+Blah, blah, blah...
+
+## Loading Data
+
+## Select Region and Season
+
+## Plot available centroids and extent of analysis
+
+## Plot Predictor Importance
+
+## Plot Partial Depedencies
+
+
+# 6. Conversion
 
 The `raster` package has a lot of functionality and the RasterLayer format is useful for spatial analysis and mapping, but some users do not have GIS experience or want the data in a simpler format for their preferred method of analysis. There are multiple ways to get more basic representations of the data.
 
