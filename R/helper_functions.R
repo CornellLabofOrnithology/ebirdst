@@ -11,7 +11,7 @@
 #' @param path Full path to directory containing more than one STEM .tif raster.
 #'
 #' @return RasterStack object
-#'
+#' @export
 #' @examples
 #' tif_path <- "~"
 #' raster_stack <- stack_stem(tif_path)
@@ -54,7 +54,7 @@ stack_stem <- function(path) {
 #' @param stack A RasterStack object, ideally of occurrence or abundace.
 #'
 #' @return raster Extent object
-#'
+#' @export
 #' @examples
 #' tif_path <- "~"
 #' raster_stack <- stack_stem(tif_path)
@@ -126,7 +126,7 @@ calc_full_extent <- function(stack) {
 #' @param stack A RasterStack object, of abundance results.
 #'
 #' @return vector containing break points of bins
-#'
+#' @export
 #' @examples
 #' tif_path <- "~"
 #' raster_stack <- stack_stem(tif_path)
@@ -176,18 +176,13 @@ calc_bins <- function(stack) {
   return(bins)
 }
 
-#' Loads PI data
+#' Summary file loader
 #'
-load_pis <- function(path) {
-  # load config vars
+#' Used by load_pis() and load_pds()
+load_summary <- function(path) {
   e <- new.env()
   config_file <- list.files(path, pattern="*_config*")
   load(paste(path, "/", config_file, sep = ""), envir = e)
-
-  # load pi.txt
-  pi_vec <- data.table::fread(paste(path, "/stixels/pi.txt", sep = ""))
-  names(pi_vec)[4:ncol(pi_vec)] <- e$PI_VARS
-  names(pi_vec)[3] <- "stixel.id"
 
   # load summary
   train_covariate_means_names <- paste("train.cov.mean",
@@ -235,10 +230,210 @@ load_pis <- function(path) {
 
   summary_nona <- summary_vec[!is.na(summary_vec$centroid.lon), ]
 
-  pi_summary <- merge(pi_vec, summary_nona, by = c("stixel.id"))
+  return(summary_nona)
+}
 
+#' Loads PI data
+#'
+#' @import data.table
+#' @export
+load_pis <- function(path) {
+  # load config vars
+  e <- new.env()
+  config_file <- list.files(path, pattern="*_config*")
+  load(paste(path, "/", config_file, sep = ""), envir = e)
+
+  # load pi.txt
+  pi_vec <- data.table::fread(paste(path, "/stixels/pi.txt", sep = ""))
+  names(pi_vec)[4:ncol(pi_vec)] <- e$PI_VARS
+  names(pi_vec)[3] <- "stixel.id"
+
+  # get summary file
+  summary_file <- stemhelper::load_summary(path)
+
+  # merge
+  pi_summary <- merge(pi_vec, summary_file, by = c("stixel.id"))
+  rm(pi_vec, summary_file)
+
+  # return
   # TODO, what else should we select to return?
   pi_summary[,c("V1.x", "V2.x", "V1.y", "V2.y") := NULL]
 
-  return(pi_summary)
+  return(as.data.frame(pi_summary))
+}
+
+#' Loads PD data
+#'
+#' @import data.table
+#' @export
+load_pds <- function(path) {
+  # load config vars
+  e <- new.env()
+  config_file <- list.files(path, pattern="*_config*")
+  load(paste(path, "/", config_file, sep = ""), envir = e)
+
+  # load pi.txt
+  pd_vec <- data.table::fread(paste(path, "/stixels/pd.txt", sep = ""))
+  names(pd_vec)[3] <- "stixel.id"
+
+  # load summary file
+  summary_file <- load_summary(path)
+
+  # merge
+  pd_summary <- merge(pd_vec, summary_file, by = c("stixel.id"), all.y = TRUE)
+  rm(pd_vec, summary_file)
+
+  # return
+  # TODO, what else should we select to return?
+  pd_summary[,c("V1.x", "V2.x", "V1.y", "V2.y") := NULL]
+
+  return(as.data.frame(pd_summary))
+}
+
+#' Plot PIs and PDs
+#'
+#' @export
+plot_centroids <- function(pis,
+                           pds,
+                           st_extent = NA,
+                           plot_pis = TRUE,
+                           plot_pds = TRUE,
+                           ...) {
+
+  if(plot_pds == FALSE & plot_pis == FALSE) {
+    stop("Plotting of both PIs and PDs set to FALSE. Nothing to plot!")
+  }
+
+  ll <- "+init=epsg:4326"
+  eck4 <- "+proj=eck4"
+
+  par(mar=c(0,0,3,0))
+  title_text <- ""
+
+  if(plot_pds == TRUE) {
+    tpds <- unique(pds[, c("centroid.lon","centroid.lat","centroid.date")])
+    tpds_sp <- sp::SpatialPointsDataFrame(tpds[,c("centroid.lon",
+                                                  "centroid.lat")],
+                                          tpds,
+                                          proj4string = sp::CRS(ll))
+    tpds_prj <- sp::spTransform(tpds_sp, sp::CRS(eck4))
+    rm(tpds)
+
+    # this is the wrong way to check
+    if(!is.na(st_extent)) {
+      tpds_sub <- tpds_sp[tpds_sp$centroid.date > st_extent$t.min &
+                          tpds_sp$centroid.date <= st_extent$t.max &
+                          tpds_sp$centroid.lat > st_extent$y.min &
+                          tpds_sp$centroid.lat <= st_extent$y.max &
+                          tpds_sp$centroid.lon > st_extent$x.min &
+                          tpds_sp$centroid.lon <= st_extent$x.max, ]
+
+      tpds_region <- sp::spTransform(tpds_sub, sp::CRS(eck4))
+    }
+
+    rm(tpds_sp)
+
+    # start plot with all possible PDs
+    raster::plot(tpds_prj,
+                 ext = raster::extent(tpds_prj),
+                 col = "darkblue",
+                 cex = 0.5,
+                 pch = 16)
+
+    # plot PDs in st_extent
+    if(!is.na(st_extent)) {
+      raster::plot(tpds_region,
+                   ext = raster::extent(tpds_prj),
+                   col = "blue",
+                   cex = 0.5,
+                   pch = 16,
+                   add = TRUE)
+    }
+
+    title_text <- paste(title_text,
+                        "Available PDs: ", nrow(tpds_prj), "\n",
+                        "Selected PDs: ", nrow(tpds_region), "\n",
+                        sep = "")
+  }
+
+  if(plot_pis == TRUE) {
+    tpis <- unique(pis[, c("centroid.lon","centroid.lat","centroid.date")])
+    tpis_sp <- sp::SpatialPointsDataFrame(tpis[,c("centroid.lon",
+                                                  "centroid.lat")],
+                                          tpis,
+                                          proj4string = sp::CRS(ll))
+    tpis_prj <- sp::spTransform(tpis_sp, sp::CRS(eck4))
+    rm(tpis)
+
+    # this is the wrong way to check
+    if(!is.na(st_extent)) {
+      tpis_sub <- tpis_sp[tpis_sp$centroid.date > st_extent$t.min &
+                          tpis_sp$centroid.date <= st_extent$t.max &
+                          tpis_sp$centroid.lat > st_extent$y.min &
+                          tpis_sp$centroid.lat <= st_extent$y.max &
+                          tpis_sp$centroid.lon > st_extent$x.min &
+                          tpis_sp$centroid.lon <= st_extent$x.max, ]
+
+      tpis_region <- sp::spTransform(tpis_sub, sp::CRS(eck4))
+    }
+    rm(tpis_sp)
+
+    count110_prj <- sp::spTransform(rnaturalearthdata::countries110,
+                                    sp::CRS(eck4))
+    states50_prj <- sp::spTransform(rnaturalearthdata::states50,
+                                    sp::CRS(eck4))
+
+    if(plot_pds == TRUE) {
+      # start plot with all possible PDs
+      raster::plot(tpis_prj,
+                   ext = raster::extent(tpds_prj),
+                   col = "darkred",
+                   cex = 0.5,
+                   pch = 16,
+                   add = TRUE)
+
+      # plot PDs in st_extent
+      if(!is.na(st_extent)) {
+        raster::plot(tpis_region,
+                     ext = raster::extent(tpds_prj),
+                     col = "red",
+                     cex = 0.5,
+                     pch = 16,
+                     add = TRUE)
+      }
+
+      raster::plot(count110_prj, ext = raster::extent(tpds_prj), add = TRUE)
+      raster::plot(states50_prj,
+                   ext = raster::extent(tpds_prj),
+                   lwd = 0.5,
+                   add = TRUE)
+    } else {
+      # start plot with all possible PDs
+      raster::plot(tpis_prj,
+                   ext = raster::extent(tpis_sp_prj),
+                   col = "darkred",
+                   cex = 0.5,
+                   pch = 16)
+
+      # plot PDs in st_extent
+      if(!is.na(st_extent)) {
+        raster::plot(tpis_region,
+                     ext = raster::extent(tpis_sp_prj),
+                     add = TRUE,
+                     col = "red",
+                     cex = 0.5,
+                     pch = 2,
+                     add = TRUE)
+      }
+      raster::plot(count110_prj, ext = raster::extent(tpis_sp_prj), add = TRUE)
+      raster::plot(states50_prj, ext = raster::extent(tpis_sp_prj), add = TRUE)
+    }
+
+    title_text <- paste(title_text,
+                        "Available PIs: ", nrow(tpis_prj), "\n",
+                        "Selected PIs: ", nrow(tpis_region), "\n",
+                        sep = "")
+  }
+
+  title(main = title_text, cex.main = 0.75, line=-1)
 }

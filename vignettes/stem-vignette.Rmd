@@ -404,9 +404,41 @@ Blah, blah, blah...
 
 ## Loading Data
 
+```{r load_pipd, cache=TRUE}
+
+# path to species bundle
+sp_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/woothr/"
+
+pis <- load_pis(sp_path)
+pds <- load_pds(sp_path)
+
+```
+
+
 ## Select Region and Season
 
+```{r plot_centroids, cache=TRUE, warning=FALSE, messages=FALSE}
+
+ne_extent <- list()
+ne_extent <- list(type = "rectangle",
+                  y.min = 40,  
+		              y.max = 47,
+		              x.min = -80,
+		              x.max = -70,
+		              t.min = 0.425,
+	 	              t.max = 0.475)
+
+plot_centroids(pis=pis, pds=pds, st_extent=ne_extent)
+
+```
+
+
 ## Plot available centroids and extent of analysis
+
+```{r }
+
+```
+
 
 ## Plot Predictor Importance
 
