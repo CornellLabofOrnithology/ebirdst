@@ -175,3 +175,70 @@ calc_bins <- function(stack) {
 
   return(bins)
 }
+
+#' Loads PI data
+#'
+load_pis <- function(path) {
+  # load config vars
+  e <- new.env()
+  config_file <- list.files(path, pattern="*_config*")
+  load(paste(path, "/", config_file, sep = ""), envir = e)
+
+  # load pi.txt
+  pi_vec <- data.table::fread(paste(path, "/stixels/pi.txt", sep = ""))
+  names(pi_vec)[4:ncol(pi_vec)] <- e$PI_VARS
+  names(pi_vec)[3] <- "stixel.id"
+
+  # load summary
+  train_covariate_means_names <- paste("train.cov.mean",
+                                       e$PREDICTOR_LIST,
+                                       sep = "_")
+  srd_covariate_means_names <- paste("srd.cov.mean",
+                                     e$PREDICTOR_LIST,
+                                     sep = "_")
+  summary_vec_name_vec <-c(
+    "srd.n",
+    "centroid.lon",
+    "centroid.lat",
+    "centroid.date",
+    "stixel_width",
+    "stixel_height",
+    "stixel_area",
+    "train.n",
+    "positive.ob_n",
+    "stixel_prevalence",
+    "mean_non_zero_count",
+    # ------------
+    "binary_Kappa",
+    "binary_AUC",
+    # ------------
+    "binary.deviance_model",
+    "binary.deviance_mean",
+    "binary.deviance_explained",
+    "pois.deviance_model",
+    "pois.deviance_mean",
+    "posi.deviance_explained",
+    # ------------
+    "total_EFFORT_HRS",
+    "total_EFFORT_DISTANCE_KM",
+    "total_NUMBER_OBSERVERS",
+    "train_elevation_mean",
+    # ------------
+    train_covariate_means_names, #k-covariate values
+    "train_covariate_entropy",
+    "srd_elevation_mean",
+    srd_covariate_means_names, #k-covariate values
+    "srd_covariate_entropy" )
+  summary_vec <- data.table::fread(paste(path, "/stixels/summary.txt", sep=""))
+  names(summary_vec)[3] <- "stixel.id"
+  names(summary_vec)[4:ncol(summary_vec)] <- summary_vec_name_vec
+
+  summary_nona <- summary_vec[!is.na(summary_vec$centroid.lon), ]
+
+  pi_summary <- merge(pi_vec, summary_nona, by = c("stixel.id"))
+
+  # TODO, what else should we select to return?
+  pi_summary[,c("V1.x", "V2.x", "V1.y", "V2.y") := NULL]
+
+  return(pi_summary)
+}
