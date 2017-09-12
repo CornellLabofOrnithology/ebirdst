@@ -570,7 +570,7 @@ calc_effective_extent <- function(st_extent,
 #' Plotting PIs as barplots
 #'
 #' @export
-#' @import ggplot2
+#' @import ggplot2 mgcv
 plot_pis <- function(pis,
                      st_extent,
                      by_cover_class = FALSE,
@@ -651,4 +651,275 @@ plot_pis <- function(pis,
     coord_flip() +
     labs(y = "Relative PI", x = "")
   pi_bars
+}
+
+#' Plot PDs
+#'
+#' @export
+#' @import mgcv ggplot2
+plot_pds <- function(pd_name,
+                     pds,
+                     st_extent,
+                     pointwise_pi = FALSE,
+                     stixel_pds = TRUE,
+                     k.cont.res = 25,
+                     nnn.bs = 100,
+                     equivalent.ensemble.ss = 10,
+                     ci.alpha = 0.05,
+                     mean.all.data = FALSE) {
+  PD_MAX_RESOLUTION <- 50
+
+  print('inside plot_pds')
+  print(k.cont.res)
+
+  # ----------------------
+  # PD_NAME <- "EFFORT_HRS"
+  # PD_NAME <- "UMD_FS_C4_1500_PD"
+  # pipd.data.list,
+  # st.extent.list = st.extent.list.E
+  # pointwise.ci = T
+  # k.cont.res <- 25
+  # -------------------
+  t.ul <- NULL
+  t.ll <- NULL
+  t.median <- NULL
+  # Defines extent of PD predictions along independent axis
+  # X.tail.level of data are trimmed the both ends where data are sparser.
+  # This avoids edge effects.
+  x.tail.level  <- 0.0
+  # Confidence level for replicate/stixel level prediction Intervals
+  # Because of the relatively small sample sizes I am using 80% PIs
+  gbm.tail.prob <- 0.10  # Tail probabilty [0, 0.49]
+  # Number of CV folds for data driven selection of gbm's n.trees
+  # parameter. Since this doesn't work on my machine I have
+  # take the simpler approach of fixing the n.trees == 200
+  # This seems to work well.
+  gbm.cv.folds <- 0  # >= 5 computational vs statistical efficiecy
+  gbm.n.trees <- 500
+  best.iter <- gbm.n.trees
+  # Number of bootstrap replicasted for Conditional Mean
+  #nnn.bs <- 25
+  # Number of evaluation points on x-axis / indepent var
+  nd.pred.size <- PD_MAX_RESOLUTION
+  # ----------------------
+
+  pd.index <- pds$centroid.date > st_extent$t.min &
+              pds$centroid.date <= st_extent$t.max &
+              pds$centroid.lat > st_extent$y.min &
+              pds$centroid.lat <= st_extent$y.max &
+              pds$centroid.lon > st_extent$x.min &
+              pds$centroid.lon <= st_extent$x.max
+
+  pd_vec <- pds[ pd.index, 	]
+  # Select PD Variable
+  var_pd <- pd_vec[pd_vec$V4 == pd_name,]
+  # Clean
+  var_pd <- var_pd[!is.na(var_pd$V5), ]
+  # Each Column is one replicate estimate of PD
+  # 	x = x coordinate values
+  # 	y = y coordinate values
+  pd.x <- matrix(NA, PD_MAX_RESOLUTION, nrow(var_pd))
+  pd.y <- matrix(NA, PD_MAX_RESOLUTION, nrow(var_pd))
+  pd.mean <- rep(NA, nrow(var_pd))
+  for (rid in 1:nrow(var_pd)) {
+    #rid <- 100
+    pd.x[,rid] <- as.numeric(
+      var_pd[rid, (PD_MAX_RESOLUTION+4):(2*PD_MAX_RESOLUTION+3)] )
+    ttt <- as.numeric(var_pd[rid, 3:(PD_MAX_RESOLUTION+2)])
+    pd.mean[rid] <- mean(ttt, na.rm=T)
+    pd.y[,rid] <- ttt - pd.mean[rid]
+  }
+  pd.x <- as.data.frame(pd.x)
+  pd.y <- as.data.frame(pd.y)
+  # Compute Prediction Design for 1D PD
+  ttt <- data.frame(
+    x = stack(pd.x)[,1],
+    y = stack(pd.y)[,1] )
+  nd <- data.frame( x = seq(
+    from = quantile(
+      ttt$x, probs = x.tail.level, na.rm=T),
+    to = quantile(
+      ttt$x, probs = 1 - x.tail.level, na.rm=T),
+    length = nd.pred.size ) )
+  # PLOT STIXEL PD Replicates or just set up plot
+  if (stixel_pds){
+    matplot(
+      jitter(as.matrix(pd.x), amount=0.00),
+      pd.y,
+      xlab = pd_name,
+      ylab = "Deviation E(Logit Occurrence)",
+      type= "l",
+      #pch = 15,
+      #cex = 2.0,
+      lwd = 5,
+      lty = 1,
+      col=alpha("black", .025))
+    #ylim = quantile(pd.y, probs=c(0.01, 0.99), na.rm=T))
+  }
+  if (!stixel_pds){
+    plot(
+      pd.x[,1],
+      pd.y[,1],
+      xlab = pd_name,
+      ylab = "Deviation E(Logit Occurrence)",
+      type = "n")
+    #ylim = quantile(pd.y, probs=c(0.01, 0.99), na.rm=T))
+  }
+  abline(0,0, col="black", lwd=2)
+  # -----------------
+  # GBM Qunatiles
+  # -----------------
+  if(pointwise_pi) {
+    ttt <- data.frame(
+      x = stack(pd.x)[,1],
+      y = stack(pd.y)[,1] )
+    d.ul <- gbm::gbm(
+      y ~ x,
+      data = ttt,
+      distribution =
+        list(name="quantile",alpha=(1-gbm.tail.prob)),
+      n.trees = gbm.n.trees,
+      interaction.depth = 4,
+      shrinkage = 0.05,
+      bag.fraction = 0.5,
+      train.fraction = 1.0,
+      cv.folds = gbm.cv.folds,
+      verbose=F,
+      n.cores = 1)
+    #best.iter <- gbm.perf(d.ul, method="cv", plot.it=F)
+    #print(best.iter)
+    d.ll <- gbm::gbm(
+      y ~ x,
+      data = ttt,
+      distribution =
+        list(name="quantile",alpha=gbm.tail.prob),
+      n.trees = gbm.n.trees,
+      interaction.depth = 4,
+      shrinkage = 0.05,
+      bag.fraction = 0.5,
+      train.fraction = 1.0,
+      cv.folds = gbm.cv.folds,
+      verbose=F,
+      n.cores = 1)
+    #best.iter <- gbm.perf(d.ll, method="cv", plot.it=F)
+    #cat("LL:", jjj, best.iter,"\n")
+    # ------------
+    #best.iter <- 200
+    t.ul <- predict(d.ul,
+                    newdata= nd,
+                    n.trees=best.iter)
+    t.ll <- predict(d.ll,
+                    newdata= nd,
+                    n.trees=best.iter)
+    # ------------
+    poly.x <- c(nd[,1], rev(nd[,1]))
+    poly.y <- c(t.ll, rev(t.ul))
+    polygon( poly.x, poly.y, col=alpha("red", .25), border=F)
+  } # END if (pointwise.ci){
+
+  # -----------------
+  # GAM Pointwise CI for conditional mean estimate
+  # via bootstrapping
+  # -----------------
+  if (pointwise_pi){
+    # nnn.bs <- 25
+    # nd.pred.size <- 50
+    bs.gam.pred <- matrix(NA, nd.pred.size, nnn.bs)
+    for (iii.bs in 1:nnn.bs) {
+      # Take Random Sample of evaluation points
+      # to account for randomness in X
+      # and reduces computational time.
+      # E.g. We could do this taking random
+      # sample of replicates and evalution points,
+      # (randomly drawing from rows and columns)
+      # and set the GAM sample size at 500,
+      # or the equivalent sample size when averaging
+      # 10 replicate PD's each evaluated at 50 x-values.
+      #
+      # This suggests a nice interpretation;
+      # these CI's represent the sampling variation
+      # of an ensemble estimate based on a given number
+      # of STIXEL PD replicates.
+      #
+      # equivalent.ensemble.ss <- 10
+      #
+      # Note that the SAME set of rows is used for every
+      # column! This should be changed!
+      # ------
+      # Sample of STIXEL replicates
+      # bs.index <- sample.int(
+      # 	n = nrow(var_pd),
+      # 	size = round(nrow(var_pd)*0.5),
+      # 	replace = T)
+      # replicate.ss <- ceiling(
+      # 	equivalent.ensemble.ss*PD_MAX_RESOLUTION/length(bs.index))
+      # row.index <- sample.int(
+      # 	n = PD_MAX_RESOLUTION,
+      # 	size = replicate.ss,
+      # 	# This sets a constant fraction of available
+      # 	#round(PD_MAX_RESOLUTION*0.25),
+      # 	replace = F)
+      random.index <-  matrix(
+        (rbinom(
+          n = nrow(pd.x)*ncol(pd.x),
+          size = 1,
+          prob = equivalent.ensemble.ss*PD_MAX_RESOLUTION/
+            nrow(pd.x)/ncol(pd.x)) == 1),
+        nrow(pd.x),
+        ncol(pd.x))
+      # dim(random.index)
+      # head(random.index)
+      # sum(random.index)
+      ttt <- data.frame(
+        x = pd.x[random.index],
+        y = pd.y[random.index] )
+      #x = stack(pd.x[row.index, bs.index])[,1],
+      #y = stack(pd.y[row.index, bs.index])[,1] )
+
+      print("inside here")
+      print(str(ttt))
+
+      d.gam <- gam(
+        y ~ s(x, k = k.cont.res, bs="ds", m=1),
+        data = ttt,
+        gamma = 1.5 )
+      # summary(d.gam)
+      bs.gam.pred[, iii.bs] <- predict(d.gam, newdata = nd, se=F)
+      #lines(nd[,1],bs.gam.pred[, iii.bs], col=alpha("green", 0.5), lwd=2 )
+    }
+    t.ul <- apply(bs.gam.pred, 1, quantile, probs= 1-ci.alpha, na.rm=T)
+    t.ll <- apply(bs.gam.pred, 1, quantile, probs= ci.alpha, na.rm=T)
+    t.median <- apply(bs.gam.pred, 1, quantile, probs= 0.5, na.rm=T)
+    # ------------
+    poly.x <- c(nd[,1], rev(nd[,1]))
+    poly.y <- c(t.ll, rev(t.ul))
+    polygon( poly.x, poly.y, col=alpha("blue", .25), border=F)
+    lines(nd[,1], t.median,
+          col=alpha("darkorange", 1.0), lwd=2 )
+  }
+  # GAM CONDITIONAL MEAN - ALL DATA
+  if (mean.all.data){
+    ttt <- data.frame(
+      x = stack(pd.x)[,1],
+      y = stack(pd.y)[,1] )
+    d.gam <- mgcv::gam(
+      y ~ s(x, k = k.cont.res, bs="ds", m=1),
+      data = ttt,
+      gamma = 1.5 )
+    # summary(d.gam)
+    p.gam <- mgcv::predict(d.gam,
+                     newdata = nd,
+                     se=T)
+    polygon(
+      x = c(nd[,1], rev(nd[,1])),
+      y = c( p.gam$fit + 2*p.gam$se.fit,
+             rev(p.gam$fit - 2*p.gam$se.fit) ),
+      col = alpha("lightblue", 0.25),
+      border = NA)
+    lines( nd[,1], p.gam$fit, col = alpha("yellow", 0.75), lwd=3)
+  }
+  return( list(
+    t.median = t.median,
+    t.ul = t.ul,
+    t.ll = t.ll))
 }
