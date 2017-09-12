@@ -258,6 +258,7 @@ load_pis <- function(path) {
   # return
   # TODO, what else should we select to return?
   pi_summary[,c("V1.x", "V2.x", "V1.y", "V2.y") := NULL]
+  pi_summary <- pi_summary[,1:98]
 
   return(as.data.frame(pi_summary))
 }
@@ -286,6 +287,7 @@ load_pds <- function(path) {
   # return
   # TODO, what else should we select to return?
   pd_summary[,c("V1.x", "V2.x", "V1.y", "V2.y") := NULL]
+  pd_summary <- pd_summary[,1:114]
 
   return(as.data.frame(pd_summary))
 }
