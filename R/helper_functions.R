@@ -467,6 +467,7 @@ calc_effective_extent <- function(st_extent,
 
   # select the centroid locs
   ll <- "+init=epsg:4326"
+  mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
 
   if(!is.na(pis)) {
     stixels <- pis
@@ -535,9 +536,9 @@ calc_effective_extent <- function(st_extent,
 
   # plot
   wh <- rnaturalearth::ne_countries(continent = c("North America",
-                                                  "South America"))
-  wh_states <- rnaturalearth::ne_states(iso_a2 = unique(wh@data$iso_a2),
-                                        scale = 50)
+                                                  "South America"),
+                                    scale = 50)
+  wh_states <- rnaturalearth::ne_states(iso_a2 = unique(wh@data$iso_a2))
   wh_moll <- sp::spTransform(wh, mollweide)
   wh_states_moll <- sp::spTransform(wh_states, mollweide)
 
