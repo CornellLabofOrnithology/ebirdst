@@ -523,9 +523,7 @@ calc_effective_extent <- function(pis,
   tpis_per_prj <- raster::projectRaster(raster::mask(tpis_per, template_raster),
                                         crs=mollweide)
 
-  tpis_ext <- raster::extent(raster::trim(raster::projectRaster(tpis_r,
-                                                                crs=mollweide),
-                                          values=NA))
+  tdspolydf_moll <- sp::spTransform(tdspolydf_prj, mollweide)
 
   # project the selected points to mollweide
   tpis_sub_moll <- sp::spTransform(tpis_sub, mollweide)
@@ -536,7 +534,7 @@ calc_effective_extent <- function(pis,
                xaxt='n',
                yaxt='n',
                bty='n',
-               ext=tpis_ext,
+               ext=raster::extent(tdspolydf_moll),
                col=viridis::viridis(100),
                maxpixels=raster::ncell(tpis_per_prj),
                legend=TRUE)
