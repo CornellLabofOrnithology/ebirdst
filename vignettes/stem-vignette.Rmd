@@ -270,16 +270,11 @@ week26s <- raster::stack(week26_pes, week26_zes, week26_moll)
 week26c <- raster::calc(week26s, max, na.rm=TRUE)
 
 # to add context, let's pull in some reference data to add
-# need to select countries from naturalearthdata before 
-# projecting to mollweide
-library(rnaturalearthdata)
-
-countries110_prj <- sp::spTransform(countries110,
-                                    sp::CRS(sp::proj4string(template_raster)))
-e <- as(sp_ext, "SpatialPolygons")
-sp::proj4string(e) <- sp::CRS(sp::proj4string(template_raster))
-wh <- countries110_prj[!is.na(sp::over(countries110_prj, e)),]
+wh <- rnaturalearth::ne_countries(continent = c("North America",
+                                                "South America"))
+wh_states <- rnaturalearth::ne_states(iso_a2 = unique(wh@data$iso_a2))
 wh_moll <- sp::spTransform(wh, mollweide)
+wh_states_moll <- sp::spTransform(wh_states, mollweide)
 
 par(mar=c(0,0,0,2))
 raster::plot(week26c, 
@@ -293,6 +288,7 @@ raster::plot(week26c,
              maxpixels=raster::ncell(week26c),
              legend=TRUE)
 sp::plot(wh_moll, add=TRUE, border='gray')
+sp::plot(wh_moll_states, add=TRUE, border='gray', lwd=0.5)
 ```
 
 ## Mapping Abundance Confidence Intervals
@@ -364,11 +360,10 @@ coords <- cbind(-76.5, 42.5)
 pt <- sp::SpatialPoints(coords, proj4string = sp::CRS("+init=epsg:4326"))
 pt_prj <- sp::spTransform(pt, sp::CRS(sp::proj4string(template_raster)))
 
-# set an e
-library(rnaturalearthdata)
-
-states50prj <- sp::spTransform(states50, sp::CRS(sp::proj4string(template_raster)))
-wv <- states50prj[states50prj@data$name == "West Virginia",]
+# set an extent based on polygon
+us <- rnaturalearth::ne_states(geounit = "United States of America")
+us_prj <- sp::spTransform(us, sp::CRS(sp::proj4string(template_raster)))
+wv <- us_prj[us_prj@data$name == "West Virginia",]
 
 # extract
 # because we're using regions, we get lots of values that we need to average together

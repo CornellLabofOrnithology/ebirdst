@@ -15,5 +15,5 @@ RoxygenNote: 6.0.1
 Imports: raster,
     tools,
     data.table,
-    rnaturalearthdata,
-    sp
+    sp,
+    rnaturalearth

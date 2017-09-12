@@ -382,21 +382,13 @@ plot_centroids <- function(pis,
     }
     rm(tpis_sp)
 
-    if(plot_pds == TRUE) {
-      # use extent from all PDs
-      e <- as(tpds_ext, "SpatialPolygons")
-    } else {
-      # use extent from all PIs
-      e <- as(tpis_ext, "SpatialPolygons")
-    }
-
-    sp::proj4string(e) <- sp::CRS(sp::proj4string(rnaturalearthdata::countries50))
-    c50 <- rnaturalearthdata::countries50
-    s50 <- rnaturalearthdata::states50
-    wh <- c50[!is.na(sp::over(c50, e)),]
-    wh_states <- s50[!is.na(sp::over(s50, e)),]
-    wh_moll <- sp::spTransform(wh, sp::CRS(mollweide))
-    wh_states_moll <- sp::spTransform(wh_states, sp::CRS(mollweide))
+    # plot
+    wh <- rnaturalearth::ne_countries(continent = c("North America",
+                                                    "South America"),
+                                      scale = 50)
+    wh_states <- rnaturalearth::ne_states(iso_a2 = unique(wh@data$iso_a2))
+    wh_moll <- sp::spTransform(wh, mollweide)
+    wh_states_moll <- sp::spTransform(wh_states, mollweide)
 
     if(plot_pds == TRUE) {
       # start plot with all possible PDs
@@ -542,15 +534,10 @@ calc_effective_extent <- function(st_extent,
   tpis_per[tpis_per < 0.50] <- NA
 
   # plot
-  countries50_prj <- sp::spTransform(rnaturalearthdata::countries50,
-                                      sp::CRS(sp::proj4string(template_raster)))
-  states50_prj <- sp::spTransform(rnaturalearthdata::states50,
-                                 sp::CRS(sp::proj4string(template_raster)))
-  e <- as(sp_ext, "SpatialPolygons")
-  sp::proj4string(e) <- sp::CRS(sp::proj4string(template_raster))
-  wh <- countries50_prj[!is.na(sp::over(countries50_prj, e)),]
-  wh_states <- states50_prj[!is.na(sp::over(states50_prj, e)),]
-  mollweide <- sp::CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
+  wh <- rnaturalearth::ne_countries(continent = c("North America",
+                                                  "South America"))
+  wh_states <- rnaturalearth::ne_states(iso_a2 = unique(wh@data$iso_a2),
+                                        scale = 50)
   wh_moll <- sp::spTransform(wh, mollweide)
   wh_states_moll <- sp::spTransform(wh_states, mollweide)
 
