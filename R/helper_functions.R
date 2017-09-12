@@ -437,3 +437,112 @@ plot_centroids <- function(pis,
 
   title(main = title_text, cex.main = 0.75, line=-1)
 }
+
+#' Plot extent of estimation calculated from subset of centroids
+#'
+#' @export
+#' @import sp
+calc_effective_extent <- function(pis,
+                                  st_extent) {
+  # select the centroid locs
+  ll <- "+init=epsg:4326"
+  eck4 <- "+proj=eck4"
+
+  tpis <- unique(pis[, c("centroid.lon", "centroid.lat", "centroid.date",
+                         "stixel_width", "stixel_height")])
+  tpis_sp <- sp::SpatialPointsDataFrame(tpis[,c("centroid.lon",
+                                                "centroid.lat")],
+                                        tpis,
+                                        proj4string = sp::CRS(ll))
+
+  tpis_sp_prj <- sp::spTransform(tpis_sp,
+                                 sp::CRS(sp::proj4string(template_raster)))
+
+  sp_ext <- raster::extent(tpis_sp_prj)
+  rm(tpis, tpis_sp_prj)
+
+  tpis_sub <- tpis_sp[tpis_sp$centroid.date > st_extent$t.min &
+                        tpis_sp$centroid.date <= st_extent$t.max &
+                        tpis_sp$centroid.lat > st_extent$y.min &
+                        tpis_sp$centroid.lat <= st_extent$y.max &
+                        tpis_sp$centroid.lon > st_extent$x.min &
+                        tpis_sp$centroid.lon <= st_extent$x.max, ]
+
+  # build stixels as polygons
+
+  # create corners
+  xPlus <- tpis_sub$centroid.lon + (tpis_sub$stixel_width/2)
+  yPlus <- tpis_sub$centroid.lat + (tpis_sub$stixel_height/2)
+  xMinus <- tpis_sub$centroid.lon - (tpis_sub$stixel_width/2)
+  yMinus <- tpis_sub$centroid.lat - (tpis_sub$stixel_height/2)
+
+  ID <- row.names(tpis_sub)
+
+  square <- cbind(xMinus, yPlus, xPlus, yPlus, xPlus,
+                  yMinus, xMinus, yMinus, xMinus, yPlus)
+
+  polys <- sp::SpatialPolygons(mapply(function(poly, id) {
+    xy <- matrix(poly, ncol=2, byrow=TRUE)
+    sp::Polygons(list(sp::Polygon(xy)), ID=id)
+  },
+  split(square, row(square)),
+  ID),
+  proj4string=sp::CRS("+init=epsg:4326"))
+
+  tdspolydf <- sp::SpatialPolygonsDataFrame(polys, tpis_sub@data)
+
+  # assign value
+  tdspolydf$weight <- 1
+
+  # project to template raster
+  tdspolydf_prj <- sp::spTransform(tdspolydf,
+                                   sp::CRS(sp::proj4string(template_raster)))
+
+  # summarize...not sure how to do this step
+  tpis_r <- raster::rasterize(tdspolydf_prj,
+                              template_raster,
+                              field="weight",
+                              fun=sum)
+
+  tpis_per <- tpis_r/nrow(tpis_sub)
+  tpis_per[tpis_per < 0.50] <- NA
+
+  # plot
+  countries50_prj <- sp::spTransform(rnaturalearthdata::countries50,
+                                      sp::CRS(sp::proj4string(template_raster)))
+  states50_prj <- sp::spTransform(rnaturalearthdata::states50,
+                                 sp::CRS(sp::proj4string(template_raster)))
+  e <- as(sp_ext, "SpatialPolygons")
+  sp::proj4string(e) <- sp::CRS(sp::proj4string(template_raster))
+  wh <- countries50_prj[!is.na(sp::over(countries50_prj, e)),]
+  wh_states <- states50_prj[!is.na(sp::over(states50_prj, e)),]
+  mollweide <- sp::CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
+  wh_moll <- sp::spTransform(wh, mollweide)
+  wh_states_moll <- sp::spTransform(wh_states, mollweide)
+
+  tpis_per_prj <- raster::projectRaster(raster::mask(tpis_per, template_raster),
+                                        crs=mollweide)
+
+  tpis_ext <- raster::extent(raster::trim(raster::projectRaster(tpis_r,
+                                                                crs=mollweide),
+                                          values=NA))
+
+  # project the selected points to mollweide
+  tpis_sub_moll <- sp::spTransform(tpis_sub, mollweide)
+
+
+  par(mar=c(0,0,0,2))
+  raster::plot(tpis_per_prj,
+               xaxt='n',
+               yaxt='n',
+               bty='n',
+               ext=tpis_ext,
+               col=viridis::viridis(100),
+               maxpixels=raster::ncell(tpis_per_prj),
+               legend=TRUE)
+  sp::plot(wh_moll, add=TRUE, border='gray')
+  sp::plot(wh_states_moll, add=TRUE, border='gray')
+  sp::plot(tpis_sub_moll, add=TRUE, pch=19)
+
+  return(tpis_per)
+}
