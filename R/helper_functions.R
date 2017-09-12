@@ -444,13 +444,29 @@ plot_centroids <- function(pis,
 #'
 #' @export
 #' @import sp
-calc_effective_extent <- function(pis,
-                                  st_extent) {
+calc_effective_extent <- function(st_extent,
+                                  pis = NA,
+                                  pds = NA) {
+
+  if(is.na(pis) & is.na(pds)) {
+    stop("Both PIs and PDs are NA. Nothing to calculate.")
+  }
+
+  if(!is.na(pis) & !is.na(pds)) {
+    stop("Unable to calculate for both PIs and PDs, supply one or the other.")
+  }
+
+
   # select the centroid locs
   ll <- "+init=epsg:4326"
-  eck4 <- "+proj=eck4"
 
-  tpis <- unique(pis[, c("centroid.lon", "centroid.lat", "centroid.date",
+  if(!is.na(pis)) {
+    stixels <- pis
+  } else {
+    stixels <- pds
+  }
+
+  tpis <- unique(stixels[, c("centroid.lon", "centroid.lat", "centroid.date",
                          "stixel_width", "stixel_height")])
   tpis_sp <- sp::SpatialPointsDataFrame(tpis[,c("centroid.lon",
                                                 "centroid.lat")],

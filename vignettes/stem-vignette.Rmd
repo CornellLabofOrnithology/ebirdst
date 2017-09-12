@@ -435,7 +435,11 @@ plot_centroids(pis=pis, pds=pds, st_extent=ne_extent)
 
 ## Plot available centroids and extent of analysis
 
-```{r }
+```{r plot_extents, cache=TRUE}
+
+pi_extent <- calc_effective_extent(ne_extent, pis = pis)
+
+pd_extent <- calc_effective_extent(ne_extent, pds = pds)
 
 ```
 

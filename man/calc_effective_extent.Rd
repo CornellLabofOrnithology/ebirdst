@@ -4,7 +4,7 @@
 \alias{calc_effective_extent}
 \title{Plot extent of estimation calculated from subset of centroids}
 \usage{
-calc_effective_extent(pis, st_extent)
+calc_effective_extent(st_extent, pis = NA, pds = NA)
 }
 \description{
 Plot extent of estimation calculated from subset of centroids
