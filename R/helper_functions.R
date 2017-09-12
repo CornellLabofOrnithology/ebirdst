@@ -307,7 +307,7 @@ plot_centroids <- function(pis,
   }
 
   ll <- "+init=epsg:4326"
-  eck4 <- "+proj=eck4"
+  mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
 
   par(mar=c(0,0,3,0))
   title_text <- ""
@@ -318,7 +318,8 @@ plot_centroids <- function(pis,
                                                   "centroid.lat")],
                                           tpds,
                                           proj4string = sp::CRS(ll))
-    tpds_prj <- sp::spTransform(tpds_sp, sp::CRS(eck4))
+    tpds_ext <- raster::extent(tpds_sp)
+    tpds_prj <- sp::spTransform(tpds_sp, sp::CRS(mollweide))
     rm(tpds)
 
     # this is the wrong way to check
@@ -330,7 +331,7 @@ plot_centroids <- function(pis,
                           tpds_sp$centroid.lon > st_extent$x.min &
                           tpds_sp$centroid.lon <= st_extent$x.max, ]
 
-      tpds_region <- sp::spTransform(tpds_sub, sp::CRS(eck4))
+      tpds_region <- sp::spTransform(tpds_sub, sp::CRS(mollweide))
     }
 
     rm(tpds_sp)
@@ -364,7 +365,8 @@ plot_centroids <- function(pis,
                                                   "centroid.lat")],
                                           tpis,
                                           proj4string = sp::CRS(ll))
-    tpis_prj <- sp::spTransform(tpis_sp, sp::CRS(eck4))
+    tpis_ext <- raster::extent(tpis_sp)
+    tpis_prj <- sp::spTransform(tpis_sp, mollweide)
     rm(tpis)
 
     # this is the wrong way to check
@@ -376,14 +378,25 @@ plot_centroids <- function(pis,
                           tpis_sp$centroid.lon > st_extent$x.min &
                           tpis_sp$centroid.lon <= st_extent$x.max, ]
 
-      tpis_region <- sp::spTransform(tpis_sub, sp::CRS(eck4))
+      tpis_region <- sp::spTransform(tpis_sub, sp::CRS(mollweide))
     }
     rm(tpis_sp)
 
-    count110_prj <- sp::spTransform(rnaturalearthdata::countries110,
-                                    sp::CRS(eck4))
-    states50_prj <- sp::spTransform(rnaturalearthdata::states50,
-                                    sp::CRS(eck4))
+    if(plot_pds == TRUE) {
+      # use extent from all PDs
+      e <- as(tpds_ext, "SpatialPolygons")
+    } else {
+      # use extent from all PIs
+      e <- as(tpis_ext, "SpatialPolygons")
+    }
+
+    sp::proj4string(e) <- sp::CRS(sp::proj4string(rnaturalearthdata::countries50))
+    c50 <- rnaturalearthdata::countries50
+    s50 <- rnaturalearthdata::states50
+    wh <- c50[!is.na(sp::over(c50, e)),]
+    wh_states <- s50[!is.na(sp::over(s50, e)),]
+    wh_moll <- sp::spTransform(wh, sp::CRS(mollweide))
+    wh_states_moll <- sp::spTransform(wh_states, sp::CRS(mollweide))
 
     if(plot_pds == TRUE) {
       # start plot with all possible PDs
@@ -404,8 +417,8 @@ plot_centroids <- function(pis,
                      add = TRUE)
       }
 
-      raster::plot(count110_prj, ext = raster::extent(tpds_prj), add = TRUE)
-      raster::plot(states50_prj,
+      raster::plot(wh_moll, ext = raster::extent(tpds_prj), add = TRUE)
+      raster::plot(wh_states_moll,
                    ext = raster::extent(tpds_prj),
                    lwd = 0.5,
                    add = TRUE)
@@ -427,8 +440,11 @@ plot_centroids <- function(pis,
                      pch = 2,
                      add = TRUE)
       }
-      raster::plot(count110_prj, ext = raster::extent(tpis_sp_prj), add = TRUE)
-      raster::plot(states50_prj, ext = raster::extent(tpis_sp_prj), add = TRUE)
+      raster::plot(wh_moll, ext = raster::extent(tpis_sp_prj), add = TRUE)
+      raster::plot(wh_states_moll,
+                   ext = raster::extent(tpis_sp_prj),
+                   lwd = 0.5,
+                   add = TRUE)
     }
 
     title_text <- paste(title_text,
