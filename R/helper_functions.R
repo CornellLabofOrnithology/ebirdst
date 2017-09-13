@@ -918,3 +918,97 @@ plot_pds <- function(pd_name,
     t.ul = t.ul,
     t.ll = t.ll))
 }
+
+# ' Make a cake plot of the pis and pds
+# '
+# ' @export
+cake_plot <- function(path,
+                      pis,
+                      pds,
+                      st_extent) {
+
+  # load config vars
+  e <- new.env()
+  config_file <- list.files(path, pattern="*_config*")
+  load(paste(path, "/", config_file, sep = ""), envir = e)
+
+  # subset centroids
+  tpis <- pis[pis$centroid.date > st_extent$t.min &
+              pis$centroid.date <= st_extent$t.max &
+              pis$centroid.lat > st_extent$y.min &
+              pis$centroid.lat <= st_extent$y.max &
+              pis$centroid.lon > st_extent$x.min &
+              pis$centroid.lon <= st_extent$x.max, ]
+
+  tpds <- pds[pds$centroid.date > st_extent$t.min &
+              pds$centroid.date <= st_extent$t.max &
+              pds$centroid.lat > st_extent$y.min &
+              pds$centroid.lat <= st_extent$y.max &
+              pds$centroid.lon > st_extent$x.min &
+              pds$centroid.lon <= st_extent$x.max, ]
+
+  # subset to cover classes
+  land.cover.class.codes <- c(1:10,12,13,16)
+  lc.tag <- "UMD_FS_C"
+  land_covers <- paste(lc.tag, land.cover.class.codes, sep = "")
+
+  water.cover.class.codes <- c(0,2,3,5,6,7)
+  wc.tag <- "MODISWATER_FS_C"
+  water_covers <- paste(wc.tag, water.cover.class.codes, sep = "")
+
+  cover_classes <- c(land_covers, water_covers)
+
+  cover_cols <- e$PREDICTOR_LIST[grep(paste(cover_classes,
+                                            collapse="|"),
+                                      e$PREDICTOR_LIST)]
+
+  # need to extract directionality
+  # area weighted loess?
+  # minimum number of points?
+  PD_MAX_RESOLUTION <- 50
+
+  # Select PD Variable
+  pd_name <- "UMD_FS_C1_1500_PLAND"
+  var_pd <- tpds[tpds$V4 == pd_name,]
+  # Clean
+  var_pd <- var_pd[!is.na(var_pd$V5), ]
+  # Each Column is one replicate estimate of PD
+  # 	x = x coordinate values
+  # 	y = y coordinate values
+  pd.x <- matrix(NA, PD_MAX_RESOLUTION, nrow(var_pd))
+  pd.y <- matrix(NA, PD_MAX_RESOLUTION, nrow(var_pd))
+  pd.mean <- rep(NA, nrow(var_pd))
+  for (rid in 1:nrow(var_pd)) {
+    #rid <- 100
+    pd.x[,rid] <- as.numeric(
+      var_pd[rid, (PD_MAX_RESOLUTION+4):(2*PD_MAX_RESOLUTION+3)] )
+    ttt <- as.numeric(var_pd[rid, 3:(PD_MAX_RESOLUTION+2)])
+    pd.mean[rid] <- mean(ttt, na.rm=T)
+    pd.y[,rid] <- ttt - pd.mean[rid]
+  }
+  pd.x <- as.data.frame(pd.x)
+  pd.y <- as.data.frame(pd.y)
+  # Compute Prediction Design for 1D PD
+  ttt <- data.frame(
+    x = stack(pd.x)[,1],
+    y = stack(pd.y)[,1] )
+
+  sm <- lm(ttt$y ~ ttt$x)
+
+  sl <- sm$coefficients[[2]]
+
+  # calculate mean PI
+  pi_means <- colMeans(tpis[, cover_cols], na.rm = TRUE)
+
+  # scale PIs
+  pi_mean_sum <- sum(pi_means, na.rm = TRUE)
+  pi_adj <- pi_means/pi_mean_sum
+
+  # mutiply PI x PD
+
+
+  # sum by cover class (or not?)
+
+  # end with a ggplot
+
+}
