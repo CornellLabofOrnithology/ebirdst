@@ -656,7 +656,6 @@ plot_pis <- function(pis,
 #' Plot PDs
 #'
 #' @export
-#' @import mgcv ggplot2
 plot_pds <- function(pd_name,
                      pds,
                      st_extent,
@@ -876,11 +875,9 @@ plot_pds <- function(pd_name,
       #x = stack(pd.x[row.index, bs.index])[,1],
       #y = stack(pd.y[row.index, bs.index])[,1] )
 
-      print("inside here")
-      print(str(ttt))
-
+      s = mgcv::s
       d.gam <- mgcv::gam(
-        y ~ mgcv::s(x, k = k.cont.res, bs="ds", m=1),
+        y ~ s(x, k = k.cont.res, bs="ds", m=1),
         data = ttt,
         gamma = 1.5 )
       # summary(d.gam)
@@ -903,7 +900,7 @@ plot_pds <- function(pd_name,
       x = stack(pd.x)[,1],
       y = stack(pd.y)[,1] )
     d.gam <- mgcv::gam(
-      y ~ mgcv::s(x, k = k.cont.res, bs="ds", m=1),
+      y ~ s(x, k = k.cont.res, bs="ds", m=1),
       data = ttt,
       gamma = 1.5 )
     # summary(d.gam)
