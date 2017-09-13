@@ -662,14 +662,13 @@ plot_pds <- function(pd_name,
                      pointwise_pi = FALSE,
                      stixel_pds = TRUE,
                      k.cont.res = 25,
+                     gbm.n.trees = 500,
                      nnn.bs = 100,
                      equivalent.ensemble.ss = 10,
                      ci.alpha = 0.05,
                      mean.all.data = FALSE) {
-  PD_MAX_RESOLUTION <- 50
 
-  print('inside plot_pds')
-  print(k.cont.res)
+  PD_MAX_RESOLUTION <- 50
 
   # ----------------------
   # PD_NAME <- "EFFORT_HRS"
@@ -694,7 +693,6 @@ plot_pds <- function(pd_name,
   # take the simpler approach of fixing the n.trees == 200
   # This seems to work well.
   gbm.cv.folds <- 0  # >= 5 computational vs statistical efficiecy
-  gbm.n.trees <- 500
   best.iter <- gbm.n.trees
   # Number of bootstrap replicasted for Conditional Mean
   #nnn.bs <- 25
