@@ -933,19 +933,17 @@ cake_plot <- function(path,
   load(paste(path, "/", config_file, sep = ""), envir = e)
 
   # subset centroids
-  tpis <- pis[pis$centroid.date > st_extent$t.min &
-              pis$centroid.date <= st_extent$t.max &
-              pis$centroid.lat > st_extent$y.min &
+  tpis <- pis[pis$centroid.lat > st_extent$y.min &
               pis$centroid.lat <= st_extent$y.max &
               pis$centroid.lon > st_extent$x.min &
-              pis$centroid.lon <= st_extent$x.max, ]
+              pis$centroid.lon <= st_extent$x.max &
+              !is.na(pis[,2]), ]
 
-  tpds <- pds[pds$centroid.date > st_extent$t.min &
-              pds$centroid.date <= st_extent$t.max &
-              pds$centroid.lat > st_extent$y.min &
+  tpds <- pds[pds$centroid.lat > st_extent$y.min &
               pds$centroid.lat <= st_extent$y.max &
               pds$centroid.lon > st_extent$x.min &
-              pds$centroid.lon <= st_extent$x.max, ]
+              pds$centroid.lon <= st_extent$x.max &
+              !is.na(pds$V5), ]
 
   # subset to cover classes
   land.cover.class.codes <- c(1:10,12,13,16)
@@ -967,48 +965,150 @@ cake_plot <- function(path,
   # minimum number of points?
   PD_MAX_RESOLUTION <- 50
 
-  # Select PD Variable
-  pd_name <- "UMD_FS_C1_1500_PLAND"
-  var_pd <- tpds[tpds$V4 == pd_name,]
-  # Clean
-  var_pd <- var_pd[!is.na(var_pd$V5), ]
-  # Each Column is one replicate estimate of PD
-  # 	x = x coordinate values
-  # 	y = y coordinate values
-  pd.x <- matrix(NA, PD_MAX_RESOLUTION, nrow(var_pd))
-  pd.y <- matrix(NA, PD_MAX_RESOLUTION, nrow(var_pd))
-  pd.mean <- rep(NA, nrow(var_pd))
-  for (rid in 1:nrow(var_pd)) {
-    #rid <- 100
-    pd.x[,rid] <- as.numeric(
-      var_pd[rid, (PD_MAX_RESOLUTION+4):(2*PD_MAX_RESOLUTION+3)] )
-    ttt <- as.numeric(var_pd[rid, 3:(PD_MAX_RESOLUTION+2)])
-    pd.mean[rid] <- mean(ttt, na.rm=T)
-    pd.y[,rid] <- ttt - pd.mean[rid]
+  ## Calculate slopes for each
+  #### PD
+  calc_slope <- function(y) {
+    x <- as.data.frame(tpds[y, ])
+
+    x_vals <- as.numeric(x[(PD_MAX_RESOLUTION+4):(2*PD_MAX_RESOLUTION+3)])
+    y_vals <- as.numeric(x[3:(PD_MAX_RESOLUTION+2)]) -
+      mean(as.numeric(x[3:(PD_MAX_RESOLUTION+2)]), na.rm = T)
+
+    sm <- lm(x_vals ~ y_vals)
+
+    sl <- sm$coefficients[[2]]
+
+    if(!is.na(sl)) {
+      if(sl > 0) {
+        return(1)
+      } else {
+        return(0)
+      }
+    } else {
+      return(NA)
+    }
   }
-  pd.x <- as.data.frame(pd.x)
-  pd.y <- as.data.frame(pd.y)
-  # Compute Prediction Design for 1D PD
-  ttt <- data.frame(
-    x = stack(pd.x)[,1],
-    y = stack(pd.y)[,1] )
 
-  sm <- lm(ttt$y ~ ttt$x)
+  pd_slope <- lapply(X = 1:nrow(tpds), FUN=calc_slope)
+  tpds$slope <- unlist(pd_slope)
+  rm(pd_slope)
 
-  sl <- sm$coefficients[[2]]
+  pd_w_slope <- tpds[tpds$V4 %in% cover_cols, c("stixel.id",
+                                                "centroid.date",
+                                                "V4",
+                                                "slope")]
+  pd_mean_slope <- aggregate(pd_w_slope,
+                             by = list(pd_w_slope$V4, pd_w_slope$centroid.date),
+                             FUN = mean,
+                             na.rm = TRUE)
+
+  pd_slopes <- pd_mean_slope[,c("Group.1", "centroid.date", "slope")]
+  names(pd_slopes) <- c("predictor", "date", "slope")
+
+  # need to loess fit and predict for each variable for uniform date set
+  SRD_DATE_VEC <- seq(from = 0, to= 1, length= 52 +1)
+  SRD_DATE_VEC <- (SRD_DATE_VEC[1:52] + SRD_DATE_VEC[2:(52+1)])/2
+  SRD_DATE_VEC <- round(SRD_DATE_VEC,digits=2)
+
+  nd <- data.frame(date=SRD_DATE_VEC)
+
+  fit_and_predict_pd <- function(x) {
+    D <- pd_slopes[pd_slopes$predictor == x, ]
+    D$predictor <- NULL
+
+    d.loess <- loess(formula = "slope ~ date",
+                     defree = 1,
+                     data = D)
+
+    loess_preds <- predict(d.loess, nd)
+
+    results <- data.frame(predictor = x,
+                          date = nd,
+                          smooth_slopes = loess_preds)
+
+    return(results)
+  }
+
+  loesses <- lapply(X=unique(pd_slopes$predictor), FUN=fit_and_predict_pd)
+
+  smooth_pds <- dplyr::bind_rows(loesses)
+
+  smooth_pds$direction <- NA
+  smooth_pds$direction[smooth_pds$smooth_slopes >= 0.7] <- 1
+  smooth_pds$direction[smooth_pds$smooth_slopes <= 0.3] <- -1
+  smooth_pds$smooth_slopes <- NULL
+
+  # aggregate by stixel.id and $V4 calculating mean with na.rm
 
   # calculate mean PI
-  pi_means <- colMeans(tpis[, cover_cols], na.rm = TRUE)
+  pi_means <- as.data.frame(colMeans(tpis[, cover_cols], na.rm = TRUE))
+
+  fit_and_predict_pi <- function(x) {
+    D <- tpis[,c(x, "centroid.date")]
+    names(D) <- c("predictor", "date")
+    D$predictor <- log(D$predictor + 0.001)
+
+    d.loess <- loess(formula = "predictor ~ date",
+                     defree = 1,
+                     data = D)
+
+    loess_preds <- predict(d.loess, nd)
+
+    results <- data.frame(predictor = x,
+                          date = nd,
+                          smooth_pis = exp(loess_preds),
+                          stringsAsFactors = FALSE)
+
+    return(results)
+  }
+
+  pi_loess <- lapply(X=cover_cols, FUN=fit_and_predict_pi)
+  smooth_pis <- dplyr::bind_rows(pi_loess)
 
   # scale PIs
-  pi_mean_sum <- sum(pi_means, na.rm = TRUE)
-  pi_adj <- pi_means/pi_mean_sum
+  pi_week_sums <- aggregate(smooth_pis$smooth_pis,
+                            by = list(smooth_pis$date),
+                            FUN = sum,
+                            na.rm = TRUE)
+
+  smooth_pis_w_sums <- merge(smooth_pis,
+                             pi_week_sums,
+                             by.x = "date",
+                             by.y="Group.1")
+
+  smooth_pis_w_sums$pi_adj <- smooth_pis_w_sums$smooth_pis/smooth_pis_w_sums$x
+  smooth_pis_w_sums$x <- NULL
+  smooth_pis_w_sums$smooth_pis <- NULL
+
 
   # mutiply PI x PD
+  pipd <- merge(smooth_pis_w_sums, smooth_pds, by=c("predictor", "date"))
+  pipd$pidir <- pipd$pi_adj * pipd$direction
+  pipd$direction <- NULL
+  pipd$pi_adj <- NULL
 
+  # calculate absolute maxes of
+  absmax <- aggregate(pipd$pidir,
+                      by = list(pipd$predictor),
+                      FUN = function(x) { abs(max(x, na.rm = TRUE))})
+
+  short_set <- absmax[!is.infinite(absmax$x) & abs(absmax$x) > 0.05,]
+
+  pipd_short <- pipd[pipd$predictor %in% short_set$Group.1, ]
 
   # sum by cover class (or not?)
 
-  # end with a ggplot
+  # ggplot
+  wave <- ggplot2::ggplot(pipd_short, ggplot2::aes(x=date,
+                                             y=pidir,
+                                             group=predictor,
+                                             fill=predictor)) +
+    ggplot2::geom_area() +
+    ggplot2::xlim(0, 1) +
+    ggplot2::ylim(-1, 1)
+    #ggplot2::theme(legend.position = "none")
+  wave
+
+  p <- plotly::plot_ly(pipd_short, x= ~date, y= ~pidir)
 
 }
