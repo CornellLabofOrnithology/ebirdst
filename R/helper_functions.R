@@ -879,8 +879,8 @@ plot_pds <- function(pd_name,
       print("inside here")
       print(str(ttt))
 
-      d.gam <- gam(
-        y ~ s(x, k = k.cont.res, bs="ds", m=1),
+      d.gam <- mgcv::gam(
+        y ~ mgcv::s(x, k = k.cont.res, bs="ds", m=1),
         data = ttt,
         gamma = 1.5 )
       # summary(d.gam)
@@ -903,11 +903,11 @@ plot_pds <- function(pd_name,
       x = stack(pd.x)[,1],
       y = stack(pd.y)[,1] )
     d.gam <- mgcv::gam(
-      y ~ s(x, k = k.cont.res, bs="ds", m=1),
+      y ~ mgcv::s(x, k = k.cont.res, bs="ds", m=1),
       data = ttt,
       gamma = 1.5 )
     # summary(d.gam)
-    p.gam <- mgcv::predict(d.gam,
+    p.gam <- predict(d.gam,
                      newdata = nd,
                      se=T)
     polygon(
