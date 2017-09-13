@@ -925,7 +925,8 @@ plot_pds <- function(pd_name,
 cake_plot <- function(path,
                       pis,
                       pds,
-                      st_extent) {
+                      st_extent,
+                      by_cover_class = FALSE) {
 
   # load config vars
   e <- new.env()
@@ -1087,16 +1088,57 @@ cake_plot <- function(path,
   pipd$direction <- NULL
   pipd$pi_adj <- NULL
 
+  if(by_cover_class == TRUE) {
+    # add column of class
+
+    pipd <- pipd[grep("*PLAND|*LPI", pipd$predictor),]
+
+
+    return_class <- function(x) {
+      y <- x["predictor"]
+
+      spls <- strsplit(y, "_")
+
+      return(paste(spls[[1]][1], spls[[1]][2], spls[[1]][3], sep="_"))
+    }
+
+
+    pipd$class <- apply(pipd, 1, return_class)
+
+    # sum pidir by class
+
+    pipd_agg <- aggregate(pipd$pidir,
+                          by = list(pipd$class, pipd$date),
+                          FUN = sum,
+                          na.rm = TRUE)
+    names(pipd_agg) <- c("predictor", "date", "pidir")
+
+    pipd <- pipd_agg
+
+  }
+
   # calculate absolute maxes of
   absmax <- aggregate(pipd$pidir,
                       by = list(pipd$predictor),
-                      FUN = function(x) { abs(max(x, na.rm = TRUE))})
+                      FUN = function(x) { max(abs(x), na.rm = TRUE)})
 
-  short_set <- absmax[!is.infinite(absmax$x) & abs(absmax$x) > 0.05,]
-
+  short_set <- absmax[!is.infinite(absmax$x) & absmax$x > 0.01,]
   pipd_short <- pipd[pipd$predictor %in% short_set$Group.1, ]
 
+  pipd_short <- pipd
+
   # sum by cover class (or not?)
+
+  # agg colors
+  agg_colors <- c("blue", "chartreuse", "cyan", "cyan3", "blue2", "blue4",
+                  "#48D8AE", "#FCF050", "#E28373", "#C289F3", "#E6E6E6",
+                  "#19AB81", "#88DA4A", "#5AB01A", "#A3B36B", "#D1BB7B",
+                  "#E1D4AC", "#DCA453", "#EACA57")
+
+  unagg_colors <- c("blue", "blue", "blue", "blue", "chartreuse", "chartreuse", "chartreuse", "chartreuse", "cyan", "cyan", "cyan", "cyan3",  "cyan3",  "cyan3",  "cyan3", "blue2", "blue2", "blue2", "blue2", "blue4", "blue4", "blue4", "blue4",
+                    "#48D8AE", "#48D8AE", "#FCF050", "#FCF050", "#FCF050", "#FCF050", "#E28373", "#E28373", "#E28373", "#E28373", "#C289F3", "#C289F3",  "#C289F3", "#C289F3", "#E6E6E6", "#E6E6E6", "#E6E6E6", "#E6E6E6",
+                    "#19AB81", "#19AB81", "#19AB81", "#19AB81", "#88DA4A", "#88DA4A", "#88DA4A", "#88DA4A", "#5AB01A", "#5AB01A", "#5AB01A", "#5AB01A", "#A3B36B", "#A3B36B", "#A3B36B", "#A3B36B", "#D1BB7B", "#D1BB7B",
+                    "#E1D4AC", "#E1D4AC", "#E1D4AC", "#E1D4AC", "#DCA453", "#DCA453", "#DCA453", "#DCA453", "#EACA57", "#EACA57", "#EACA57", "#EACA57" )
 
   # ggplot
   wave <- ggplot2::ggplot(pipd_short, ggplot2::aes(x=date,
@@ -1105,10 +1147,9 @@ cake_plot <- function(path,
                                              fill=predictor)) +
     ggplot2::geom_area() +
     ggplot2::xlim(0, 1) +
-    ggplot2::ylim(-1, 1)
-    #ggplot2::theme(legend.position = "none")
+    ggplot2::ylim(-1, 1) +
+    ggplot2::scale_fill_manual(values=unagg_colors) +
+    ggplot2::theme(legend.position = "none")
+
   wave
-
-  p <- plotly::plot_ly(pipd_short, x= ~date, y= ~pidir)
-
 }
