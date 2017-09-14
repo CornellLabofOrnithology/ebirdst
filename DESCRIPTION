@@ -19,4 +19,5 @@ Imports: raster,
     rnaturalearth,
     gbm,
     mgcv,
-    dplyr
+    dplyr,
+    rgeos

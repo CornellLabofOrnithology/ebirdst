@@ -29,4 +29,4 @@ devtools::install_github("CornellLabofOrnithology/stemhelper")
 
 ## Vignette
 
-Please see the vignette for full examples of how to use the package.
+Please see the vignette for full examples of how to use the package. Vignette can be found at the repo [website](https://cornelllabofornithology.github.io/stemhelper/).

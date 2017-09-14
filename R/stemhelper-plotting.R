@@ -354,19 +354,21 @@ plot_pds <- function(pd_name,
 
 # ' Function used by cake_plot()
 # '
-train_check <- function(x) {
-  train_index <- train_data.date$train_data.date >= (as.numeric(x["date"])-full_week) &
-    train_data.date$train_data.date <= (as.numeric(x["date"])+full_week)
+train_check <- function(y, train_data, empty_val) {
+  full_week <- 0.02
+  D <- train_data
+  date_sub <- D[D$centroid.date >= as.numeric(y["date"])-full_week &
+                D$centroid.date <= as.numeric(y["date"])+full_week, ]
 
-  if(all(train_index == FALSE)) {
-    return(empty_val)
+  if(nrow(date_sub) == 0) {
+    return(NA)
   } else {
-    min_train <- min(train_data.date$train_data.date[train_index], na.rm=TRUE)
-    max_train <- max(train_data.date$train_data.date[train_index], na.rm=TRUE)
+    min_train <- min(date_sub$centroid.date, na.rm = TRUE)
+    max_train <- max(date_sub$centroid.date, na.rm = TRUE)
 
     # end of year present problems for checking to see if there's data
     # on both sides of the prediction date, this adjusts for that
-    pred_date <- as.numeric(x["date"])
+    pred_date <- as.numeric(y["date"])
 
     if(pred_date == 0.01) {
       pred_date <- 0.02
@@ -376,23 +378,23 @@ train_check <- function(x) {
 
     if( min_train < pred_date & max_train > pred_date )  {
       # if there is data on both sides, return prediction
-      return(as.numeric(x["preds"]))
+      return(as.numeric(y["preds"]))
     } else {
-      # otherwise return log "zeros"
+      # otherwise return empty_val
       return(empty_val)
     }
-
   }
 }
 
 # ' Make a cake plot of the pis and pds
 # '
 # ' @export
+# ' @import sp
 cake_plot <- function(path,
                       pis,
                       pds,
                       st_extent,
-                      by_cover_class = FALSE) {
+                      by_cover_class = TRUE) {
 
   # load config vars
   e <- load_config(path)
@@ -429,6 +431,8 @@ cake_plot <- function(path,
   # area weighted loess?
   # minimum number of points?
   PD_MAX_RESOLUTION <- 50
+  ll <- "+init=epsg:4326"
+  mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
 
   ## Calculate slopes for each
   #### PD
@@ -460,6 +464,10 @@ cake_plot <- function(path,
 
   pd_w_slope <- tpds[tpds$V4 %in% cover_cols, c("stixel.id",
                                                 "centroid.date",
+                                                "centroid.lat",
+                                                "centroid.lon",
+                                                "stixel_width",
+                                                "stixel_height",
                                                 "V4",
                                                 "slope")]
   pd_mean_slope <- aggregate(pd_w_slope,
@@ -467,8 +475,12 @@ cake_plot <- function(path,
                              FUN = mean,
                              na.rm = TRUE)
 
-  pd_slopes <- pd_mean_slope[,c("Group.1", "centroid.date", "slope")]
-  names(pd_slopes) <- c("predictor", "date", "slope")
+  pd_slopes <- pd_mean_slope[,c("Group.1", "centroid.date", "centroid.lat",
+                                "centroid.lon", "stixel_width", "stixel_height",
+                                "slope")]
+  names(pd_slopes) <- c("predictor", "centroid.date", "centroid.lat",
+                        "centroid.lon", "stixel_width", "stixel_height",
+                        "slope")
 
   # need to loess fit and predict for each variable for uniform date set
   SRD_DATE_VEC <- seq(from = 0, to= 1, length= 52 +1)
@@ -477,68 +489,172 @@ cake_plot <- function(path,
 
   nd <- data.frame(date=SRD_DATE_VEC)
 
-  fit_and_predict_pd <- function(x) {
+  fit_and_predict_pd <- function(x, ext) {
     D <- pd_slopes[pd_slopes$predictor == x, ]
     D$predictor <- NULL
 
-    d.loess <- loess(formula = "slope ~ date",
-                     defree = 1,
-                     data = D)
+    # make stixel polygons from centroids and widths and heights
+    tdsp <- sp::SpatialPointsDataFrame(coords = D[,c("centroid.lon",
+                                                     "centroid.lat")],
+                                       data = D,
+                                       proj4string = sp::CRS(ll))
+
+    xPlus <- tdsp$centroid.lon + (tdsp$stixel_width/2)
+    yPlus <- tdsp$centroid.lat + (tdsp$stixel_height/2)
+    xMinus <- tdsp$centroid.lon - (tdsp$stixel_width/2)
+    yMinus <- tdsp$centroid.lat - (tdsp$stixel_height/2)
+
+    ID <- row.names(tdsp)
+
+    square <- cbind(xMinus, yPlus, xPlus, yPlus, xPlus,
+                    yMinus, xMinus, yMinus, xMinus, yPlus)
+
+    polys <- sp::SpatialPolygons(mapply(function(poly, id) {
+      xy <- matrix(poly, ncol=2, byrow=TRUE)
+      sp::Polygons(list(sp::Polygon(xy)), ID=id)
+    }, split(square, row(square)), ID), proj4string=sp::CRS(ll))
+
+    tdspolydf <- sp::SpatialPolygonsDataFrame(polys, tdsp@data)
+
+    # get the full input extent
+    tdsp_ext <- as(raster::extent(ext$x.min,
+                                  ext$x.max,
+                                  ext$y.min,
+                                  ext$y.max), "SpatialPolygons")
+    raster::crs(tdsp_ext) <- sp::CRS(ll)
+    tdsp_ext_moll <- sp::spTransform(tdsp_ext, sp::CRS(mollweide))
+
+    # calculate area weights based on percentage of stixel covering
+    # extent of interest
+    tdsp_moll <- sp::spTransform(tdspolydf, sp::CRS(mollweide))
+    tdsp_moll$stsqkm <- rgeos::gArea(tdsp_moll, byid = TRUE)/1000000
+
+    rint <- raster::intersect(x = tdsp_moll, y = tdsp_ext_moll)
+    rint$intsqkm <- rgeos::gArea(rint, byid = TRUE)/1000000
+    rint$refcov <- rint$intsqkm/rint$stsqkm
+
+    # drop any stixels that cover the are less than 10%
+    rint_sub <- rint[rint$refcov >= 0.10, ]
+
+    rint_d <- data.frame(slope = rint_sub@data$slope,
+                         date = rint_sub@data$centroid.date)
+
+    d.loess <- loess(formula = as.formula("slope ~ date"),
+                     degree = 1,
+                     data = rint_d,
+                     weights = rint_sub@data$refcov)
 
     loess_preds <- predict(d.loess, nd)
 
-
-    # do training data check
-
-
-
     results <- data.frame(predictor = x,
                           date = nd,
-                          smooth_slopes = loess_preds)
+                          preds = loess_preds,
+                          stringsAsFactors = TRUE)
 
-
+    # do training data check and replace for gaps, edges, and corners
+    results$preds <- apply(results,
+                           1,
+                           train_check,
+                           empty_val = NA,
+                           train_data = D)
 
     return(results)
   }
 
-  loesses <- lapply(X=unique(pd_slopes$predictor), FUN=fit_and_predict_pd)
+  loesses <- lapply(X = unique(pd_slopes$predictor),
+                    FUN = fit_and_predict_pd,
+                    ext = st_extent)
 
   smooth_pds <- dplyr::bind_rows(loesses)
 
   smooth_pds$direction <- NA
-  smooth_pds$direction[smooth_pds$smooth_slopes >= 0.7] <- 1
-  smooth_pds$direction[smooth_pds$smooth_slopes <= 0.3] <- -1
-  smooth_pds$smooth_slopes <- NULL
+  smooth_pds$direction[smooth_pds$preds >= 0.7] <- 1
+  smooth_pds$direction[smooth_pds$preds <= 0.3] <- -1
+  smooth_pds$preds <- NULL
 
   # aggregate by stixel.id and $V4 calculating mean with na.rm
 
-  # calculate mean PI
-  pi_means <- as.data.frame(colMeans(tpis[, cover_cols], na.rm = TRUE))
-
-  fit_and_predict_pi <- function(x) {
-    D <- tpis[,c(x, "centroid.date")]
-    names(D) <- c("predictor", "date")
+  # calculate PIs
+  fit_and_predict_pi <- function(x, ext) {
+    D <- tpis[ ,c(x, "centroid.date", "centroid.lat", "centroid.lon",
+                  "stixel_width", "stixel_height")]
+    names(D) <- c("predictor", "centroid.date", "centroid.lat", "centroid.lon",
+                  "stixel_width", "stixel_height")
     D$predictor <- log(D$predictor + 0.001)
 
-    d.loess <- loess(formula = "predictor ~ date",
-                     defree = 1,
-                     data = D)
+    # make stixel polygons from centroids and widths and heights
+    tdsp <- sp::SpatialPointsDataFrame(coords = D[,c("centroid.lon",
+                                                     "centroid.lat")],
+                                       data = D,
+                                       proj4string = sp::CRS(ll))
+
+    xPlus <- tdsp$centroid.lon + (tdsp$stixel_width/2)
+    yPlus <- tdsp$centroid.lat + (tdsp$stixel_height/2)
+    xMinus <- tdsp$centroid.lon - (tdsp$stixel_width/2)
+    yMinus <- tdsp$centroid.lat - (tdsp$stixel_height/2)
+
+    ID <- row.names(tdsp)
+
+    square <- cbind(xMinus, yPlus, xPlus, yPlus, xPlus,
+                    yMinus, xMinus, yMinus, xMinus, yPlus)
+
+    polys <- sp::SpatialPolygons(mapply(function(poly, id) {
+      xy <- matrix(poly, ncol=2, byrow=TRUE)
+      sp::Polygons(list(sp::Polygon(xy)), ID=id)
+    }, split(square, row(square)), ID), proj4string=sp::CRS(ll))
+
+    tdspolydf <- sp::SpatialPolygonsDataFrame(polys, tdsp@data)
+
+    # get the full input extent
+    tdsp_ext <- as(raster::extent(ext$x.min,
+                                  ext$x.max,
+                                  ext$y.min,
+                                  ext$y.max), "SpatialPolygons")
+    raster::crs(tdsp_ext) <- sp::CRS(ll)
+    tdsp_ext_moll <- sp::spTransform(tdsp_ext, sp::CRS(mollweide))
+
+    # calculate area weights based on percentage of stixel covering
+    # extent of interest
+    tdsp_moll <- sp::spTransform(tdspolydf, sp::CRS(mollweide))
+    tdsp_moll$stsqkm <- rgeos::gArea(tdsp_moll, byid = TRUE)/1000000
+
+    rint <- raster::intersect(x = tdsp_moll, y = tdsp_ext_moll)
+    rint$intsqkm <- rgeos::gArea(rint, byid = TRUE)/1000000
+    rint$refcov <- rint$intsqkm/rint$stsqkm
+
+    # drop any stixels that cover the are less than 10%
+    rint_sub <- rint[rint$refcov >= 0.10, ]
+
+    rint_d <- data.frame(predictor = rint_sub@data$predictor,
+                         date = rint_sub@data$centroid.date)
+
+    d.loess <- loess(formula = as.formula("predictor ~ date"),
+                     degree = 1,
+                     data = rint_d,
+                     weights = rint_sub@data$refcov)
 
     loess_preds <- predict(d.loess, nd)
 
     results <- data.frame(predictor = x,
                           date = nd,
-                          smooth_pis = exp(loess_preds),
+                          preds = exp(loess_preds),
                           stringsAsFactors = FALSE)
+
+    # do training data check and replace for gaps, edges, and corners
+    results$preds <- apply(results,
+                           1,
+                           train_check,
+                           empty_val = 0,
+                           train_data = D)
 
     return(results)
   }
 
-  pi_loess <- lapply(X=cover_cols, FUN=fit_and_predict_pi)
+  pi_loess <- lapply(X=cover_cols, FUN=fit_and_predict_pi, ext = st_extent)
   smooth_pis <- dplyr::bind_rows(pi_loess)
 
   # scale PIs
-  pi_week_sums <- aggregate(smooth_pis$smooth_pis,
+  pi_week_sums <- aggregate(smooth_pis$preds,
                             by = list(smooth_pis$date),
                             FUN = sum,
                             na.rm = TRUE)
@@ -548,10 +664,9 @@ cake_plot <- function(path,
                              by.x = "date",
                              by.y="Group.1")
 
-  smooth_pis_w_sums$pi_adj <- smooth_pis_w_sums$smooth_pis/smooth_pis_w_sums$x
+  smooth_pis_w_sums$pi_adj <- smooth_pis_w_sums$preds/smooth_pis_w_sums$x
   smooth_pis_w_sums$x <- NULL
-  smooth_pis_w_sums$smooth_pis <- NULL
-
+  smooth_pis_w_sums$preds <- NULL
 
   # mutiply PI x PD
   pipd <- merge(smooth_pis_w_sums, smooth_pds, by=c("predictor", "date"))
@@ -562,9 +677,6 @@ cake_plot <- function(path,
   if(by_cover_class == TRUE) {
     # add column of class
 
-    pipd <- pipd[grep("*PLAND|*LPI", pipd$predictor),]
-
-
     return_class <- function(x) {
       y <- x["predictor"]
 
@@ -573,11 +685,9 @@ cake_plot <- function(path,
       return(paste(spls[[1]][1], spls[[1]][2], spls[[1]][3], sep="_"))
     }
 
-
     pipd$class <- apply(pipd, 1, return_class)
 
     # sum pidir by class
-
     pipd_agg <- aggregate(pipd$pidir,
                           by = list(pipd$class, pipd$date),
                           FUN = sum,
@@ -585,17 +695,15 @@ cake_plot <- function(path,
     names(pipd_agg) <- c("predictor", "date", "pidir")
 
     pipd <- pipd_agg
-
   }
 
   # calculate absolute maxes of
-  absmax <- aggregate(pipd$pidir,
-                      by = list(pipd$predictor),
-                      FUN = function(x) { max(abs(x), na.rm = TRUE)})
+  #absmax <- aggregate(pipd$pidir,
+  #                    by = list(pipd$predictor),
+  #                    FUN = function(x) { max(abs(x), na.rm = TRUE)})
 
-  short_set <- absmax[!is.infinite(absmax$x) & absmax$x > 0.01,]
-  pipd_short <- pipd[pipd$predictor %in% short_set$Group.1, ]
-
+  #short_set <- absmax[!is.infinite(absmax$x) & absmax$x > 0.01,]
+  #pipd_short <- pipd[pipd$predictor %in% short_set$Group.1, ]
   pipd_short <- pipd
 
   # sum by cover class (or not?)
@@ -605,11 +713,6 @@ cake_plot <- function(path,
                   "#48D8AE", "#FCF050", "#E28373", "#C289F3", "#E6E6E6",
                   "#19AB81", "#88DA4A", "#5AB01A", "#A3B36B", "#D1BB7B",
                   "#E1D4AC", "#DCA453", "#EACA57")
-
-  unagg_colors <- c("blue", "blue", "blue", "blue", "chartreuse", "chartreuse", "chartreuse", "chartreuse", "cyan", "cyan", "cyan", "cyan3",  "cyan3",  "cyan3",  "cyan3", "blue2", "blue2", "blue2", "blue2", "blue4", "blue4", "blue4", "blue4",
-                    "#48D8AE", "#48D8AE", "#FCF050", "#FCF050", "#FCF050", "#FCF050", "#E28373", "#E28373", "#E28373", "#E28373", "#C289F3", "#C289F3",  "#C289F3", "#C289F3", "#E6E6E6", "#E6E6E6", "#E6E6E6", "#E6E6E6",
-                    "#19AB81", "#19AB81", "#19AB81", "#19AB81", "#88DA4A", "#88DA4A", "#88DA4A", "#88DA4A", "#5AB01A", "#5AB01A", "#5AB01A", "#5AB01A", "#A3B36B", "#A3B36B", "#A3B36B", "#A3B36B", "#D1BB7B", "#D1BB7B",
-                    "#E1D4AC", "#E1D4AC", "#E1D4AC", "#E1D4AC", "#DCA453", "#DCA453", "#DCA453", "#DCA453", "#EACA57", "#EACA57", "#EACA57", "#EACA57" )
 
   # ggplot
   wave <- ggplot2::ggplot(pipd_short, ggplot2::aes(x=date,
