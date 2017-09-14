@@ -23,7 +23,7 @@ plot_pis <- function(pis,
     lc.tag <- "UMD_FS_C"
     water.cover.class.codes <- c(0,2,3,5,6,7)
     wc.tag <- "MODISWATER_FS_C"
-    predictor.names <- names(tpis_sub)
+    predictor.names <- names(ttt)
 
     # ---
     ttt.new <- NULL
@@ -352,6 +352,39 @@ plot_pds <- function(pd_name,
     t.ll = t.ll))
 }
 
+# ' Function used by cake_plot()
+# '
+train_check <- function(x) {
+  train_index <- train_data.date$train_data.date >= (as.numeric(x["date"])-full_week) &
+    train_data.date$train_data.date <= (as.numeric(x["date"])+full_week)
+
+  if(all(train_index == FALSE)) {
+    return(empty_val)
+  } else {
+    min_train <- min(train_data.date$train_data.date[train_index], na.rm=TRUE)
+    max_train <- max(train_data.date$train_data.date[train_index], na.rm=TRUE)
+
+    # end of year present problems for checking to see if there's data
+    # on both sides of the prediction date, this adjusts for that
+    pred_date <- as.numeric(x["date"])
+
+    if(pred_date == 0.01) {
+      pred_date <- 0.02
+    } else if(pred_date == 0.99) {
+      pred_date <- 0.98
+    }
+
+    if( min_train < pred_date & max_train > pred_date )  {
+      # if there is data on both sides, return prediction
+      return(as.numeric(x["preds"]))
+    } else {
+      # otherwise return log "zeros"
+      return(empty_val)
+    }
+
+  }
+}
+
 # ' Make a cake plot of the pis and pds
 # '
 # ' @export
@@ -454,9 +487,16 @@ cake_plot <- function(path,
 
     loess_preds <- predict(d.loess, nd)
 
+
+    # do training data check
+
+
+
     results <- data.frame(predictor = x,
                           date = nd,
                           smooth_slopes = loess_preds)
+
+
 
     return(results)
   }
@@ -579,8 +619,8 @@ cake_plot <- function(path,
     ggplot2::geom_area() +
     ggplot2::xlim(0, 1) +
     ggplot2::ylim(-1, 1) +
-    ggplot2::scale_fill_manual(values=unagg_colors) +
-    ggplot2::theme(legend.position = "none")
+    ggplot2::scale_fill_manual(values=agg_colors)
+    #ggplot2::theme(legend.position = "none")
 
   wave
 }

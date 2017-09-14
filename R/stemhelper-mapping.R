@@ -138,7 +138,7 @@ calc_bins <- function(stack) {
 #' Map PI and PD centroid locations for species
 #'
 #' @export
-maps_centroids <- function(pis,
+map_centroids <- function(pis,
                            pds,
                            st_extent = NA,
                            plot_pis = TRUE,

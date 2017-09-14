@@ -18,11 +18,10 @@ devtools::load_all()
 # Outline
 
 1. Background
-2. Projections and Loading Rasters
+2. Projections, Loading Raster, Conversion
 3. Mapping Occurrence and Abundance
 4. Extracting Trajectories with Uncertainty
 5. Plotting Predictor Importance and Partial Dependencies
-6. Conversion
 
 # 1. Background
 
@@ -98,6 +97,28 @@ variable (e.g., abundance mean) for a single species. However, if the STEM .tif
 rasters were re-arranged, the function could be used to, for example, stack 
 single weeks for a single variable across multiple species.
 
+## Conversion
+
+The `raster` package has a lot of functionality and the RasterLayer format is useful for spatial analysis and mapping, but some users do not have GIS experience or want the data in a simpler format for their preferred method of analysis. There are multiple ways to get more basic representations of the data.
+
+```{r conversion, warning=FALSE, cache=TRUE}
+# To convert the data to a simpler geographic format and access tabularly	
+# reproject into geographic (decimal degrees) 
+abund_stack_ll <- raster::projectRaster(abund_stack[[26]], crs=sp::CRS("+init=epsg:4326"))
+
+# Convert raster object into a matrix
+p <- raster::rasterToPoints(abund_stack_ll)
+head(p)
+```
+
+```{r conversion_write, warning=FALSE, eval=FALSE}
+# Write a CSV file of the matrix
+write.csv(p, 
+          file = paste(raster_dir, "/woothr_week26.csv", sep=""),
+          row.names = FALSE)
+```
+
+
 # 3. Mapping Occurrence and Abundance
 
 One of the most common activities with STEM results is to make plots of occurrence and abundance. It is fast and easy to make plots immediately, but to get ideal plotting behavior takes a little bit of preparation. This sections describes some helper functions intended to assist with mapping.
@@ -126,7 +147,6 @@ raster::plot(week1_moll,
              bty='n',
              col=viridis(20),
              maxpixels=raster::ncell(week1_moll))
-sp::plot(countries110_prj, add=TRUE)
 ```
 
 Plotting the layer at the full spatial extent of the analysis area makes for a small map. The process of building the stack unifies the extent of all layers in the stack. However, this also means that plotting happens at the full spatial extent of the area of analysis, the Western Hemisphere, as seen above. If we calculate the full annual spatial extent for the species, project to Mollwide, and then map, we get an extent that works for the entire full-annual cycle of the species.
@@ -299,7 +319,7 @@ raster::plot(week26c,
              maxpixels=raster::ncell(week26c),
              legend=TRUE)
 sp::plot(wh_moll, add=TRUE, border='gray')
-sp::plot(wh_moll_states, add=TRUE, border='gray', lwd=0.5)
+sp::plot(wh_states_moll, add=TRUE, border='gray', lwd=0.5)
 ```
 
 ## Mapping Abundance Confidence Intervals
@@ -426,7 +446,7 @@ pds <- load_pds(sp_path)
 
 ## Select Region and Season
 
-```{r plot_centroids, cache=TRUE, warning=FALSE, messages=FALSE}
+```{r map_centroids, cache=TRUE, warning=FALSE, messages=FALSE}
 
 ne_extent <- list()
 ne_extent <- list(type = "rectangle",
@@ -437,7 +457,7 @@ ne_extent <- list(type = "rectangle",
 		              t.min = 0.425,
 	 	              t.max = 0.475)
 
-plot_centroids(pis=pis, pds=pds, st_extent=ne_extent)
+map_centroids(pis=pis, pds=pds, st_extent=ne_extent)
 
 ```
 
@@ -478,27 +498,20 @@ mypds <- plot_pds(pd_name = "EFFORT_HRS",
 
 ```
 
+## Cake Plots
 
+When PIs and PDs are combined with can get predictor importance with directionality. By week, these can be turned into a stacked area chart (we affectionately call cake plots) that show the relative predictor importance and directionality by week.
 
-# 6. Conversion
+```{r cake_plots, cache=TRUE, message=FALSE, warning=FALSE}
 
-The `raster` package has a lot of functionality and the RasterLayer format is useful for spatial analysis and mapping, but some users do not have GIS experience or want the data in a simpler format for their preferred method of analysis. There are multiple ways to get more basic representations of the data.
+# this requires a fair amount of computation
+# this doesn't work right now
+#cp <- cake_plot(path = sp_path,
+#                pis = pis,
+#                pds = pds,
+#                st_extent = ne_extent,
+#                by_cover_class = TRUE)
 
-```{r conversion, warning=FALSE, cache=TRUE}
-# To convert the data to a simpler geographic format and access tabularly	
-# reproject into geographic (decimal degrees) 
-abund_stack_ll <- raster::projectRaster(abund_stack[[26]], crs=sp::CRS("+init=epsg:4326"))
-
-# Convert raster object into a matrix
-p <- raster::rasterToPoints(abund_stack_ll)
-head(p)
-```
-
-```{r conversion_write, warning=FALSE, eval=FALSE}
-# Write a CSV file of the matrix
-write.csv(p, 
-          file = paste(raster_dir, "/woothr_week26.csv", sep=""),
-          row.names = FALSE)
 ```
 
 ### References
