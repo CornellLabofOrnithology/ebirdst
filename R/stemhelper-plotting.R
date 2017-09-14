@@ -362,9 +362,7 @@ cake_plot <- function(path,
                       by_cover_class = FALSE) {
 
   # load config vars
-  e <- new.env()
-  config_file <- list.files(path, pattern="*_config*")
-  load(paste(path, "/", config_file, sep = ""), envir = e)
+  e <- load_config(path)
 
   # subset centroids
   tpis <- pis[pis$centroid.lat > st_extent$y.min &

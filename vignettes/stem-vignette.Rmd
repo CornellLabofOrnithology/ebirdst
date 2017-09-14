@@ -65,12 +65,17 @@ template_raster
 Once you have accessed and downloaded a set of STEM results, the first task is to load them into R in a way that they can be used easily. To save space on disk, each individual raster (e.g., abundance mean for Wood Thrush for January 4) has had NA values trimmed before saving (using the raster package trim() function). While this saves space on disk, it means that the rasters are not immediately comparable and trying to use the raster `stack()` function will fail. 
 
 ```{r load_single_raster, cache=TRUE}
+# TODO set this up to do a curl of the example results first
+
+# Note, if you currently access results you can use this path construction
+# by replacing the root_path with where your copy lives
+root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
+species <- "woothr-ERD2016-PROD-20170505-3f880822"
+raster_path <- "/results/tifs/presentation/abundance_umean/"
+tif_path <- paste(root_path, species, raster_path, sep = "")
+
 # To load a single raster file and extend it to the full analysis extent
 # Note that the template_raster object is included with this package
-tif_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/woothr/tifs/presentation/abundance_umean"
-
-# TODO set this up to do a curl of the example results first
-# change to a different variable
 r <- raster::extend(raster::raster(paste(tif_path, "/", 
                                          list.files(tif_path)[1], 
                                          sep = "")),
@@ -148,14 +153,15 @@ raster::plot(week1_moll,
              maxpixels=raster::ncell(week1_moll))
 ```
 
-
 ## Mapping Occurrence
 
 Most examples in this vignette focus primarily on abundance predictions, as they're the most novel and informative. However, we also provide the probability of occurrence predictions. These are much simpler to plot than abundance, as values range between 0 and 1 throughout the year.
 
 ```{r plot_occurrence, cache=TRUE}
+
 # load a stack of occurrence
-occ_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/woothr/tifs/presentation/occurrence_umean"
+occ_path <- paste(root_path, species, 
+                  "/results/tifs/presentation/occurrence_umean/", sep = "")
 occ_stack <- stack_stem(occ_path)
 
 # create breaks every 0.05 from 0 to 1
@@ -249,13 +255,18 @@ With a good full-annual extent and color bins, that accurately represent the dat
 
 ```{r plot_es, cache=TRUE, warnings=FALSE}
 # pull in species-specific ensemble support, represent predicted 0s where there is no abundance value
-pos_es_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/woothr/tifs/presentation/abundance_ensemble_support"
+pos_es_path <- paste(root_path, 
+                     species, 
+                     "/results/tifs/presentation/abundance_ensemble_support", 
+                     sep = "")
 pos_es_stack <- stack_stem(pos_es_path)
 week26_pes <- raster::projectRaster(pos_es_stack[[26]], crs=mollweide)
 
-# pull in checklist-level ensemble support, represent assummed 0s
-zero_es_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/zero_es"
-zero_es_stack <- stack_stem(zero_es_path)
+# to represent assumed 0s, we have provided the data object zero_es_stack
+# that has values for the ensemble support indicating sufficient checklists
+# to fit and predict models at that location
+# for presentation we use a value of 99 to show locations with assumed 0s
+zero_es_stack
 week26_zes_vals <- raster::projectRaster(raster::mask(zero_es_stack[[26]], 
                                                  template_raster), 
                                     crs=mollweide)
@@ -297,9 +308,12 @@ In addition to occurrence and abundance predictions, we also provide confidence 
 
 ```{r plot_confidence, cache=TRUE}
 # load lower and upper stacks
-lower_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/woothr/tifs/presentation/abundance_lower"
+lower_path <- paste(root_path, species, 
+                    "/results/tifs/presentation/abundance_lower", sep = "")
 lower_stack <- stack_stem(lower_path)
-upper_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/woothr/tifs/presentation/abundance_upper"
+
+upper_path <- paste(root_path, species, 
+                    "/results/tifs/presentation/abundance_upper", sep = "")
 upper_stack <- stack_stem(upper_path)
 
 # calculate band width
@@ -402,7 +416,7 @@ Blah, blah, blah...
 ```{r load_pipd, cache=TRUE}
 
 # path to species bundle
-sp_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/woothr/"
+sp_path <- paste(root_path, species, sep = "")
 
 pis <- load_pis(sp_path)
 pds <- load_pds(sp_path)

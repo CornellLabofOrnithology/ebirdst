@@ -41,13 +41,22 @@ stack_stem <- function(path) {
   return(st)
 }
 
+#' Config file loader
+#'
+#' Used by load_summary(), load_pis(), and load_pds()
+load_config <- function(path) {
+  e <- new.env()
+  config_file <- list.files(paste(path, "/data", sep = ""), pattern="*_config*")
+  load(paste(path, "/data/", config_file, sep = ""), envir = e)
+
+  return(e)
+}
+
 #' Summary file loader
 #'
 #' Used by load_pis() and load_pds()
 load_summary <- function(path) {
-  e <- new.env()
-  config_file <- list.files(path, pattern="*_config*")
-  load(paste(path, "/", config_file, sep = ""), envir = e)
+  e <- load_config(path)
 
   # load summary
   train_covariate_means_names <- paste("train.cov.mean",
@@ -89,7 +98,10 @@ load_summary <- function(path) {
     "srd_elevation_mean",
     srd_covariate_means_names, #k-covariate values
     "srd_covariate_entropy" )
-  summary_vec <- data.table::fread(paste(path, "/stixels/summary.txt", sep=""))
+
+  stixel_path <- "/results/abund_preds/unpeeled_folds/"
+  summary_vec <- data.table::fread(paste(path, stixel_path,
+                                         "summary.txt", sep=""))
   names(summary_vec)[3] <- "stixel.id"
   names(summary_vec)[4:ncol(summary_vec)] <- summary_vec_name_vec
 
@@ -104,12 +116,11 @@ load_summary <- function(path) {
 #' @export
 load_pis <- function(path) {
   # load config vars
-  e <- new.env()
-  config_file <- list.files(path, pattern="*_config*")
-  load(paste(path, "/", config_file, sep = ""), envir = e)
+  e <- load_config(path)
 
   # load pi.txt
-  pi_vec <- data.table::fread(paste(path, "/stixels/pi.txt", sep = ""))
+  stixel_path <- "/results/abund_preds/unpeeled_folds/"
+  pi_vec <- data.table::fread(paste(path, stixel_path, "pi.txt", sep = ""))
   names(pi_vec)[4:ncol(pi_vec)] <- e$PI_VARS
   names(pi_vec)[3] <- "stixel.id"
 
@@ -134,12 +145,11 @@ load_pis <- function(path) {
 #' @export
 load_pds <- function(path) {
   # load config vars
-  e <- new.env()
-  config_file <- list.files(path, pattern="*_config*")
-  load(paste(path, "/", config_file, sep = ""), envir = e)
+  e <- load_config(path)
 
   # load pi.txt
-  pd_vec <- data.table::fread(paste(path, "/stixels/pd.txt", sep = ""))
+  stixel_path <- "/results/abund_preds/unpeeled_folds/"
+  pd_vec <- data.table::fread(paste(path, stixel_path, "/pd.txt", sep = ""))
   names(pd_vec)[3] <- "stixel.id"
 
   # load summary file
