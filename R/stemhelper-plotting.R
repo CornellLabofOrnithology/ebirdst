@@ -386,10 +386,10 @@ train_check <- function(y, train_data, empty_val) {
   }
 }
 
-# ' Make a cake plot of the pis and pds
-# '
-# ' @export
-# ' @import sp
+#' Make a cake plot of the pis and pds
+#'
+#' @import sp
+#' @export
 cake_plot <- function(path,
                       pis,
                       pds,
@@ -539,12 +539,16 @@ cake_plot <- function(path,
     rint_d <- data.frame(slope = rint_sub@data$slope,
                          date = rint_sub@data$centroid.date)
 
-    d.loess <- loess(formula = as.formula("slope ~ date"),
-                     degree = 1,
-                     data = rint_d,
-                     weights = rint_sub@data$refcov)
+    if(!all(is.nan(rint_d$slope))) {
+      d.loess <- loess(formula = as.formula("slope ~ date"),
+                       degree = 1,
+                       data = rint_d,
+                       weights = rint_sub@data$refcov)
 
-    loess_preds <- predict(d.loess, nd)
+      loess_preds <- predict(d.loess, nd)
+    } else {
+      loess_preds <- rep(NA, length(nd))
+    }
 
     results <- data.frame(predictor = x,
                           date = nd,
@@ -628,12 +632,16 @@ cake_plot <- function(path,
     rint_d <- data.frame(predictor = rint_sub@data$predictor,
                          date = rint_sub@data$centroid.date)
 
-    d.loess <- loess(formula = as.formula("predictor ~ date"),
-                     degree = 1,
-                     data = rint_d,
-                     weights = rint_sub@data$refcov)
+    if(!all(is.nan(rint_d$predictor))) {
+      d.loess <- loess(formula = as.formula("predictor ~ date"),
+                       degree = 1,
+                       data = rint_d,
+                       weights = rint_sub@data$refcov)
 
-    loess_preds <- predict(d.loess, nd)
+      loess_preds <- predict(d.loess, nd)
+    } else {
+      loess_preds <- rep(0, length(nd))
+    }
 
     results <- data.frame(predictor = x,
                           date = nd,
