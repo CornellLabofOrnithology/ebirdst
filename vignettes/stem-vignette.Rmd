@@ -10,7 +10,7 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(cache=TRUE, out.width="\\textwidth", fig.height=4, 
+knitr::opts_chunk$set(out.width="\\textwidth", fig.height=4, 
                       fig.width=7, fig.align="center")
 devtools::load_all()
 ```
@@ -55,7 +55,7 @@ The animated GIFs distributed with the data are generated using the "presentatio
 
 The GeoTiffs use the same Sinusoidal projection that the MODIS data uses. As part of this package, we provide a template raster, that contains the spatial extent, resolution, and land water definition (as a 0 value) for our modeled region. To access, call the `template_raster` object after loading the package.
 
-```{r show_template_raster, warning=FALSE, message=FALSE, cache=TRUE}
+```{r show_template_raster, warning=FALSE, message=FALSE}
 template_raster
 ```
 
@@ -63,7 +63,7 @@ template_raster
 
 Once you have accessed and downloaded a set of STEM results, the first task is to load them into R in a way that they can be used easily. To save space on disk, each individual raster (e.g., abundance mean for Wood Thrush for January 4) has had NA values trimmed before saving (using the raster package trim() function). While this saves space on disk, it means that the rasters are not immediately comparable and trying to use the raster `stack()` function will fail. 
 
-```{r load_single_raster, cache=TRUE}
+```{r load_single_raster}
 # TODO set this up to do a curl of the example results first
 
 # Note, if you currently access results you can use this path construction
@@ -84,7 +84,7 @@ r
 
 To assist with the loading of rasters, we have provided a helper function, `stack_stem()`, which uses the `template_raster` object to extend each input raster in a directory to the full extent of analysis and then returns a `RasterStack` object.
 
-```{r stack_abundance, cache=TRUE}
+```{r stack_abundance}
 # TODO set this up to do a curl of the example results first
 
 # load a stack of rasters with the helper function stack_stem()
@@ -101,7 +101,7 @@ single weeks for a single variable across multiple species.
 
 The `raster` package has a lot of functionality and the RasterLayer format is useful for spatial analysis and mapping, but some users do not have GIS experience or want the data in a simpler format for their preferred method of analysis. There are multiple ways to get more basic representations of the data.
 
-```{r conversion, warning=FALSE, cache=TRUE}
+```{r conversion, warning=FALSE}
 # To convert the data to a simpler geographic format and access tabularly	
 # reproject into geographic (decimal degrees) 
 abund_stack_ll <- raster::projectRaster(abund_stack[[26]], crs=sp::CRS("+init=epsg:4326"))
@@ -127,7 +127,7 @@ One of the most common activities with STEM results is to make plots of occurren
 
 The sinusoidal projection that NASA provides MODIS data in, while functional because of its equal-area property, is not good for mapping because of the significant distortion of land masses across the globe. There are few global equal-area projections, including, but not limited to, Lambert Azimuthal Equal Area, Goode Homolosine, Mollweide, and Equal Area Cylindrical. Of these, we have selected Mollweide, used in the remainder of this section, for its pleasing conformal properties across the globe, ease of projection configuration within R and the proj4string construction, and the ease of setting central meridians that best display the Western Hemisphere. It is worth noting that while projecting to a more visually appealing projection is ideal for mapping, it is not necessary for quantitative analysis of STEM results, for which purposes the results can be left in the sinusoidal projection.
 
-```{r project_stack, cache=TRUE}
+```{r project_stack}
 library(viridis)
 
 # define mollweide projection
@@ -151,7 +151,7 @@ raster::plot(week1_moll,
 
 Plotting the layer at the full spatial extent of the analysis area makes for a small map. The process of building the stack unifies the extent of all layers in the stack. However, this also means that plotting happens at the full spatial extent of the area of analysis, the Western Hemisphere, as seen above. If we calculate the full annual spatial extent for the species, project to Mollwide, and then map, we get an extent that works for the entire full-annual cycle of the species.
 
-```{r plot_stack_extent, cache=TRUE}
+```{r plot_stack_extent}
 # calculate the full annual extent on the abundance stack (in sinusoidal projection)
 sp_ext <- calc_full_extent(abund_stack)
 
@@ -177,7 +177,7 @@ raster::plot(week1_moll,
 
 Most examples in this vignette focus primarily on abundance predictions, as they're the most novel and informative. However, we also provide the probability of occurrence predictions. These are much simpler to plot than abundance, as values range between 0 and 1 throughout the year.
 
-```{r plot_occurrence, cache=TRUE}
+```{r plot_occurrence}
 
 # load a stack of occurrence
 occ_path <- paste(root_path, species, 
@@ -207,7 +207,7 @@ Mapping species abundance across the full-annual cycle presents a challenge, in 
 
 To compare, we first scale the colors linearly, based on the maximum from the entire year. 
 
-```{r plot_linear, cache=TRUE}
+```{r plot_linear}
 year_max <- max(raster::maxValue(abund_stack), na.rm = TRUE)
 
 week26_moll <- raster::projectRaster(abund_stack[[26]], crs = mollweide)
@@ -235,7 +235,7 @@ raster::plot(week26_moll,
 
 We can compare this with plots made using the binning method provided here.
 
-```{r plot_bins, cache=TRUE}
+```{r plot_bins}
 year_bins <- calc_bins(abund_stack)
 
 # create a thinner set of labels
@@ -273,7 +273,7 @@ raster::plot(week26_moll,
 
 With a good full-annual extent and color bins, that accurately represent the data distribution, we can add in other pieces of data that represent predicted and assumed zeroes, which help display the extent of estimation.
 
-```{r plot_es, cache=TRUE, warnings=FALSE}
+```{r plot_es, warnings=FALSE}
 # pull in species-specific ensemble support, represent predicted 0s where there is no abundance value
 pos_es_path <- paste(root_path, 
                      species, 
@@ -326,7 +326,7 @@ sp::plot(wh_states_moll, add=TRUE, border='gray', lwd=0.5)
 
 In addition to occurrence and abundance predictions, we also provide confidence intervals at an upper value of 90% and lower value of 10%. These can be used to calculate and map a confidence band width.
 
-```{r plot_confidence, cache=TRUE}
+```{r plot_confidence}
 # load lower and upper stacks
 lower_path <- paste(root_path, species, 
                     "/results/tifs/presentation/abundance_lower", sep = "")
@@ -356,7 +356,7 @@ raster::plot(conf_week26,
 
 With raster stacks for abundance, upper, and lower confidence intervals, we can extract an abundnace trajectory, with uncertainty intervals and plot them across the year for a single location.
 
-```{r trajectories, cache=TRUE, warnings=FALSE}
+```{r trajectories, warnings=FALSE}
 
 # set a point
 coords <- cbind(-76.5, 42.5)
@@ -387,7 +387,7 @@ g
 
 It is also possible to extract trajectories for regions, but it takes a little more data work.
 
-```{r trajectories_region, cache=TRUE, warnings=FALSE}
+```{r trajectories_region, warnings=FALSE}
 
 # set a point
 coords <- cbind(-76.5, 42.5)
@@ -433,7 +433,7 @@ Blah, blah, blah...
 
 ## Loading Data
 
-```{r load_pipd, cache=TRUE}
+```{r load_pipd}
 
 # path to species bundle
 sp_path <- paste(root_path, species, sep = "")
@@ -446,7 +446,7 @@ pds <- load_pds(sp_path)
 
 ## Select Region and Season
 
-```{r map_centroids, cache=TRUE, warning=FALSE, messages=FALSE}
+```{r map_centroids, warning=FALSE, messages=FALSE}
 
 ne_extent <- list()
 ne_extent <- list(type = "rectangle",
@@ -464,7 +464,7 @@ map_centroids(pis=pis, pds=pds, st_extent=ne_extent)
 
 ## Plot available centroids and extent of analysis
 
-```{r plot_extents, cache=TRUE}
+```{r plot_extents}
 
 par(mfrow=c(1,2), mar=c(0,0,0,4))
 pi_extent <- calc_effective_extent(ne_extent, pis = pis)
@@ -474,7 +474,7 @@ pd_extent <- calc_effective_extent(ne_extent, pds = pds)
 
 ## Plot Predictor Importance
 
-```{r plot_pis, cache=TRUE}
+```{r plot_pis}
 
 par(mfrow=c(1,2), mar=c(0,0,0,0))
 
@@ -488,7 +488,7 @@ plot_pis(pis, st_extent = ne_extent, by_cover_class = TRUE)
 
 ## Plot Partial Depedencies
 
-```{r plot_pds, cache=TRUE}
+```{r plot_pds}
 
 mypds <- plot_pds(pd_name = "EFFORT_HRS", 
                   pds = pds, 
@@ -502,7 +502,7 @@ mypds <- plot_pds(pd_name = "EFFORT_HRS",
 
 When PIs and PDs are combined with can get predictor importance with directionality. By week, these can be turned into a stacked area chart (we affectionately call cake plots) that show the relative predictor importance and directionality by week.
 
-```{r cake_plots, cache=TRUE, message=FALSE, warning=FALSE}
+```{r cake_plots, message=FALSE, warning=FALSE}
 
 # this requires a fair amount of computation
 # this doesn't work right now
