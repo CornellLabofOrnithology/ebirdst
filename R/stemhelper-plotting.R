@@ -394,7 +394,8 @@ cake_plot <- function(path,
                       pis,
                       pds,
                       st_extent,
-                      by_cover_class = TRUE) {
+                      by_cover_class = TRUE,
+                      pland_and_lpi_only = TRUE) {
 
   # load config vars
   e <- load_config(path)
@@ -426,6 +427,10 @@ cake_plot <- function(path,
   cover_cols <- e$PREDICTOR_LIST[grep(paste(cover_classes,
                                             collapse="|"),
                                       e$PREDICTOR_LIST)]
+
+  if(pland_and_lpi_only == TRUE) {
+    cover_cols <- cover_cols[grep(pattern = "PLAND|LPI", cover_cols)]
+  }
 
   # need to extract directionality
   # area weighted loess?
@@ -470,6 +475,10 @@ cake_plot <- function(path,
                                                 "stixel_height",
                                                 "V4",
                                                 "slope")]
+
+  # this aggregation is both for speed and stability of loess
+  # without this agg, some of the pd trajectories
+  # for lesser predictors get a little weird
   pd_mean_slope <- aggregate(pd_w_slope,
                              by = list(pd_w_slope$V4, pd_w_slope$centroid.date),
                              FUN = mean,
@@ -682,6 +691,12 @@ cake_plot <- function(path,
   pipd$direction <- NULL
   pipd$pi_adj <- NULL
 
+  # agg colors
+  agg_colors <- c("blue", "chartreuse", "cyan", "cyan3", "blue2", "blue4",
+                  "#48D8AE", "#FCF050", "#E28373", "#C289F3", "#E6E6E6",
+                  "#19AB81", "#88DA4A", "#5AB01A", "#A3B36B", "#D1BB7B",
+                  "#E1D4AC", "#DCA453", "#EACA57")
+
   if(by_cover_class == TRUE) {
     # add column of class
 
@@ -703,6 +718,9 @@ cake_plot <- function(path,
     names(pipd_agg) <- c("predictor", "date", "pidir")
 
     pipd <- pipd_agg
+  } else {
+    agg_colors <- unname(randomcoloR::distinctColorPalette(length(unique(
+      pipd$predictor))))
   }
 
   # calculate absolute maxes of
@@ -714,13 +732,10 @@ cake_plot <- function(path,
   #pipd_short <- pipd[pipd$predictor %in% short_set$Group.1, ]
   pipd_short <- pipd
 
-  # sum by cover class (or not?)
+  pipd_short$pidir[is.na(pipd_short$pidir)] <- 0
+  pipd_short$pidir[is.nan(pipd_short$pidir)] <- 0
 
-  # agg colors
-  agg_colors <- c("blue", "chartreuse", "cyan", "cyan3", "blue2", "blue4",
-                  "#48D8AE", "#FCF050", "#E28373", "#C289F3", "#E6E6E6",
-                  "#19AB81", "#88DA4A", "#5AB01A", "#A3B36B", "#D1BB7B",
-                  "#E1D4AC", "#DCA453", "#EACA57")
+  # sum by cover class (or not?)
 
   # ggplot
   wave <- ggplot2::ggplot(pipd_short, ggplot2::aes(x=date,
