@@ -19,9 +19,9 @@ of the year. This template raster provides the full spatial extent of the
 study area.
 }
 \examples{
-str(template_raster)
+str(stemhelper::template_raster)
 
 r <- raster()
-extended_raster <- extend(r, extent(template_raster))
+extended_raster <- extend(r, extent(stemhelper::template_raster))
 }
 \keyword{datasets}

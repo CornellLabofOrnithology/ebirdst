@@ -9,9 +9,12 @@
 zero_es_stack
 }
 \description{
-A RasterStacks (one for each week of the year) indicating the ensemble support based on sufficient checklists to fit models within an individiual stixel. Values range from 0 to 100. For presentation, we use a value of 99 to indicate sufficient information to assume that, if there are no positive occurrence or abundance predictions within a given raster cell, that there is a value of 0 occurrence and 0 abundance.
+A RasterStack (one layer for each week of the year) indicating the ensemble support based on sufficient checklists to fit models within an individiual stixel. Values range from 0 to 100. For presentation, we use a value of 99 to indicate sufficient information to assume that, if there are no positive occurrence or abundance predictions within a given raster cell, that there is a value of 0 occurrence and 0 abundance.
 }
 \examples{
-zero_es_stack
+stemhelper::zero_es_stack
+
+# create binary layers for each week where to show assumed zeroes
+stemhelper::zero_es_stack[stemhelper::zero_es_stack < 99] <- NA
 }
 \keyword{datasets}
