@@ -81,9 +81,9 @@ calc_full_extent <- function(stack) {
 #'
 #' Mapping species abundnace across the full-annual cycle presents a challenge, in that patterns of concentration and dispersion in abundance change throughout the year, making it difficult to define color bins that suit all seasons and accurately reflect the detail of abundance predictions. To address this, we selected a method (described by Maciejewski et al. 2013) that log transforms the entire year of data, constructs bins with the log-transformed data using standard-deviations, and then untransforms the bins.
 #'
-#' @usage \code{calc_bins(stack)}
+#' @usage \code{calc_bins(x)}
 #'
-#' @param stack A RasterStack object, of abundance results.
+#' @param x Raster* object
 #'
 #' @return vector containing break points of bins
 #' @export
@@ -92,11 +92,12 @@ calc_full_extent <- function(stack) {
 #' raster_stack <- stack_stem(tif_path)
 #' year_bins <- calc_bins(raster_stack)
 #'
-#' raster::plot(raster_stack[[1]], xaxt='n', yaxt='n', breaks=year_bins)
-calc_bins <- function(stack) {
+#' raster::plot(raster_stack[[1]], xaxt = 'n', yaxt = 'n', breaks = year_bins)
+calc_bins <- function(x) {
 
   # get a vector of all the values in the stack
-  zrv <- raster::getValues(stack)
+  zrv <- raster::getValues(x)
+  zrv[zrv == 0] <- NA
 
   # log transform the non-NA values
   # there shouldn't be zero values in here based on how the data is stored
