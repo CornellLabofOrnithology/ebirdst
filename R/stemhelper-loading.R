@@ -47,14 +47,16 @@ stack_stem <- function(path) {
 #' configuration variables from species run information.
 load_config <- function(path) {
   e <- new.env()
-  config_file <- list.files(paste(path, "/data", sep = ""),
-                            pattern = "*_config*")
+
+  config_file_path <- list.files(paste(path, "/data", sep = ""),
+                                 pattern = "*_config*")
+  config_file <- paste(path, "/data/", config_file_path, sep = "")
 
   if(!file.exists(config_file)) {
     stop("*_config.RData file does not exist in the /data directory.")
   }
 
-  load(paste(path, "/data/", config_file, sep = ""), envir = e)
+  load(config_file, envir = e)
   rm(config_file)
 
   return(e)
