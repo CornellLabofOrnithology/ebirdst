@@ -40,11 +40,12 @@ calc_full_extent <- function(stack) {
 
   # if stack projection is different from template_raster,
   # project template_raster
-  if(raster::projection(template_raster) != raster::projection(stack)) {
-    this_template_raster <- projectRaster(template_raster,
-                                          raster::projection(stack))
+  tr <- stemhelper::template_raster
+
+  if(raster::projection(te) != raster::projection(stack)) {
+    this_template_raster <- projectRaster(tr, raster::projection(stack))
   } else {
-    this_template_raster <- template_raster
+    this_template_raster <- tr
   }
 
   # create object of this template_raster for comparison to extent extracted
@@ -326,7 +327,9 @@ calc_effective_extent <- function(st_extent,
                                         proj4string = sp::CRS(ll))
 
   tpis_sp_prj <- sp::spTransform(tpis_sp,
-                                 sp::CRS(sp::proj4string(template_raster)))
+                                 sp::CRS(
+                                   sp::proj4string(
+                                     stemhelper::template_raster)))
 
   sp_ext <- raster::extent(tpis_sp_prj)
   rm(tpis, tpis_sp_prj)
@@ -366,11 +369,13 @@ calc_effective_extent <- function(st_extent,
 
   # project to template raster
   tdspolydf_prj <- sp::spTransform(tdspolydf,
-                                   sp::CRS(sp::proj4string(template_raster)))
+                                   sp::CRS(
+                                     sp::proj4string(
+                                       stemhelper::template_raster)))
 
   # summarize...not sure how to do this step
   tpis_r <- raster::rasterize(tdspolydf_prj,
-                              template_raster,
+                              stemhelper::template_raster,
                               field="weight",
                               fun=sum)
 
@@ -385,7 +390,8 @@ calc_effective_extent <- function(st_extent,
   wh_moll <- sp::spTransform(wh, mollweide)
   wh_states_moll <- sp::spTransform(wh_states, mollweide)
 
-  tpis_per_prj <- raster::projectRaster(raster::mask(tpis_per, template_raster),
+  tpis_per_prj <- raster::projectRaster(raster::mask(tpis_per,
+                                                     stemhelper::template_raster),
                                         crs=mollweide)
 
   tdspolydf_moll <- sp::spTransform(tdspolydf_prj, mollweide)

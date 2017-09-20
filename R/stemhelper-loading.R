@@ -22,7 +22,7 @@ stack_stem <- function(path) {
 
     if(tools::file_ext(x) == "tif") {
       r <- raster::extend(raster::raster(paste(path, "/", x, sep = "")),
-                          template_raster)
+                          stemhelper::template_raster)
 
       return(r)
     }

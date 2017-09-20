@@ -1,5 +1,3 @@
-
-
 #' Plotting PIs as barplots
 #'
 #' @export
