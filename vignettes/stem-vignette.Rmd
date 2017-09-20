@@ -55,7 +55,7 @@ The animated GIFs distributed with the data are generated using the "presentatio
 
 The GeoTiffs use the same Sinusoidal projection that the MODIS data uses. As part of this package, we provide a template raster, that contains the spatial extent, resolution, and land water definition (as a 0 value) for our modeled region. To access, call the `template_raster` object after loading the package.
 
-```{r show_template_raster, warning=FALSE, message=FALSE}
+```{r show_template_raster}
 template_raster
 ```
 
@@ -101,17 +101,19 @@ single weeks for a single variable across multiple species.
 
 The `raster` package has a lot of functionality and the RasterLayer format is useful for spatial analysis and mapping, but some users do not have GIS experience or want the data in a simpler format for their preferred method of analysis. There are multiple ways to get more basic representations of the data.
 
-```{r conversion, warning=FALSE}
+```{r conversion}
 # To convert the data to a simpler geographic format and access tabularly	
 # reproject into geographic (decimal degrees) 
-abund_stack_ll <- raster::projectRaster(abund_stack[[26]], crs=sp::CRS("+init=epsg:4326"))
+abund_stack_ll <- raster::projectRaster(abund_stack[[26]], 
+                                        crs = sp::CRS("+init=epsg:4326"))
 
 # Convert raster object into a matrix
 p <- raster::rasterToPoints(abund_stack_ll)
+colnames(p) <- c("longitude", "latitude", "abundance_umean")
 head(p)
 ```
 
-```{r conversion_write, warning=FALSE, eval=FALSE}
+```{r conversion_write, eval=FALSE}
 # Write a CSV file of the matrix
 write.csv(p, 
           file = paste(raster_dir, "/woothr_week26.csv", sep=""),
@@ -134,19 +136,19 @@ library(viridis)
 mollweide <- sp::CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
 
 # project single layer from stack to mollweide
-week1_moll <- raster::projectRaster(abund_stack[[1]], crs=mollweide)
+week1_moll <- raster::projectRaster(abund_stack[[1]], crs = mollweide)
 
 # optionally, you can project an entire stack, but it takes much longer
-#abund_stack_moll <- raster::projectRaster(abund_stack, crs=mollweide)
+#abund_stack_moll <- raster::projectRaster(abund_stack, crs = mollweide)
 
 # plot single layer with full annual extent
-par(mar=c(0,0,0,2))
+par(mar = c(0,0,0,2))
 raster::plot(week1_moll, 
-             xaxt='n', 
-             yaxt='n',
-             bty='n',
-             col=viridis(20),
-             maxpixels=raster::ncell(week1_moll))
+             xaxt = 'n', 
+             yaxt = 'n',
+             bty = 'n',
+             col = viridis(20),
+             maxpixels = raster::ncell(week1_moll))
 ```
 
 Plotting the layer at the full spatial extent of the analysis area makes for a small map. The process of building the stack unifies the extent of all layers in the stack. However, this also means that plotting happens at the full spatial extent of the area of analysis, the Western Hemisphere, as seen above. If we calculate the full annual spatial extent for the species, project to Mollwide, and then map, we get an extent that works for the entire full-annual cycle of the species.
@@ -156,20 +158,20 @@ Plotting the layer at the full spatial extent of the analysis area makes for a s
 sp_ext <- calc_full_extent(abund_stack)
 
 # project the full annual extent to Mollweide
-extent_raster <- raster::raster(ext=sp_ext, 
-                                crs=sp::proj4string(template_raster))
+extent_raster <- raster::raster(ext = sp_ext, 
+                                crs = sp::proj4string(template_raster))
 extent_raster[is.na(extent_raster)] <- 1
 sp_ext_moll <- raster::extent(raster::projectRaster(extent_raster, 
-                                                    crs=mollweide))
+                                                    crs = mollweide))
 
 # plot the first week of the abundance stack in Mollweide
-par(mar=c(0,0,0,2))
+par(mar = c(0,0,0,2))
 raster::plot(week1_moll, 
-             xaxt='n', 
-             yaxt='n', 
-             bty='n',
-             ext=sp_ext_moll, 
-             col=viridis(20),
+             xaxt = 'n', 
+             yaxt = 'n', 
+             bty = 'n',
+             ext = sp_ext_moll, 
+             col = viridis(20),
              maxpixels=raster::ncell(week1_moll))
 ```
 
@@ -178,7 +180,6 @@ raster::plot(week1_moll,
 Most examples in this vignette focus primarily on abundance predictions, as they're the most novel and informative. However, we also provide the probability of occurrence predictions. These are much simpler to plot than abundance, as values range between 0 and 1 throughout the year.
 
 ```{r plot_occurrence}
-
 # load a stack of occurrence
 occ_path <- paste(root_path, species, 
                   "/results/tifs/presentation/occurrence_umean/", sep = "")
@@ -186,20 +187,18 @@ occ_stack <- stack_stem(occ_path)
 
 # create breaks every 0.05 from 0 to 1
 occ_bins <- seq(0, 1, by = 0.05)
-occ_week26 <- raster::projectRaster(occ_stack[[26]], crs=mollweide)
+occ_week26 <- raster::projectRaster(occ_stack[[26]], crs = mollweide)
 
-par(mar=c(0,0,0,2), cex=0.7)
+par(mar = c(0,0,0,2), cex = 0.7)
 raster::plot(occ_week26, 
-             xaxt='n', 
-             yaxt='n', 
-             bty='n',
-             ext=sp_ext_moll,
-             breaks=occ_bins,
-             col=viridis(length(occ_bins)-1),
-             maxpixels=raster::ncell(occ_week26))
-
+             xaxt = 'n', 
+             yaxt = 'n', 
+             bty = 'n',
+             ext = sp_ext_moll,
+             breaks = occ_bins,
+             col = viridis(length(occ_bins) - 1),
+             maxpixels = raster::ncell(occ_week26))
 ```
-
 
 ## Calculating Abundance Bins
 
@@ -212,25 +211,25 @@ year_max <- max(raster::maxValue(abund_stack), na.rm = TRUE)
 
 week26_moll <- raster::projectRaster(abund_stack[[26]], crs = mollweide)
 
-par(mfrow=c(1,2), mar=c(0,0,0,0))
+par(mfrow = c(1,2), mar = c(0,0,0,0))
 raster::plot(week1_moll, 
-             xaxt='n', 
-             yaxt='n', 
-             bty='n',
-             ext=sp_ext_moll, 
-             zlim=c(0, year_max),
-             col=viridis(20),
-             maxpixels=raster::ncell(week1_moll),
+             xaxt = 'n', 
+             yaxt = 'n', 
+             bty = 'n',
+             ext = sp_ext_moll, 
+             zlim = c(0, year_max),
+             col = viridis(20),
+             maxpixels = raster::ncell(week1_moll),
              legend=FALSE)
-par(mar=c(0,0,0,4))
+par(mar = c(0,0,0,4))
 raster::plot(week26_moll, 
-             xaxt='n', 
-             yaxt='n', 
-             bty='n',
-             ext=sp_ext_moll, 
-             zlim=c(0, year_max),
-             col=viridis(20),
-             maxpixels=raster::ncell(week26_moll))
+             xaxt = 'n', 
+             yaxt = 'n', 
+             bty = 'n',
+             ext = sp_ext_moll, 
+             zlim = c(0, year_max),
+             col = viridis(20),
+             maxpixels = raster::ncell(week26_moll))
 ```
 
 We can compare this with plots made using the binning method provided here.
@@ -241,31 +240,32 @@ year_bins <- calc_bins(abund_stack)
 # create a thinner set of labels
 bin_labels <- format(round(year_bins, 2), nsmall = 2)
 bin_labels[!(bin_labels %in% c(bin_labels[1], 
-                    bin_labels[round((length(bin_labels)/4))+1], 
-                    bin_labels[round((length(bin_labels)/2))+1],
-                    bin_labels[length(bin_labels) - round((length(bin_labels)/4))+1],
+                    bin_labels[round((length(bin_labels) / 4)) + 1], 
+                    bin_labels[round((length(bin_labels) / 2)) + 1],
+                    bin_labels[length(bin_labels) - 
+                               round((length(bin_labels) / 4)) + 1],
                     bin_labels[length(bin_labels)]))] <- ""
 
-par(mfrow=c(1,2), mar=c(0,0,0,0))
+par(mfrow = c(1,2), mar = c(0,0,0,0))
 raster::plot(week1_moll, 
-             xaxt='n', 
-             yaxt='n', 
-             bty='n',
-             ext=sp_ext_moll, 
-             breaks=year_bins,
-             lab.breaks=bin_labels,
-             col=viridis(length(year_bins)-1),
-             maxpixels=raster::ncell(week1_moll),
-             legend=FALSE)
-par(mar=c(0,0,0,5))
+             xaxt = 'n', 
+             yaxt = 'n', 
+             bty = 'n',
+             ext = sp_ext_moll, 
+             breaks = year_bins,
+             lab.breaks = bin_labels,
+             col = viridis(length(year_bins) - 1),
+             maxpixels = raster::ncell(week1_moll),
+             legend = FALSE)
+par(mar = c(0,0,0,5))
 raster::plot(week26_moll, 
-             xaxt='n', 
-             yaxt='n', 
-             bty='n',
-             ext=sp_ext_moll, 
-             breaks=year_bins,
-             lab.breaks=bin_labels,
-             col=viridis(length(year_bins)-1),
+             xaxt = 'n', 
+             yaxt = 'n', 
+             bty = 'n',
+             ext = sp_ext_moll, 
+             breaks = year_bins,
+             lab.breaks = bin_labels,
+             col = viridis(length(year_bins) - 1),
              maxpixels=raster::ncell(week26_moll))
 ```
 
@@ -273,14 +273,14 @@ raster::plot(week26_moll,
 
 With a good full-annual extent and color bins, that accurately represent the data distribution, we can add in other pieces of data that represent predicted and assumed zeroes, which help display the extent of estimation.
 
-```{r plot_es, warnings=FALSE}
+```{r plot_es}
 # pull in species-specific ensemble support, represent predicted 0s where there is no abundance value
 pos_es_path <- paste(root_path, 
                      species, 
                      "/results/tifs/presentation/abundance_ensemble_support", 
                      sep = "")
 pos_es_stack <- stack_stem(pos_es_path)
-week26_pes <- raster::projectRaster(pos_es_stack[[26]], crs=mollweide)
+week26_pes <- raster::projectRaster(pos_es_stack[[26]], crs = mollweide)
 
 # to represent assumed 0s, we have provided the data object zero_es_stack
 # that has values for the ensemble support indicating sufficient checklists
@@ -289,7 +289,7 @@ week26_pes <- raster::projectRaster(pos_es_stack[[26]], crs=mollweide)
 zero_es_stack
 week26_zes_vals <- raster::projectRaster(raster::mask(zero_es_stack[[26]], 
                                                  template_raster), 
-                                    crs=mollweide)
+                                    crs = mollweide)
 
 # we'll combine the two types of zeroes with the positive prediction for plotting
 week26_pes[week26_pes] <- 0
@@ -298,7 +298,7 @@ week26_zes[week26_zes == 0] <- NA
 week26_zes[week26_zes == 1] <- 0
 
 week26s <- raster::stack(week26_pes, week26_zes, week26_moll)
-week26c <- raster::calc(week26s, max, na.rm=TRUE)
+week26c <- raster::calc(week26s, max, na.rm = TRUE)
 
 # to add context, let's pull in some reference data to add
 wh <- rnaturalearth::ne_countries(continent = c("North America",
@@ -307,19 +307,19 @@ wh_states <- rnaturalearth::ne_states(iso_a2 = unique(wh@data$iso_a2))
 wh_moll <- sp::spTransform(wh, mollweide)
 wh_states_moll <- sp::spTransform(wh_states, mollweide)
 
-par(mar=c(0,0,0,2))
+par(mar = c(0,0,0,2))
 raster::plot(week26c, 
-             xaxt='n', 
-             yaxt='n',
-             bty='n',
-             ext=sp_ext_moll, 
-             breaks=year_bins,
-             lab.breaks=bin_labels,
-             col=viridis(length(year_bins)-1),
-             maxpixels=raster::ncell(week26c),
-             legend=TRUE)
-sp::plot(wh_moll, add=TRUE, border='gray')
-sp::plot(wh_states_moll, add=TRUE, border='gray', lwd=0.5)
+             xaxt = 'n', 
+             yaxt = 'n',
+             bty = 'n',
+             ext = sp_ext_moll, 
+             breaks = year_bins,
+             lab.breaks = bin_labels,
+             col = viridis(length(year_bins)-1),
+             maxpixels = raster::ncell(week26c),
+             legend = TRUE)
+sp::plot(wh_moll, add = TRUE, border = 'gray')
+sp::plot(wh_states_moll, add = TRUE, border = 'gray', lwd = 0.5)
 ```
 
 ## Mapping Abundance Confidence Intervals
@@ -339,56 +339,63 @@ upper_stack <- stack_stem(upper_path)
 # calculate band width
 conf_band <- upper_stack - lower_stack
 
-conf_week26 <- raster::projectRaster(conf_band[[26]], crs=mollweide)
+conf_week26 <- raster::projectRaster(conf_band[[26]], crs = mollweide)
 
-par(mar=c(0,0,0,2))
+par(mar = c(0,0,0,2))
 raster::plot(conf_week26, 
-             xaxt='n', 
-             yaxt='n',
-             bty='n',
-             ext=sp_ext_moll,
-             col=magma(20),
+             xaxt = 'n', 
+             yaxt = 'n',
+             bty = 'n',
+             ext = sp_ext_moll,
+             col = magma(20),
              maxpixel=raster::ncell(conf_week26))
-
 ```
 
 # 4. Extracting Trajectories with Uncertainty
 
 With raster stacks for abundance, upper, and lower confidence intervals, we can extract an abundnace trajectory, with uncertainty intervals and plot them across the year for a single location.
 
-```{r trajectories, warnings=FALSE}
-
+```{r trajectories}
 # set a point
 coords <- cbind(-76.5, 42.5)
 pt <- sp::SpatialPoints(coords, proj4string = sp::CRS("+init=epsg:4326"))
 pt_prj <- sp::spTransform(pt, sp::CRS(sp::proj4string(template_raster)))
 
 # extract
-abund_traj <- unlist(raster::extract(abund_stack, pt_prj, fun=mean, na.rm=TRUE))
-upper_traj <- unlist(raster::extract(upper_stack, pt_prj, fun=mean, na.rm=TRUE))
-lower_traj <- unlist(raster::extract(lower_stack, pt_prj, fun=mean, na.rm=TRUE))
+abund_traj <- unlist(raster::extract(abund_stack, 
+                                     pt_prj, 
+                                     fun = mean, 
+                                     na.rm = TRUE))
+upper_traj <- unlist(raster::extract(upper_stack, 
+                                     pt_prj, 
+                                     fun = mean, 
+                                     na.rm = TRUE))
+lower_traj <- unlist(raster::extract(lower_stack, 
+                                     pt_prj, 
+                                     fun = mean, 
+                                     na.rm = TRUE))
 
 # Plot trajectories
 library(ggplot2)
 
-plot_frame <- data.frame(x=1:length(abund_traj),
-                         y=c(unname(abund_traj)),
-                         upper=c(unname(upper_traj)),
-                         lower=c(unname(lower_traj)))
+plot_frame <- data.frame(x = 1:length(abund_traj),
+                         y = c(unname(abund_traj)),
+                         upper = c(unname(upper_traj)),
+                         lower = c(unname(lower_traj)))
 
 g <- ggplot(plot_frame, aes(x, y)) +
-     geom_line(data=plot_frame) +
-     geom_ribbon(data=plot_frame, aes(ymin=lower, ymax=upper), alpha = 0.3) +
+     geom_line(data = plot_frame) +
+     geom_ribbon(data = plot_frame, 
+                 aes(ymin = lower, ymax = upper), 
+                 alpha = 0.3) +
      ylab("Expected Count (count/(km hr))") +
      xlab("Week")
 g
-
 ```
 
 It is also possible to extract trajectories for regions, but it takes a little more data work.
 
-```{r trajectories_region, warnings=FALSE}
-
+```{r trajectories_region}
 # set a point
 coords <- cbind(-76.5, 42.5)
 pt <- sp::SpatialPoints(coords, proj4string = sp::CRS("+init=epsg:4326"))
@@ -401,53 +408,51 @@ wv <- us_prj[us_prj@data$name == "West Virginia",]
 
 # extract
 # because we're using regions, we get lots of values that we need to average together
-abund_traj <- raster::extract(abund_stack, wv, fun=mean, na.rm=TRUE)
-abund_traj <- apply(abund_traj, 2, mean, na.rm=TRUE)
+abund_traj <- raster::extract(abund_stack, wv, fun = mean, na.rm = TRUE)
+abund_traj <- apply(abund_traj, 2, mean, na.rm = TRUE)
 
-upper_traj <- raster::extract(upper_stack, wv, fun=mean, na.rm=TRUE)
-upper_traj <- apply(upper_traj, 2, mean, na.rm=TRUE)
+upper_traj <- raster::extract(upper_stack, wv, fun = mean, na.rm = TRUE)
+upper_traj <- apply(upper_traj, 2, mean, na.rm = TRUE)
 
-lower_traj <- raster::extract(lower_stack, wv, fun=mean, na.rm=TRUE)
-lower_traj <- apply(lower_traj, 2, mean, na.rm=TRUE)
+lower_traj <- raster::extract(lower_stack, wv, fun = mean, na.rm = TRUE)
+lower_traj <- apply(lower_traj, 2, mean, na.rm = TRUE)
 
 # Plot trajectories
 library(ggplot2)
 
-plot_frame <- data.frame(x=1:length(abund_traj),
-                         y=c(unname(abund_traj)),
-                         upper=c(unname(upper_traj)),
-                         lower=c(unname(lower_traj)))
+plot_frame <- data.frame(x = 1:length(abund_traj),
+                         y = c(unname(abund_traj)),
+                         upper = c(unname(upper_traj)),
+                         lower = c(unname(lower_traj)))
 
 g <- ggplot(plot_frame, aes(x, y)) +
-     geom_line(data=plot_frame) +
-     geom_ribbon(data=plot_frame, aes(ymin=lower, ymax=upper), alpha = 0.3) +
+     geom_line(data = plot_frame) +
+     geom_ribbon(data = plot_frame, 
+                 aes(ymin = lower, ymax =upper), 
+                 alpha = 0.3) +
      ylab("Expected Count (count/(km hr))") +
      xlab("Week")
 g
-
 ```
 
 # 5. Plotting Predictor Importance and Partial Dependencies
 
-Blah, blah, blah...
+To complete...
 
 ## Loading Data
 
 ```{r load_pipd}
-
 # path to species bundle
 sp_path <- paste(root_path, species, sep = "")
 
 pis <- load_pis(sp_path)
 pds <- load_pds(sp_path)
-
 ```
 
 
 ## Select Region and Season
 
-```{r map_centroids, warning=FALSE, messages=FALSE}
-
+```{r map_centroids}
 ne_extent <- list()
 ne_extent <- list(type = "rectangle",
                   y.min = 40,  
@@ -457,61 +462,50 @@ ne_extent <- list(type = "rectangle",
 		              t.min = 0.425,
 	 	              t.max = 0.475)
 
-map_centroids(pis=pis, pds=pds, st_extent=ne_extent)
-
+map_centroids(pis = pis, pds = pds, st_extent = ne_extent)
 ```
 
 
 ## Plot available centroids and extent of analysis
 
 ```{r plot_extents}
-
-par(mfrow=c(1,2), mar=c(0,0,0,4))
+par(mfrow = c(1,2), mar = c(0,0,0,4))
 pi_extent <- calc_effective_extent(ne_extent, pis = pis)
 pd_extent <- calc_effective_extent(ne_extent, pds = pds)
-
 ```
 
 ## Plot Predictor Importance
 
 ```{r plot_pis}
-
-par(mfrow=c(1,2), mar=c(0,0,0,0))
-
 # with all classes
 plot_pis(pis, st_extent = ne_extent, by_cover_class = FALSE)
 
 # aggregating fragstats for cover classes
 plot_pis(pis, st_extent = ne_extent, by_cover_class = TRUE)
-
 ```
 
 ## Plot Partial Depedencies
 
 ```{r plot_pds}
-
 mypds <- plot_pds(pd_name = "EFFORT_HRS", 
                   pds = pds, 
                   st_extent = ne_extent, 
                   pointwise_pi = TRUE, 
                   stixel_pds = TRUE)
-
 ```
 
 ## Cake Plots
 
 When PIs and PDs are combined with can get predictor importance with directionality. By week, these can be turned into a stacked area chart (we affectionately call cake plots) that show the relative predictor importance and directionality by week.
 
-```{r cake_plots, message=FALSE, warning=FALSE}
-
-# this requires a fair amount of computation
+```{r cake_plots}
+# this requires a fair amount of computation, about 5 minutes
 cake_plot(path = sp_path,
           pis = pis,
           pds = pds,
           st_extent = ne_extent,
           by_cover_class = TRUE,
           pland_and_lpi_only = TRUE)
-
 ```
 
 ### References
