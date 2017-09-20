@@ -43,74 +43,85 @@ stack_stem <- function(path) {
 
 #' Config file loader
 #'
-#' Used by load_summary(), load_pis(), and load_pds()
+#' Internal function used by load_summary(), load_pis(), and load_pds() to get
+#' configuration variables from species run information.
 load_config <- function(path) {
   e <- new.env()
-  config_file <- list.files(paste(path, "/data", sep = ""), pattern="*_config*")
+  config_file <- list.files(paste(path, "/data", sep = ""),
+                            pattern = "*_config*")
+
+  if(!file.exists(config_file)) {
+    stop("*_config.RData file does not exist in the /data directory.")
+  }
+
   load(paste(path, "/data/", config_file, sep = ""), envir = e)
+  rm(config_file)
 
   return(e)
 }
 
 #' Summary file loader
 #'
-#' Used by load_pis() and load_pds()
+#' Internal function used by load_pis() and load_pds() to get the stixel
+#' summary information
 load_summary <- function(path) {
   e <- load_config(path)
 
-  # load summary
+  # define stixel summary fields
   train_covariate_means_names <- paste("train.cov.mean",
                                        e$PREDICTOR_LIST,
                                        sep = "_")
   srd_covariate_means_names <- paste("srd.cov.mean",
                                      e$PREDICTOR_LIST,
                                      sep = "_")
-  summary_vec_name_vec <-c(
-    "srd.n",
-    "centroid.lon",
-    "centroid.lat",
-    "centroid.date",
-    "stixel_width",
-    "stixel_height",
-    "stixel_area",
-    "train.n",
-    "positive.ob_n",
-    "stixel_prevalence",
-    "mean_non_zero_count",
-    # ------------
-    "binary_Kappa",
-    "binary_AUC",
-    # ------------
-    "binary.deviance_model",
-    "binary.deviance_mean",
-    "binary.deviance_explained",
-    "pois.deviance_model",
-    "pois.deviance_mean",
-    "posi.deviance_explained",
-    # ------------
-    "total_EFFORT_HRS",
-    "total_EFFORT_DISTANCE_KM",
-    "total_NUMBER_OBSERVERS",
-    "train_elevation_mean",
-    # ------------
-    train_covariate_means_names, #k-covariate values
-    "train_covariate_entropy",
-    "srd_elevation_mean",
-    srd_covariate_means_names, #k-covariate values
-    "srd_covariate_entropy" )
+  summary_vec_name_vec <- c("srd.n",
+                            "centroid.lon",
+                            "centroid.lat",
+                            "centroid.date",
+                            "stixel_width",
+                            "stixel_height",
+                            "stixel_area",
+                            "train.n",
+                            "positive.ob_n",
+                            "stixel_prevalence",
+                            "mean_non_zero_count",
+                            "binary_Kappa",
+                            "binary_AUC",
+                            "binary.deviance_model",
+                            "binary.deviance_mean",
+                            "binary.deviance_explained",
+                            "pois.deviance_model",
+                            "pois.deviance_mean",
+                            "posi.deviance_explained",
+                            "total_EFFORT_HRS",
+                            "total_EFFORT_DISTANCE_KM",
+                            "total_NUMBER_OBSERVERS",
+                            "train_elevation_mean",
+                            train_covariate_means_names, #k-covariate values
+                            "train_covariate_entropy",
+                            "srd_elevation_mean",
+                            srd_covariate_means_names, #k-covariate values
+                            "srd_covariate_entropy")
 
   stixel_path <- "/results/abund_preds/unpeeled_folds/"
-  summary_vec <- data.table::fread(paste(path, stixel_path,
-                                         "summary.txt", sep=""))
+  summary_file <- paste(path, stixel_path, "summary.txt", sep = "")
+
+  if(!file.exists(summary_file)) {
+    stop(paste("The file summary.txt does not exist at ",
+               path, stixel_path, sep = ""))
+  }
+
+  summary_vec <- data.table::fread(summary_file)
   names(summary_vec)[3] <- "stixel.id"
   names(summary_vec)[4:ncol(summary_vec)] <- summary_vec_name_vec
 
   summary_nona <- summary_vec[!is.na(summary_vec$centroid.lon), ]
+  rm(summary_vec, summary_file)
 
   return(summary_nona)
 }
 
-#' Loads PI data
+#' Load Predictor Importance file for a single species
 #'
 #' @import data.table
 #' @export
@@ -118,23 +129,29 @@ load_pis <- function(path) {
   # load config vars
   e <- load_config(path)
 
-  # load pi.txt
+  # load pi.txt and set column names
   stixel_path <- "/results/abund_preds/unpeeled_folds/"
-  pi_vec <- data.table::fread(paste(path, stixel_path, "pi.txt", sep = ""))
+  pi_file <- paste(path, stixel_path, "pi.txt", sep = "")
+
+  if(!file.exists(pi_file)) {
+    stop(paste("The file pi.txt does not exist at",
+               path, stixel_path, sep = ""))
+  }
+
+  pi_vec <- data.table::fread(pi_file)
   names(pi_vec)[4:ncol(pi_vec)] <- e$PI_VARS
   names(pi_vec)[3] <- "stixel.id"
 
   # get summary file
   summary_file <- stemhelper:::load_summary(path)
 
-  # merge
+  # merge pis with summary
   pi_summary <- merge(pi_vec, summary_file, by = c("stixel.id"))
   rm(pi_vec, summary_file)
 
-  # return
-  # TODO, what else should we select to return?
-  pi_summary[,c("V1.x", "V2.x", "V1.y", "V2.y") := NULL]
-  pi_summary <- pi_summary[,1:98]
+  # return subset
+  pi_summary[, c("V1.x", "V2.x", "V1.y", "V2.y") := NULL]
+  pi_summary <- pi_summary[, 1:98]
 
   return(as.data.frame(pi_summary))
 }
@@ -149,7 +166,15 @@ load_pds <- function(path) {
 
   # load pi.txt
   stixel_path <- "/results/abund_preds/unpeeled_folds/"
-  pd_vec <- data.table::fread(paste(path, stixel_path, "/pd.txt", sep = ""))
+  pd_file <- paste(path, stixel_path, "/pd.txt", sep = "")
+
+  if(!file.exists(pd_file)) {
+    stop(paste("The file pd.txt does not exist at ",
+               path, stixel_path, sep = ""))
+  }
+
+  # load pd.txt
+  pd_vec <- data.table::fread(pd_file)
   names(pd_vec)[3] <- "stixel.id"
 
   # load summary file
@@ -159,10 +184,9 @@ load_pds <- function(path) {
   pd_summary <- merge(pd_vec, summary_file, by = c("stixel.id"), all.y = TRUE)
   rm(pd_vec, summary_file)
 
-  # return
-  # TODO, what else should we select to return?
-  pd_summary[,c("V1.x", "V2.x", "V1.y", "V2.y") := NULL]
-  pd_summary <- pd_summary[,1:114]
+  # return a subset of the fields
+  pd_summary[ ,c("V1.x", "V2.x", "V1.y", "V2.y") := NULL]
+  pd_summary <- pd_summary[, 1:114]
 
   return(as.data.frame(pd_summary))
 }
