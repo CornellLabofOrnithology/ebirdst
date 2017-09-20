@@ -47,10 +47,12 @@ calc_full_extent <- function(stack) {
   } else {
     this_template_raster <- tr
   }
+  rm(tr, stack)
 
   # create object of this template_raster for comparison to extent extracted
   # from the stack above
   template_raster_extent <- raster::extent(this_template_raster)
+  rm(this_template_raster)
 
   # xmin too low
   if(map_extent[1] < template_raster_extent[1]) {
@@ -92,93 +94,122 @@ calc_full_extent <- function(stack) {
 #'
 #' raster::plot(raster_stack[[1]], xaxt='n', yaxt='n', breaks=year_bins)
 calc_bins <- function(stack) {
+
+  # get a vector of all the values in the stack
   zrv <- raster::getValues(stack)
+
+  # log transform the non-NA values
+  # there shouldn't be zero values in here based on how the data is stored
+  # however, it might be worth a check
   lzwk <- log(zrv[!is.na(zrv)])
   rm(zrv)
 
-  # LOG SD
+  # setup the binning structure
+  # calculate metrics
+  maxl <- max(lzwk)
+  minl <- min(lzwk)
   mdl <- mean(lzwk)
   sdl <- sd(lzwk)
-  log_sd <- c(mdl-(3.00*sdl),mdl-(2.50*sdl),mdl-(2.00*sdl),mdl-(1.75*sdl),
-              mdl-(1.50*sdl),mdl-(1.25*sdl),mdl-(1.00*sdl),mdl-(0.75*sdl),
-              mdl-(0.50*sdl),mdl-(0.25*sdl),mdl-(0.125*sdl),
-              mdl,
-              mdl+(0.125*sdl),mdl+(0.25*sdl),mdl+(0.50*sdl),mdl+(0.75*sdl),
-              mdl+(1.00*sdl),mdl+(1.25*sdl),mdl+(1.50*sdl),mdl+(1.75*sdl),
-              mdl+(2.00*sdl),mdl+(2.50*sdl),mdl+(3.00*sdl))
+  rm(lzwk)
 
-  if(max(lzwk) > mdl+(3.00*sdl)) {
-    log_sd <- append(log_sd, max(lzwk))
+  # build a vector of bins
+  log_sd <- c(mdl - (3.00 * sdl),
+              mdl - (2.50 * sdl),
+              mdl - (2.00 * sdl),
+              mdl - (1.75 * sdl),
+              mdl - (1.50 * sdl),
+              mdl - (1.25 * sdl),
+              mdl - (1.00 * sdl),
+              mdl - (0.75 * sdl),
+              mdl - (0.50 * sdl),
+              mdl - (0.25 * sdl),
+              mdl - (0.125 * sdl),
+              mdl,
+              mdl + (0.125 * sdl),
+              mdl + (0.25 * sdl),
+              mdl + (0.50 * sdl),
+              mdl + (0.75 * sdl),
+              mdl + (1.00 * sdl),
+              mdl + (1.25 * sdl),
+              mdl + (1.50 * sdl),
+              mdl + (1.75 * sdl),
+              mdl + (2.00 * sdl),
+              mdl + (2.50 * sdl),
+              mdl + (3.00 * sdl))
+
+  # lots of checks for values outside of the upper and lower bounds
+
+  # add max if the max is greater than +3 SD break
+  if(maxl > mdl + (3.00 * sdl)) {
+    log_sd <- append(log_sd, maxl)
   }
 
-  if(max(lzwk) < mdl+(3.00*sdl)) {
+  # remove +3 SD break if it is greater than max
+  if(maxl < mdl + (3.00 * sdl)) {
     log_sd <- log_sd[1:length(log_sd)-1]
   }
 
-  if(min(lzwk) < mdl-(3.00*sdl)) {
-    log_sd <- append(log_sd, min(lzwk), after=0)
+  # add min if the min is less than -3 SD break
+  if(minl < mdl - (3.00 * sdl)) {
+    log_sd <- append(log_sd, minl, after = 0)
   }
 
-  if(min(lzwk) > mdl-(3.00*sdl)) {
+  # remove the -3 SD break if it is less than the min
+  if(minl > mdl - (3.00 * sdl)) {
     log_sd <- log_sd[2:length(log_sd)]
   }
 
-  if(exp(min(lzwk)) > 0) {
-    log_sd <- append(log_sd, -Inf, after=0)
+  # if the untransformed min is greater than 0, add a zero break
+  if(exp(minl) > 0) {
+    log_sd <- append(log_sd, -Inf, after = 0)
   }
 
-  rm(lzwk)
-
+  # untransform
   bins <- exp(log_sd)
+  rm(log_sd)
 
   return(bins)
 }
-
-
 
 #' Map PI and PD centroid locations for species
 #'
 #' @export
 map_centroids <- function(pis,
-                           pds,
-                           st_extent = NA,
-                           plot_pis = TRUE,
-                           plot_pds = TRUE,
-                           ...) {
+                          pds,
+                          st_extent = NA,
+                          plot_pis = TRUE,
+                          plot_pds = TRUE,
+                          ...) {
 
   if(plot_pds == FALSE & plot_pis == FALSE) {
     stop("Plotting of both PIs and PDs set to FALSE. Nothing to plot!")
   }
 
+  # projection information
   ll <- "+init=epsg:4326"
   mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
 
+  # initialize graphical parameters
   par(mar=c(0,0,3,0))
   title_text <- ""
 
+  # gather the reference data
+  wh <- rnaturalearth::ne_countries(continent = c("North America",
+                                                  "South America"),
+                                    scale = 50)
+  wh_states <- rnaturalearth::ne_states(iso_a2 = unique(wh@data$iso_a2))
+  wh_moll <- sp::spTransform(wh, mollweide)
+  wh_states_moll <- sp::spTransform(wh_states, mollweide)
+
+  # Plotting PDs
   if(plot_pds == TRUE) {
-    tpds <- unique(pds[, c("centroid.lon","centroid.lat","centroid.date")])
-    tpds_sp <- sp::SpatialPointsDataFrame(tpds[,c("centroid.lon",
-                                                  "centroid.lat")],
+    tpds <- unique(pds[, c("centroid.lon", "centroid.lat", "centroid.date")])
+    tpds_sp <- sp::SpatialPointsDataFrame(tpds[, c("centroid.lon",
+                                                   "centroid.lat")],
                                           tpds,
                                           proj4string = sp::CRS(ll))
-    tpds_ext <- raster::extent(tpds_sp)
     tpds_prj <- sp::spTransform(tpds_sp, sp::CRS(mollweide))
     rm(tpds)
-
-    # this is the wrong way to check
-    if(!is.na(st_extent)) {
-      tpds_sub <- tpds_sp[tpds_sp$centroid.date > st_extent$t.min &
-                            tpds_sp$centroid.date <= st_extent$t.max &
-                            tpds_sp$centroid.lat > st_extent$y.min &
-                            tpds_sp$centroid.lat <= st_extent$y.max &
-                            tpds_sp$centroid.lon > st_extent$x.min &
-                            tpds_sp$centroid.lon <= st_extent$x.max, ]
-
-      tpds_region <- sp::spTransform(tpds_sub, sp::CRS(mollweide))
-    }
-
-    rm(tpds_sp)
 
     # start plot with all possible PDs
     raster::plot(tpds_prj,
@@ -187,8 +218,18 @@ map_centroids <- function(pis,
                  cex = 0.5,
                  pch = 16)
 
-    # plot PDs in st_extent
-    if(!is.na(st_extent)) {
+    if(!all(is.na(st_extent))) {
+      tpds_sub <- tpds_sp[tpds_sp$centroid.date > st_extent$t.min &
+                          tpds_sp$centroid.date <= st_extent$t.max &
+                          tpds_sp$centroid.lat > st_extent$y.min &
+                          tpds_sp$centroid.lat <= st_extent$y.max &
+                          tpds_sp$centroid.lon > st_extent$x.min &
+                          tpds_sp$centroid.lon <= st_extent$x.max, ]
+
+      tpds_region <- sp::spTransform(tpds_sub, sp::CRS(mollweide))
+      rm(tpds_sub)
+
+      # plot PDs in st_extent
       raster::plot(tpds_region,
                    ext = raster::extent(tpds_prj),
                    col = "blue",
@@ -196,100 +237,72 @@ map_centroids <- function(pis,
                    pch = 16,
                    add = TRUE)
     }
+    rm(tpds_sp)
 
     title_text <- paste(title_text,
                         "Available PDs: ", nrow(tpds_prj), "\n",
                         "Selected PDs: ", nrow(tpds_region), "\n",
                         sep = "")
+
+    wh_extent <- raster::extent(tpds_prj)
+    rm(tpds_prj, tpds_region)
   }
 
+  # Plotting PIs
   if(plot_pis == TRUE) {
-    tpis <- unique(pis[, c("centroid.lon","centroid.lat","centroid.date")])
-    tpis_sp <- sp::SpatialPointsDataFrame(tpis[,c("centroid.lon",
-                                                  "centroid.lat")],
+    tpis <- unique(pis[, c("centroid.lon", "centroid.lat", "centroid.date")])
+    tpis_sp <- sp::SpatialPointsDataFrame(tpis[, c("centroid.lon",
+                                                   "centroid.lat")],
                                           tpis,
                                           proj4string = sp::CRS(ll))
-    tpis_ext <- raster::extent(tpis_sp)
     tpis_prj <- sp::spTransform(tpis_sp, mollweide)
     rm(tpis)
 
-    # this is the wrong way to check
-    if(!is.na(st_extent)) {
+    if(plot_pds == FALSE) {
+      wh_extent <- raster::extent(tpis_prj)
+    }
+
+    # start plot with all possible PIs
+    raster::plot(tpis_prj,
+                 ext = wh_extent,
+                 col = "darkred",
+                 cex = 0.5,
+                 pch = 16,
+                 add = plot_pds)
+
+    if(!all(is.na(st_extent))) {
       tpis_sub <- tpis_sp[tpis_sp$centroid.date > st_extent$t.min &
-                            tpis_sp$centroid.date <= st_extent$t.max &
-                            tpis_sp$centroid.lat > st_extent$y.min &
-                            tpis_sp$centroid.lat <= st_extent$y.max &
-                            tpis_sp$centroid.lon > st_extent$x.min &
-                            tpis_sp$centroid.lon <= st_extent$x.max, ]
+                          tpis_sp$centroid.date <= st_extent$t.max &
+                          tpis_sp$centroid.lat > st_extent$y.min &
+                          tpis_sp$centroid.lat <= st_extent$y.max &
+                          tpis_sp$centroid.lon > st_extent$x.min &
+                          tpis_sp$centroid.lon <= st_extent$x.max, ]
 
       tpis_region <- sp::spTransform(tpis_sub, sp::CRS(mollweide))
-    }
-    rm(tpis_sp)
 
-    # plot
-    wh <- rnaturalearth::ne_countries(continent = c("North America",
-                                                    "South America"),
-                                      scale = 50)
-    wh_states <- rnaturalearth::ne_states(iso_a2 = unique(wh@data$iso_a2))
-    wh_moll <- sp::spTransform(wh, mollweide)
-    wh_states_moll <- sp::spTransform(wh_states, mollweide)
-
-    if(plot_pds == TRUE) {
-      # start plot with all possible PDs
-      raster::plot(tpis_prj,
-                   ext = raster::extent(tpds_prj),
-                   col = "darkred",
+      # plot PIs in st_extent
+      raster::plot(tpis_region,
+                   ext = wh_extent,
+                   col = "red",
                    cex = 0.5,
                    pch = 16,
                    add = TRUE)
-
-      # plot PDs in st_extent
-      if(!is.na(st_extent)) {
-        raster::plot(tpis_region,
-                     ext = raster::extent(tpds_prj),
-                     col = "red",
-                     cex = 0.5,
-                     pch = 16,
-                     add = TRUE)
-      }
-
-      raster::plot(wh_moll, ext = raster::extent(tpds_prj), add = TRUE)
-      raster::plot(wh_states_moll,
-                   ext = raster::extent(tpds_prj),
-                   lwd = 0.5,
-                   add = TRUE)
-    } else {
-      # start plot with all possible PDs
-      raster::plot(tpis_prj,
-                   ext = raster::extent(tpis_sp_prj),
-                   col = "darkred",
-                   cex = 0.5,
-                   pch = 16)
-
-      # plot PDs in st_extent
-      if(!is.na(st_extent)) {
-        raster::plot(tpis_region,
-                     ext = raster::extent(tpis_sp_prj),
-                     add = TRUE,
-                     col = "red",
-                     cex = 0.5,
-                     pch = 2,
-                     add = TRUE)
-      }
-      raster::plot(wh_moll, ext = raster::extent(tpis_sp_prj), add = TRUE)
-      raster::plot(wh_states_moll,
-                   ext = raster::extent(tpis_sp_prj),
-                   lwd = 0.5,
-                   add = TRUE)
     }
+    rm(tpis_sp)
 
     title_text <- paste(title_text,
                         "Available PIs: ", nrow(tpis_prj), "\n",
                         "Selected PIs: ", nrow(tpis_region), "\n",
                         sep = "")
+    rm(tpis_prj, tpis_region)
   }
 
-  title(main = title_text, cex.main = 0.75, line=-1)
+  # plot reference data
+  raster::plot(wh_moll, ext = wh_extent, add = TRUE)
+  raster::plot(wh_states_moll, ext = wh_extent, lwd = 0.5, add = TRUE)
+
+  # add title
+  title(main = title_text, cex.main = 0.75, line = -1)
 }
 
 #' Map extent of estimation calculated from subset of centroids
@@ -300,49 +313,44 @@ calc_effective_extent <- function(st_extent,
                                   pis = NA,
                                   pds = NA) {
 
-  if(is.na(pis) & is.na(pds)) {
+  if(is.null(nrow(pis)) & is.null(nrow(pds))) {
     stop("Both PIs and PDs are NA. Nothing to calculate.")
   }
 
-  if(!is.na(pis) & !is.na(pds)) {
+  if(!is.null(nrow(pis)) & !is.null(nrow(pds))) {
     stop("Unable to calculate for both PIs and PDs, supply one or the other.")
   }
 
-
-  # select the centroid locs
+  # projection info
   ll <- "+init=epsg:4326"
   mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
 
-  if(!is.na(pis)) {
+  # set object based on whether using PIs or PDs
+  if(!is.null(nrow(pis))) {
     stixels <- pis
   } else {
     stixels <- pds
   }
+  rm(pis, pds)
 
+  # subset, create spatial data, project
   tpis <- unique(stixels[, c("centroid.lon", "centroid.lat", "centroid.date",
                              "stixel_width", "stixel_height")])
   tpis_sp <- sp::SpatialPointsDataFrame(tpis[,c("centroid.lon",
                                                 "centroid.lat")],
                                         tpis,
                                         proj4string = sp::CRS(ll))
-
-  tpis_sp_prj <- sp::spTransform(tpis_sp,
-                                 sp::CRS(
-                                   sp::proj4string(
-                                     stemhelper::template_raster)))
-
-  sp_ext <- raster::extent(tpis_sp_prj)
-  rm(tpis, tpis_sp_prj)
+  rm(tpis)
 
   tpis_sub <- tpis_sp[tpis_sp$centroid.date > st_extent$t.min &
-                        tpis_sp$centroid.date <= st_extent$t.max &
-                        tpis_sp$centroid.lat > st_extent$y.min &
-                        tpis_sp$centroid.lat <= st_extent$y.max &
-                        tpis_sp$centroid.lon > st_extent$x.min &
-                        tpis_sp$centroid.lon <= st_extent$x.max, ]
+                      tpis_sp$centroid.date <= st_extent$t.max &
+                      tpis_sp$centroid.lat > st_extent$y.min &
+                      tpis_sp$centroid.lat <= st_extent$y.max &
+                      tpis_sp$centroid.lon > st_extent$x.min &
+                      tpis_sp$centroid.lon <= st_extent$x.max, ]
+  rm(tpis_sp)
 
   # build stixels as polygons
-
   # create corners
   xPlus <- tpis_sub$centroid.lon + (tpis_sub$stixel_width/2)
   yPlus <- tpis_sub$centroid.lat + (tpis_sub$stixel_height/2)
@@ -355,14 +363,12 @@ calc_effective_extent <- function(st_extent,
                   yMinus, xMinus, yMinus, xMinus, yPlus)
 
   polys <- sp::SpatialPolygons(mapply(function(poly, id) {
-    xy <- matrix(poly, ncol=2, byrow=TRUE)
-    sp::Polygons(list(sp::Polygon(xy)), ID=id)
-  },
-  split(square, row(square)),
-  ID),
-  proj4string=sp::CRS("+init=epsg:4326"))
+    xy <- matrix(poly, ncol = 2, byrow = TRUE)
+    sp::Polygons(list(sp::Polygon(xy)), ID = id)
+  }, split(square, row(square)), ID), proj4string = sp::CRS("+init=epsg:4326"))
 
   tdspolydf <- sp::SpatialPolygonsDataFrame(polys, tpis_sub@data)
+  rm(xPlus, yPlus, xMinu, yMinus, ID, square, polys)
 
   # assign value
   tdspolydf$weight <- 1
@@ -372,6 +378,7 @@ calc_effective_extent <- function(st_extent,
                                    sp::CRS(
                                      sp::proj4string(
                                        stemhelper::template_raster)))
+  rm(tdspolydf)
 
   # summarize...not sure how to do this step
   tpis_r <- raster::rasterize(tdspolydf_prj,
@@ -380,9 +387,11 @@ calc_effective_extent <- function(st_extent,
                               fun=sum)
 
   tpis_per <- tpis_r/nrow(tpis_sub)
+  rm(tpis_r)
   tpis_per[tpis_per < 0.50] <- NA
 
   # plot
+  # setup reference data
   wh <- rnaturalearth::ne_countries(continent = c("North America",
                                                   "South America"),
                                     scale = 50)
@@ -390,15 +399,13 @@ calc_effective_extent <- function(st_extent,
   wh_moll <- sp::spTransform(wh, mollweide)
   wh_states_moll <- sp::spTransform(wh_states, mollweide)
 
-  tpis_per_prj <- raster::projectRaster(raster::mask(tpis_per,
-                                                     stemhelper::template_raster),
-                                        crs=mollweide)
+  tpis_per_prj <- raster::projectRaster(
+    raster::mask(tpis_per, stemhelper::template_raster), crs=mollweide)
 
   tdspolydf_moll <- sp::spTransform(tdspolydf_prj, mollweide)
 
   # project the selected points to mollweide
   tpis_sub_moll <- sp::spTransform(tpis_sub, mollweide)
-
 
   par(mar=c(0,0,0,2))
   raster::plot(tpis_per_prj,
