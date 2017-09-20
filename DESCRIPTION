@@ -20,4 +20,5 @@ Imports: raster,
     gbm,
     mgcv,
     dplyr,
-    rgeos
+    rgeos,
+    randomcoloR
