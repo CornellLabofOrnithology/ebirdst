@@ -368,7 +368,7 @@ calc_effective_extent <- function(st_extent,
   }, split(square, row(square)), ID), proj4string = sp::CRS("+init=epsg:4326"))
 
   tdspolydf <- sp::SpatialPolygonsDataFrame(polys, tpis_sub@data)
-  rm(xPlus, yPlus, xMinu, yMinus, ID, square, polys)
+  rm(xPlus, yPlus, xMinus, yMinus, ID, square, polys)
 
   # assign value
   tdspolydf$weight <- 1
