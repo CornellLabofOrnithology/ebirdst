@@ -29,28 +29,20 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="..//index.html">
-    <span class="fa fa-home fa-lg"></span>
-     
-  </a>
+  <a href="../articles/stem-vignette.html">Vignette</a>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
-</li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-<li>
-      <a href="../articles/stem-vignette.html">stemhelper: STEM Use and Helper Functions</a>
-    </li>
-  </ul>
+  <a href="../reference/index.html">Function Reference</a>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/CornellLabofOrnithology/stemhelper">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -65,7 +57,7 @@
       <h1>stemhelper: STEM Use and Helper Functions</h1>
                         <h4 class="author">Tom Auer &amp; Daniel Fink</h4>
             
-            <h4 class="date">2017-09-14</h4>
+            <h4 class="date">2017-09-20</h4>
           </div>
 
     
@@ -170,25 +162,20 @@ abund_stack</code></pre></div>
 <p>The <code>raster</code> package has a lot of functionality and the RasterLayer format is useful for spatial analysis and mapping, but some users do not have GIS experience or want the data in a simpler format for their preferred method of analysis. There are multiple ways to get more basic representations of the data.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># To convert the data to a simpler geographic format and access tabularly   </span>
 <span class="co"># reproject into geographic (decimal degrees) </span>
-abund_stack_ll &lt;-<span class="st"> </span>raster::<span class="kw">projectRaster</span>(abund_stack[[<span class="dv">26</span>]], <span class="dt">crs=</span>sp::<span class="kw">CRS</span>(<span class="st">"+init=epsg:4326"</span>))
+abund_stack_ll &lt;-<span class="st"> </span>raster::<span class="kw">projectRaster</span>(abund_stack[[<span class="dv">26</span>]], 
+                                        <span class="dt">crs =</span> sp::<span class="kw">CRS</span>(<span class="st">"+init=epsg:4326"</span>))
 
 <span class="co"># Convert raster object into a matrix</span>
 p &lt;-<span class="st"> </span>raster::<span class="kw">rasterToPoints</span>(abund_stack_ll)
+<span class="kw">colnames</span>(p) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"longitude"</span>, <span class="st">"latitude"</span>, <span class="st">"abundance_umean"</span>)
 <span class="kw">head</span>(p)</code></pre></div>
-<pre><code>##              x       y
-## [1,] -94.91638 48.7625
-## [2,] -94.83988 48.7625
-## [3,] -94.53388 48.7625
-## [4,] -94.45738 48.7625
-## [5,] -94.38088 48.7625
-## [6,] -94.30438 48.7625
-##      woothr.ERD2016.PROD.20170505.3f880822_week_06.27_presentation_abundance_umean
-## [1,]                                                                     0.2094019
-## [2,]                                                                     0.1718842
-## [3,]                                                                     0.1721756
-## [4,]                                                                     0.2931008
-## [5,]                                                                     0.5760729
-## [6,]                                                                     0.3509973</code></pre>
+<pre><code>##      longitude latitude abundance_umean
+## [1,] -94.91638  48.7625       0.2094019
+## [2,] -94.83988  48.7625       0.1718842
+## [3,] -94.53388  48.7625       0.1721756
+## [4,] -94.45738  48.7625       0.2931008
+## [5,] -94.38088  48.7625       0.5760729
+## [6,] -94.30438  48.7625       0.3509973</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Write a CSV file of the matrix</span>
 <span class="kw">write.csv</span>(p, 
           <span class="dt">file =</span> <span class="kw">paste</span>(raster_dir, <span class="st">"/woothr_week26.csv"</span>, <span class="dt">sep=</span><span class="st">""</span>),
@@ -203,45 +190,45 @@ p &lt;-<span class="st"> </span>raster::<span class="kw">rasterToPoints</span>(a
 <h2 class="hasAnchor">
 <a href="#projections-and-calculating-full-annual-spatial-extent" class="anchor"></a>Projections and Calculating Full-annual Spatial Extent</h2>
 <p>The sinusoidal projection that NASA provides MODIS data in, while functional because of its equal-area property, is not good for mapping because of the significant distortion of land masses across the globe. There are few global equal-area projections, including, but not limited to, Lambert Azimuthal Equal Area, Goode Homolosine, Mollweide, and Equal Area Cylindrical. Of these, we have selected Mollweide, used in the remainder of this section, for its pleasing conformal properties across the globe, ease of projection configuration within R and the proj4string construction, and the ease of setting central meridians that best display the Western Hemisphere. It is worth noting that while projecting to a more visually appealing projection is ideal for mapping, it is not necessary for quantitative analysis of STEM results, for which purposes the results can be left in the sinusoidal projection.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(viridis)</code></pre></div>
-<pre><code>## Loading required package: viridisLite</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># define mollweide projection</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(viridis)
+
+<span class="co"># define mollweide projection</span>
 mollweide &lt;-<span class="st"> </span>sp::<span class="kw">CRS</span>(<span class="st">"+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"</span>)
 
 <span class="co"># project single layer from stack to mollweide</span>
-week1_moll &lt;-<span class="st"> </span>raster::<span class="kw">projectRaster</span>(abund_stack[[<span class="dv">1</span>]], <span class="dt">crs=</span>mollweide)
+week1_moll &lt;-<span class="st"> </span>raster::<span class="kw">projectRaster</span>(abund_stack[[<span class="dv">1</span>]], <span class="dt">crs =</span> mollweide)
 
 <span class="co"># optionally, you can project an entire stack, but it takes much longer</span>
-<span class="co">#abund_stack_moll &lt;- raster::projectRaster(abund_stack, crs=mollweide)</span>
+<span class="co">#abund_stack_moll &lt;- raster::projectRaster(abund_stack, crs = mollweide)</span>
 
 <span class="co"># plot single layer with full annual extent</span>
-<span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">2</span>))
+<span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">2</span>))
 raster::<span class="kw">plot</span>(week1_moll, 
-             <span class="dt">xaxt=</span><span class="st">'n'</span>, 
-             <span class="dt">yaxt=</span><span class="st">'n'</span>,
-             <span class="dt">bty=</span><span class="st">'n'</span>,
-             <span class="dt">col=</span><span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="dv">20</span>),
-             <span class="dt">maxpixels=</span>raster::<span class="kw">ncell</span>(week1_moll))</code></pre></div>
+             <span class="dt">xaxt =</span> <span class="st">'n'</span>, 
+             <span class="dt">yaxt =</span> <span class="st">'n'</span>,
+             <span class="dt">bty =</span> <span class="st">'n'</span>,
+             <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="dv">20</span>),
+             <span class="dt">maxpixels =</span> raster::<span class="kw">ncell</span>(week1_moll))</code></pre></div>
 <p><img src="stem-vignette_files/figure-html/project_stack-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 <p>Plotting the layer at the full spatial extent of the analysis area makes for a small map. The process of building the stack unifies the extent of all layers in the stack. However, this also means that plotting happens at the full spatial extent of the area of analysis, the Western Hemisphere, as seen above. If we calculate the full annual spatial extent for the species, project to Mollwide, and then map, we get an extent that works for the entire full-annual cycle of the species.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate the full annual extent on the abundance stack (in sinusoidal projection)</span>
 sp_ext &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calc_full_extent.html">calc_full_extent</a></span>(abund_stack)
 
 <span class="co"># project the full annual extent to Mollweide</span>
-extent_raster &lt;-<span class="st"> </span>raster::<span class="kw">raster</span>(<span class="dt">ext=</span>sp_ext, 
-                                <span class="dt">crs=</span>sp::<span class="kw">proj4string</span>(template_raster))
+extent_raster &lt;-<span class="st"> </span>raster::<span class="kw">raster</span>(<span class="dt">ext =</span> sp_ext, 
+                                <span class="dt">crs =</span> sp::<span class="kw">proj4string</span>(template_raster))
 extent_raster[<span class="kw">is.na</span>(extent_raster)] &lt;-<span class="st"> </span><span class="dv">1</span>
 sp_ext_moll &lt;-<span class="st"> </span>raster::<span class="kw">extent</span>(raster::<span class="kw">projectRaster</span>(extent_raster, 
-                                                    <span class="dt">crs=</span>mollweide))
+                                                    <span class="dt">crs =</span> mollweide))
 
 <span class="co"># plot the first week of the abundance stack in Mollweide</span>
-<span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">2</span>))
+<span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">2</span>))
 raster::<span class="kw">plot</span>(week1_moll, 
-             <span class="dt">xaxt=</span><span class="st">'n'</span>, 
-             <span class="dt">yaxt=</span><span class="st">'n'</span>, 
-             <span class="dt">bty=</span><span class="st">'n'</span>,
-             <span class="dt">ext=</span>sp_ext_moll, 
-             <span class="dt">col=</span><span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="dv">20</span>),
+             <span class="dt">xaxt =</span> <span class="st">'n'</span>, 
+             <span class="dt">yaxt =</span> <span class="st">'n'</span>, 
+             <span class="dt">bty =</span> <span class="st">'n'</span>,
+             <span class="dt">ext =</span> sp_ext_moll, 
+             <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="dv">20</span>),
              <span class="dt">maxpixels=</span>raster::<span class="kw">ncell</span>(week1_moll))</code></pre></div>
 <p><img src="stem-vignette_files/figure-html/plot_stack_extent-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
@@ -256,17 +243,17 @@ occ_stack &lt;-<span class="st"> </span><span class="kw"><a href="../reference/s
 
 <span class="co"># create breaks every 0.05 from 0 to 1</span>
 occ_bins &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">by =</span> <span class="fl">0.05</span>)
-occ_week26 &lt;-<span class="st"> </span>raster::<span class="kw">projectRaster</span>(occ_stack[[<span class="dv">26</span>]], <span class="dt">crs=</span>mollweide)
+occ_week26 &lt;-<span class="st"> </span>raster::<span class="kw">projectRaster</span>(occ_stack[[<span class="dv">26</span>]], <span class="dt">crs =</span> mollweide)
 
-<span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">2</span>), <span class="dt">cex=</span><span class="fl">0.7</span>)
+<span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">2</span>), <span class="dt">cex =</span> <span class="fl">0.7</span>)
 raster::<span class="kw">plot</span>(occ_week26, 
-             <span class="dt">xaxt=</span><span class="st">'n'</span>, 
-             <span class="dt">yaxt=</span><span class="st">'n'</span>, 
-             <span class="dt">bty=</span><span class="st">'n'</span>,
-             <span class="dt">ext=</span>sp_ext_moll,
-             <span class="dt">breaks=</span>occ_bins,
-             <span class="dt">col=</span><span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="kw">length</span>(occ_bins)-<span class="dv">1</span>),
-             <span class="dt">maxpixels=</span>raster::<span class="kw">ncell</span>(occ_week26))</code></pre></div>
+             <span class="dt">xaxt =</span> <span class="st">'n'</span>, 
+             <span class="dt">yaxt =</span> <span class="st">'n'</span>, 
+             <span class="dt">bty =</span> <span class="st">'n'</span>,
+             <span class="dt">ext =</span> sp_ext_moll,
+             <span class="dt">breaks =</span> occ_bins,
+             <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="kw">length</span>(occ_bins) -<span class="st"> </span><span class="dv">1</span>),
+             <span class="dt">maxpixels =</span> raster::<span class="kw">ncell</span>(occ_week26))</code></pre></div>
 <p><img src="stem-vignette_files/figure-html/plot_occurrence-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="calculating-abundance-bins" class="section level2">
@@ -278,25 +265,25 @@ raster::<span class="kw">plot</span>(occ_week26,
 
 week26_moll &lt;-<span class="st"> </span>raster::<span class="kw">projectRaster</span>(abund_stack[[<span class="dv">26</span>]], <span class="dt">crs =</span> mollweide)
 
-<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), <span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))
+<span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), <span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))
 raster::<span class="kw">plot</span>(week1_moll, 
-             <span class="dt">xaxt=</span><span class="st">'n'</span>, 
-             <span class="dt">yaxt=</span><span class="st">'n'</span>, 
-             <span class="dt">bty=</span><span class="st">'n'</span>,
-             <span class="dt">ext=</span>sp_ext_moll, 
-             <span class="dt">zlim=</span><span class="kw">c</span>(<span class="dv">0</span>, year_max),
-             <span class="dt">col=</span><span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="dv">20</span>),
-             <span class="dt">maxpixels=</span>raster::<span class="kw">ncell</span>(week1_moll),
+             <span class="dt">xaxt =</span> <span class="st">'n'</span>, 
+             <span class="dt">yaxt =</span> <span class="st">'n'</span>, 
+             <span class="dt">bty =</span> <span class="st">'n'</span>,
+             <span class="dt">ext =</span> sp_ext_moll, 
+             <span class="dt">zlim =</span> <span class="kw">c</span>(<span class="dv">0</span>, year_max),
+             <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="dv">20</span>),
+             <span class="dt">maxpixels =</span> raster::<span class="kw">ncell</span>(week1_moll),
              <span class="dt">legend=</span><span class="ot">FALSE</span>)
-<span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">4</span>))
+<span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">4</span>))
 raster::<span class="kw">plot</span>(week26_moll, 
-             <span class="dt">xaxt=</span><span class="st">'n'</span>, 
-             <span class="dt">yaxt=</span><span class="st">'n'</span>, 
-             <span class="dt">bty=</span><span class="st">'n'</span>,
-             <span class="dt">ext=</span>sp_ext_moll, 
-             <span class="dt">zlim=</span><span class="kw">c</span>(<span class="dv">0</span>, year_max),
-             <span class="dt">col=</span><span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="dv">20</span>),
-             <span class="dt">maxpixels=</span>raster::<span class="kw">ncell</span>(week26_moll))</code></pre></div>
+             <span class="dt">xaxt =</span> <span class="st">'n'</span>, 
+             <span class="dt">yaxt =</span> <span class="st">'n'</span>, 
+             <span class="dt">bty =</span> <span class="st">'n'</span>,
+             <span class="dt">ext =</span> sp_ext_moll, 
+             <span class="dt">zlim =</span> <span class="kw">c</span>(<span class="dv">0</span>, year_max),
+             <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="dv">20</span>),
+             <span class="dt">maxpixels =</span> raster::<span class="kw">ncell</span>(week26_moll))</code></pre></div>
 <p><img src="stem-vignette_files/figure-html/plot_linear-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 <p>We can compare this with plots made using the binning method provided here.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">year_bins &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calc_bins.html">calc_bins</a></span>(abund_stack)
@@ -304,31 +291,32 @@ raster::<span class="kw">plot</span>(week26_moll,
 <span class="co"># create a thinner set of labels</span>
 bin_labels &lt;-<span class="st"> </span><span class="kw">format</span>(<span class="kw">round</span>(year_bins, <span class="dv">2</span>), <span class="dt">nsmall =</span> <span class="dv">2</span>)
 bin_labels[!(bin_labels %in%<span class="st"> </span><span class="kw">c</span>(bin_labels[<span class="dv">1</span>], 
-                    bin_labels[<span class="kw">round</span>((<span class="kw">length</span>(bin_labels)/<span class="dv">4</span>))+<span class="dv">1</span>], 
-                    bin_labels[<span class="kw">round</span>((<span class="kw">length</span>(bin_labels)/<span class="dv">2</span>))+<span class="dv">1</span>],
-                    bin_labels[<span class="kw">length</span>(bin_labels) -<span class="st"> </span><span class="kw">round</span>((<span class="kw">length</span>(bin_labels)/<span class="dv">4</span>))+<span class="dv">1</span>],
+                    bin_labels[<span class="kw">round</span>((<span class="kw">length</span>(bin_labels) /<span class="st"> </span><span class="dv">4</span>)) +<span class="st"> </span><span class="dv">1</span>], 
+                    bin_labels[<span class="kw">round</span>((<span class="kw">length</span>(bin_labels) /<span class="st"> </span><span class="dv">2</span>)) +<span class="st"> </span><span class="dv">1</span>],
+                    bin_labels[<span class="kw">length</span>(bin_labels) -<span class="st"> </span>
+<span class="st">                               </span><span class="kw">round</span>((<span class="kw">length</span>(bin_labels) /<span class="st"> </span><span class="dv">4</span>)) +<span class="st"> </span><span class="dv">1</span>],
                     bin_labels[<span class="kw">length</span>(bin_labels)]))] &lt;-<span class="st"> ""</span>
 
-<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), <span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))
+<span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), <span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))
 raster::<span class="kw">plot</span>(week1_moll, 
-             <span class="dt">xaxt=</span><span class="st">'n'</span>, 
-             <span class="dt">yaxt=</span><span class="st">'n'</span>, 
-             <span class="dt">bty=</span><span class="st">'n'</span>,
-             <span class="dt">ext=</span>sp_ext_moll, 
-             <span class="dt">breaks=</span>year_bins,
-             <span class="dt">lab.breaks=</span>bin_labels,
-             <span class="dt">col=</span><span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="kw">length</span>(year_bins)-<span class="dv">1</span>),
-             <span class="dt">maxpixels=</span>raster::<span class="kw">ncell</span>(week1_moll),
-             <span class="dt">legend=</span><span class="ot">FALSE</span>)
-<span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">5</span>))
+             <span class="dt">xaxt =</span> <span class="st">'n'</span>, 
+             <span class="dt">yaxt =</span> <span class="st">'n'</span>, 
+             <span class="dt">bty =</span> <span class="st">'n'</span>,
+             <span class="dt">ext =</span> sp_ext_moll, 
+             <span class="dt">breaks =</span> year_bins,
+             <span class="dt">lab.breaks =</span> bin_labels,
+             <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="kw">length</span>(year_bins) -<span class="st"> </span><span class="dv">1</span>),
+             <span class="dt">maxpixels =</span> raster::<span class="kw">ncell</span>(week1_moll),
+             <span class="dt">legend =</span> <span class="ot">FALSE</span>)
+<span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">5</span>))
 raster::<span class="kw">plot</span>(week26_moll, 
-             <span class="dt">xaxt=</span><span class="st">'n'</span>, 
-             <span class="dt">yaxt=</span><span class="st">'n'</span>, 
-             <span class="dt">bty=</span><span class="st">'n'</span>,
-             <span class="dt">ext=</span>sp_ext_moll, 
-             <span class="dt">breaks=</span>year_bins,
-             <span class="dt">lab.breaks=</span>bin_labels,
-             <span class="dt">col=</span><span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="kw">length</span>(year_bins)-<span class="dv">1</span>),
+             <span class="dt">xaxt =</span> <span class="st">'n'</span>, 
+             <span class="dt">yaxt =</span> <span class="st">'n'</span>, 
+             <span class="dt">bty =</span> <span class="st">'n'</span>,
+             <span class="dt">ext =</span> sp_ext_moll, 
+             <span class="dt">breaks =</span> year_bins,
+             <span class="dt">lab.breaks =</span> bin_labels,
+             <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="kw">length</span>(year_bins) -<span class="st"> </span><span class="dv">1</span>),
              <span class="dt">maxpixels=</span>raster::<span class="kw">ncell</span>(week26_moll))</code></pre></div>
 <p><img src="stem-vignette_files/figure-html/plot_bins-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
@@ -342,7 +330,7 @@ pos_es_path &lt;-<span class="st"> </span><span class="kw">paste</span>(root_pat
                      <span class="st">"/results/tifs/presentation/abundance_ensemble_support"</span>, 
                      <span class="dt">sep =</span> <span class="st">""</span>)
 pos_es_stack &lt;-<span class="st"> </span><span class="kw"><a href="../reference/stack_stem.html">stack_stem</a></span>(pos_es_path)
-week26_pes &lt;-<span class="st"> </span>raster::<span class="kw">projectRaster</span>(pos_es_stack[[<span class="dv">26</span>]], <span class="dt">crs=</span>mollweide)
+week26_pes &lt;-<span class="st"> </span>raster::<span class="kw">projectRaster</span>(pos_es_stack[[<span class="dv">26</span>]], <span class="dt">crs =</span> mollweide)
 
 <span class="co"># to represent assumed 0s, we have provided the data object zero_es_stack</span>
 <span class="co"># that has values for the ensemble support indicating sufficient checklists</span>
@@ -359,7 +347,7 @@ zero_es_stack</code></pre></div>
 ## max values  :                   100,                   100,                   100,                   100,                   100,                   100,                   100,                   100,                   100,                   100,                   100,                   100,                   100,                   100,                   100, ...</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">week26_zes_vals &lt;-<span class="st"> </span>raster::<span class="kw">projectRaster</span>(raster::<span class="kw">mask</span>(zero_es_stack[[<span class="dv">26</span>]], 
                                                  template_raster), 
-                                    <span class="dt">crs=</span>mollweide)
+                                    <span class="dt">crs =</span> mollweide)
 
 <span class="co"># we'll combine the two types of zeroes with the positive prediction for plotting</span>
 week26_pes[week26_pes] &lt;-<span class="st"> </span><span class="dv">0</span>
@@ -368,41 +356,28 @@ week26_zes[week26_zes ==<span class="st"> </span><span class="dv">0</span>] &lt;
 week26_zes[week26_zes ==<span class="st"> </span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="dv">0</span>
 
 week26s &lt;-<span class="st"> </span>raster::<span class="kw">stack</span>(week26_pes, week26_zes, week26_moll)
-week26c &lt;-<span class="st"> </span>raster::<span class="kw">calc</span>(week26s, max, <span class="dt">na.rm=</span><span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>## Warning in FUN(newX[, i], ...): no non-missing arguments to max; returning
-## -Inf
+week26c &lt;-<span class="st"> </span>raster::<span class="kw">calc</span>(week26s, max, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
 
-## Warning in FUN(newX[, i], ...): no non-missing arguments to max; returning
-## -Inf
-
-## Warning in FUN(newX[, i], ...): no non-missing arguments to max; returning
-## -Inf
-
-## Warning in FUN(newX[, i], ...): no non-missing arguments to max; returning
-## -Inf
-
-## Warning in FUN(newX[, i], ...): no non-missing arguments to max; returning
-## -Inf</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># to add context, let's pull in some reference data to add</span>
+<span class="co"># to add context, let's pull in some reference data to add</span>
 wh &lt;-<span class="st"> </span>rnaturalearth::<span class="kw">ne_countries</span>(<span class="dt">continent =</span> <span class="kw">c</span>(<span class="st">"North America"</span>,
                                                 <span class="st">"South America"</span>))
 wh_states &lt;-<span class="st"> </span>rnaturalearth::<span class="kw">ne_states</span>(<span class="dt">iso_a2 =</span> <span class="kw">unique</span>(wh@data$iso_a2))
 wh_moll &lt;-<span class="st"> </span>sp::<span class="kw">spTransform</span>(wh, mollweide)
 wh_states_moll &lt;-<span class="st"> </span>sp::<span class="kw">spTransform</span>(wh_states, mollweide)
 
-<span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">2</span>))
+<span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">2</span>))
 raster::<span class="kw">plot</span>(week26c, 
-             <span class="dt">xaxt=</span><span class="st">'n'</span>, 
-             <span class="dt">yaxt=</span><span class="st">'n'</span>,
-             <span class="dt">bty=</span><span class="st">'n'</span>,
-             <span class="dt">ext=</span>sp_ext_moll, 
-             <span class="dt">breaks=</span>year_bins,
-             <span class="dt">lab.breaks=</span>bin_labels,
-             <span class="dt">col=</span><span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="kw">length</span>(year_bins)-<span class="dv">1</span>),
-             <span class="dt">maxpixels=</span>raster::<span class="kw">ncell</span>(week26c),
-             <span class="dt">legend=</span><span class="ot">TRUE</span>)
-sp::<span class="kw">plot</span>(wh_moll, <span class="dt">add=</span><span class="ot">TRUE</span>, <span class="dt">border=</span><span class="st">'gray'</span>)
-sp::<span class="kw">plot</span>(wh_states_moll, <span class="dt">add=</span><span class="ot">TRUE</span>, <span class="dt">border=</span><span class="st">'gray'</span>, <span class="dt">lwd=</span><span class="fl">0.5</span>)</code></pre></div>
+             <span class="dt">xaxt =</span> <span class="st">'n'</span>, 
+             <span class="dt">yaxt =</span> <span class="st">'n'</span>,
+             <span class="dt">bty =</span> <span class="st">'n'</span>,
+             <span class="dt">ext =</span> sp_ext_moll, 
+             <span class="dt">breaks =</span> year_bins,
+             <span class="dt">lab.breaks =</span> bin_labels,
+             <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="kw">length</span>(year_bins)-<span class="dv">1</span>),
+             <span class="dt">maxpixels =</span> raster::<span class="kw">ncell</span>(week26c),
+             <span class="dt">legend =</span> <span class="ot">TRUE</span>)
+sp::<span class="kw">plot</span>(wh_moll, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">border =</span> <span class="st">'gray'</span>)
+sp::<span class="kw">plot</span>(wh_states_moll, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">border =</span> <span class="st">'gray'</span>, <span class="dt">lwd =</span> <span class="fl">0.5</span>)</code></pre></div>
 <p><img src="stem-vignette_files/figure-html/plot_es-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="mapping-abundance-confidence-intervals" class="section level2">
@@ -421,15 +396,15 @@ upper_stack &lt;-<span class="st"> </span><span class="kw"><a href="../reference
 <span class="co"># calculate band width</span>
 conf_band &lt;-<span class="st"> </span>upper_stack -<span class="st"> </span>lower_stack
 
-conf_week26 &lt;-<span class="st"> </span>raster::<span class="kw">projectRaster</span>(conf_band[[<span class="dv">26</span>]], <span class="dt">crs=</span>mollweide)
+conf_week26 &lt;-<span class="st"> </span>raster::<span class="kw">projectRaster</span>(conf_band[[<span class="dv">26</span>]], <span class="dt">crs =</span> mollweide)
 
-<span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">2</span>))
+<span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">2</span>))
 raster::<span class="kw">plot</span>(conf_week26, 
-             <span class="dt">xaxt=</span><span class="st">'n'</span>, 
-             <span class="dt">yaxt=</span><span class="st">'n'</span>,
-             <span class="dt">bty=</span><span class="st">'n'</span>,
-             <span class="dt">ext=</span>sp_ext_moll,
-             <span class="dt">col=</span><span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">magma</a></span>(<span class="dv">20</span>),
+             <span class="dt">xaxt =</span> <span class="st">'n'</span>, 
+             <span class="dt">yaxt =</span> <span class="st">'n'</span>,
+             <span class="dt">bty =</span> <span class="st">'n'</span>,
+             <span class="dt">ext =</span> sp_ext_moll,
+             <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">magma</a></span>(<span class="dv">20</span>),
              <span class="dt">maxpixel=</span>raster::<span class="kw">ncell</span>(conf_week26))</code></pre></div>
 <p><img src="stem-vignette_files/figure-html/plot_confidence-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
@@ -444,25 +419,35 @@ pt &lt;-<span class="st"> </span>sp::<span class="kw">SpatialPoints</span>(coord
 pt_prj &lt;-<span class="st"> </span>sp::<span class="kw">spTransform</span>(pt, sp::<span class="kw">CRS</span>(sp::<span class="kw">proj4string</span>(template_raster)))
 
 <span class="co"># extract</span>
-abund_traj &lt;-<span class="st"> </span><span class="kw">unlist</span>(raster::<span class="kw">extract</span>(abund_stack, pt_prj, <span class="dt">fun=</span>mean, <span class="dt">na.rm=</span><span class="ot">TRUE</span>))
-upper_traj &lt;-<span class="st"> </span><span class="kw">unlist</span>(raster::<span class="kw">extract</span>(upper_stack, pt_prj, <span class="dt">fun=</span>mean, <span class="dt">na.rm=</span><span class="ot">TRUE</span>))
-lower_traj &lt;-<span class="st"> </span><span class="kw">unlist</span>(raster::<span class="kw">extract</span>(lower_stack, pt_prj, <span class="dt">fun=</span>mean, <span class="dt">na.rm=</span><span class="ot">TRUE</span>))
+abund_traj &lt;-<span class="st"> </span><span class="kw">unlist</span>(raster::<span class="kw">extract</span>(abund_stack, 
+                                     pt_prj, 
+                                     <span class="dt">fun =</span> mean, 
+                                     <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))
+upper_traj &lt;-<span class="st"> </span><span class="kw">unlist</span>(raster::<span class="kw">extract</span>(upper_stack, 
+                                     pt_prj, 
+                                     <span class="dt">fun =</span> mean, 
+                                     <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))
+lower_traj &lt;-<span class="st"> </span><span class="kw">unlist</span>(raster::<span class="kw">extract</span>(lower_stack, 
+                                     pt_prj, 
+                                     <span class="dt">fun =</span> mean, 
+                                     <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))
 
 <span class="co"># Plot trajectories</span>
 <span class="kw">library</span>(ggplot2)
 
-plot_frame &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span><span class="dv">1</span>:<span class="kw">length</span>(abund_traj),
-                         <span class="dt">y=</span><span class="kw">c</span>(<span class="kw">unname</span>(abund_traj)),
-                         <span class="dt">upper=</span><span class="kw">c</span>(<span class="kw">unname</span>(upper_traj)),
-                         <span class="dt">lower=</span><span class="kw">c</span>(<span class="kw">unname</span>(lower_traj)))
+plot_frame &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="dv">1</span>:<span class="kw">length</span>(abund_traj),
+                         <span class="dt">y =</span> <span class="kw">c</span>(<span class="kw">unname</span>(abund_traj)),
+                         <span class="dt">upper =</span> <span class="kw">c</span>(<span class="kw">unname</span>(upper_traj)),
+                         <span class="dt">lower =</span> <span class="kw">c</span>(<span class="kw">unname</span>(lower_traj)))
 
 g &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggplot">ggplot</a></span>(plot_frame, <span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(x, y)) +
-<span class="st">     </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_path">geom_line</a></span>(<span class="dt">data=</span>plot_frame) +
-<span class="st">     </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_ribbon">geom_ribbon</a></span>(<span class="dt">data=</span>plot_frame, <span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(<span class="dt">ymin=</span>lower, <span class="dt">ymax=</span>upper), <span class="dt">alpha =</span> <span class="fl">0.3</span>) +
+<span class="st">     </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_path">geom_line</a></span>(<span class="dt">data =</span> plot_frame) +
+<span class="st">     </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_ribbon">geom_ribbon</a></span>(<span class="dt">data =</span> plot_frame, 
+                 <span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(<span class="dt">ymin =</span> lower, <span class="dt">ymax =</span> upper), 
+                 <span class="dt">alpha =</span> <span class="fl">0.3</span>) +
 <span class="st">     </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/labs">ylab</a></span>(<span class="st">"Expected Count (count/(km hr))"</span>) +
 <span class="st">     </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/labs">xlab</a></span>(<span class="st">"Week"</span>)
 g</code></pre></div>
-<pre><code>## Warning: Removed 27 rows containing missing values (geom_path).</code></pre>
 <p><img src="stem-vignette_files/figure-html/trajectories-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 <p>It is also possible to extract trajectories for regions, but it takes a little more data work.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># set a point</span>
@@ -477,36 +462,37 @@ wv &lt;-<span class="st"> </span>us_prj[us_prj@data$name ==<span class="st"> "We
 
 <span class="co"># extract</span>
 <span class="co"># because we're using regions, we get lots of values that we need to average together</span>
-abund_traj &lt;-<span class="st"> </span>raster::<span class="kw">extract</span>(abund_stack, wv, <span class="dt">fun=</span>mean, <span class="dt">na.rm=</span><span class="ot">TRUE</span>)
-abund_traj &lt;-<span class="st"> </span><span class="kw">apply</span>(abund_traj, <span class="dv">2</span>, mean, <span class="dt">na.rm=</span><span class="ot">TRUE</span>)
+abund_traj &lt;-<span class="st"> </span>raster::<span class="kw">extract</span>(abund_stack, wv, <span class="dt">fun =</span> mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+abund_traj &lt;-<span class="st"> </span><span class="kw">apply</span>(abund_traj, <span class="dv">2</span>, mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
 
-upper_traj &lt;-<span class="st"> </span>raster::<span class="kw">extract</span>(upper_stack, wv, <span class="dt">fun=</span>mean, <span class="dt">na.rm=</span><span class="ot">TRUE</span>)
-upper_traj &lt;-<span class="st"> </span><span class="kw">apply</span>(upper_traj, <span class="dv">2</span>, mean, <span class="dt">na.rm=</span><span class="ot">TRUE</span>)
+upper_traj &lt;-<span class="st"> </span>raster::<span class="kw">extract</span>(upper_stack, wv, <span class="dt">fun =</span> mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+upper_traj &lt;-<span class="st"> </span><span class="kw">apply</span>(upper_traj, <span class="dv">2</span>, mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
 
-lower_traj &lt;-<span class="st"> </span>raster::<span class="kw">extract</span>(lower_stack, wv, <span class="dt">fun=</span>mean, <span class="dt">na.rm=</span><span class="ot">TRUE</span>)
-lower_traj &lt;-<span class="st"> </span><span class="kw">apply</span>(lower_traj, <span class="dv">2</span>, mean, <span class="dt">na.rm=</span><span class="ot">TRUE</span>)
+lower_traj &lt;-<span class="st"> </span>raster::<span class="kw">extract</span>(lower_stack, wv, <span class="dt">fun =</span> mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+lower_traj &lt;-<span class="st"> </span><span class="kw">apply</span>(lower_traj, <span class="dv">2</span>, mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
 
 <span class="co"># Plot trajectories</span>
 <span class="kw">library</span>(ggplot2)
 
-plot_frame &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span><span class="dv">1</span>:<span class="kw">length</span>(abund_traj),
-                         <span class="dt">y=</span><span class="kw">c</span>(<span class="kw">unname</span>(abund_traj)),
-                         <span class="dt">upper=</span><span class="kw">c</span>(<span class="kw">unname</span>(upper_traj)),
-                         <span class="dt">lower=</span><span class="kw">c</span>(<span class="kw">unname</span>(lower_traj)))
+plot_frame &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="dv">1</span>:<span class="kw">length</span>(abund_traj),
+                         <span class="dt">y =</span> <span class="kw">c</span>(<span class="kw">unname</span>(abund_traj)),
+                         <span class="dt">upper =</span> <span class="kw">c</span>(<span class="kw">unname</span>(upper_traj)),
+                         <span class="dt">lower =</span> <span class="kw">c</span>(<span class="kw">unname</span>(lower_traj)))
 
 g &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggplot">ggplot</a></span>(plot_frame, <span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(x, y)) +
-<span class="st">     </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_path">geom_line</a></span>(<span class="dt">data=</span>plot_frame) +
-<span class="st">     </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_ribbon">geom_ribbon</a></span>(<span class="dt">data=</span>plot_frame, <span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(<span class="dt">ymin=</span>lower, <span class="dt">ymax=</span>upper), <span class="dt">alpha =</span> <span class="fl">0.3</span>) +
+<span class="st">     </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_path">geom_line</a></span>(<span class="dt">data =</span> plot_frame) +
+<span class="st">     </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_ribbon">geom_ribbon</a></span>(<span class="dt">data =</span> plot_frame, 
+                 <span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(<span class="dt">ymin =</span> lower, <span class="dt">ymax =</span>upper), 
+                 <span class="dt">alpha =</span> <span class="fl">0.3</span>) +
 <span class="st">     </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/labs">ylab</a></span>(<span class="st">"Expected Count (count/(km hr))"</span>) +
 <span class="st">     </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/labs">xlab</a></span>(<span class="st">"Week"</span>)
 g</code></pre></div>
-<pre><code>## Warning: Removed 21 rows containing missing values (geom_path).</code></pre>
 <p><img src="stem-vignette_files/figure-html/trajectories_region-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="plotting-predictor-importance-and-partial-dependencies" class="section level1">
 <h1 class="hasAnchor">
 <a href="#plotting-predictor-importance-and-partial-dependencies" class="anchor"></a>5. Plotting Predictor Importance and Partial Dependencies</h1>
-<p>Blah, blah, blah…</p>
+<p>To complete…</p>
 <div id="loading-data" class="section level2">
 <h2 class="hasAnchor">
 <a href="#loading-data" class="anchor"></a>Loading Data</h2>
@@ -528,33 +514,21 @@ ne_extent &lt;-<span class="st"> </span><span class="kw">list</span>(<span class
                       <span class="dt">t.min =</span> <span class="fl">0.425</span>,
                       <span class="dt">t.max =</span> <span class="fl">0.475</span>)
 
-<span class="kw"><a href="../reference/map_centroids.html">map_centroids</a></span>(<span class="dt">pis=</span>pis, <span class="dt">pds=</span>pds, <span class="dt">st_extent=</span>ne_extent)</code></pre></div>
+<span class="kw"><a href="../reference/map_centroids.html">map_centroids</a></span>(<span class="dt">pis =</span> pis, <span class="dt">pds =</span> pds, <span class="dt">st_extent =</span> ne_extent)</code></pre></div>
 <p><img src="stem-vignette_files/figure-html/map_centroids-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="plot-available-centroids-and-extent-of-analysis" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plot-available-centroids-and-extent-of-analysis" class="anchor"></a>Plot available centroids and extent of analysis</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), <span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">4</span>))
-pi_extent &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calc_effective_extent.html">calc_effective_extent</a></span>(ne_extent, <span class="dt">pis =</span> pis)</code></pre></div>
-<pre><code>## Warning in if (is.na(pis) &amp; is.na(pds)) {: the condition has length &gt; 1 and
-## only the first element will be used</code></pre>
-<pre><code>## Warning in if (!is.na(pis) &amp; !is.na(pds)) {: the condition has length &gt; 1
-## and only the first element will be used</code></pre>
-<pre><code>## Warning in if (!is.na(pis)) {: the condition has length &gt; 1 and only the
-## first element will be used</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pd_extent &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calc_effective_extent.html">calc_effective_extent</a></span>(ne_extent, <span class="dt">pds =</span> pds)</code></pre></div>
-<pre><code>## Warning in if (is.na(pis) &amp; is.na(pds)) {: the condition has length &gt; 1 and
-## only the first element will be used</code></pre>
-<pre><code>## Warning in if (!is.na(pis) &amp; !is.na(pds)) {: the condition has length &gt; 1
-## and only the first element will be used</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), <span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">4</span>))
+pi_extent &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calc_effective_extent.html">calc_effective_extent</a></span>(ne_extent, <span class="dt">pis =</span> pis)
+pd_extent &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calc_effective_extent.html">calc_effective_extent</a></span>(ne_extent, <span class="dt">pds =</span> pds)</code></pre></div>
 <p><img src="stem-vignette_files/figure-html/plot_extents-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="plot-predictor-importance" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plot-predictor-importance" class="anchor"></a>Plot Predictor Importance</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), <span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))
-
-<span class="co"># with all classes</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># with all classes</span>
 <span class="kw"><a href="../reference/plot_pis.html">plot_pis</a></span>(pis, <span class="dt">st_extent =</span> ne_extent, <span class="dt">by_cover_class =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <p><img src="stem-vignette_files/figure-html/plot_pis-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># aggregating fragstats for cover classes</span>
@@ -575,13 +549,13 @@ pi_extent &lt;-<span class="st"> </span><span class="kw"><a href="../reference/c
 <h2 class="hasAnchor">
 <a href="#cake-plots" class="anchor"></a>Cake Plots</h2>
 <p>When PIs and PDs are combined with can get predictor importance with directionality. By week, these can be turned into a stacked area chart (we affectionately call cake plots) that show the relative predictor importance and directionality by week.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># this requires a fair amount of computation</span>
-<span class="co"># this doesn't work right now</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># this requires a fair amount of computation, about 5 minutes</span>
 <span class="kw"><a href="../reference/cake_plot.html">cake_plot</a></span>(<span class="dt">path =</span> sp_path,
           <span class="dt">pis =</span> pis,
           <span class="dt">pds =</span> pds,
           <span class="dt">st_extent =</span> ne_extent,
-          <span class="dt">by_cover_class =</span> <span class="ot">TRUE</span>)</code></pre></div>
+          <span class="dt">by_cover_class =</span> <span class="ot">TRUE</span>,
+          <span class="dt">pland_and_lpi_only =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <p><img src="stem-vignette_files/figure-html/cake_plots-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 <div id="references" class="section level3">
 <h3 class="hasAnchor">

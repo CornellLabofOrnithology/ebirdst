@@ -7,5 +7,6 @@
 load_config(path)
 }
 \description{
-Used by load_summary(), load_pis(), and load_pds()
+Internal function used by load_summary(), load_pis(), and load_pds() to get
+configuration variables from species run information.
 }

@@ -2,10 +2,10 @@
 % Please edit documentation in R/stemhelper-loading.R
 \name{load_pis}
 \alias{load_pis}
-\title{Loads PI data}
+\title{Load Predictor Importance file for a single species}
 \usage{
 load_pis(path)
 }
 \description{
-Loads PI data
+Load Predictor Importance file for a single species
 }

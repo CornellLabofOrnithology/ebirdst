@@ -7,5 +7,6 @@
 load_summary(path)
 }
 \description{
-Used by load_pis() and load_pds()
+Internal function used by load_pis() and load_pds() to get the stixel
+summary information
 }
