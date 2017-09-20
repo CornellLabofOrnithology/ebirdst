@@ -7,50 +7,53 @@ plot_pis <- function(pis,
                      by_cover_class = FALSE,
                      num_top_preds = 50) {
 
-  # subset for exetnt
+  # subset for extent
   ttt <- pis[pis$centroid.date > st_extent$t.min &
-               pis$centroid.date <= st_extent$t.max &
-               pis$centroid.lat > st_extent$y.min &
-               pis$centroid.lat <= st_extent$y.max &
-               pis$centroid.lon > st_extent$x.min &
-               pis$centroid.lon <= st_extent$x.max, 2:87]
+             pis$centroid.date <= st_extent$t.max &
+             pis$centroid.lat > st_extent$y.min &
+             pis$centroid.lat <= st_extent$y.max &
+             pis$centroid.lon > st_extent$x.min &
+             pis$centroid.lon <= st_extent$x.max, 2:87]
 
+  # if aggregating by cover class
+  # aggregate the fragstats into land cover classes
   if(by_cover_class == TRUE) {
-
-    land.cover.class.codes <- c(1:10,12,13,16)
+    land.cover.class.codes <- c(1:10, 12, 13, 16)
     lc.tag <- "UMD_FS_C"
-    water.cover.class.codes <- c(0,2,3,5,6,7)
+
+    water.cover.class.codes <- c(0, 2, 3, 5, 6, 7)
     wc.tag <- "MODISWATER_FS_C"
+
     predictor.names <- names(ttt)
 
-    # ---
     ttt.new <- NULL
-    for (iii.pred in 1:length(land.cover.class.codes)){
-      # iii.pred <- 1
-      new.pred.name <- paste(lc.tag,land.cover.class.codes[iii.pred],"_",sep="")
-      pred.nindex <- grep(
-        new.pred.name,
-        x = predictor.names)
-      ttt.new <- cbind(ttt.new,
-                       apply( ttt[, pred.nindex], 1, mean, na.rm=T))
+    for (iii.pred in 1:length(land.cover.class.codes)) {
+      new.pred.name <- paste(lc.tag,
+                             land.cover.class.codes[iii.pred],
+                             "_",
+                             sep = "")
+      pred.nindex <- grep(new.pred.name, x = predictor.names)
+      ttt.new <- cbind(ttt.new, apply(ttt[, pred.nindex], 1, mean, na.rm=T))
       ttt.new <- as.data.frame(ttt.new)
-      names(ttt.new)[ncol(ttt.new)] <-
-        paste(lc.tag,land.cover.class.codes[iii.pred],sep="")
+      names(ttt.new)[ncol(ttt.new)] <- paste(lc.tag,
+                                             land.cover.class.codes[iii.pred],
+                                             sep="")
     }
-    for (iii.pred in 1:length(water.cover.class.codes)){
-      # iii.pred <- 1
-      new.pred.name <- paste(wc.tag,water.cover.class.codes[iii.pred],"_",sep="")
-      pred.nindex <- grep(
-        new.pred.name,
-        x = predictor.names)
-      ttt.new <- cbind(ttt.new,
-                       apply( ttt[, pred.nindex], 1, mean, na.rm=T))
+    for (iii.pred in 1:length(water.cover.class.codes)) {
+      new.pred.name <- paste(wc.tag,
+                             water.cover.class.codes[iii.pred],
+                             "_",
+                             sep = "")
+      pred.nindex <- grep(new.pred.name, x = predictor.names)
+      ttt.new <- cbind(ttt.new, apply(ttt[, pred.nindex], 1, mean, na.rm=T))
       ttt.new <- as.data.frame(ttt.new)
-      names(ttt.new)[ncol(ttt.new)] <-
-        paste(wc.tag,water.cover.class.codes[iii.pred],sep="")
+      names(ttt.new)[ncol(ttt.new)] <- paste(wc.tag,
+                                             water.cover.class.codes[iii.pred],
+                                             sep = "")
     }
-    #head(ttt.new)
+
     ttt <- ttt.new
+    rm(ttt.new)
   }
 
   # compute median
@@ -59,21 +62,26 @@ plot_pis <- function(pis,
   # find the top preds based on function variable num_top_preds
   top_names <- names(pi_median)[order(pi_median,
                                       decreasing = T)][1:num_top_preds]
+  rm(pi_median)
   top_names <- na.omit(top_names)
 
   # subset all values based on top_names
-  top_pis <- ttt[ ,top_names]
+  top_pis <- ttt[, top_names]
+  rm(top_names)
 
   # munging and filtering for ggplot
-  pi_stack <- stack(top_pis)
+  pi_stack <- utils::stack(top_pis)
+  rm(top_pis)
 
-  # PI's have have spurious large values, NA's and NAN's
+  # PIs have have spurious large values, NAs and NaNs
+  # so clean up, trim, and check for complete cases
   pi_stack$values[!is.numeric(pi_stack$values)] <- NA
   pi_stack <- pi_stack[pi_stack$values < quantile(pi_stack$values,
                                                   probs = c(0.98),
                                                   na.rm = TRUE), ]
-  pi_stack <- pi_stack[complete.cases(pi_stack),]
+  pi_stack <- pi_stack[complete.cases(pi_stack), ]
 
+  # plot
   pi_bars <- ggplot2::ggplot(pi_stack, aes(reorder(ind,
                                                    values,
                                                    FUN=median),
