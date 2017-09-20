@@ -1,4 +1,4 @@
-#' Calculates spatial extent of a stack for plotting
+#' Calculates spatial extent of Raster* object for plotting
 #'
 #' After creating a stack, there are lots of NA values and plots of the
 #' individual raster layers are at the full extent of the template_raster. To
@@ -6,9 +6,9 @@
 #' to make sure it returns a reasonable extent (based on the template_raster)
 #' for plotting. The returned extent object can then be used for plotting.
 #'
-#' @usage \code{calc_full_extent(stack))}
+#' @usage \code{calc_full_extent(x))}
 #'
-#' @param stack A RasterStack object, ideally of occurrence or abundace.
+#' @param stack Raster* object, ideally of occurrence or abundace.
 #'
 #' @return raster Extent object
 #' @export
@@ -16,11 +16,11 @@
 #' tif_path <- "~"
 #' raster_stack <- stack_stem(tif_path)
 #' plot_extent <- calc_full_extent(raster_stack)
-#' raster::plot(raster_stack[[1]], ext=plot_extent)
-calc_full_extent <- function(stack) {
+#' raster::plot(raster_stack[[1]], ext = plot_extent)
+calc_full_extent <- function(x) {
 
   # aggregate stack for speed, otherwise everything else takes too long
-  stack <- raster::aggregate(stack, fact = 3)
+  stack <- raster::aggregate(x, fact = 3)
 
   # convert 0s to NAs, otherwise trimming is slow and the extent is too broad
   stack[stack == 0] <- NA
@@ -43,7 +43,7 @@ calc_full_extent <- function(stack) {
   tr <- stemhelper::template_raster
 
   if(raster::projection(tr) != raster::projection(stack)) {
-    this_template_raster <- projectRaster(tr, raster::projection(stack))
+    this_template_raster <- projectRaster(tr, crs = sp::proj4string(stack))
   } else {
     this_template_raster <- tr
   }
