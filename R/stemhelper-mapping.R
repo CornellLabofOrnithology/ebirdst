@@ -20,7 +20,7 @@
 calc_full_extent <- function(stack) {
 
   # aggregate stack for speed, otherwise everything else takes too long
-  stack <- raster::aggregate(stack, fact=3)
+  stack <- raster::aggregate(stack, fact = 3)
 
   # convert 0s to NAs, otherwise trimming is slow and the extent is too broad
   stack[stack == 0] <- NA
@@ -42,7 +42,7 @@ calc_full_extent <- function(stack) {
   # project template_raster
   tr <- stemhelper::template_raster
 
-  if(raster::projection(te) != raster::projection(stack)) {
+  if(raster::projection(tr) != raster::projection(stack)) {
     this_template_raster <- projectRaster(tr, raster::projection(stack))
   } else {
     this_template_raster <- tr
