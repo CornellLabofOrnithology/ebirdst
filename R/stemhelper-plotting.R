@@ -383,6 +383,17 @@ train_check <- function(y, train_data, empty_val) {
 # ' Loess fit and predict for cake_plot() PIs and PDs
 # '
 loess_fit_and_predict <- function(x, ext, input_data, type) {
+  # static projections
+  ll <- "+init=epsg:4326"
+  mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
+
+  # for both PI and PD need to loess fit and predict for each variable
+  # for uniform date set, defined here
+  SRD_DATE_VEC <- seq(from = 0, to = 1, length = 52 + 1)
+  SRD_DATE_VEC <- (SRD_DATE_VEC[1:52] + SRD_DATE_VEC[2:(52+1)])/2
+  SRD_DATE_VEC <- round(SRD_DATE_VEC, digits = 2)
+  nd <- data.frame(date = SRD_DATE_VEC)
+
   if(type == "PI") {
     D <- input_data[, c(x, "centroid.date", "centroid.lat", "centroid.lon",
                   "stixel_width", "stixel_height")]
@@ -458,7 +469,7 @@ loess_fit_and_predict <- function(x, ext, input_data, type) {
     y_name <- "slope"
   }
 
-  if(!all(is.nan(rint_d[y_name]))) {
+  if(!all(is.nan(rint_d[,c(y_name)]))) {
     d.loess <- loess(formula = as.formula(paste(y_name, " ~ date", sep = "")),
                      degree = 1,
                      data = rint_d,
@@ -507,13 +518,6 @@ cake_plot <- function(path,
   PD_MAX_RESOLUTION <- 50
   ll <- "+init=epsg:4326"
   mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
-
-  # for both PI and PD need to loess fit and predict for each variable
-  # for uniform date set, defined here
-  SRD_DATE_VEC <- seq(from = 0, to = 1, length = 52 + 1)
-  SRD_DATE_VEC <- (SRD_DATE_VEC[1:52] + SRD_DATE_VEC[2:(52+1)])/2
-  SRD_DATE_VEC <- round(SRD_DATE_VEC, digits = 2)
-  nd <- data.frame(date = SRD_DATE_VEC)
 
   # subset centroids
   tpis <- pis[pis$centroid.lat > st_extent$y.min &
