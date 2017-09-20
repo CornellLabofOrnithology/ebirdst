@@ -140,24 +140,24 @@ calc_bins <- function(x) {
 
   # lots of checks for values outside of the upper and lower bounds
 
-  # add max if the max is greater than +3 SD break
-  if(maxl > mdl + (3.00 * sdl)) {
-    log_sd <- append(log_sd, maxl)
-  }
-
   # remove +3 SD break if it is greater than max
   if(maxl < mdl + (3.00 * sdl)) {
     log_sd <- log_sd[1:length(log_sd)-1]
   }
 
-  # add min if the min is less than -3 SD break
-  if(minl < mdl - (3.00 * sdl)) {
-    log_sd <- append(log_sd, minl, after = 0)
+  # add max if the max is greater than +3 SD break
+  if(maxl > mdl + (3.00 * sdl) | maxl > log_sd[length(log_sd)]) {
+    log_sd <- append(log_sd, maxl)
   }
 
   # remove the -3 SD break if it is less than the min
   if(minl > mdl - (3.00 * sdl)) {
     log_sd <- log_sd[2:length(log_sd)]
+  }
+
+  # add min if the min is less than -3 SD break
+  if(minl < mdl - (3.00 * sdl) | minl < log_sd[1]) {
+    log_sd <- append(log_sd, minl, after = 0)
   }
 
   # if the untransformed min is greater than 0, add a zero break
