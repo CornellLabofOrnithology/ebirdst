@@ -81,7 +81,6 @@ stack_stem <- function(path,
   load_and_extend <- function(x, ext, use_extend) {
     if(tools::file_ext(x) == "tif") {
       if(!is.null(ext)) {
-        print("loading with extent")
         r <- raster::crop(
           raster::extend(
             raster::raster(paste(fp, "/", x, sep = "")), ext), ext)

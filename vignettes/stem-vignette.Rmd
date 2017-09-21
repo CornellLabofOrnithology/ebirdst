@@ -61,7 +61,7 @@ template_raster
 
 ## Loading Rasters
 
-Once you have accessed and downloaded a set of STEM results, the first task is to load them into R in a way that they can be used easily. To save space on disk, each individual raster (e.g., abundance mean for Wood Thrush for January 4) has had NA values trimmed before saving (using the raster package trim() function). While this saves space on disk, it means that the rasters are not immediately comparable and trying to use the raster `stack()` function will fail. 
+Once you have accessed and downloaded a set of STEM results, the first task is to load them into R in a way that they can be used easily. To save space on disk, each individual raster (e.g., abundance mean for Wood Thrush for January 4) has had NA values trimmed before saving (using the raster package trim() function). While this saves space on disk, it means that the rasters are not immediately comparable and trying to use the raster `stack()` function will fail. To assist with the loading of rasters, we have provided a helper function, `stack_stem()`, which uses the `template_raster` object to extend each input raster in a directory to the full extent of analysis and then returns a `RasterStack` object.
 
 ```{r load_single_raster}
 # TODO set this up to do a curl of the example results first
@@ -70,26 +70,11 @@ Once you have accessed and downloaded a set of STEM results, the first task is t
 # by replacing the root_path with where your copy lives
 root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
 species <- "woothr-ERD2016-PROD-20170505-3f880822"
-raster_path <- "/results/tifs/presentation/abundance_umean/"
-tif_path <- paste(root_path, species, raster_path, sep = "")
-
-# To load a single raster file and extend it to the full analysis extent
-# Note that the template_raster object is included with this package
-r <- raster::extend(raster::raster(paste(tif_path, "/", 
-                                         list.files(tif_path)[1], 
-                                         sep = "")),
-                    template_raster)
-r
-```
-
-To assist with the loading of rasters, we have provided a helper function, `stack_stem()`, which uses the `template_raster` object to extend each input raster in a directory to the full extent of analysis and then returns a `RasterStack` object.
-
-```{r stack_abundance}
-# TODO set this up to do a curl of the example results first
+sp_path <- paste(root_path, species, sep = "")
 
 # load a stack of rasters with the helper function stack_stem()
-abund_stack <- stack_stem(tif_path)
-abund_stack
+abund_stack <- stack_stem(sp_path, variable = "abundance_umean")
+print(abund_stack)
 ```
 
 In most use cases, this function will be used to stack the 52 weeks of a single 
@@ -181,9 +166,7 @@ Most examples in this vignette focus primarily on abundance predictions, as they
 
 ```{r plot_occurrence}
 # load a stack of occurrence
-occ_path <- paste(root_path, species, 
-                  "/results/tifs/presentation/occurrence_umean/", sep = "")
-occ_stack <- stack_stem(occ_path)
+occ_stack <- stack_stem(sp_path, variable = "occurrence_umean")
 
 # create breaks every 0.05 from 0 to 1
 occ_bins <- seq(0, 1, by = 0.05)
@@ -275,11 +258,7 @@ With a good full-annual extent and color bins, that accurately represent the dat
 
 ```{r plot_es}
 # pull in species-specific ensemble support, represent predicted 0s where there is no abundance value
-pos_es_path <- paste(root_path, 
-                     species, 
-                     "/results/tifs/presentation/abundance_ensemble_support", 
-                     sep = "")
-pos_es_stack <- stack_stem(pos_es_path)
+pos_es_stack <- stack_stem(sp_path, variable = "abundance_ensemble_support")
 week26_pes <- raster::projectRaster(pos_es_stack[[26]], crs = mollweide)
 
 # to represent assumed 0s, we have provided the data object zero_es_stack
@@ -328,13 +307,8 @@ In addition to occurrence and abundance predictions, we also provide confidence 
 
 ```{r plot_confidence}
 # load lower and upper stacks
-lower_path <- paste(root_path, species, 
-                    "/results/tifs/presentation/abundance_lower", sep = "")
-lower_stack <- stack_stem(lower_path)
-
-upper_path <- paste(root_path, species, 
-                    "/results/tifs/presentation/abundance_upper", sep = "")
-upper_stack <- stack_stem(upper_path)
+lower_stack <- stack_stem(sp_path, variable = "abundance_lower")
+upper_stack <- stack_stem(sp_path, variable = "abundance_upper")
 
 # calculate band width
 conf_band <- upper_stack - lower_stack
@@ -453,7 +427,6 @@ pds <- load_pds(sp_path)
 ## Select Region and Season
 
 ```{r map_centroids}
-ne_extent <- list()
 ne_extent <- list(type = "rectangle",
                   lat.min = 40,  
 		              lat.max = 47,
