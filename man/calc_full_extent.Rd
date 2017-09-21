@@ -2,12 +2,12 @@
 % Please edit documentation in R/stemhelper-mapping.R
 \name{calc_full_extent}
 \alias{calc_full_extent}
-\title{Calculates spatial extent of a stack for plotting}
+\title{Calculates spatial extent of Raster* object for plotting}
 \usage{
-\code{calc_full_extent(stack))}
+\code{calc_full_extent(x))}
 }
 \arguments{
-\item{stack}{A RasterStack object, ideally of occurrence or abundace.}
+\item{stack}{Raster* object, ideally of occurrence or abundace.}
 }
 \value{
 raster Extent object
@@ -23,5 +23,5 @@ for plotting. The returned extent object can then be used for plotting.
 tif_path <- "~"
 raster_stack <- stack_stem(tif_path)
 plot_extent <- calc_full_extent(raster_stack)
-raster::plot(raster_stack[[1]], ext=plot_extent)
+raster::plot(raster_stack[[1]], ext = plot_extent)
 }

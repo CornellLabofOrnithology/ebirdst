@@ -4,10 +4,10 @@
 \alias{calc_bins}
 \title{Calculates bins based on standard deviations of log-transformed data}
 \usage{
-\code{calc_bins(stack)}
+\code{calc_bins(x)}
 }
 \arguments{
-\item{stack}{A RasterStack object, of abundance results.}
+\item{x}{Raster* object}
 }
 \value{
 vector containing break points of bins
@@ -20,5 +20,5 @@ tif_path <- "~"
 raster_stack <- stack_stem(tif_path)
 year_bins <- calc_bins(raster_stack)
 
-raster::plot(raster_stack[[1]], xaxt='n', yaxt='n', breaks=year_bins)
+raster::plot(raster_stack[[1]], xaxt = 'n', yaxt = 'n', breaks = year_bins)
 }
