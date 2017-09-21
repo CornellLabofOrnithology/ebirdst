@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Calculates spatial extent of a stack for plotting — calc_full_extent • stemhelper</title>
+<title>Calculates spatial extent of Raster* object for plotting — calc_full_extent • stemhelper</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -77,7 +77,7 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Calculates spatial extent of a stack for plotting</h1>
+    <h1>Calculates spatial extent of Raster* object for plotting</h1>
     </div>
 
     
@@ -88,14 +88,14 @@ to make sure it returns a reasonable extent (based on the template_raster)
 for plotting. The returned extent object can then be used for plotting.</p>
     
 
-    <pre class="usage"><code>calc_full_extent(stack))</code></pre>
+    <pre class="usage"><code>calc_full_extent(x))</code></pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>stack</th>
-      <td><p>A RasterStack object, ideally of occurrence or abundace.</p></td>
+      <td><p>Raster* object, ideally of occurrence or abundace.</p></td>
     </tr>
     </table>
     
@@ -106,7 +106,7 @@ for plotting. The returned extent object can then be used for plotting.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='no'>tif_path</span> <span class='kw'>&lt;-</span> <span class='st'>"~"</span>
-<span class='no'>raster_stack</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='stack_stem.html'>stack_stem</a></span>(<span class='no'>tif_path</span>)</div><div class='output co'>#&gt; <span class='error'>Error in stack_stem(tif_path): Directory does not contain at least 2 .tif files.</span></div><div class='input'><span class='no'>plot_extent</span> <span class='kw'>&lt;-</span> <span class='fu'>calc_full_extent</span>(<span class='no'>raster_stack</span>)</div><div class='output co'>#&gt; <span class='error'>Error in raster::aggregate(stack, fact = 3): object 'raster_stack' not found</span></div><div class='input'><span class='kw pkg'>raster</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/raster/topics/plot'>plot</a></span>(<span class='no'>raster_stack</span><span class='kw'>[[</span><span class='fl'>1</span>]], <span class='kw'>ext</span><span class='kw'>=</span><span class='no'>plot_extent</span>)</div><div class='output co'>#&gt; <span class='error'>Error in raster::plot(raster_stack[[1]], ext = plot_extent): object 'raster_stack' not found</span></div></pre>
+<span class='no'>raster_stack</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='stack_stem.html'>stack_stem</a></span>(<span class='no'>tif_path</span>)</div><div class='output co'>#&gt; <span class='error'>Error in match(x, table, nomatch = 0L): argument "variable" is missing, with no default</span></div><div class='input'><span class='no'>plot_extent</span> <span class='kw'>&lt;-</span> <span class='fu'>calc_full_extent</span>(<span class='no'>raster_stack</span>)</div><div class='output co'>#&gt; <span class='error'>Error in raster::aggregate(x, fact = 3): object 'raster_stack' not found</span></div><div class='input'><span class='kw pkg'>raster</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/raster/topics/plot'>plot</a></span>(<span class='no'>raster_stack</span><span class='kw'>[[</span><span class='fl'>1</span>]], <span class='kw'>ext</span> <span class='kw'>=</span> <span class='no'>plot_extent</span>)</div><div class='output co'>#&gt; <span class='error'>Error in raster::plot(raster_stack[[1]], ext = plot_extent): object 'raster_stack' not found</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

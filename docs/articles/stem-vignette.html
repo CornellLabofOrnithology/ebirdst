@@ -57,7 +57,7 @@
       <h1>stemhelper: STEM Use and Helper Functions</h1>
                         <h4 class="author">Tom Auer &amp; Daniel Fink</h4>
             
-            <h4 class="date">2017-09-20</h4>
+            <h4 class="date">2017-09-21</h4>
           </div>
 
     
@@ -115,37 +115,18 @@
 <div id="loading-rasters" class="section level2">
 <h2 class="hasAnchor">
 <a href="#loading-rasters" class="anchor"></a>Loading Rasters</h2>
-<p>Once you have accessed and downloaded a set of STEM results, the first task is to load them into R in a way that they can be used easily. To save space on disk, each individual raster (e.g., abundance mean for Wood Thrush for January 4) has had NA values trimmed before saving (using the raster package trim() function). While this saves space on disk, it means that the rasters are not immediately comparable and trying to use the raster <code>stack()</code> function will fail.</p>
+<p>Once you have accessed and downloaded a set of STEM results, the first task is to load them into R in a way that they can be used easily. To save space on disk, each individual raster (e.g., abundance mean for Wood Thrush for January 4) has had NA values trimmed before saving (using the raster package trim() function). While this saves space on disk, it means that the rasters are not immediately comparable and trying to use the raster <code>stack()</code> function will fail. To assist with the loading of rasters, we have provided a helper function, <code><a href="../reference/stack_stem.html">stack_stem()</a></code>, which uses the <code>template_raster</code> object to extend each input raster in a directory to the full extent of analysis and then returns a <code>RasterStack</code> object.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># TODO set this up to do a curl of the example results first</span>
 
 <span class="co"># Note, if you currently access results you can use this path construction</span>
 <span class="co"># by replacing the root_path with where your copy lives</span>
 root_path &lt;-<span class="st"> "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"</span>
 species &lt;-<span class="st"> "woothr-ERD2016-PROD-20170505-3f880822"</span>
-raster_path &lt;-<span class="st"> "/results/tifs/presentation/abundance_umean/"</span>
-tif_path &lt;-<span class="st"> </span><span class="kw">paste</span>(root_path, species, raster_path, <span class="dt">sep =</span> <span class="st">""</span>)
-
-<span class="co"># To load a single raster file and extend it to the full analysis extent</span>
-<span class="co"># Note that the template_raster object is included with this package</span>
-r &lt;-<span class="st"> </span>raster::<span class="kw">extend</span>(raster::<span class="kw">raster</span>(<span class="kw">paste</span>(tif_path, <span class="st">"/"</span>, 
-                                         <span class="kw">list.files</span>(tif_path)[<span class="dv">1</span>], 
-                                         <span class="dt">sep =</span> <span class="st">""</span>)),
-                    template_raster)
-r</code></pre></div>
-<pre><code>## class       : RasterLayer 
-## dimensions  : 1907, 2267, 4323169  (nrow, ncol, ncell)
-## resolution  : 8339.629, 8339.629  (x, y)
-## extent      : -20015109, -1109171, -6674483, 9229189  (xmin, xmax, ymin, ymax)
-## coord. ref. : +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs 
-## data source : /Users/mta45/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/woothr-ERD2016-PROD-20170505-3f880822/results/tifs/presentation/abundance_umean/woothr-ERD2016-PROD-20170505-3f880822_week_01-04_presentation_abundance_umean.tif 
-## names       : woothr.ERD2016.PROD.20170505.3f880822_week_01.04_presentation_abundance_umean 
-## values      : 0.01511837, 1.330251  (min, max)</code></pre>
-<p>To assist with the loading of rasters, we have provided a helper function, <code><a href="../reference/stack_stem.html">stack_stem()</a></code>, which uses the <code>template_raster</code> object to extend each input raster in a directory to the full extent of analysis and then returns a <code>RasterStack</code> object.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># TODO set this up to do a curl of the example results first</span>
+sp_path &lt;-<span class="st"> </span><span class="kw">paste</span>(root_path, species, <span class="dt">sep =</span> <span class="st">""</span>)
 
 <span class="co"># load a stack of rasters with the helper function stack_stem()</span>
-abund_stack &lt;-<span class="st"> </span><span class="kw"><a href="../reference/stack_stem.html">stack_stem</a></span>(tif_path)
-abund_stack</code></pre></div>
+abund_stack &lt;-<span class="st"> </span><span class="kw"><a href="../reference/stack_stem.html">stack_stem</a></span>(sp_path, <span class="dt">variable =</span> <span class="st">"abundance_umean"</span>)
+<span class="kw">print</span>(abund_stack)</code></pre></div>
 <pre><code>## class       : RasterStack 
 ## dimensions  : 1907, 2267, 4323169, 52  (nrow, ncol, ncell, nlayers)
 ## resolution  : 8339.629, 8339.629  (x, y)
@@ -237,9 +218,7 @@ raster::<span class="kw">plot</span>(week1_moll,
 <a href="#mapping-occurrence" class="anchor"></a>Mapping Occurrence</h2>
 <p>Most examples in this vignette focus primarily on abundance predictions, as they’re the most novel and informative. However, we also provide the probability of occurrence predictions. These are much simpler to plot than abundance, as values range between 0 and 1 throughout the year.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load a stack of occurrence</span>
-occ_path &lt;-<span class="st"> </span><span class="kw">paste</span>(root_path, species, 
-                  <span class="st">"/results/tifs/presentation/occurrence_umean/"</span>, <span class="dt">sep =</span> <span class="st">""</span>)
-occ_stack &lt;-<span class="st"> </span><span class="kw"><a href="../reference/stack_stem.html">stack_stem</a></span>(occ_path)
+occ_stack &lt;-<span class="st"> </span><span class="kw"><a href="../reference/stack_stem.html">stack_stem</a></span>(sp_path, <span class="dt">variable =</span> <span class="st">"occurrence_umean"</span>)
 
 <span class="co"># create breaks every 0.05 from 0 to 1</span>
 occ_bins &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">by =</span> <span class="fl">0.05</span>)
@@ -325,11 +304,7 @@ raster::<span class="kw">plot</span>(week26_moll,
 <a href="#mapping-abundance" class="anchor"></a>Mapping Abundance</h2>
 <p>With a good full-annual extent and color bins, that accurately represent the data distribution, we can add in other pieces of data that represent predicted and assumed zeroes, which help display the extent of estimation.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># pull in species-specific ensemble support, represent predicted 0s where there is no abundance value</span>
-pos_es_path &lt;-<span class="st"> </span><span class="kw">paste</span>(root_path, 
-                     species, 
-                     <span class="st">"/results/tifs/presentation/abundance_ensemble_support"</span>, 
-                     <span class="dt">sep =</span> <span class="st">""</span>)
-pos_es_stack &lt;-<span class="st"> </span><span class="kw"><a href="../reference/stack_stem.html">stack_stem</a></span>(pos_es_path)
+pos_es_stack &lt;-<span class="st"> </span><span class="kw"><a href="../reference/stack_stem.html">stack_stem</a></span>(sp_path, <span class="dt">variable =</span> <span class="st">"abundance_ensemble_support"</span>)
 week26_pes &lt;-<span class="st"> </span>raster::<span class="kw">projectRaster</span>(pos_es_stack[[<span class="dv">26</span>]], <span class="dt">crs =</span> mollweide)
 
 <span class="co"># to represent assumed 0s, we have provided the data object zero_es_stack</span>
@@ -385,13 +360,8 @@ sp::<span class="kw">plot</span>(wh_states_moll, <span class="dt">add =</span> <
 <a href="#mapping-abundance-confidence-intervals" class="anchor"></a>Mapping Abundance Confidence Intervals</h2>
 <p>In addition to occurrence and abundance predictions, we also provide confidence intervals at an upper value of 90% and lower value of 10%. These can be used to calculate and map a confidence band width.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load lower and upper stacks</span>
-lower_path &lt;-<span class="st"> </span><span class="kw">paste</span>(root_path, species, 
-                    <span class="st">"/results/tifs/presentation/abundance_lower"</span>, <span class="dt">sep =</span> <span class="st">""</span>)
-lower_stack &lt;-<span class="st"> </span><span class="kw"><a href="../reference/stack_stem.html">stack_stem</a></span>(lower_path)
-
-upper_path &lt;-<span class="st"> </span><span class="kw">paste</span>(root_path, species, 
-                    <span class="st">"/results/tifs/presentation/abundance_upper"</span>, <span class="dt">sep =</span> <span class="st">""</span>)
-upper_stack &lt;-<span class="st"> </span><span class="kw"><a href="../reference/stack_stem.html">stack_stem</a></span>(upper_path)
+lower_stack &lt;-<span class="st"> </span><span class="kw"><a href="../reference/stack_stem.html">stack_stem</a></span>(sp_path, <span class="dt">variable =</span> <span class="st">"abundance_lower"</span>)
+upper_stack &lt;-<span class="st"> </span><span class="kw"><a href="../reference/stack_stem.html">stack_stem</a></span>(sp_path, <span class="dt">variable =</span> <span class="st">"abundance_upper"</span>)
 
 <span class="co"># calculate band width</span>
 conf_band &lt;-<span class="st"> </span>upper_stack -<span class="st"> </span>lower_stack
@@ -505,12 +475,11 @@ pds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_pd
 <div id="select-region-and-season" class="section level2">
 <h2 class="hasAnchor">
 <a href="#select-region-and-season" class="anchor"></a>Select Region and Season</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ne_extent &lt;-<span class="st"> </span><span class="kw">list</span>()
-ne_extent &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">type =</span> <span class="st">"rectangle"</span>,
-                  <span class="dt">y.min =</span> <span class="dv">40</span>,  
-                      <span class="dt">y.max =</span> <span class="dv">47</span>,
-                      <span class="dt">x.min =</span> -<span class="dv">80</span>,
-                      <span class="dt">x.max =</span> -<span class="dv">70</span>,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ne_extent &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">type =</span> <span class="st">"rectangle"</span>,
+                  <span class="dt">lat.min =</span> <span class="dv">40</span>,  
+                      <span class="dt">lat.max =</span> <span class="dv">47</span>,
+                      <span class="dt">lon.min =</span> -<span class="dv">80</span>,
+                      <span class="dt">lon.max =</span> -<span class="dv">70</span>,
                       <span class="dt">t.min =</span> <span class="fl">0.425</span>,
                       <span class="dt">t.max =</span> <span class="fl">0.475</span>)
 
