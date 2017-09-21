@@ -455,10 +455,10 @@ pds <- load_pds(sp_path)
 ```{r map_centroids}
 ne_extent <- list()
 ne_extent <- list(type = "rectangle",
-                  y.min = 40,  
-		              y.max = 47,
-		              x.min = -80,
-		              x.max = -70,
+                  lat.min = 40,  
+		              lat.max = 47,
+		              lon.min = -80,
+		              lon.max = -70,
 		              t.min = 0.425,
 	 	              t.max = 0.475)
 

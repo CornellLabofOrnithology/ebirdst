@@ -10,10 +10,10 @@ plot_pis <- function(pis,
   # subset for extent
   ttt <- pis[pis$centroid.date > st_extent$t.min &
              pis$centroid.date <= st_extent$t.max &
-             pis$centroid.lat > st_extent$y.min &
-             pis$centroid.lat <= st_extent$y.max &
-             pis$centroid.lon > st_extent$x.min &
-             pis$centroid.lon <= st_extent$x.max, 2:87]
+             pis$centroid.lat > st_extent$lat.min &
+             pis$centroid.lat <= st_extent$lat.max &
+             pis$centroid.lon > st_extent$lon.min &
+             pis$centroid.lon <= st_extent$lon.max, 2:87]
 
   # if aggregating by cover class
   # aggregate the fragstats into land cover classes
@@ -137,10 +137,10 @@ plot_pds <- function(pd_name,
   # subset based on extent
   pd_index <- pds$centroid.date > st_extent$t.min &
               pds$centroid.date <= st_extent$t.max &
-              pds$centroid.lat > st_extent$y.min &
-              pds$centroid.lat <= st_extent$y.max &
-              pds$centroid.lon > st_extent$x.min &
-              pds$centroid.lon <= st_extent$x.max
+              pds$centroid.lat > st_extent$lat.min &
+              pds$centroid.lat <= st_extent$lat.max &
+              pds$centroid.lon > st_extent$lon.min &
+              pds$centroid.lon <= st_extent$lon.max
   pd_vec <- pds[pd_index, ]
   rm(pd_index, pds)
 
@@ -435,10 +435,10 @@ loess_fit_and_predict <- function(x, ext, input_data, type) {
   rm(tdsp)
 
   # get the full input extent
-  tdsp_ext <- as(raster::extent(ext$x.min,
-                                ext$x.max,
-                                ext$y.min,
-                                ext$y.max), "SpatialPolygons")
+  tdsp_ext <- as(raster::extent(ext$lon.min,
+                                ext$lon.max,
+                                ext$lat.min,
+                                ext$lat.max), "SpatialPolygons")
   raster::crs(tdsp_ext) <- sp::CRS(ll)
   tdsp_ext_moll <- sp::spTransform(tdsp_ext, sp::CRS(mollweide))
 
@@ -520,17 +520,17 @@ cake_plot <- function(path,
   mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
 
   # subset centroids
-  tpis <- pis[pis$centroid.lat > st_extent$y.min &
-              pis$centroid.lat <= st_extent$y.max &
-              pis$centroid.lon > st_extent$x.min &
-              pis$centroid.lon <= st_extent$x.max &
+  tpis <- pis[pis$centroid.lat > st_extent$lat.min &
+              pis$centroid.lat <= st_extent$lat.max &
+              pis$centroid.lon > st_extent$lon.min &
+              pis$centroid.lon <= st_extent$lon.max &
               !is.na(pis[, 2]), ]
   rm(pis)
 
-  tpds <- pds[pds$centroid.lat > st_extent$y.min &
-              pds$centroid.lat <= st_extent$y.max &
-              pds$centroid.lon > st_extent$x.min &
-              pds$centroid.lon <= st_extent$x.max &
+  tpds <- pds[pds$centroid.lat > st_extent$lat.min &
+              pds$centroid.lat <= st_extent$lat.max &
+              pds$centroid.lon > st_extent$lon.min &
+              pds$centroid.lon <= st_extent$lon.max &
               !is.na(pds$V5), ]
   rm(pds)
 
