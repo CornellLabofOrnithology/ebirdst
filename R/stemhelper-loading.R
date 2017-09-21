@@ -1,3 +1,25 @@
+#' Internal function for transforming st_extent to sinusoidal raster extent
+#'
+get_sinu_ext <- function(extent) {
+  # projection information
+  ll <- "+init=epsg:4326"
+
+  sp_ext <- raster::extent(extent$lon.min,
+                           extent$lon.max,
+                           extent$lat.min,
+                           extent$lat.max)
+  extllr <- raster::raster(ext = sp_ext)
+  extllr[is.na(extllr)] <- 0
+  raster::crs(extllr) <- ll
+
+  extsinur <- raster::projectRaster(extllr,
+                                    crs = sp::proj4string(
+                                      stemhelper::template_raster))
+
+  return(raster::extent(extsinur))
+}
+
+
 #' Load, extend, and stack all STEM .tif rasters in a directory
 #'
 #' Takes all of the .tif rasters in a directory at provided path, loads them,
@@ -15,25 +37,76 @@
 #' @examples
 #' tif_path <- "~"
 #' raster_stack <- stack_stem(tif_path)
-stack_stem <- function(path) {
+stack_stem <- function(path,
+                       variable,
+                       ext = NA,
+                       use_analysis_extent = FALSE) {
+
+  poss_var <- c("abundance_ensemble_support", "abundance_lower",
+                "abundance_upper", "abundance_umean", "occurrence_umean")
+  if(!(variable %in% poss_var)) {
+    stop(paste("Selected variable is not one of the following: ",
+               paste(poss_var, collapse = ", "), ".", sep = ""))
+  }
+
+  fp <- paste(path, "/results/tifs/presentation/", variable, sep = "")
+
+  load_extent <- NULL
+  load_extend <- FALSE
+  e <- load_config(path)
+
+  if(all(is.na(ext))) {
+    if(use_analysis_extent == TRUE) {
+      # load with extent
+      if(!is.null(e$SPATIAL_EXTENT_LIST)) {
+        load_extent <- get_sinu_ext(e$SPATIAL_EXTENT_LIST)
+      } else {
+        load_extend <- TRUE
+      }
+    } else {
+      if(e$SRD_AGG_FACT == 1) {
+        # load without extend
+        load_extend <- FALSE
+      } else {
+        # load with extend
+        load_extend <- TRUE
+      }
+    }
+  } else {
+    # load with extent
+    load_extent <- get_sinu_ext(ext)
+  }
 
   # define function to load and extend each file in path
-  load_and_extend <- function(x) {
-
+  load_and_extend <- function(x, ext, use_extend) {
     if(tools::file_ext(x) == "tif") {
-      r <- raster::extend(raster::raster(paste(path, "/", x, sep = "")),
-                          stemhelper::template_raster)
+      if(!is.null(ext)) {
+        print("loading with extent")
+        r <- raster::crop(
+          raster::extend(
+            raster::raster(paste(fp, "/", x, sep = "")), ext), ext)
+      } else {
+        if(use_extend == TRUE) {
+          r <- raster::extend(raster::raster(paste(fp, "/", x, sep = "")),
+                              stemhelper::template_raster)
+        } else {
+          r <- raster::raster(paste(fp, "/", x, sep = ""))
+        }
+      }
 
       return(r)
     }
   }
 
   # check to see if path contains more than 1 geotiff file
-  if( sum(tools::file_ext(list.files(path)) == "tif", na.rm = TRUE) < 2 ) {
+  if( sum(tools::file_ext(list.files(fp)) == "tif", na.rm = TRUE) < 2 ) {
     stop("Directory does not contain at least 2 .tif files.")
   }
 
-  all_lays <- lapply(X = list.files(path), FUN = load_and_extend)
+  all_lays <- lapply(X = list.files(fp),
+                     FUN = load_and_extend,
+                     ext = load_extent,
+                     use_extend = load_extend)
 
   st <- raster::stack(all_lays)
   rm(all_lays)
