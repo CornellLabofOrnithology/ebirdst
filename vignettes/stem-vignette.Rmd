@@ -257,27 +257,9 @@ raster::plot(week26_moll,
 With a good full-annual extent and color bins, that accurately represent the data distribution, we can add in other pieces of data that represent predicted and assumed zeroes, which help display the extent of estimation.
 
 ```{r plot_es}
-# pull in species-specific ensemble support, represent predicted 0s where there is no abundance value
-pos_es_stack <- stack_stem(sp_path, variable = "abundance_ensemble_support")
-week26_pes <- raster::projectRaster(pos_es_stack[[26]], crs = mollweide)
-
-# to represent assumed 0s, we have provided the data object zero_es_stack
-# that has values for the ensemble support indicating sufficient checklists
-# to fit and predict models at that location
-# for presentation we use a value of 99 to show locations with assumed 0s
-zero_es_stack
-week26_zes_vals <- raster::projectRaster(raster::mask(zero_es_stack[[26]], 
-                                                 template_raster), 
-                                    crs = mollweide)
-
-# we'll combine the two types of zeroes with the positive prediction for plotting
-week26_pes[week26_pes] <- 0
-week26_zes <- week26_zes_vals >= 99
-week26_zes[week26_zes == 0] <- NA
-week26_zes[week26_zes == 1] <- 0
-
-week26s <- raster::stack(week26_pes, week26_zes, week26_moll)
-week26c <- raster::calc(week26s, max, na.rm = TRUE)
+# the helper function combine_layers() fills in with assumed and predicted zeroes
+week26 <- combine_layers(sp_path, week = 26)
+week26c <- raster::projectRaster(week26, crs = mollweide)
 
 # to add context, let's pull in some reference data to add
 wh <- rnaturalearth::ne_countries(continent = c("North America",

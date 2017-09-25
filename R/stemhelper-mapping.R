@@ -172,6 +172,46 @@ calc_bins <- function(x) {
   return(bins)
 }
 
+#' Combine zero layers and abundance to create a single layer
+#'
+#' @export
+combine_layers <- function(path, week) {
+  e <- load_config(path)
+
+  # possible checks
+  # week is between 1 and 52
+
+  # load abundance
+  abund_stack <- stack_stem(path, variable = "abundance_umean")
+  abund_week <- abund_stack[[week]]
+
+  # load positive ensemble support
+  pos_es_stack <- stack_stem(path, variable = "abundance_ensemble_support")
+  pos_es_week <- pos_es_stack[[week]]
+
+  # load zero ensemble support
+  zero_es_week <- zero_es_stack[[week]]
+
+  if(e$SRD_AGG_FACT == 1) {
+    zero_es_week <- raster::resample(zero_es_week, pos_es_week)
+    zero_es_mask <- raster::mask(zero_es_week, pos_es_week)
+  } else {
+    zero_es_mask <- raster::mask(zero_es_week, stemhelper::template_raster)
+  }
+
+  # set zeroes
+  pos_es_week[pos_es_week] <- 0
+  zero_es_mask <- zero_es_mask >= 99
+  zero_es_mask[zero_es_mask == 0] <- NA
+  zero_es_mask[zero_es_mask == 1] <- 0
+
+  # stack and max
+  week_stack <- raster::stack(pos_es_week, zero_es_mask, abund_week)
+  week_max <- raster::calc(week_stack, max, na.rm = TRUE)
+
+  return(week_max)
+}
+
 #' Map PI and PD centroid locations for species
 #'
 #' @export
