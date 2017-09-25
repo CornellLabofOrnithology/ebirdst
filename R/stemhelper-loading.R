@@ -225,7 +225,7 @@ load_pis <- function(path) {
 
   # return subset
   pi_summary[, c("V1.x", "V2.x", "V1.y", "V2.y") := NULL]
-  pi_summary <- pi_summary[, 1:98]
+  pi_summary <- pi_summary[, 1:(length(e$PI_VARS) + 12)]
 
   return(as.data.frame(pi_summary))
 }
@@ -260,7 +260,7 @@ load_pds <- function(path) {
 
   # return a subset of the fields
   pd_summary[ ,c("V1.x", "V2.x", "V1.y", "V2.y") := NULL]
-  pd_summary <- pd_summary[, 1:114]
+  pd_summary <- pd_summary[, 1:(length(e$PD_VARS) + 28)]
 
   return(as.data.frame(pd_summary))
 }
