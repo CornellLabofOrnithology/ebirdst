@@ -370,11 +370,6 @@ g
 It is also possible to extract trajectories for regions, but it takes a little more data work.
 
 ```{r trajectories_region}
-# set a point
-coords <- cbind(-76.5, 42.5)
-pt <- sp::SpatialPoints(coords, proj4string = sp::CRS("+init=epsg:4326"))
-pt_prj <- sp::spTransform(pt, sp::CRS(sp::proj4string(template_raster)))
-
 # set an extent based on polygon
 us <- rnaturalearth::ne_states(geounit = "United States of America")
 us_prj <- sp::spTransform(us, sp::CRS(sp::proj4string(template_raster)))
