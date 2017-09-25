@@ -566,6 +566,10 @@ cake_plot <- function(path,
     cover_cols <- cover_cols[grep(pattern = "PLAND|LPI", cover_cols)]
   }
 
+  if(length(cover_cols) == 0) {
+    stop("No land or water cover classes to plot.")
+  }
+
   ## Calculate PD slopes for each centroid
   calc_slope <- function(y) {
     x <- as.data.frame(tpds[y, ])
@@ -654,7 +658,7 @@ cake_plot <- function(path,
   smooth_pis_w_sums <- merge(smooth_pis,
                              pi_week_sums,
                              by.x = "date",
-                             by.y="Group.1")
+                             by.y = "Group.1")
   rm(smooth_pis, pi_week_sums)
 
   smooth_pis_w_sums$pi_adj <- smooth_pis_w_sums$preds/smooth_pis_w_sums$x
