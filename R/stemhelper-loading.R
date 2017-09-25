@@ -40,7 +40,7 @@ get_sinu_ext <- function(extent) {
 stack_stem <- function(path,
                        variable,
                        ext = NA,
-                       use_analysis_extent = FALSE) {
+                       use_analysis_extent = TRUE) {
 
   poss_var <- c("abundance_ensemble_support", "abundance_lower",
                 "abundance_upper", "abundance_umean", "occurrence_umean")
