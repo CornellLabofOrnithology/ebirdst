@@ -2,7 +2,8 @@
 #'
 #' @export
 #' @import ggplot2 mgcv
-plot_pis <- function(pis,
+plot_pis <- function(path,
+                     pis,
                      st_extent,
                      by_cover_class = FALSE,
                      num_top_preds = 50) {
@@ -69,6 +70,9 @@ plot_pis <- function(pis,
     rm(ttt.new)
   }
 
+  # replace names with readable
+  names(ttt) <- stemhelper::convert_classes(names(ttt), by_cover_class)
+
   # compute median
   pi_median <- apply(ttt, 2, median, na.rm = T)
 
@@ -111,7 +115,7 @@ plot_pis <- function(pis,
 plot_pds <- function(pd_name,
                      pds,
                      st_extent,
-                     pointwise_pi = FALSE,
+                     pointwise_pi = TRUE,
                      stixel_pds = TRUE,
                      k.cont.res = 25,
                      gbm.n.trees = 500,
@@ -162,6 +166,8 @@ plot_pds <- function(pd_name,
   rm(pd_vec)
   # Clean
   var_pd <- var_pd[!is.na(var_pd$V5), ]
+
+  pd_name <- stemhelper::convert_classes(pd_name)
 
   # Each Column is one replicate estimate of PD
   # 	x = x coordinate values
@@ -719,6 +725,15 @@ cake_plot <- function(path,
   pipd_short$pidir[is.nan(pipd_short$pidir)] <- 0
   rm(pipd)
 
+  # attempt to clean up the names...not working
+  #ccfun <- function(x) {
+  #  stemhelper::convert_classes(x["predictor"], by_cover_class)
+  #}
+
+  #pipd_short$predictor <- apply(pipd_short,
+  #                              1,
+  #                              FUN = ccfun)
+
   # ggplot
   wave <- ggplot2::ggplot(pipd_short, ggplot2::aes(x = date,
                                                    y = pidir,
@@ -731,4 +746,58 @@ cake_plot <- function(path,
     #ggplot2::theme(legend.position = "none")
 
   wave
+}
+
+#' Internal function for converting cover class names to readable
+#'
+convert_classes <- function(cov_names,
+                            by_cover_class = FALSE) {
+
+  if(by_cover_class == TRUE) {
+    ending <- ""
+  } else {
+    ending <- "_"
+  }
+
+  # subset to cover classes
+  land.cover.class.codes <- c(1:10, 12, 13, 16)
+  lc.tag <- "UMD_FS_C"
+  land_covers <- paste(lc.tag, land.cover.class.codes, ending, sep = "")
+
+  water.cover.class.codes <- c(0, 2, 3, 5, 6, 7)
+  wc.tag <- "MODISWATER_FS_C"
+  water_covers <- paste(wc.tag, water.cover.class.codes, ending, sep = "")
+
+  both_covers <- c(land_covers, water_covers)
+
+  land_cover_names <- c("EVERGREEN_NEEDLELEAF_FOREST",
+                        "EVERGREEN_BROADLEAF_FOREST",
+                        "DECIDUOUS_NEEDLELEAF_FOREST",
+                        "DECIDUOUS_BROADLEAF_FOREST",
+                        "MIXED_FOREST",
+                        "CLOSED_SHRUBLANDS",
+                        "OPEN_SHRUBLANDS",
+                        "WOODY_SAVANNAS",
+                        "SAVANNAS",
+                        "GRASSLANDS",
+                        "CROPLANDS",
+                        "URBAN",
+                        "BARREN")
+
+  water_cover_names <- c("SHALLOW_OCEAN", "OCEAN_COASTLINES_AND_LAKE_SHORES",
+                         "SHALLOW_INLAND_WATER", "DEEP_INLAND_WATER",
+                         "MODERATE_OCEAN", "DEEP_OCEAN")
+
+  both_names <- paste(c(land_cover_names, water_cover_names), ending, sep = "")
+
+  converted <- c()
+  for(n in cov_names) {
+    a <- both_covers[which(!is.na(pmatch(both_covers, n)))]
+    b <- both_names[which(!is.na(pmatch(both_covers, n)))]
+
+    conv <- ifelse(length(a) > 0, stringr::str_replace_all(n, a, b), n)
+    converted <- c(converted, conv)
+  }
+
+  return(converted)
 }
