@@ -1,0 +1,19 @@
+citHeader("To cite stemhelper in publications use:")
+
+citEntry(
+  entry        = "Manual",
+  title        = "stemhelper: Helper functions for STEM loading, plotting, mapping and analysis",
+  author       = personList(
+                   as.person("Tom Auer"),
+                   as.person("Daniel Fink")
+                 ),
+  year         = "2017",
+  note         = "R package version 0.1.0",
+  url          = "https://cornelllabofornithology.github.io/stemhelper/",
+
+  textVersion  =
+  paste("Tom Auer and Daniel Fink (2017).",
+        "stemhelper: Helper functions for STEM loading, plotting, mapping and analysis.",
+        "R package version 0.1.0.",
+        "https://cornelllabofornithology.github.io/stemhelper/")
+)

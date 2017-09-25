@@ -1,10 +1,14 @@
 Package: stemhelper
 Title: STEM Loading, Mapping, Plotting and Analysis
 Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Authors@R: c(person("Tom", "Auer", email = "mta45@cornell.edu", role = c("aut", "cre")),
+             person("Daniel", "Fink", email = "df36@cornell.edu", role = "aut"),
+             person("Cornell Lab of Ornithology", role = "cph"))
+URL: https://github.com/CornellLabofOrnithology/stemhelper
+BugReports: https://github.com/CornellLabofOrnithology/stemhelper/issues
+Description: Helper functions to assist with the loading, plotting, mapping and analysis of results from eBird Spatiotemporal Exploratory Models (STEM) (<http://ebird.org/content/ebird/stem/>).
 Depends: R (>= 3.3.3)
-License: What license is it under?
+License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
