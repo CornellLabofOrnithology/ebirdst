@@ -6,6 +6,7 @@ plot_pis <- function(pis,
                      st_extent,
                      by_cover_class = FALSE,
                      num_top_preds = 50) {
+  e <- load_config(path)
 
   # subset for extent
   ttt <- pis[pis$centroid.date > st_extent$t.min &
@@ -13,7 +14,7 @@ plot_pis <- function(pis,
              pis$centroid.lat > st_extent$lat.min &
              pis$centroid.lat <= st_extent$lat.max &
              pis$centroid.lon > st_extent$lon.min &
-             pis$centroid.lon <= st_extent$lon.max, 2:87]
+             pis$centroid.lon <= st_extent$lon.max, e$PI_VARS]
 
   # if aggregating by cover class
   # aggregate the fragstats into land cover classes
@@ -33,7 +34,13 @@ plot_pis <- function(pis,
                              "_",
                              sep = "")
       pred.nindex <- grep(new.pred.name, x = predictor.names)
-      ttt.new <- cbind(ttt.new, apply(ttt[, pred.nindex], 1, mean, na.rm=T))
+
+      if(length(pred.nindex) == 1) {
+        ttt.new <- cbind(ttt.new, ttt[, pred.nindex])
+      } else {
+        ttt.new <- cbind(ttt.new, apply(ttt[, pred.nindex], 1, mean, na.rm=T))
+      }
+
       ttt.new <- as.data.frame(ttt.new)
       names(ttt.new)[ncol(ttt.new)] <- paste(lc.tag,
                                              land.cover.class.codes[iii.pred],
@@ -45,7 +52,13 @@ plot_pis <- function(pis,
                              "_",
                              sep = "")
       pred.nindex <- grep(new.pred.name, x = predictor.names)
-      ttt.new <- cbind(ttt.new, apply(ttt[, pred.nindex], 1, mean, na.rm=T))
+
+      if(length(pred.nindex) == 1) {
+        ttt.new <- cbind(ttt.new, ttt[, pred.nindex])
+      } else {
+        ttt.new <- cbind(ttt.new, apply(ttt[, pred.nindex], 1, mean, na.rm=T))
+      }
+
       ttt.new <- as.data.frame(ttt.new)
       names(ttt.new)[ncol(ttt.new)] <- paste(wc.tag,
                                              water.cover.class.codes[iii.pred],
