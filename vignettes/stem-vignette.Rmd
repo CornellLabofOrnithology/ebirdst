@@ -345,7 +345,8 @@ g <- ggplot(plot_frame, aes(x, y)) +
                  aes(ymin = lower, ymax = upper), 
                  alpha = 0.3) +
      ylab("Expected Count (count/(km hr))") +
-     xlab("Week")
+     xlab("Week") +
+     theme_light()
 g
 ```
 
@@ -382,7 +383,8 @@ g <- ggplot(plot_frame, aes(x, y)) +
                  aes(ymin = lower, ymax =upper), 
                  alpha = 0.3) +
      ylab("Expected Count (count/(km hr))") +
-     xlab("Week")
+     xlab("Week") +
+     theme_light()
 g
 ```
 
@@ -419,7 +421,7 @@ map_centroids(pis = pis, pds = pds, st_extent = ne_extent)
 ## Plot available centroids and extent of analysis
 
 ```{r plot_extents}
-par(mfrow = c(1,2), mar = c(0,0,0,4))
+par(mfrow = c(1,2), mar = c(0,0,0,6))
 pi_extent <- calc_effective_extent(ne_extent, pis = pis)
 pd_extent <- calc_effective_extent(ne_extent, pds = pds)
 ```

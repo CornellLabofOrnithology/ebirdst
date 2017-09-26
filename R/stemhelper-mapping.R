@@ -506,7 +506,7 @@ calc_effective_extent <- function(st_extent,
                legend=TRUE)
   sp::plot(wh_moll, add=TRUE, border='gray')
   sp::plot(wh_states_moll, add=TRUE, border='gray')
-  sp::plot(tpis_sub_moll, add=TRUE, pch=17)
+  sp::plot(tpis_sub_moll, add=TRUE, pch=16, cex = 0.4)
 
   return(tpis_per)
 }

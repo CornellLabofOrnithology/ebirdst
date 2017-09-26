@@ -107,7 +107,8 @@ plot_pis <- function(path,
                                            values)) +
     geom_boxplot() +
     coord_flip() +
-    labs(y = "Relative PI", x = "")
+    labs(y = "Relative PI", x = "") +
+    theme_light()
   pi_bars
 }
 
@@ -747,8 +748,13 @@ cake_plot <- function(path,
     ggplot2::geom_area() +
     ggplot2::xlim(0, 1) +
     ggplot2::ylim(-1, 1) +
-    ggplot2::scale_fill_manual(values=agg_colors, labels=pipd_short$labels)
-    #ggplot2::theme(legend.position = "none")
+    ggplot2::scale_fill_manual(values = agg_colors,
+                               labels = pipd_short$labels,
+                               name = "Predictor") +
+    ggplot2::theme_light() +
+    ggplot2::xlab("Week") +
+    ggplot2::ylab("Association Direction (Positive/Negative)") +
+    ggplot2::theme(legend.key.size = ggplot2::unit(1, "line"))
 
   wave
 }
