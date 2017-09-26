@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Authors • stemhelper</title>
+<title>Citation and Authors • stemhelper</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -37,7 +37,7 @@
   </head>
 
   <body>
-    <div class="container template-authors">
+    <div class="container template-citation-authors">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -75,14 +75,38 @@
       </header>
 
       <div class="row">
-  <div class="contents col-md-12">
+  <div class="contents col-md-9">
+
+    <div class="page-header">
+      <h1>Citation</h1>
+    </div>
+
+    <p>Auer T and Fink D (2017).
+<em>stemhelper: Helper functions for STEM loading, plotting, mapping and analysis</em>.
+R package version 0.1.0, <a href="https://cornelllabofornithology.github.io/stemhelper/">https://cornelllabofornithology.github.io/stemhelper/</a>. 
+</p>
+    <pre>@Manual{,
+  title = {stemhelper: Helper functions for STEM loading, plotting, mapping and analysis},
+  author = {Tom Auer and Daniel Fink},
+  year = {2017},
+  note = {R package version 0.1.0},
+  url = {https://cornelllabofornithology.github.io/stemhelper/},
+}</pre>
     <div class="page-header">
       <h1>Authors</h1>
     </div>
 
     <ul class="list-unstyled">
       <li>
-        <p><strong>First Last</strong>. Author, maintainer.
+        <p><strong><a href='http://twitter.com/tom_auer'>Tom Auer</a></strong>. Author, maintainer.
+        </p>
+      </li>
+      <li>
+        <p><strong>Daniel Fink</strong>. Author.
+        </p>
+      </li>
+      <li>
+        <p><strong>Cornell Lab of Ornithology</strong>. Copyright holder.
         </p>
       </li>
     </ul>
@@ -94,7 +118,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by First Last.</p>
+  <p>Developed by <a href='http://twitter.com/tom_auer'>Tom Auer</a>, Daniel Fink.</p>
 </div>
 
 <div class="pkgdown">

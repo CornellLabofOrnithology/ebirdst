@@ -1,7 +1,9 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-stemhelper
-==========
+stemhelper: Helper functions for STEM loading, mapping, plotting, and analysis
+==============================================================================
+
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 
 **THIS PACKAGE IS UNDER ACTIVE DEVELOPMENT. FUNCTIONALITY MAY CHANGE AT ANY TIME.**
 
@@ -20,4 +22,4 @@ devtools::install_github("CornellLabofOrnithology/stemhelper")
 Vignette
 --------
 
-Please see the vignette for full examples of how to use the package. Vignette can be found at the repo [website](https://cornelllabofornithology.github.io/stemhelper/).
+Please see the [vignette](https://cornelllabofornithology.github.io/stemhelper/articles/stem-vignette.html) for full examples of how to use the package.

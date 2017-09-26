@@ -57,7 +57,7 @@
       <h1>stemhelper: STEM Use and Helper Functions</h1>
                         <h4 class="author">Tom Auer &amp; Daniel Fink</h4>
             
-            <h4 class="date">2017-09-21</h4>
+            <h4 class="date">2017-09-26</h4>
           </div>
 
     
@@ -303,35 +303,9 @@ raster::<span class="kw">plot</span>(week26_moll,
 <h2 class="hasAnchor">
 <a href="#mapping-abundance" class="anchor"></a>Mapping Abundance</h2>
 <p>With a good full-annual extent and color bins, that accurately represent the data distribution, we can add in other pieces of data that represent predicted and assumed zeroes, which help display the extent of estimation.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># pull in species-specific ensemble support, represent predicted 0s where there is no abundance value</span>
-pos_es_stack &lt;-<span class="st"> </span><span class="kw"><a href="../reference/stack_stem.html">stack_stem</a></span>(sp_path, <span class="dt">variable =</span> <span class="st">"abundance_ensemble_support"</span>)
-week26_pes &lt;-<span class="st"> </span>raster::<span class="kw">projectRaster</span>(pos_es_stack[[<span class="dv">26</span>]], <span class="dt">crs =</span> mollweide)
-
-<span class="co"># to represent assumed 0s, we have provided the data object zero_es_stack</span>
-<span class="co"># that has values for the ensemble support indicating sufficient checklists</span>
-<span class="co"># to fit and predict models at that location</span>
-<span class="co"># for presentation we use a value of 99 to show locations with assumed 0s</span>
-zero_es_stack</code></pre></div>
-<pre><code>## class       : RasterStack 
-## dimensions  : 1907, 2267, 4323169, 52  (nrow, ncol, ncell, nlayers)
-## resolution  : 8339.629, 8339.629  (x, y)
-## extent      : -20015109, -1109171, -6674483, 9229189  (xmin, xmax, ymin, ymax)
-## coord. ref. : +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs 
-## names       : Western_H//le_support, Western_H//le_support, Western_H//le_support, Western_H//le_support, Western_H//le_support, Western_H//le_support, Western_H//le_support, Western_H//le_support, Western_H//le_support, Western_H//le_support, Western_H//le_support, Western_H//le_support, Western_H//le_support, Western_H//le_support, Western_H//le_support, ... 
-## min values  :                     0,                     0,                     0,                     0,                     0,                     0,                     0,                     0,                     0,                     0,                     0,                     0,                     0,                     0,                     0, ... 
-## max values  :                   100,                   100,                   100,                   100,                   100,                   100,                   100,                   100,                   100,                   100,                   100,                   100,                   100,                   100,                   100, ...</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">week26_zes_vals &lt;-<span class="st"> </span>raster::<span class="kw">projectRaster</span>(raster::<span class="kw">mask</span>(zero_es_stack[[<span class="dv">26</span>]], 
-                                                 template_raster), 
-                                    <span class="dt">crs =</span> mollweide)
-
-<span class="co"># we'll combine the two types of zeroes with the positive prediction for plotting</span>
-week26_pes[week26_pes] &lt;-<span class="st"> </span><span class="dv">0</span>
-week26_zes &lt;-<span class="st"> </span>week26_zes_vals &gt;=<span class="st"> </span><span class="dv">99</span>
-week26_zes[week26_zes ==<span class="st"> </span><span class="dv">0</span>] &lt;-<span class="st"> </span><span class="ot">NA</span>
-week26_zes[week26_zes ==<span class="st"> </span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="dv">0</span>
-
-week26s &lt;-<span class="st"> </span>raster::<span class="kw">stack</span>(week26_pes, week26_zes, week26_moll)
-week26c &lt;-<span class="st"> </span>raster::<span class="kw">calc</span>(week26s, max, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># the helper function combine_layers() fills in with assumed and predicted zeroes</span>
+week26 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/combine_layers.html">combine_layers</a></span>(sp_path, <span class="dt">week =</span> <span class="dv">26</span>)
+week26c &lt;-<span class="st"> </span>raster::<span class="kw">projectRaster</span>(week26, <span class="dt">crs =</span> mollweide)
 
 <span class="co"># to add context, let's pull in some reference data to add</span>
 wh &lt;-<span class="st"> </span>rnaturalearth::<span class="kw">ne_countries</span>(<span class="dt">continent =</span> <span class="kw">c</span>(<span class="st">"North America"</span>,
@@ -420,12 +394,7 @@ g &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentat
 g</code></pre></div>
 <p><img src="stem-vignette_files/figure-html/trajectories-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 <p>It is also possible to extract trajectories for regions, but it takes a little more data work.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># set a point</span>
-coords &lt;-<span class="st"> </span><span class="kw">cbind</span>(-<span class="fl">76.5</span>, <span class="fl">42.5</span>)
-pt &lt;-<span class="st"> </span>sp::<span class="kw">SpatialPoints</span>(coords, <span class="dt">proj4string =</span> sp::<span class="kw">CRS</span>(<span class="st">"+init=epsg:4326"</span>))
-pt_prj &lt;-<span class="st"> </span>sp::<span class="kw">spTransform</span>(pt, sp::<span class="kw">CRS</span>(sp::<span class="kw">proj4string</span>(template_raster)))
-
-<span class="co"># set an extent based on polygon</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># set an extent based on polygon</span>
 us &lt;-<span class="st"> </span>rnaturalearth::<span class="kw">ne_states</span>(<span class="dt">geounit =</span> <span class="st">"United States of America"</span>)
 us_prj &lt;-<span class="st"> </span>sp::<span class="kw">spTransform</span>(us, sp::<span class="kw">CRS</span>(sp::<span class="kw">proj4string</span>(template_raster)))
 wv &lt;-<span class="st"> </span>us_prj[us_prj@data$name ==<span class="st"> "West Virginia"</span>,]
@@ -498,10 +467,10 @@ pd_extent &lt;-<span class="st"> </span><span class="kw"><a href="../reference/c
 <h2 class="hasAnchor">
 <a href="#plot-predictor-importance" class="anchor"></a>Plot Predictor Importance</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># with all classes</span>
-<span class="kw"><a href="../reference/plot_pis.html">plot_pis</a></span>(pis, <span class="dt">st_extent =</span> ne_extent, <span class="dt">by_cover_class =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<span class="kw"><a href="../reference/plot_pis.html">plot_pis</a></span>(<span class="dt">path =</span> sp_path, pis, <span class="dt">st_extent =</span> ne_extent, <span class="dt">by_cover_class =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <p><img src="stem-vignette_files/figure-html/plot_pis-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># aggregating fragstats for cover classes</span>
-<span class="kw"><a href="../reference/plot_pis.html">plot_pis</a></span>(pis, <span class="dt">st_extent =</span> ne_extent, <span class="dt">by_cover_class =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<span class="kw"><a href="../reference/plot_pis.html">plot_pis</a></span>(<span class="dt">path =</span> sp_path, pis, <span class="dt">st_extent =</span> ne_extent, <span class="dt">by_cover_class =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <p><img src="stem-vignette_files/figure-html/plot_pis-2.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="plot-partial-depedencies" class="section level2">
@@ -582,7 +551,7 @@ pd_extent &lt;-<span class="st"> </span><span class="kw"><a href="../reference/c
 
 
       <footer><div class="copyright">
-  <p>Developed by First Last.</p>
+  <p>Developed by <a href="http://twitter.com/tom_auer">Tom Auer</a>, Daniel Fink.</p>
 </div>
 
 <div class="pkgdown">
