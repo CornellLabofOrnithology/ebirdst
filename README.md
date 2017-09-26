@@ -77,7 +77,7 @@ sp_ext_moll <- raster::extent(raster::projectRaster(extent_raster,
                                                     crs = mollweide))
 
 # the helper function combine_layers() fills in with assumed and predicted zeroes
-week26 <- combine_layers(sp_path, week = 26)
+week26 <- combine_layers(abund_stack, sp_path, week = 26)
 week26c <- raster::projectRaster(week26, crs = mollweide)
 
 # to add context, pull in some reference data to add

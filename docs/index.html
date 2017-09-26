@@ -29,7 +29,10 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="articles/stem-vignette.html">Vignette</a>
+  <a href="articles/stemhelper-intro-mapping.html">Intro Vignette</a>
+</li>
+<li>
+  <a href="articles/stemhelper-pipd.html">Advanced Vignette</a>
 </li>
 <li>
   <a href="reference/index.html">Function Reference</a>
@@ -59,23 +62,98 @@
     
 <div class="contents">
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+<pre><code>## Loading stemhelper</code></pre>
+<pre><code>## Warning: Installed Rcpp (0.12.12) different from Rcpp used to build dplyr (0.12.11).
+## Please reinstall dplyr to avoid random crashes or undefined behavior.</code></pre>
 <div id="stemhelper-helper-functions-for-stem-loading-mapping-plotting-and-analysis" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#stemhelper-helper-functions-for-stem-loading-mapping-plotting-and-analysis" class="anchor"></a>stemhelper: Helper functions for STEM loading, mapping, plotting, and analysis</h1></div>
-
+<!-- [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0) -->
 <p><strong>THIS PACKAGE IS UNDER ACTIVE DEVELOPMENT. FUNCTIONALITY MAY CHANGE AT ANY TIME.</strong></p>
-<p>The goal of stemhelper is to provide functionality for loading, mapping, plotting, and analysing STEM results.</p>
+<p>The goal of stemhelper is to provide functionality for loading, mapping, plotting, and analyzing STEM results.</p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<p>You can install stemhelper from github with:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install.packages("devtools")</span>
+<p>You can install stemhelper from GitHub with:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install the development version from GitHub</span>
+<span class="co"># install.packages("devtools")</span>
 devtools::<span class="kw">install_github</span>(<span class="st">"CornellLabofOrnithology/stemhelper"</span>)</code></pre></div>
 </div>
 <div id="vignette" class="section level2">
 <h2 class="hasAnchor">
 <a href="#vignette" class="anchor"></a>Vignette</h2>
-<p>Please see the <a href="https://cornelllabofornithology.github.io/stemhelper/articles/stem-vignette.html">vignette</a> for full examples of how to use the package.</p>
+<p>For a full introduction and advanced usage, please see the package <a href="https://cornelllabofornithology.github.io/stemhelper">website</a>. An <a href="https://cornelllabofornithology.github.io/stemhelper/articles/stem-intro-mapping.html">introductory vignette</a> is available, detailing the structure of the results and how to begin loading and mapping the results. Further, an <a href="ttps://cornelllabofornithology.github.io/stemhelper/articles/stem-pipd.html">advanced vignette</a> details how to access additional information from the model results about predictor importance and directionality, as well as predictive performance metrics.</p>
+</div>
+<div id="quick-start" class="section level2">
+<h2 class="hasAnchor">
+<a href="#quick-start" class="anchor"></a>Quick Start</h2>
+<p>After downloading results…</p>
+<p>One of the first things to do is to load a RasterStack of estimated abundance predictions and plot a week of estimates.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(viridis)
+
+<span class="co"># TODO set this up to do a curl of the example results first</span>
+
+<span class="co"># SETUP PATHS</span>
+<span class="co"># Note, if you currently access results you can use this path construction</span>
+<span class="co"># by replacing the root_path with where your copy lives</span>
+root_path &lt;-<span class="st"> "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"</span>
+species &lt;-<span class="st"> "woothr-ERD2016-PROD-20170505-3f880822"</span>
+sp_path &lt;-<span class="st"> </span><span class="kw">paste</span>(root_path, species, <span class="dt">sep =</span> <span class="st">""</span>)
+
+<span class="co"># load a stack of rasters with the helper function stack_stem()</span>
+abund_stack &lt;-<span class="st"> </span><span class="kw"><a href="reference/stack_stem.html">stack_stem</a></span>(sp_path, <span class="dt">variable =</span> <span class="st">"abundance_umean"</span>)
+
+<span class="co"># calculate the full annual extent on the abundance stack (in sinusoidal projection)</span>
+sp_ext &lt;-<span class="st"> </span><span class="kw"><a href="reference/calc_full_extent.html">calc_full_extent</a></span>(abund_stack)
+
+<span class="co"># calculate ideal color bins for abundance values across the full year</span>
+year_bins &lt;-<span class="st"> </span><span class="kw"><a href="reference/calc_bins.html">calc_bins</a></span>(abund_stack)
+
+<span class="co"># create a thinner set of labels</span>
+bin_labels &lt;-<span class="st"> </span><span class="kw">format</span>(<span class="kw">round</span>(year_bins, <span class="dv">2</span>), <span class="dt">nsmall =</span> <span class="dv">2</span>)
+bin_labels[!(bin_labels %in%<span class="st"> </span><span class="kw">c</span>(bin_labels[<span class="dv">1</span>], 
+                    bin_labels[<span class="kw">round</span>((<span class="kw">length</span>(bin_labels) /<span class="st"> </span><span class="dv">4</span>)) +<span class="st"> </span><span class="dv">1</span>], 
+                    bin_labels[<span class="kw">round</span>((<span class="kw">length</span>(bin_labels) /<span class="st"> </span><span class="dv">2</span>)) +<span class="st"> </span><span class="dv">1</span>],
+                    bin_labels[<span class="kw">length</span>(bin_labels) -<span class="st"> </span>
+<span class="st">                               </span><span class="kw">round</span>((<span class="kw">length</span>(bin_labels) /<span class="st"> </span><span class="dv">4</span>)) +<span class="st"> </span><span class="dv">1</span>],
+                    bin_labels[<span class="kw">length</span>(bin_labels)]))] &lt;-<span class="st"> ""</span>
+
+<span class="co"># define mollweide projection for plotting</span>
+mollweide &lt;-<span class="st"> </span>sp::<span class="kw">CRS</span>(<span class="st">"+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"</span>)
+
+<span class="co"># project the full annual extent to Mollweide</span>
+extent_raster &lt;-<span class="st"> </span>raster::<span class="kw">raster</span>(<span class="dt">ext =</span> sp_ext, 
+                                <span class="dt">crs =</span> sp::<span class="kw">proj4string</span>(template_raster))
+extent_raster[<span class="kw">is.na</span>(extent_raster)] &lt;-<span class="st"> </span><span class="dv">1</span>
+sp_ext_moll &lt;-<span class="st"> </span>raster::<span class="kw">extent</span>(raster::<span class="kw">projectRaster</span>(extent_raster, 
+                                                    <span class="dt">crs =</span> mollweide))
+
+<span class="co"># the helper function combine_layers() fills in with assumed and predicted zeroes</span>
+week26 &lt;-<span class="st"> </span><span class="kw"><a href="reference/combine_layers.html">combine_layers</a></span>(abund_stack, sp_path, <span class="dt">week =</span> <span class="dv">26</span>)
+week26c &lt;-<span class="st"> </span>raster::<span class="kw">projectRaster</span>(week26, <span class="dt">crs =</span> mollweide)
+
+<span class="co"># to add context, pull in some reference data to add</span>
+wh &lt;-<span class="st"> </span>rnaturalearth::<span class="kw">ne_countries</span>(<span class="dt">continent =</span> <span class="kw">c</span>(<span class="st">"North America"</span>,
+                                                <span class="st">"South America"</span>))
+wh_states &lt;-<span class="st"> </span>rnaturalearth::<span class="kw">ne_states</span>(<span class="dt">iso_a2 =</span> <span class="kw">unique</span>(wh@data$iso_a2))
+wh_moll &lt;-<span class="st"> </span>sp::<span class="kw">spTransform</span>(wh, mollweide)
+wh_states_moll &lt;-<span class="st"> </span>sp::<span class="kw">spTransform</span>(wh_states, mollweide)
+
+<span class="co"># plot abundance</span>
+<span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">2</span>))
+raster::<span class="kw">plot</span>(week26c, 
+             <span class="dt">xaxt =</span> <span class="st">'n'</span>, 
+             <span class="dt">yaxt =</span> <span class="st">'n'</span>,
+             <span class="dt">bty =</span> <span class="st">'n'</span>,
+             <span class="dt">ext =</span> sp_ext_moll, 
+             <span class="dt">breaks =</span> year_bins,
+             <span class="dt">lab.breaks =</span> bin_labels,
+             <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="kw">length</span>(year_bins)-<span class="dv">1</span>),
+             <span class="dt">maxpixels =</span> raster::<span class="kw">ncell</span>(week26c),
+             <span class="dt">legend =</span> <span class="ot">TRUE</span>)
+sp::<span class="kw">plot</span>(wh_moll, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">border =</span> <span class="st">'gray'</span>)
+sp::<span class="kw">plot</span>(wh_states_moll, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">border =</span> <span class="st">'gray'</span>, <span class="dt">lwd =</span> <span class="fl">0.5</span>)</code></pre></div>
+<p><img src="README-quick_start-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 </div>
 </div>
@@ -102,10 +180,6 @@ devtools::<span class="kw">install_github</span>(<span class="st">"CornellLabofO
 <a href="http://twitter.com/tom_auer">Tom Auer</a> <br><small class="roles"> Author, maintainer </small> </li>
 <li>Daniel Fink <br><small class="roles"> Author </small> </li>
 <li><a href="authors.html">All authors...</a></li>
-</ul>
-<h2>Dev status</h2>
-<ul class="list-unstyled">
-<li><a href="http://www.gnu.org/licenses/gpl-3.0"><img src="https://img.shields.io/badge/License-GPL%20v3-blue.svg" alt="License: GPL v3"></a></li>
 </ul>
 </div>
 
