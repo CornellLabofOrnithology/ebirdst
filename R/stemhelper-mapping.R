@@ -175,15 +175,14 @@ calc_bins <- function(x) {
 #' Combine zero layers and abundance to create a single layer
 #'
 #' @export
-combine_layers <- function(path, week) {
+combine_layers <- function(stack, path, week) {
   e <- load_config(path)
 
   # possible checks
   # week is between 1 and 52
 
   # load abundance
-  abund_stack <- stack_stem(path, variable = "abundance_umean")
-  abund_week <- abund_stack[[week]]
+  abund_week <- stack[[week]]
 
   # load positive ensemble support
   pos_es_stack <- stack_stem(path, variable = "abundance_ensemble_support")

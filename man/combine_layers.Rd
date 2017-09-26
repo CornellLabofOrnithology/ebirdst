@@ -4,7 +4,7 @@
 \alias{combine_layers}
 \title{Combine zero layers and abundance to create a single layer}
 \usage{
-combine_layers(path, week)
+combine_layers(stack, path, week)
 }
 \description{
 Combine zero layers and abundance to create a single layer
