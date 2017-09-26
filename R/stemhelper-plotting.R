@@ -71,7 +71,9 @@ plot_pis <- function(path,
   }
 
   # replace names with readable
-  names(ttt) <- stemhelper::convert_classes(names(ttt), by_cover_class)
+  names(ttt) <- stemhelper::convert_classes(names(ttt),
+                                            by_cover_class = by_cover_class,
+                                            pretty = by_cover_class)
 
   # compute median
   pi_median <- apply(ttt, 2, median, na.rm = T)
@@ -167,7 +169,7 @@ plot_pds <- function(pd_name,
   # Clean
   var_pd <- var_pd[!is.na(var_pd$V5), ]
 
-  pd_name <- stemhelper::convert_classes(pd_name)
+  pd_name <- stemhelper::convert_classes(pd_name, pretty = TRUE)
 
   # Each Column is one replicate estimate of PD
   # 	x = x coordinate values
@@ -726,13 +728,16 @@ cake_plot <- function(path,
   rm(pipd)
 
   # attempt to clean up the names...not working
-  #ccfun <- function(x) {
-  #  stemhelper::convert_classes(x["predictor"], by_cover_class)
-  #}
+  ccfun <- function(x, by_cover_class) {
+    stemhelper::convert_classes(x["predictor"],
+                                by_cover_class = by_cover_class,
+                                pretty = by_cover_class)
+  }
 
-  #pipd_short$predictor <- apply(pipd_short,
-  #                              1,
-  #                              FUN = ccfun)
+  pipd_short$labels <- apply(pipd_short,
+                             1,
+                             FUN = ccfun,
+                             by_cover_class = by_cover_class)
 
   # ggplot
   wave <- ggplot2::ggplot(pipd_short, ggplot2::aes(x = date,
@@ -742,7 +747,7 @@ cake_plot <- function(path,
     ggplot2::geom_area() +
     ggplot2::xlim(0, 1) +
     ggplot2::ylim(-1, 1) +
-    ggplot2::scale_fill_manual(values=agg_colors)
+    ggplot2::scale_fill_manual(values=agg_colors, labels=pipd_short$labels)
     #ggplot2::theme(legend.position = "none")
 
   wave
@@ -751,7 +756,8 @@ cake_plot <- function(path,
 #' Internal function for converting cover class names to readable
 #'
 convert_classes <- function(cov_names,
-                            by_cover_class = FALSE) {
+                            by_cover_class = FALSE,
+                            pretty = FALSE) {
 
   if(by_cover_class == TRUE) {
     ending <- ""
@@ -797,6 +803,11 @@ convert_classes <- function(cov_names,
 
     conv <- ifelse(length(a) > 0, stringr::str_replace_all(n, a, b), n)
     converted <- c(converted, conv)
+  }
+
+  if(pretty == TRUE) {
+    converted <- lettercase::str_title_case(
+      lettercase::str_lower_case(converted))
   }
 
   return(converted)
