@@ -230,10 +230,6 @@ map_centroids <- function(pis,
   ll <- "+init=epsg:4326"
   mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
 
-  # initialize graphical parameters
-  par(mar=c(0,0,3,0))
-  title_text <- ""
-
   # gather the reference data
   wh <- rnaturalearth::ne_countries(continent = c("North America",
                                                   "South America"),
@@ -241,6 +237,9 @@ map_centroids <- function(pis,
   wh_states <- rnaturalearth::ne_states(iso_a2 = unique(wh@data$iso_a2))
   wh_moll <- sp::spTransform(wh, mollweide)
   wh_states_moll <- sp::spTransform(wh_states, mollweide)
+
+  # initialize graphical parameters
+  par(mfrow = c(1, 1), mar=c(0,0,0,0), bg = "black")
 
   # Plotting PDs
   if(plot_pds == TRUE) {
@@ -255,9 +254,18 @@ map_centroids <- function(pis,
     # start plot with all possible PDs
     raster::plot(tpds_prj,
                  ext = raster::extent(tpds_prj),
-                 col = "darkblue",
-                 cex = 0.5,
+                 col = "#1b9377",
+                 cex = 0.01,
                  pch = 16)
+
+    sp::plot(wh_moll, col = "#5a5a5a", add = TRUE)
+
+    raster::plot(tpds_prj,
+                 ext = raster::extent(tpds_prj),
+                 col = "#1b9377",
+                 cex = 0.4,
+                 pch = 16,
+                 add = TRUE)
 
     if(!all(is.na(st_extent))) {
       tpds_sub <- tpds_sp[tpds_sp$centroid.date > st_extent$t.min &
@@ -273,17 +281,29 @@ map_centroids <- function(pis,
       # plot PDs in st_extent
       raster::plot(tpds_region,
                    ext = raster::extent(tpds_prj),
-                   col = "blue",
-                   cex = 0.5,
+                   col = "#b3e2cd",
+                   cex = 0.4,
                    pch = 16,
                    add = TRUE)
     }
     rm(tpds_sp)
 
-    title_text <- paste(title_text,
-                        "Available PDs: ", nrow(tpds_prj), "\n",
-                        "Selected PDs: ", nrow(tpds_region), "\n",
-                        sep = "")
+    # xmin, xmax, ymin, ymax
+    usr <- par("usr")
+    xwidth <- usr[2] - usr[1]
+    yheight <- usr[4] - usr[3]
+
+    text(x = usr[1] + xwidth/8,
+         y = usr[3] + yheight/7,
+         paste("Available PDs: ", nrow(tpds_prj), sep = ""),
+         cex = 1,
+         col = "#1b9377")
+
+    text(x = usr[1] + xwidth/8,
+         y = usr[3] + yheight/9,
+         paste("Selected PDs: ", nrow(tpds_region), sep = ""),
+         cex = 1,
+         col = "#b3e2cd")
 
     wh_extent <- raster::extent(tpds_prj)
     rm(tpds_prj, tpds_region)
@@ -301,15 +321,24 @@ map_centroids <- function(pis,
 
     if(plot_pds == FALSE) {
       wh_extent <- raster::extent(tpis_prj)
+
+      # start plot with all possible PDs
+      raster::plot(tpis_prj,
+                   ext = wh_extent,
+                   col = "#1b9377",
+                   cex = 0.01,
+                   pch = 16)
+
+      sp::plot(wh_moll, col = "#5a5a5a", add = TRUE)
     }
 
     # start plot with all possible PIs
     raster::plot(tpis_prj,
                  ext = wh_extent,
-                 col = "darkred",
-                 cex = 0.5,
+                 col = "#d95f02",
+                 cex = 0.4,
                  pch = 16,
-                 add = plot_pds)
+                 add = TRUE)
 
     if(!all(is.na(st_extent))) {
       tpis_sub <- tpis_sp[tpis_sp$centroid.date > st_extent$t.min &
@@ -324,26 +353,44 @@ map_centroids <- function(pis,
       # plot PIs in st_extent
       raster::plot(tpis_region,
                    ext = wh_extent,
-                   col = "red",
-                   cex = 0.5,
+                   col = "#fdcdac",
+                   cex = 0.4,
                    pch = 16,
                    add = TRUE)
     }
     rm(tpis_sp)
 
-    title_text <- paste(title_text,
-                        "Available PIs: ", nrow(tpis_prj), "\n",
-                        "Selected PIs: ", nrow(tpis_region), "\n",
-                        sep = "")
+    # xmin, xmax, ymin, ymax
+    usr <- par("usr")
+    xwidth <- usr[2] - usr[1]
+    yheight <- usr[4] - usr[3]
+
+    text(x = usr[1] + xwidth/8,
+         y = usr[3] + yheight/12,
+         paste("Available PIs: ", nrow(tpis_prj), sep = ""),
+         cex = 1,
+         col = "#d95f02")
+
+    text(x = usr[1] + xwidth/8,
+         y = usr[3] + yheight/17,
+         paste("Selected PIs: ", nrow(tpis_region), sep = ""),
+         cex = 1,
+         col = "#fdcdac")
+
     rm(tpis_prj, tpis_region)
   }
 
   # plot reference data
-  raster::plot(wh_moll, ext = wh_extent, add = TRUE)
-  raster::plot(wh_states_moll, ext = wh_extent, lwd = 0.5, add = TRUE)
-
-  # add title
-  title(main = title_text, cex.main = 0.75, line = -1)
+  raster::plot(wh_moll,
+               ext = wh_extent,
+               lwd = 0.25,
+               border = 'black',
+               add = TRUE)
+  raster::plot(wh_states_moll,
+               ext = wh_extent,
+               lwd = 0.25,
+               border = 'black',
+               add = TRUE)
 }
 
 #' Map extent of estimation calculated from subset of centroids
