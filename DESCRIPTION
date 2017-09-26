@@ -25,4 +25,6 @@ Imports: raster,
     mgcv,
     dplyr,
     rgeos,
-    randomcoloR
+    randomcoloR,
+    stringr,
+    lettercase
