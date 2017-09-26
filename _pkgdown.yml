@@ -2,8 +2,10 @@ navbar:
   title: ~
   type: default
   left:
-  - text: Vignette
-    href: articles/stem-vignette.html
+  - text: Intro Vignette
+    href: articles/stemhelper-intro-mapping.html
+  - text: Advanced Vignette
+    href: articles/stemhelper-pipd.html
   - text: Function Reference
     href: reference/index.html
   right:
