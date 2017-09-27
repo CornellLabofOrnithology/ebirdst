@@ -117,3 +117,11 @@ cake_plot(path = sp_path,
           by_cover_class = TRUE,
           pland_and_lpi_only = TRUE)
 ```
+
+# 8. Predictive Performance Metrics (PPMs)
+```{r load_ppms}
+
+ppm_data <- load_ppm_data(sp_path)
+
+```
+
