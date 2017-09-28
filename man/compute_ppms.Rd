@@ -4,9 +4,7 @@
 \alias{compute_ppms}
 \title{Compute PPMs}
 \usage{
-compute_ppms(ppm.data.list, st.extent.list, n.mc = 25, occ.binary = T,
-  occ.prob = T, count = T, occ.min.ss = 50, occ.min.mean = 0.01,
-  count.min.ss = 50, count.min.mean = 0.25, count.max = NA)
+compute_ppms(ppm_data_list, st_extent)
 }
 \description{
 Compute PPMs

@@ -27,4 +27,6 @@ Imports: raster,
     rgeos,
     randomcoloR,
     stringr,
-    lettercase
+    lettercase,
+    plyr,
+    PresenceAbsence

@@ -53,7 +53,6 @@ The stemhelper package provides functions for accessing these, such that you sho
 # by replacing the root_path with where your copy lives
 root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
 species <- "woothr-ERD2016-PROD-20170505-3f880822"
-sp_path <- paste(root_path, species, sep = "")
 
 # path to species bundle
 sp_path <- paste(root_path, species, sep = "")
@@ -121,7 +120,7 @@ cake_plot(path = sp_path,
 # 8. Predictive Performance Metrics (PPMs)
 ```{r load_ppms}
 
-ppm_data <- load_ppm_data(sp_path)
+ppm_data_list <- load_ppm_data(sp_path)
 
 ```
 
