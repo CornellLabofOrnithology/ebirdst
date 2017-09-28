@@ -4,7 +4,7 @@
 \alias{compute_ppms}
 \title{Compute PPMs}
 \usage{
-compute_ppms(ppm_data_list, st_extent)
+compute_ppms(ppm_data_list, st_extent = NA)
 }
 \description{
 Compute PPMs

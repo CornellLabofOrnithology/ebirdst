@@ -191,7 +191,6 @@ balanced.binary.sample <- function(
 
 #' Load PPM data
 #'
-#' @export
 load_ppm_data <- function(path) {
   # load the test data and assign names
   test_file <- paste(path,
@@ -314,7 +313,11 @@ bernoulli.dev <- function(obs, pred){
 #' Compute PPMs
 #'
 #' @export
-compute_ppms <- function(ppm_data_list, st_extent) {
+compute_ppms <- function(path, st_extent = NA) {
+
+  ppm_data_list <- load_ppm_data(path)
+
+
   # static vars
   n_mc <- 25
   occ_binary <- TRUE
@@ -344,13 +347,18 @@ compute_ppms <- function(ppm_data_list, st_extent) {
   # Compute MC Sample of PPMs for ST Subsets
   # ------------------------------------------------------------------
   # Extract ST Subset
-  st_index <- ppm_data_list$ppm_data$date > st_extent$t.min &
-              ppm_data_list$ppm_data$date < st_extent$t.max &
-              ppm_data_list$ppm_data$lat > st_extent$lat.min &
-              ppm_data_list$ppm_data$lat < st_extent$lat.max &
-              ppm_data_list$ppm_data$lon > st_extent$lon.min &
-              ppm_data_list$ppm_data$lon < st_extent$lon.max
-  st_data <- ppm_data_list$ppm_data[st_index, ]
+
+  if(!all(is.na(st_extent))) {
+    st_index <- ppm_data_list$ppm_data$date > st_extent$t.min &
+                ppm_data_list$ppm_data$date < st_extent$t.max &
+                ppm_data_list$ppm_data$lat > st_extent$lat.min &
+                ppm_data_list$ppm_data$lat < st_extent$lat.max &
+                ppm_data_list$ppm_data$lon > st_extent$lon.min &
+                ppm_data_list$ppm_data$lon < st_extent$lon.max
+    st_data <- ppm_data_list$ppm_data[st_index, ]
+  } else {
+    st_data <- ppm_data_list$ppm_data
+  }
 
   # Add Extent of Analysis - NA & SA
   st_data$in_eoa <- FALSE
@@ -548,4 +556,77 @@ compute_ppms <- function(ppm_data_list, st_extent) {
   return(list(binary_stats = binary_stats,
               occ_stats = occ_stats,
               count_stats = count_stats))
+}
+
+#' Plot binary PPMs by time (week, month, custom)
+#'
+#' @export
+plot_binary_by_time <- function(path,
+                                metric = c("Kappa",
+                                           "AUC",
+                                           "Sensitivity",
+                                           "Specificity"),
+                                n_time_periods = 52,
+                                st_extent = NA) {
+
+  seasonal_ppms <- list(NA)
+
+  if(all(is.na(st_extent))) {
+    st_extent <- list()
+    st_extent$type = "rectangle"
+    st_extent$lat.min <- -90
+    st_extent$lat.max <- 90
+    st_extent$lon.min <- -180
+    st_extent$lon.max <- 180
+  }
+
+  for(i_t in 1:n_time_periods) {
+    st_extent$t.min <- (i_t-1)/n_time_periods
+    st_extent$t.max <- i_t/n_time_periods
+
+    s_ppms <- compute_ppms(path, st_extent)
+    seasonal_ppms[[i_t]] <- s_ppms
+  }
+
+  ttt <- NULL
+
+  for (iii.time in 1:n_time_periods) {
+    values <- seasonal_ppms[[iii.time]][[1]][, c(metric)]
+    if(sum(is.na(values)) == length(values)) {
+      values <- 0
+    }
+
+    # Add mean resp
+    ttt <- rbind(ttt,
+                 cbind(rep(iii.time,
+                           length(values)),
+                       values,
+                       seasonal_ppms[[iii.time]][[1]][, 3]))
+  }
+
+  ttt <- as.data.frame(ttt)
+  names(ttt) <- c("Week", "Values", "mean.resp")
+
+  # -----------------
+  # Plot
+  # -----------------
+
+  if(metric == "AUC") {
+    metric_ylim <- c(0.5, 1)
+  } else {
+    metric_ylim <- c(0, 1)
+  }
+
+  bp <- ggplot2::ggplot(ttt, ggplot2::aes(Week, Values, group = Week)) +
+    ggplot2::geom_boxplot() +
+    ggplot2::ylim(metric_ylim) +
+    ggplot2::xlab("Fraction of Year") +
+    ggplot2::ggtitle(metric) +
+    ggplot2::theme_light()
+  bp
+
+}
+
+plot_all_ppms <- function(ppm_data, st_exent) {
+
 }

@@ -120,7 +120,10 @@ cake_plot(path = sp_path,
 # 8. Predictive Performance Metrics (PPMs)
 ```{r load_ppms}
 
-ppm_data_list <- load_ppm_data(sp_path)
+# may want to hide these internally
+ppms <- compute_ppms(sp_path, ne_extent)
+
+plot_binary_by_time(sp_path, metric = "Kappa", n_time_periods = 12)
 
 ```
 
