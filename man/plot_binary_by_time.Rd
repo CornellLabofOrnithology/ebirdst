@@ -5,7 +5,7 @@
 \title{Plot binary PPMs by time (week, month, custom)}
 \usage{
 plot_binary_by_time(path, metric = c("Kappa", "AUC", "Sensitivity",
-  "Specificity"), st_extent = NA)
+  "Specificity"), n_time_periods = 52, st_extent = NA)
 }
 \description{
 Plot binary PPMs by time (week, month, custom)

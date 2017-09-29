@@ -627,6 +627,43 @@ plot_binary_by_time <- function(path,
 
 }
 
-plot_all_ppms <- function(ppm_data, st_exent) {
+#' Plot all PPMs for a spatiotemporal extent
+#'
+#' @export
+plot_all_ppms <- function(path, st_extent) {
+  if(all(is.na(st_extent))) {
+    stop("Must provide a complete spatiotemporal extent.")
+  }
 
+  ppm_data <- compute_ppms(path, st_extent)
+
+  ppm_data$binary_stats$type <- "Occ Binary"
+  ppm_data$occ_stats$type <- "Occ Probability"
+  ppm_data$count_stats$type <- "Abundance"
+
+  all_ppms <- dplyr::bind_rows(ppm_data)
+
+  # columns: metric, values, type
+  all_ppms_melt <- reshape2::melt(all_ppms, id = c("type"))
+  all_ppms_melt <- all_ppms_melt[!(all_ppms_melt$variable %in%
+                                     c("mc", "ss", "mean", "threshold",
+                                       "P.DE.occ", "Spearman.occ")), ]
+  all_ppms_melt <- all_ppms_melt[!(all_ppms_melt$type == "Occ Binary" &
+                                     all_ppms_melt$variable== "B.DE"), ]
+  all_ppms_melt <- all_ppms_melt[!is.na(all_ppms_melt$value), ]
+  all_ppms_melt$type <- factor(all_ppms_melt$type,
+                               levels = c("Occ Binary",
+                                          "Occ Probability",
+                                          "Abundance"))
+
+  bp <- ggplot2::ggplot(all_ppms_melt,
+                        ggplot2::aes(variable, value, group = variable)) +
+    ggplot2::stat_boxplot(geom = "errorbar", width = 0.25) +
+    ggplot2::geom_boxplot(notch = TRUE) +
+    ggplot2::facet_grid(. ~ type, scales = "free") +
+    ggplot2::ylim(c(0,1)) +
+    ggplot2::xlab("Metric") +
+    ggplot2::theme_light() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
+  bp
 }
