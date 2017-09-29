@@ -317,7 +317,6 @@ compute_ppms <- function(path, st_extent = NA) {
 
   ppm_data_list <- load_ppm_data(path)
 
-
   # static vars
   n_mc <- 25
   occ_binary <- TRUE
@@ -411,13 +410,37 @@ compute_ppms <- function(path, st_extent = NA) {
     # -------------------------------------------------------------
     # Spatially Balanced Case Control Sampling
     # (NOTE NO!!! oversampling)
+    #bbs <- balanced.binary.sample(binary.outcome = as.numeric(st_data$obs > 0),
+    #                              x = st_data$lon,
+    #                              y = st_data$lat,
+    #                              xlim = range(st_data$lon, na.rm = TRUE),
+    #                              ylim = range(st_data$lat, na.rm = TRUE),
+    #                              nx = 50,
+    #                              ny = 50,
+    #                              min.class = 0.0,
+    #                              neg.size = 1)
+
+    # projected bbs
+    st_data_sp <- sp::SpatialPointsDataFrame(st_data[, c("lon", "lat")],
+                                             st_data,
+                                             proj4string =
+                                               sp::CRS("+init=epsg:4326"))
+    sinu <- sp::CRS(sp::proj4string(stemhelper::template_raster))
+    st_data_prj <- sp::spTransform(st_data_sp, sinu)
+
+    xrange <- range(st_data_prj@coords[, 1], na.rm = TRUE)
+    yrange <- range(st_data_prj@coords[, 2], na.rm = TRUE)
+
+    xwidth <- xrange[2] - xrange[1]
+    yheight <- yrange[2] - yrange[1]
+
     bbs <- balanced.binary.sample(binary.outcome = as.numeric(st_data$obs > 0),
-                                  x = st_data$lon,
-                                  y = st_data$lat,
-                                  xlim = range(st_data$lon, na.rm = TRUE),
-                                  ylim = range(st_data$lat, na.rm = TRUE),
-                                  nx = 50,
-                                  ny = 50,
+                                  x = st_data_prj@coords[, 1],
+                                  y = st_data_prj@coords[, 2],
+                                  xlim = xrange,
+                                  ylim = yrange,
+                                  nx = xwidth/10000,
+                                  ny = yheight/10000,
                                   min.class = 0.0,
                                   neg.size = 1)
 
