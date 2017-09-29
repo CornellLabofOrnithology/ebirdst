@@ -688,6 +688,6 @@ plot_all_ppms <- function(path, st_extent) {
     ggplot2::xlab("Metric") +
     ggplot2::theme_light() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90),
-                   axis.text.y = ggplot2::element_blank())
+                   axis.title.y = ggplot2::element_blank())
   bp
 }
