@@ -107,6 +107,8 @@ stack_stem <- function(path,
                      ext = load_extent,
                      use_extend = load_extend)
 
+  all_lays <- all_lays[!sapply(all_lays, is.null)]
+
   st <- raster::stack(all_lays)
   rm(all_lays)
 
