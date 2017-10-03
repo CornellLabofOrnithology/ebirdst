@@ -709,8 +709,7 @@ cake_plot <- function(path,
 
     pipd <- pipd_agg
   } else {
-    agg_colors <- unname(randomcoloR::distinctColorPalette(length(unique(
-      pipd$predictor))))
+    agg_colors <- palette(rainbow(length(unique(pipd$predictor))))
   }
 
   # Currently, unused, but keeping it here for potential future calc
