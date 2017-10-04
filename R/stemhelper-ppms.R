@@ -388,6 +388,10 @@ compute_ppms <- function(path, st_extent = NA) {
   # Remove rows where binary = NA (inherited from PAT = NA)
   st_data <- st_data[!is.na(st_data$binary), ]
 
+  if(nrow(st_data) == 0) {
+    return(NA)
+  }
+
   # -------------------------------------------------------------
   # Monte Carlo Samples for PPMs Binary, Spatially Balanced Sample
   # (NO!!! oversampling +'s')
@@ -614,22 +618,33 @@ plot_binary_by_time <- function(path,
   ttt <- NULL
 
   for (iii.time in 1:n_time_periods) {
-    values <- seasonal_ppms[[iii.time]][[1]][, c(metric)]
-    if(sum(is.na(values)) == length(values)) {
-      values <- 0
-    }
+    if(!all(is.na(seasonal_ppms[[iii.time]]))) {
+      values <- seasonal_ppms[[iii.time]][[1]][, c(metric)]
+      if(sum(is.na(values)) == length(values)) {
+        values <- 0
+      }
 
-    # Add mean resp
-    ttt <- rbind(ttt,
-                 cbind(rep(iii.time,
-                           length(values)),
-                       values,
-                       seasonal_ppms[[iii.time]][[1]][, 3]))
+      # Add mean resp
+      ttt <- rbind(ttt,
+                   cbind(rep(iii.time,
+                             length(values)),
+                         values,
+                         seasonal_ppms[[iii.time]][[1]][, 3]))
+    }
   }
 
   ttt <- as.data.frame(ttt)
   names(ttt) <- c("Week", "Values", "mean.resp")
-  ttt$week <- ttt$week/n_time_periods
+
+  ttt$Date <- apply(ttt, 1, FUN = function(x) {
+    strftime(as.Date((x["Week"] / n_time_periods) * 366,
+                     origin=as.Date('2013-01-01')),
+             format = "%Y-%m-%d")
+  })
+
+  ttt$Date <- as.Date(ttt$Date)
+
+
 
   # -----------------
   # Plot
@@ -641,11 +656,15 @@ plot_binary_by_time <- function(path,
     metric_ylim <- c(0, 1)
   }
 
-  bp <- ggplot2::ggplot(ttt, ggplot2::aes(Week, Values, group = Week)) +
+  bp <- ggplot2::ggplot(ttt, ggplot2::aes(Date, Values, group = Date)) +
     ggplot2::geom_boxplot() +
     ggplot2::ylim(metric_ylim) +
-    ggplot2::xlab("Fraction of Year") +
+    ggplot2::xlab("Date") +
     ggplot2::ggtitle(metric) +
+    ggplot2::scale_x_date(date_labels = "%b %d",
+                          limits = c(as.Date("2013-01-01"),
+                                     as.Date("2013-12-31")),
+                          date_breaks = "1 month") +
     ggplot2::theme_light()
   bp
 
