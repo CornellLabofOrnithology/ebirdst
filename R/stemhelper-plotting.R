@@ -71,9 +71,9 @@ plot_pis <- function(path,
   }
 
   # replace names with readable
-  names(ttt) <- stemhelper::convert_classes(names(ttt),
-                                            by_cover_class = by_cover_class,
-                                            pretty = by_cover_class)
+  names(ttt) <- convert_classes(names(ttt),
+                                by_cover_class = by_cover_class,
+                                pretty = by_cover_class)
 
   # compute median
   pi_median <- apply(ttt, 2, median, na.rm = T)
@@ -170,7 +170,7 @@ plot_pds <- function(pd_name,
   # Clean
   var_pd <- var_pd[!is.na(var_pd$V5), ]
 
-  pd_name <- stemhelper::convert_classes(pd_name, pretty = TRUE)
+  pd_name <- convert_classes(pd_name, pretty = TRUE)
 
   # Each Column is one replicate estimate of PD
   # 	x = x coordinate values
@@ -729,9 +729,9 @@ cake_plot <- function(path,
 
   # attempt to clean up the names...not working
   ccfun <- function(x, by_cover_class) {
-    stemhelper::convert_classes(x["predictor"],
-                                by_cover_class = by_cover_class,
-                                pretty = by_cover_class)
+    convert_classes(x["predictor"],
+                    by_cover_class = by_cover_class,
+                    pretty = by_cover_class)
   }
 
   pipd_short$labels <- apply(pipd_short,
