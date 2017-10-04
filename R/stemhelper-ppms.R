@@ -629,6 +629,7 @@ plot_binary_by_time <- function(path,
 
   ttt <- as.data.frame(ttt)
   names(ttt) <- c("Week", "Values", "mean.resp")
+  ttt$week <- ttt$week/n_time_periods
 
   # -----------------
   # Plot
