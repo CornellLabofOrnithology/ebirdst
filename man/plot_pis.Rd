@@ -4,7 +4,8 @@
 \alias{plot_pis}
 \title{Plotting PIs as barplots}
 \usage{
-plot_pis(path, pis, st_extent, by_cover_class = FALSE, num_top_preds = 50)
+plot_pis(path, pis, st_extent, by_cover_class = FALSE, num_top_preds = 50,
+  return_top = FALSE, pretty_names = TRUE)
 }
 \description{
 Plotting PIs as barplots

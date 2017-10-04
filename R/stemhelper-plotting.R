@@ -6,7 +6,9 @@ plot_pis <- function(path,
                      pis,
                      st_extent,
                      by_cover_class = FALSE,
-                     num_top_preds = 50) {
+                     num_top_preds = 50,
+                     return_top = FALSE,
+                     pretty_names = TRUE) {
   e <- load_config(path)
 
   # subset for extent
@@ -71,9 +73,11 @@ plot_pis <- function(path,
   }
 
   # replace names with readable
-  names(ttt) <- convert_classes(names(ttt),
-                                by_cover_class = by_cover_class,
-                                pretty = by_cover_class)
+  if(pretty_names == TRUE) {
+    names(ttt) <- convert_classes(names(ttt),
+                                  by_cover_class = by_cover_class,
+                                  pretty = by_cover_class)
+  }
 
   # compute median
   pi_median <- apply(ttt, 2, median, na.rm = T)
@@ -86,7 +90,6 @@ plot_pis <- function(path,
 
   # subset all values based on top_names
   top_pis <- ttt[, top_names]
-  rm(top_names)
 
   # munging and filtering for ggplot
   pi_stack <- utils::stack(top_pis)
@@ -110,6 +113,10 @@ plot_pis <- function(path,
     labs(y = "Relative PI", x = "") +
     theme_light()
   pi_bars
+
+  if(return_top == TRUE) {
+    return(top_names)
+  }
 }
 
 #' Plot PDs
@@ -118,6 +125,7 @@ plot_pis <- function(path,
 plot_pds <- function(pd_name,
                      pds,
                      st_extent,
+                     plot_quantiles = TRUE,
                      pointwise_pi = TRUE,
                      stixel_pds = TRUE,
                      k.cont.res = 25,
@@ -125,7 +133,8 @@ plot_pds <- function(pd_name,
                      nnn.bs = 100,
                      equivalent.ensemble.ss = 10,
                      ci.alpha = 0.05,
-                     mean.all.data = FALSE) {
+                     mean.all.data = FALSE,
+                     ylim = NA) {
 
   if(!(pd_name %in% unique(pds$V4))) {
     stop("Predictor name not in PDs.")
@@ -204,10 +213,17 @@ plot_pds <- function(pd_name,
                            length = nd.pred.size))
 
   # PLOT STIXEL PD Replicates or just set up plot
+
+  if(all(is.na(ylim))) {
+    ylim <- c(min(pd.y, na.rm = TRUE), max(pd.y, na.rm = TRUE))
+  }
+
+
   if(stixel_pds) {
     matplot(jitter(as.matrix(pd.x), amount = 0.00),
             pd.y,
-            xlab = pd_name,
+            ylim = ylim,
+            xlab = '',
             ylab = "Deviation E(Logit Occurrence)",
             type= "l",
             lwd = 5,
@@ -218,17 +234,19 @@ plot_pds <- function(pd_name,
   if(!stixel_pds) {
     plot(pd.x[,1],
          pd.y[,1],
-         xlab = pd_name,
+         xlab= '',
+         ylim = ylim,
          ylab = "Deviation E(Logit Occurrence)",
          type = "n")
   }
 
-  abline(0, 0, col="black", lwd=2)
+  title(pd_name, line = -2)
+  abline(0, 0, col="black", lwd = 3 * par()$cex)
 
   # -----------------
   # GBM Qunatiles
   # -----------------
-  if(pointwise_pi) {
+  if(plot_quantiles) {
     ttt <- data.frame(x = stack(pd.x)[,1],
                       y = stack(pd.y)[,1])
     d.ul <- gbm::gbm(y ~ x,
@@ -334,7 +352,10 @@ plot_pds <- function(pd_name,
     poly.x <- c(nd[, 1], rev(nd[, 1]))
     poly.y <- c(t.ll, rev(t.ul))
     polygon(poly.x, poly.y, col = alpha("blue", 0.25), border = FALSE)
-    lines(nd[, 1], t.median, col = alpha("darkorange", 1.0), lwd = 2)
+    lines(nd[, 1],
+          t.median,
+          col = alpha("darkorange", 1.0),
+          lwd = 2 * par()$cex)
   }
 
   # GAM CONDITIONAL MEAN - ALL DATA
@@ -356,7 +377,7 @@ plot_pds <- function(pd_name,
                   rev(p.gam$fit - 2 * p.gam$se.fit)),
             col = alpha("lightblue", 0.25),
             border = NA)
-    lines(nd[, 1], p.gam$fit, col = alpha("yellow", 0.75), lwd = 3)
+    lines(nd[, 1], p.gam$fit, col = alpha("yellow", 0.75), lwd = 2 * par()$cex)
   }
 
   return(list(t.median = t.median, t.ul = t.ul, t.ll = t.ll))
