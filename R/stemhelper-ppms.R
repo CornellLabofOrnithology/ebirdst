@@ -638,7 +638,7 @@ plot_binary_by_time <- function(path,
 
   ttt$Date <- apply(ttt, 1, FUN = function(x) {
     strftime(as.Date((x["Week"] / n_time_periods) * 366,
-                     origin=as.Date('2013-01-01')),
+                     origin = as.Date('2013-01-01')),
              format = "%Y-%m-%d")
   })
 
@@ -661,7 +661,7 @@ plot_binary_by_time <- function(path,
     ggplot2::ylim(metric_ylim) +
     ggplot2::xlab("Date") +
     ggplot2::ggtitle(metric) +
-    ggplot2::scale_x_date(date_labels = "%b %d",
+    ggplot2::scale_x_date(date_labels = "%b",
                           limits = c(as.Date("2013-01-01"),
                                      as.Date("2013-12-31")),
                           date_breaks = "1 month") +
