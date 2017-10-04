@@ -739,22 +739,38 @@ cake_plot <- function(path,
                              FUN = ccfun,
                              by_cover_class = by_cover_class)
 
+  pipd_short$Date <- apply(pipd_short, 1, FUN = function(x) {
+    strftime(as.Date(as.numeric(x["date"]) * 366,
+                     origin = as.Date('2013-01-01')),
+             format = "%Y-%m-%d")
+  })
+
+  pipd_short$Date <- as.Date(pipd_short$Date)
+  pipd_short$date <- NULL
+
+  min_date <- as.Date(st_extent$t.min * 366, origin = as.Date('2013-01-01'))
+  max_date <- as.Date(st_extent$t.max * 366, origin = as.Date('2013-01-01'))
+
   # ggplot
-  wave <- ggplot2::ggplot(pipd_short, ggplot2::aes(x = date,
+  wave <- ggplot2::ggplot(pipd_short, ggplot2::aes(x = Date,
                                                    y = pidir,
                                                    group = predictor,
                                                    fill = predictor)) +
     ggplot2::geom_area() +
-    ggplot2::xlim(0, 1) +
+    ggplot2::geom_vline(xintercept = as.numeric(min_date)) +
+    ggplot2::geom_vline(xintercept = as.numeric(max_date)) +
     ggplot2::ylim(-1, 1) +
     ggplot2::scale_fill_manual(values = agg_colors,
                                labels = pipd_short$labels,
                                name = "Predictor") +
+    ggplot2::scale_x_date(date_labels = "%b",
+                          limits = c(as.Date("2013-01-01"),
+                                     as.Date("2013-12-31")),
+                          date_breaks = "1 month") +
     ggplot2::theme_light() +
-    ggplot2::xlab("Week") +
+    ggplot2::xlab("Date") +
     ggplot2::ylab("Association Direction (Positive/Negative)") +
     ggplot2::theme(legend.key.size = ggplot2::unit(1, "line"))
-
   wave
 }
 
