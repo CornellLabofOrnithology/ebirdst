@@ -7,7 +7,7 @@
 plot_pds(pd_name, pds, st_extent, plot_quantiles = TRUE,
   pointwise_pi = TRUE, stixel_pds = TRUE, k.cont.res = 25,
   gbm.n.trees = 500, nnn.bs = 100, equivalent.ensemble.ss = 10,
-  ci.alpha = 0.05, mean.all.data = FALSE, ylim = NA)
+  ci.alpha = 0.05, mean.all.data = FALSE, ylim = NA, print_plot = TRUE)
 }
 \description{
 Plot PDs
