@@ -487,7 +487,7 @@ calc_effective_extent <- function(st_extent,
   wh_states_moll <- sp::spTransform(wh_states, mollweide)
 
   tpis_per_prj <- raster::projectRaster(
-    raster::mask(tpis_per, stemhelper::template_raster), crs=mollweide)
+    raster::mask(tpis_per, stemhelper::template_raster), crs = mollweide)
 
   tdspolydf_moll <- sp::spTransform(tdspolydf_prj, mollweide)
 
@@ -496,16 +496,16 @@ calc_effective_extent <- function(st_extent,
 
   par(mar=c(0,0,0,2))
   raster::plot(tpis_per_prj,
-               xaxt='n',
-               yaxt='n',
-               bty='n',
-               ext=raster::extent(tdspolydf_moll),
-               col=viridis::viridis(100),
-               maxpixels=raster::ncell(tpis_per_prj),
-               legend=TRUE)
-  sp::plot(wh_moll, add=TRUE, border='gray')
-  sp::plot(wh_states_moll, add=TRUE, border='gray')
-  sp::plot(tpis_sub_moll, add=TRUE, pch=16, cex = 0.4)
+               xaxt = 'n',
+               yaxt = 'n',
+               bty = 'n',
+               ext = raster::extent(tdspolydf_moll),
+               col = viridis::viridis(100),
+               maxpixels = raster::ncell(tpis_per_prj),
+               legend = TRUE)
+  sp::plot(wh_moll, add = TRUE, border = 'gray')
+  sp::plot(wh_states_moll, add = TRUE, border = 'gray')
+  sp::plot(tpis_sub_moll, add = TRUE, pch = 16, cex = 1 * par()$cex)
 
   return(tpis_per)
 }
