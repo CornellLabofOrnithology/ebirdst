@@ -7,7 +7,8 @@ plot_pis <- function(path,
                      by_cover_class = FALSE,
                      num_top_preds = 50,
                      return_top = FALSE,
-                     pretty_names = TRUE) {
+                     pretty_names = TRUE,
+                     print_plot = TRUE) {
   e <- load_config(path)
 
   # subset for extent
@@ -103,16 +104,18 @@ plot_pis <- function(path,
   pi_stack <- pi_stack[complete.cases(pi_stack), ]
 
   # plot
-  pi_bars <- ggplot2::ggplot(pi_stack,
-                             ggplot2::aes(stats::reorder(ind,
-                                                         values,
-                                                         FUN = median),
-                                          values)) +
-    ggplot2::geom_boxplot() +
-    ggplot2::coord_flip() +
-    ggplot2::labs(y = "Relative PI", x = "") +
-    ggplot2::theme_light()
-  print(pi_bars)
+  if(print_plot == TRUE) {
+    pi_bars <- ggplot2::ggplot(pi_stack,
+                               ggplot2::aes(stats::reorder(ind,
+                                                           values,
+                                                           FUN = median),
+                                            values)) +
+      ggplot2::geom_boxplot() +
+      ggplot2::coord_flip() +
+      ggplot2::labs(y = "Relative PI", x = "") +
+      ggplot2::theme_light()
+    print(pi_bars)
+  }
 
   if(return_top == TRUE) {
     return(top_names)
