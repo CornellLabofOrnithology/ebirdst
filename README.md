@@ -2,9 +2,6 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
     ## Loading stemhelper
 
-    ## Warning: Installed Rcpp (0.12.12) different from Rcpp used to build dplyr (0.12.11).
-    ## Please reinstall dplyr to avoid random crashes or undefined behavior.
-
 stemhelper: Helper functions for STEM loading, mapping, plotting, and analysis
 ==============================================================================
 
@@ -88,7 +85,23 @@ wh_moll <- sp::spTransform(wh, mollweide)
 wh_states_moll <- sp::spTransform(wh_states, mollweide)
 
 # plot abundance
-par(mar = c(0,0,0,2))
+
+# this is just here to properly set extent
+raster::plot(week26c, 
+             xaxs = 'i',
+             yaxs = 'i',
+             xaxt = 'n',
+             yaxt = 'n',
+             bty = 'n',
+             ext = sp_ext_moll, 
+             colNA = 'black',
+             maxpixels = raster::ncell(week26c),
+             legend = FALSE)
+
+# add gray background
+sp::plot(wh_moll, col = "#5a5a5a", add = TRUE)
+
+# add the abundance layer
 raster::plot(week26c, 
              xaxt = 'n', 
              yaxt = 'n',
@@ -98,9 +111,12 @@ raster::plot(week26c,
              lab.breaks = bin_labels,
              col = viridis(length(year_bins)-1),
              maxpixels = raster::ncell(week26c),
-             legend = TRUE)
-sp::plot(wh_moll, add = TRUE, border = 'gray')
-sp::plot(wh_states_moll, add = TRUE, border = 'gray', lwd = 0.5)
+             legend = TRUE,
+             add = TRUE)
+
+# add reference layer on top
+sp::plot(wh_moll, add = TRUE, border = 'black', lwd = 0.25)
+sp::plot(wh_states_moll, add = TRUE, border = 'black', lwd = 0.25)
 ```
 
 <img src="README-quick_start-1.png" width="\textwidth" style="display: block; margin: auto;" />

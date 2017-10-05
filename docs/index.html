@@ -63,8 +63,6 @@
 <div class="contents">
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 <pre><code>## Loading stemhelper</code></pre>
-<pre><code>## Warning: Installed Rcpp (0.12.12) different from Rcpp used to build dplyr (0.12.11).
-## Please reinstall dplyr to avoid random crashes or undefined behavior.</code></pre>
 <div id="stemhelper-helper-functions-for-stem-loading-mapping-plotting-and-analysis" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#stemhelper-helper-functions-for-stem-loading-mapping-plotting-and-analysis" class="anchor"></a>stemhelper: Helper functions for STEM loading, mapping, plotting, and analysis</h1></div>
@@ -140,7 +138,23 @@ wh_moll &lt;-<span class="st"> </span>sp::<span class="kw">spTransform</span>(wh
 wh_states_moll &lt;-<span class="st"> </span>sp::<span class="kw">spTransform</span>(wh_states, mollweide)
 
 <span class="co"># plot abundance</span>
-<span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">2</span>))
+
+<span class="co"># this is just here to properly set extent</span>
+raster::<span class="kw">plot</span>(week26c, 
+             <span class="dt">xaxs =</span> <span class="st">'i'</span>,
+             <span class="dt">yaxs =</span> <span class="st">'i'</span>,
+             <span class="dt">xaxt =</span> <span class="st">'n'</span>,
+             <span class="dt">yaxt =</span> <span class="st">'n'</span>,
+             <span class="dt">bty =</span> <span class="st">'n'</span>,
+             <span class="dt">ext =</span> sp_ext_moll, 
+             <span class="dt">colNA =</span> <span class="st">'black'</span>,
+             <span class="dt">maxpixels =</span> raster::<span class="kw">ncell</span>(week26c),
+             <span class="dt">legend =</span> <span class="ot">FALSE</span>)
+
+<span class="co"># add gray background</span>
+sp::<span class="kw">plot</span>(wh_moll, <span class="dt">col =</span> <span class="st">"#5a5a5a"</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
+
+<span class="co"># add the abundance layer</span>
 raster::<span class="kw">plot</span>(week26c, 
              <span class="dt">xaxt =</span> <span class="st">'n'</span>, 
              <span class="dt">yaxt =</span> <span class="st">'n'</span>,
@@ -150,9 +164,12 @@ raster::<span class="kw">plot</span>(week26c,
              <span class="dt">lab.breaks =</span> bin_labels,
              <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="kw">length</span>(year_bins)-<span class="dv">1</span>),
              <span class="dt">maxpixels =</span> raster::<span class="kw">ncell</span>(week26c),
-             <span class="dt">legend =</span> <span class="ot">TRUE</span>)
-sp::<span class="kw">plot</span>(wh_moll, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">border =</span> <span class="st">'gray'</span>)
-sp::<span class="kw">plot</span>(wh_states_moll, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">border =</span> <span class="st">'gray'</span>, <span class="dt">lwd =</span> <span class="fl">0.5</span>)</code></pre></div>
+             <span class="dt">legend =</span> <span class="ot">TRUE</span>,
+             <span class="dt">add =</span> <span class="ot">TRUE</span>)
+
+<span class="co"># add reference layer on top</span>
+sp::<span class="kw">plot</span>(wh_moll, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">border =</span> <span class="st">'black'</span>, <span class="dt">lwd =</span> <span class="fl">0.25</span>)
+sp::<span class="kw">plot</span>(wh_states_moll, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">border =</span> <span class="st">'black'</span>, <span class="dt">lwd =</span> <span class="fl">0.25</span>)</code></pre></div>
 <p><img src="README-quick_start-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 </div>
