@@ -229,14 +229,6 @@ map_centroids <- function(pis,
   ll <- "+init=epsg:4326"
   mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
 
-  # gather the reference data
-  wh <- rnaturalearth::ne_countries(continent = c("North America",
-                                                  "South America"),
-                                    scale = 50)
-  wh_states <- rnaturalearth::ne_states(iso_a2 = unique(wh@data$iso_a2))
-  wh_moll <- sp::spTransform(wh, mollweide)
-  wh_states_moll <- sp::spTransform(wh_states, mollweide)
-
   # initialize graphical parameters
   par(mfrow = c(1, 1), mar=c(0,0,0,0), bg = "black")
 
@@ -257,7 +249,7 @@ map_centroids <- function(pis,
                  cex = 0.01,
                  pch = 16)
 
-    sp::plot(wh_moll, col = "#5a5a5a", add = TRUE)
+    sp::plot(stemhelper:::ned_wh_co_moll, col = "#5a5a5a", add = TRUE)
 
     raster::plot(tpds_prj,
                  ext = raster::extent(tpds_prj),
@@ -328,7 +320,7 @@ map_centroids <- function(pis,
                    cex = 0.01,
                    pch = 16)
 
-      sp::plot(wh_moll, col = "#5a5a5a", add = TRUE)
+      sp::plot(stemhelper:::ned_wh_co_moll, col = "#5a5a5a", add = TRUE)
     }
 
     # start plot with all possible PIs
@@ -380,12 +372,13 @@ map_centroids <- function(pis,
   }
 
   # plot reference data
-  raster::plot(wh_moll,
+  raster::plot(stemhelper:::ned_wh_co_moll,
                ext = wh_extent,
                lwd = 0.25,
                border = 'black',
                add = TRUE)
-  raster::plot(wh_states_moll,
+
+  raster::plot(stemhelper:::ned_wh_st_moll,
                ext = wh_extent,
                lwd = 0.25,
                border = 'black',
@@ -478,14 +471,6 @@ calc_effective_extent <- function(st_extent,
   tpis_per[tpis_per < 0.50] <- NA
 
   # plot
-  # setup reference data
-  wh <- rnaturalearth::ne_countries(continent = c("North America",
-                                                  "South America"),
-                                    scale = 50)
-  wh_states <- rnaturalearth::ne_states(iso_a2 = unique(wh@data$iso_a2))
-  wh_moll <- sp::spTransform(wh, mollweide)
-  wh_states_moll <- sp::spTransform(wh_states, mollweide)
-
   tpis_per_prj <- raster::projectRaster(
     raster::mask(tpis_per, stemhelper::template_raster), crs = mollweide)
 
@@ -503,8 +488,8 @@ calc_effective_extent <- function(st_extent,
                col = viridis::viridis(100),
                maxpixels = raster::ncell(tpis_per_prj),
                legend = TRUE)
-  sp::plot(wh_moll, add = TRUE, border = 'gray')
-  sp::plot(wh_states_moll, add = TRUE, border = 'gray')
+  sp::plot(stemhelper:::ned_wh_co_moll, add = TRUE, border = 'gray')
+  sp::plot(stemhelper:::ned_wh_st_moll, add = TRUE, border = 'gray')
   sp::plot(tpis_sub_moll, add = TRUE, pch = 16, cex = 1 * par()$cex)
 
   return(tpis_per)
