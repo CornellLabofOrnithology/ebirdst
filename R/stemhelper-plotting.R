@@ -228,7 +228,7 @@ plot_pds <- function(pd_name,
             type= "l",
             lwd = 5,
             lty = 1,
-            col=alpha("black", .025))
+            col = scales::alpha("black", .025))
   }
 
   if(!stixel_pds) {
@@ -281,7 +281,7 @@ plot_pds <- function(pd_name,
 
     poly.x <- c(nd[, 1], rev(nd[, 1]))
     poly.y <- c(t.ll, rev(t.ul))
-    polygon(poly.x, poly.y, col = alpha("red", 0.25), border = FALSE)
+    polygon(poly.x, poly.y, col = scales::alpha("red", 0.25), border = FALSE)
   }
 
   # -----------------
@@ -351,10 +351,10 @@ plot_pds <- function(pd_name,
 
     poly.x <- c(nd[, 1], rev(nd[, 1]))
     poly.y <- c(t.ll, rev(t.ul))
-    polygon(poly.x, poly.y, col = alpha("blue", 0.25), border = FALSE)
+    polygon(poly.x, poly.y, col = scales::alpha("blue", 0.25), border = FALSE)
     lines(nd[, 1],
           t.median,
-          col = alpha("darkorange", 1.0),
+          col = scales::alpha("darkorange", 1.0),
           lwd = 2 * par()$cex)
   }
 
@@ -375,9 +375,12 @@ plot_pds <- function(pd_name,
     polygon(x = c(nd[, 1], rev(nd[, 1])),
             y = c(p.gam$fit + 2 * p.gam$se.fit,
                   rev(p.gam$fit - 2 * p.gam$se.fit)),
-            col = alpha("lightblue", 0.25),
+            col = scales::alpha("lightblue", 0.25),
             border = NA)
-    lines(nd[, 1], p.gam$fit, col = alpha("yellow", 0.75), lwd = 2 * par()$cex)
+    lines(nd[, 1],
+          p.gam$fit,
+          col = scales::alpha("yellow", 0.75),
+          lwd = 2 * par()$cex)
   }
 
   return(list(t.median = t.median, t.ul = t.ul, t.ll = t.ll))

@@ -29,4 +29,5 @@ Imports: raster,
     lettercase,
     plyr,
     PresenceAbsence,
-    reshape2
+    reshape2,
+    scales
