@@ -250,7 +250,7 @@ load_pds <- function(path) {
   }
 
   # load pd.txt
-  pd_vec <- data.table::fread(pd_file)
+  pd_vec <- data.table::fread(pd_file, showProgress = FALSE)
   names(pd_vec)[3] <- "stixel.id"
 
   # load summary file
