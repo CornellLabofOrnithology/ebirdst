@@ -137,7 +137,8 @@ plot_pds <- function(pd_name,
                      equivalent.ensemble.ss = 10,
                      ci.alpha = 0.05,
                      mean.all.data = FALSE,
-                     ylim = NA) {
+                     ylim = NA,
+                     print_plot = TRUE) {
 
   if(!(pd_name %in% unique(pds$V4))) {
     stop("Predictor name not in PDs.")
@@ -221,30 +222,29 @@ plot_pds <- function(pd_name,
     ylim <- c(min(pd.y, na.rm = TRUE), max(pd.y, na.rm = TRUE))
   }
 
+  if(print_plot == TRUE) {
+      if(stixel_pds) {
+        matplot(jitter(as.matrix(pd.x), amount = 0.00),
+                pd.y,
+                ylim = ylim,
+                xlab = '',
+                ylab = "Deviation E(Logit Occurrence)",
+                type= "l",
+                lwd = 5,
+                lty = 1,
+                col = scales::alpha("black", .025))
+      } else {
+        plot(pd.x[,1],
+             pd.y[,1],
+             xlab= '',
+             ylim = ylim,
+             ylab = "Deviation E(Logit Occurrence)",
+             type = "n")
+      }
 
-  if(stixel_pds) {
-    matplot(jitter(as.matrix(pd.x), amount = 0.00),
-            pd.y,
-            ylim = ylim,
-            xlab = '',
-            ylab = "Deviation E(Logit Occurrence)",
-            type= "l",
-            lwd = 5,
-            lty = 1,
-            col = scales::alpha("black", .025))
+      title(pd_name, line = -2)
+      abline(0, 0, col="black", lwd = 3 * par()$cex)
   }
-
-  if(!stixel_pds) {
-    plot(pd.x[,1],
-         pd.y[,1],
-         xlab= '',
-         ylim = ylim,
-         ylab = "Deviation E(Logit Occurrence)",
-         type = "n")
-  }
-
-  title(pd_name, line = -2)
-  abline(0, 0, col="black", lwd = 3 * par()$cex)
 
   # -----------------
   # GBM Qunatiles
@@ -284,7 +284,9 @@ plot_pds <- function(pd_name,
 
     poly.x <- c(nd[, 1], rev(nd[, 1]))
     poly.y <- c(t.ll, rev(t.ul))
-    polygon(poly.x, poly.y, col = scales::alpha("red", 0.25), border = FALSE)
+    if(print_plot == TRUE) {
+      polygon(poly.x, poly.y, col = scales::alpha("red", 0.25), border = FALSE)
+    }
   }
 
   # -----------------
@@ -354,11 +356,13 @@ plot_pds <- function(pd_name,
 
     poly.x <- c(nd[, 1], rev(nd[, 1]))
     poly.y <- c(t.ll, rev(t.ul))
-    polygon(poly.x, poly.y, col = scales::alpha("blue", 0.25), border = FALSE)
-    lines(nd[, 1],
-          t.median,
-          col = scales::alpha("darkorange", 1.0),
-          lwd = 2 * par()$cex)
+    if(print_plot == TRUE) {
+      polygon(poly.x, poly.y, col = scales::alpha("blue", 0.25), border = FALSE)
+      lines(nd[, 1],
+            t.median,
+            col = scales::alpha("darkorange", 1.0),
+            lwd = 2 * par()$cex)
+    }
   }
 
   # GAM CONDITIONAL MEAN - ALL DATA
@@ -375,15 +379,17 @@ plot_pds <- function(pd_name,
                      se = TRUE)
     rm(d.gam)
 
-    polygon(x = c(nd[, 1], rev(nd[, 1])),
-            y = c(p.gam$fit + 2 * p.gam$se.fit,
-                  rev(p.gam$fit - 2 * p.gam$se.fit)),
-            col = scales::alpha("lightblue", 0.25),
-            border = NA)
-    lines(nd[, 1],
-          p.gam$fit,
-          col = scales::alpha("yellow", 0.75),
-          lwd = 2 * par()$cex)
+    if(print_plot == TRUE) {
+      polygon(x = c(nd[, 1], rev(nd[, 1])),
+              y = c(p.gam$fit + 2 * p.gam$se.fit,
+                    rev(p.gam$fit - 2 * p.gam$se.fit)),
+              col = scales::alpha("lightblue", 0.25),
+              border = NA)
+      lines(nd[, 1],
+            p.gam$fit,
+            col = scales::alpha("yellow", 0.75),
+            lwd = 2 * par()$cex)
+    }
   }
 
   return(list(t.median = t.median, t.ul = t.ul, t.ll = t.ll))
