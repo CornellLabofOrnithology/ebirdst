@@ -249,7 +249,7 @@ map_centroids <- function(pis,
                  cex = 0.01,
                  pch = 16)
 
-    sp::plot(stemhelper:::ned_wh_co_moll, col = "#5a5a5a", add = TRUE)
+    sp::plot(ned_wh_co_moll, col = "#5a5a5a", add = TRUE)
 
     raster::plot(tpds_prj,
                  ext = raster::extent(tpds_prj),
@@ -320,7 +320,7 @@ map_centroids <- function(pis,
                    cex = 0.01,
                    pch = 16)
 
-      sp::plot(stemhelper:::ned_wh_co_moll, col = "#5a5a5a", add = TRUE)
+      sp::plot(ned_wh_co_moll, col = "#5a5a5a", add = TRUE)
     }
 
     # start plot with all possible PIs
@@ -372,13 +372,13 @@ map_centroids <- function(pis,
   }
 
   # plot reference data
-  raster::plot(stemhelper:::ned_wh_co_moll,
+  raster::plot(ned_wh_co_moll,
                ext = wh_extent,
                lwd = 0.25,
                border = 'black',
                add = TRUE)
 
-  raster::plot(stemhelper:::ned_wh_st_moll,
+  raster::plot(ned_wh_st_moll,
                ext = wh_extent,
                lwd = 0.25,
                border = 'black',
@@ -488,8 +488,8 @@ calc_effective_extent <- function(st_extent,
                col = viridis::viridis(100),
                maxpixels = raster::ncell(tpis_per_prj),
                legend = TRUE)
-  sp::plot(stemhelper:::ned_wh_co_moll, add = TRUE, border = 'gray')
-  sp::plot(stemhelper:::ned_wh_st_moll, add = TRUE, border = 'gray')
+  sp::plot(ned_wh_co_moll, add = TRUE, border = 'gray')
+  sp::plot(ned_wh_st_moll, add = TRUE, border = 'gray')
   sp::plot(tpis_sub_moll, add = TRUE, pch = 16, cex = 1 * par()$cex)
 
   return(tpis_per)

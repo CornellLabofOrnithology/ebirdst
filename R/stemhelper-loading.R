@@ -219,7 +219,7 @@ load_pis <- function(path) {
   names(pi_vec)[3] <- "stixel.id"
 
   # get summary file
-  summary_file <- stemhelper:::load_summary(path)
+  summary_file <- load_summary(path)
 
   # merge pis with summary
   pi_summary <- merge(pi_vec, summary_file, by = c("stixel.id"))
@@ -254,7 +254,7 @@ load_pds <- function(path) {
   names(pd_vec)[3] <- "stixel.id"
 
   # load summary file
-  summary_file <- stemhelper:::load_summary(path)
+  summary_file <- load_summary(path)
 
   # merge
   pd_summary <- merge(pd_vec, summary_file, by = c("stixel.id"), all.y = TRUE)
