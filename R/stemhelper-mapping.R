@@ -43,7 +43,8 @@ calc_full_extent <- function(x) {
   tr <- stemhelper::template_raster
 
   if(raster::projection(tr) != raster::projection(stack)) {
-    this_template_raster <- projectRaster(tr, crs = sp::proj4string(stack))
+    this_template_raster <- raster::projectRaster(tr,
+                                                  crs = sp::proj4string(stack))
   } else {
     this_template_raster <- tr
   }
@@ -110,7 +111,7 @@ calc_bins <- function(x) {
   maxl <- max(lzwk)
   minl <- min(lzwk)
   mdl <- mean(lzwk)
-  sdl <- sd(lzwk)
+  sdl <- stats::sd(lzwk)
   rm(lzwk)
 
   # build a vector of bins
@@ -189,7 +190,7 @@ combine_layers <- function(stack, path, week) {
   pos_es_week <- pos_es_stack[[week]]
 
   # load zero ensemble support
-  zero_es_week <- zero_es_stack[[week]]
+  zero_es_week <- stemhelper::zero_es_stack[[week]]
 
   if(e$SRD_AGG_FACT == 1) {
     zero_es_week <- raster::resample(zero_es_week, pos_es_week)
@@ -230,7 +231,7 @@ map_centroids <- function(pis,
   mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
 
   # initialize graphical parameters
-  par(mfrow = c(1, 1), mar=c(0,0,0,0), bg = "black")
+  graphics::par(mfrow = c(1, 1), mar=c(0,0,0,0), bg = "black")
 
   # Plotting PDs
   if(plot_pds == TRUE) {
@@ -280,21 +281,21 @@ map_centroids <- function(pis,
     rm(tpds_sp)
 
     # xmin, xmax, ymin, ymax
-    usr <- par("usr")
+    usr <- graphics::par("usr")
     xwidth <- usr[2] - usr[1]
     yheight <- usr[4] - usr[3]
 
-    text(x = usr[1] + xwidth/8,
-         y = usr[3] + yheight/7,
-         paste("Available PDs: ", nrow(tpds_prj), sep = ""),
-         cex = 1,
-         col = "#1b9377")
+    graphics::text(x = usr[1] + xwidth/8,
+                   y = usr[3] + yheight/7,
+                   paste("Available PDs: ", nrow(tpds_prj), sep = ""),
+                   cex = 1,
+                   col = "#1b9377")
 
-    text(x = usr[1] + xwidth/8,
-         y = usr[3] + yheight/9,
-         paste("Selected PDs: ", nrow(tpds_region), sep = ""),
-         cex = 1,
-         col = "#b3e2cd")
+    graphics::text(x = usr[1] + xwidth/8,
+                   y = usr[3] + yheight/9,
+                   paste("Selected PDs: ", nrow(tpds_region), sep = ""),
+                   cex = 1,
+                   col = "#b3e2cd")
 
     wh_extent <- raster::extent(tpds_prj)
     rm(tpds_prj, tpds_region)
@@ -352,7 +353,7 @@ map_centroids <- function(pis,
     rm(tpis_sp)
 
     # xmin, xmax, ymin, ymax
-    usr <- par("usr")
+    usr <- graphics::par("usr")
     xwidth <- usr[2] - usr[1]
     yheight <- usr[4] - usr[3]
 
@@ -479,7 +480,7 @@ calc_effective_extent <- function(st_extent,
   # project the selected points to mollweide
   tpis_sub_moll <- sp::spTransform(tpis_sub, mollweide)
 
-  par(mar=c(0,0,0,2))
+  graphics::par(mar = c(0, 0, 0, 2))
   raster::plot(tpis_per_prj,
                xaxt = 'n',
                yaxt = 'n',
@@ -490,7 +491,7 @@ calc_effective_extent <- function(st_extent,
                legend = TRUE)
   sp::plot(ned_wh_co_moll, add = TRUE, border = 'gray')
   sp::plot(ned_wh_st_moll, add = TRUE, border = 'gray')
-  sp::plot(tpis_sub_moll, add = TRUE, pch = 16, cex = 1 * par()$cex)
+  sp::plot(tpis_sub_moll, add = TRUE, pch = 16, cex = 1 * graphics::par()$cex)
 
   return(tpis_per)
 }

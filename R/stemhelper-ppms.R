@@ -22,8 +22,8 @@ lookup.grid.cell <- function(
     y.ll <- min(ylim)
     # If Jittered, domain is bigger & number of grid cells increases
     if (jitter){
-      x.ll <- x.ll - runif(1)*xxx.width
-      y.ll <- y.ll - runif(1)*yyy.width
+      x.ll <- x.ll - stats::runif(1)*xxx.width
+      y.ll <- y.ll - stats::runif(1)*yyy.width
       nx <- 1 + (max(xlim) - min( c(x.ll, xlim) )) %/% xxx.width
       ny <- 1 + (max(ylim) - min( c(y.ll, ylim) )) %/% yyy.width
     }
@@ -219,7 +219,7 @@ load_ppm_data <- function(path) {
                             SouthAmerica = NA)
 
   for (iii in 1:length(es_files)) {
-    ttt <- read.csv(paste(es_dir, es_files[iii], sep = ""))
+    ttt <- utils::read.csv(paste(es_dir, es_files[iii], sep = ""))
     eoa_es_data[iii, 1] <- as.character(ttt[1, 2])
     eoa_es_data[iii, 2:3] <- ttt[1, 3:4]
   }
@@ -248,7 +248,7 @@ load_ppm_data <- function(path) {
                         gamma = 1.5,
                         data = eoa_es_data,
                         knots = list(DOY = c(1,366)))
-    eoa_NorthAmerica <- predict(na_gam, newdata = pred_DOY)
+    eoa_NorthAmerica <- stats::predict(na_gam, newdata = pred_DOY)
   }
 
   if(sum(!is.na(eoa_es_data$SouthAmerica)) > 10) {
@@ -262,7 +262,7 @@ load_ppm_data <- function(path) {
                         gamma = 1.5,
                         data = eoa_es_data,
                         knots = list(DOY = c(1,366)))
-    eoa_SouthAmerica <- predict(sa_gam, newdata = pred_DOY)
+    eoa_SouthAmerica <- stats::predict(sa_gam, newdata = pred_DOY)
   }
 
   # package and return
@@ -570,12 +570,12 @@ compute_ppms <- function(path, st_extent = NA) {
         count_stats$P.DE.occ[iii.mc] <- pdev[3]
 
         # Spearman's Rank Correlations
-        count_stats$Spearman.abund[iii.mc] <- cor(ttt.data$pi.mu.mean,
-                                                  ttt.data$obs,
-                                                  method = "spearman")
-        count_stats$Spearman.occ[iii.mc] <- cor(ttt.data$pi.mean,
-                                                ttt.data$obs,
-                                                method = "spearman")
+        count_stats$Spearman.abund[iii.mc] <- stats::cor(ttt.data$pi.mu.mean,
+                                                         ttt.data$obs,
+                                                         method = "spearman")
+        count_stats$Spearman.occ[iii.mc] <- stats::cor(ttt.data$pi.mean,
+                                                       ttt.data$obs,
+                                                       method = "spearman")
       } # END Min Count SS
     } # END count
   } # END iii.mc
@@ -656,7 +656,8 @@ plot_binary_by_time <- function(path,
     metric_ylim <- c(0, 1)
   }
 
-  bp <- ggplot2::ggplot(ttt, ggplot2::aes(Date, Values, group = Date)) +
+  bp <- ggplot2::ggplot(ttt,
+                        ggplot2::aes(ttt$Date, ttt$Values, group = ttt$Date)) +
     ggplot2::geom_boxplot() +
     ggplot2::ylim(metric_ylim) +
     ggplot2::xlab("Date") +
@@ -700,7 +701,9 @@ plot_all_ppms <- function(path, st_extent) {
                                           "Abundance"))
 
   bp <- ggplot2::ggplot(all_ppms_melt,
-                        ggplot2::aes(variable, value, group = variable)) +
+                        ggplot2::aes(all_ppms_melt$variable,
+                                     all_ppms_melt$value,
+                                     group = all_ppms_melt$variable)) +
     ggplot2::stat_boxplot(geom = "errorbar", width = 0.25) +
     ggplot2::geom_boxplot(notch = TRUE) +
     ggplot2::facet_grid(. ~ type, scales = "free") +

@@ -29,4 +29,5 @@ Imports: raster,
     plyr,
     PresenceAbsence,
     reshape2,
-    scales
+    scales,
+    methods

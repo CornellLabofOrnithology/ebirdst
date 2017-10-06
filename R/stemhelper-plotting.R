@@ -80,13 +80,13 @@ plot_pis <- function(path,
   }
 
   # compute median
-  pi_median <- apply(ttt, 2, median, na.rm = T)
+  pi_median <- apply(ttt, 2, stats::median, na.rm = T)
 
   # find the top preds based on function variable num_top_preds
   top_names <- names(pi_median)[order(pi_median,
                                       decreasing = T)][1:num_top_preds]
   rm(pi_median)
-  top_names <- na.omit(top_names)
+  top_names <- stats::na.omit(top_names)
 
   # subset all values based on top_names
   top_pis <- ttt[, top_names]
@@ -98,18 +98,18 @@ plot_pis <- function(path,
   # PIs have have spurious large values, NAs and NaNs
   # so clean up, trim, and check for complete cases
   pi_stack$values[!is.numeric(pi_stack$values)] <- NA
-  pi_stack <- pi_stack[pi_stack$values < quantile(pi_stack$values,
-                                                  probs = c(0.98),
-                                                  na.rm = TRUE), ]
-  pi_stack <- pi_stack[complete.cases(pi_stack), ]
+  pi_stack <- pi_stack[pi_stack$values < stats::quantile(pi_stack$values,
+                                                         probs = c(0.98),
+                                                         na.rm = TRUE), ]
+  pi_stack <- pi_stack[stats::complete.cases(pi_stack), ]
 
   # plot
   if(print_plot == TRUE) {
     pi_bars <- ggplot2::ggplot(pi_stack,
-                               ggplot2::aes(stats::reorder(ind,
-                                                           values,
-                                                           FUN = median),
-                                            values)) +
+                               ggplot2::aes(stats::reorder(pi_stack$ind,
+                                                           pi_stack$values,
+                                                           FUN = stats::median),
+                                            pi_stack$values)) +
       ggplot2::geom_boxplot() +
       ggplot2::coord_flip() +
       ggplot2::labs(y = "Relative PI", x = "") +
@@ -206,14 +206,14 @@ plot_pds <- function(pd_name,
   rm(var_pd)
 
   # Compute Prediction Design for 1D PD
-  ttt <- data.frame(x = stack(pd.x)[,1],
-                    y = stack(pd.y)[,1])
-  nd <- data.frame(x = seq(from = quantile(ttt$x,
-                                           probs = x.tail.level,
-                                           na.rm = T),
-                           to = quantile(ttt$x,
-                                         probs = 1 - x.tail.level,
-                                         na.rm = T),
+  ttt <- data.frame(x = utils::stack(pd.x)[,1],
+                    y = utils::stack(pd.y)[,1])
+  nd <- data.frame(x = seq(from = stats::quantile(ttt$x,
+                                                  probs = x.tail.level,
+                                                  na.rm = T),
+                           to = stats::quantile(ttt$x,
+                                                probs = 1 - x.tail.level,
+                                                na.rm = T),
                            length = nd.pred.size))
 
   # PLOT STIXEL PD Replicates or just set up plot
@@ -224,15 +224,15 @@ plot_pds <- function(pd_name,
 
   if(print_plot == TRUE) {
       if(stixel_pds) {
-        matplot(jitter(as.matrix(pd.x), amount = 0.00),
-                pd.y,
-                ylim = ylim,
-                xlab = '',
-                ylab = "Deviation E(Logit Occurrence)",
-                type= "l",
-                lwd = 5,
-                lty = 1,
-                col = scales::alpha("black", .025))
+        graphics::matplot(jitter(as.matrix(pd.x), amount = 0.00),
+                          pd.y,
+                          ylim = ylim,
+                          xlab = '',
+                          ylab = "Deviation E(Logit Occurrence)",
+                          type= "l",
+                          lwd = 5,
+                          lty = 1,
+                          col = scales::alpha("black", .025))
       } else {
         plot(pd.x[,1],
              pd.y[,1],
@@ -242,16 +242,16 @@ plot_pds <- function(pd_name,
              type = "n")
       }
 
-      title(pd_name, line = -2)
-      abline(0, 0, col="black", lwd = 3 * par()$cex)
+      graphics::title(pd_name, line = -2)
+      graphics::abline(0, 0, col="black", lwd = 3 * graphics::par()$cex)
   }
 
   # -----------------
   # GBM Qunatiles
   # -----------------
   if(plot_quantiles) {
-    ttt <- data.frame(x = stack(pd.x)[,1],
-                      y = stack(pd.y)[,1])
+    ttt <- data.frame(x = utils::stack(pd.x)[,1],
+                      y = utils::stack(pd.y)[,1])
     d.ul <- gbm::gbm(y ~ x,
                      data = ttt,
                      distribution = list(name = "quantile",
@@ -278,14 +278,17 @@ plot_pds <- function(pd_name,
                      verbose = FALSE,
                      n.cores = 1)
 
-    t.ul <- predict(d.ul, newdata = nd, n.trees = best.iter)
-    t.ll <- predict(d.ll, newdata = nd, n.trees = best.iter)
+    t.ul <- stats::predict(d.ul, newdata = nd, n.trees = best.iter)
+    t.ll <- stats::predict(d.ll, newdata = nd, n.trees = best.iter)
     rm(d.ul, d.ll)
 
     poly.x <- c(nd[, 1], rev(nd[, 1]))
     poly.y <- c(t.ll, rev(t.ul))
     if(print_plot == TRUE) {
-      polygon(poly.x, poly.y, col = scales::alpha("red", 0.25), border = FALSE)
+      graphics::polygon(poly.x,
+                        poly.y,
+                        col = scales::alpha("red", 0.25),
+                        border = FALSE)
     }
   }
 
@@ -332,9 +335,9 @@ plot_pds <- function(pd_name,
       # 	replace = F)
 
       rbprob <- equivalent.ensemble.ss * PD_MAX_RESOLUTION/nrow(pd.x)/ncol(pd.x)
-      random.index <-  matrix((rbinom(n = nrow(pd.x) * ncol(pd.x),
-                                      size = 1,
-                                      prob = rbprob) == 1),
+      random.index <-  matrix((stats::rbinom(n = nrow(pd.x) * ncol(pd.x),
+                                             size = 1,
+                                             prob = rbprob) == 1),
                               nrow(pd.x),
                               ncol(pd.x))
 
@@ -346,49 +349,62 @@ plot_pds <- function(pd_name,
                          data = ttt,
                          gamma = 1.5)
 
-      bs.gam.pred[, iii.bs] <- predict(d.gam, newdata = nd, se = FALSE)
+      bs.gam.pred[, iii.bs] <- stats::predict(d.gam, newdata = nd, se = FALSE)
       rm(d.gam)
     }
 
-    t.ul <- apply(bs.gam.pred, 1, quantile, probs = 1 - ci.alpha, na.rm = TRUE)
-    t.ll <- apply(bs.gam.pred, 1, quantile, probs = ci.alpha, na.rm = TRUE)
-    t.median <- apply(bs.gam.pred, 1, quantile, probs = 0.5, na.rm = TRUE)
+    t.ul <- apply(bs.gam.pred,
+                  1,
+                  stats::quantile,
+                  probs = 1 - ci.alpha,
+                  na.rm = TRUE)
+    t.ll <- apply(bs.gam.pred,
+                  1,
+                  stats::quantile,
+                  probs = ci.alpha,
+                  na.rm = TRUE)
+    t.median <- apply(bs.gam.pred,
+                      1,
+                      stats::quantile,
+                      probs = 0.5,
+                      na.rm = TRUE)
 
     poly.x <- c(nd[, 1], rev(nd[, 1]))
     poly.y <- c(t.ll, rev(t.ul))
     if(print_plot == TRUE) {
-      polygon(poly.x, poly.y, col = scales::alpha("blue", 0.25), border = FALSE)
-      lines(nd[, 1],
-            t.median,
-            col = scales::alpha("darkorange", 1.0),
-            lwd = 2 * par()$cex)
+      graphics::polygon(poly.x,
+                        poly.y,
+                        col = scales::alpha("blue", 0.25),
+                        border = FALSE)
+      graphics::lines(nd[, 1],
+                      t.median,
+                      col = scales::alpha("darkorange", 1.0),
+                      lwd = 2 * graphics::par()$cex)
     }
   }
 
   # GAM CONDITIONAL MEAN - ALL DATA
   if(mean.all.data) {
-    ttt <- data.frame(x = stack(pd.x)[, 1],
-                      y = stack(pd.y)[, 1])
+    ttt <- data.frame(x = utils::stack(pd.x)[, 1],
+                      y = utils::stack(pd.y)[, 1])
 
     d.gam <- mgcv::gam(y ~ s(x, k = k.cont.res, bs="ds", m=1),
                        data = ttt,
                        gamma = 1.5)
 
-    p.gam <- predict(d.gam,
-                     newdata = nd,
-                     se = TRUE)
+    p.gam <- stats::predict(d.gam, newdata = nd, se = TRUE)
     rm(d.gam)
 
     if(print_plot == TRUE) {
-      polygon(x = c(nd[, 1], rev(nd[, 1])),
-              y = c(p.gam$fit + 2 * p.gam$se.fit,
-                    rev(p.gam$fit - 2 * p.gam$se.fit)),
-              col = scales::alpha("lightblue", 0.25),
-              border = NA)
-      lines(nd[, 1],
-            p.gam$fit,
-            col = scales::alpha("yellow", 0.75),
-            lwd = 2 * par()$cex)
+      graphics::polygon(x = c(nd[, 1], rev(nd[, 1])),
+                        y = c(p.gam$fit + 2 * p.gam$se.fit,
+                              rev(p.gam$fit - 2 * p.gam$se.fit)),
+                        col = scales::alpha("lightblue", 0.25),
+                        border = NA)
+      graphics::lines(nd[, 1],
+                      p.gam$fit,
+                      col = scales::alpha("yellow", 0.75),
+                      lwd = 2 * graphics::par()$cex)
     }
   }
 
@@ -490,10 +506,10 @@ loess_fit_and_predict <- function(x, ext, input_data, type) {
   rm(tdsp)
 
   # get the full input extent
-  tdsp_ext <- as(raster::extent(ext$lon.min,
-                                ext$lon.max,
-                                ext$lat.min,
-                                ext$lat.max), "SpatialPolygons")
+  tdsp_ext <- methods::as(raster::extent(ext$lon.min,
+                                         ext$lon.max,
+                                         ext$lat.min,
+                                         ext$lat.max), "SpatialPolygons")
   raster::crs(tdsp_ext) <- sp::CRS(ll)
   tdsp_ext_moll <- sp::spTransform(tdsp_ext, sp::CRS(mollweide))
 
@@ -525,13 +541,15 @@ loess_fit_and_predict <- function(x, ext, input_data, type) {
   }
 
   if(!all(is.nan(rint_d[,c(y_name)]))) {
-    d.loess <- loess(formula = as.formula(paste(y_name, " ~ date", sep = "")),
-                     degree = 1,
-                     data = rint_d,
-                     weights = rint_sub@data$refcov)
+    d.loess <- stats::loess(formula = stats::as.formula(paste(y_name,
+                                                              " ~ date",
+                                                              sep = "")),
+                            degree = 1,
+                            data = rint_d,
+                            weights = rint_sub@data$refcov)
     rm(rint_d, rint_sub)
 
-    loess_preds <- predict(d.loess, nd)
+    loess_preds <- stats::predict(d.loess, nd)
   } else {
     loess_preds <- rep(empty_val, length(nd))
   }
@@ -620,7 +638,7 @@ cake_plot <- function(path,
     y_vals <- as.numeric(x[3:(PD_MAX_RESOLUTION+2)]) -
       mean(as.numeric(x[3:(PD_MAX_RESOLUTION+2)]), na.rm = T)
 
-    sm <- lm(x_vals ~ y_vals)
+    sm <- stats::lm(x_vals ~ y_vals)
 
     sl <- sm$coefficients[[2]]
 
@@ -652,10 +670,11 @@ cake_plot <- function(path,
   # this aggregation is both for speed and stability of loess
   # without this agg, some of the pd trajectories
   # for lesser predictors get a little weird
-  pd_mean_slope <- aggregate(pd_w_slope,
-                             by = list(pd_w_slope$V4, pd_w_slope$centroid.date),
-                             FUN = mean,
-                             na.rm = TRUE)
+  pd_mean_slope <- stats::aggregate(pd_w_slope,
+                                    by = list(pd_w_slope$V4,
+                                              pd_w_slope$centroid.date),
+                                    FUN = mean,
+                                    na.rm = TRUE)
   rm(pd_w_slope)
 
   # subset and rename
@@ -692,10 +711,10 @@ cake_plot <- function(path,
   rm(pi_loess, tpis)
 
   # scale PIs
-  pi_week_sums <- aggregate(smooth_pis$preds,
-                            by = list(smooth_pis$date),
-                            FUN = sum,
-                            na.rm = TRUE)
+  pi_week_sums <- stats::aggregate(smooth_pis$preds,
+                                   by = list(smooth_pis$date),
+                                   FUN = sum,
+                                   na.rm = TRUE)
 
   smooth_pis_w_sums <- merge(smooth_pis,
                              pi_week_sums,
@@ -734,15 +753,18 @@ cake_plot <- function(path,
     pipd$class <- apply(pipd, 1, return_class)
 
     # sum pidir by class
-    pipd_agg <- aggregate(pipd$pidir,
-                          by = list(pipd$class, pipd$date),
-                          FUN = sum,
-                          na.rm = TRUE)
+    pipd_agg <- stats::aggregate(pipd$pidir,
+                                 by = list(pipd$class, pipd$date),
+                                 FUN = sum,
+                                 na.rm = TRUE)
     names(pipd_agg) <- c("predictor", "date", "pidir")
 
     pipd <- pipd_agg
   } else {
-    agg_colors <- palette(rainbow(length(unique(pipd$predictor))))
+    agg_colors <- grDevices::palette(
+      grDevices::rainbow(
+        length(
+          unique(pipd$predictor))))
   }
 
   # Currently, unused, but keeping it here for potential future calc
@@ -785,10 +807,10 @@ cake_plot <- function(path,
   max_date <- as.Date(st_extent$t.max * 366, origin = as.Date('2013-01-01'))
 
   # ggplot
-  wave <- ggplot2::ggplot(pipd_short, ggplot2::aes(x = Date,
-                                                   y = pidir,
-                                                   group = predictor,
-                                                   fill = predictor)) +
+  wave <- ggplot2::ggplot(pipd_short, ggplot2::aes(x = pipd_short$Date,
+                                                   y = pipd_short$pidir,
+                                                   group = pipd_short$predictor,
+                                                   fill = pipd_short$predictor)) +
     ggplot2::geom_area() +
     ggplot2::geom_vline(xintercept = as.numeric(min_date)) +
     ggplot2::geom_vline(xintercept = as.numeric(max_date)) +
