@@ -480,6 +480,16 @@ calc_effective_extent <- function(st_extent,
   # project the selected points to mollweide
   tpis_sub_moll <- sp::spTransform(tpis_sub, mollweide)
 
+  # convert st_extent to polygon and mollweide for plotting
+  st_ext <- raster::extent(st_extent$lon.min,
+                           st_extent$lon.max,
+                           st_extent$lat.min,
+                           st_extent$lat.max)
+  st_extp <- as(st_ext, "SpatialPolygons")
+  raster::projection(st_extp) <- sp::CRS(ll)
+  st_extp_prj <- sp::spTransform(st_extp, sp::CRS(mollweide))
+  rm(st_ext, st_extp)
+
   graphics::par(mar = c(0, 0, 0, 2))
   raster::plot(tpis_per_prj,
                xaxt = 'n',
@@ -491,6 +501,7 @@ calc_effective_extent <- function(st_extent,
                legend = TRUE)
   sp::plot(ned_wh_co_moll, add = TRUE, border = 'gray')
   sp::plot(ned_wh_st_moll, add = TRUE, border = 'gray')
+  sp::plot(st_extp_prj, add = TRUE, border = 'red')
   sp::plot(tpis_sub_moll, add = TRUE, pch = 16, cex = 1 * graphics::par()$cex)
 
   return(tpis_per)
