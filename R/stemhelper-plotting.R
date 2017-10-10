@@ -217,13 +217,12 @@ plot_pds <- function(pd_name,
                            length = nd.pred.size))
 
   # PLOT STIXEL PD Replicates or just set up plot
-
-  if(all(is.na(ylim))) {
-    ylim <- c(min(pd.y, na.rm = TRUE), max(pd.y, na.rm = TRUE))
-  }
-
   if(print_plot == TRUE) {
       if(stixel_pds) {
+        if(all(is.na(ylim))) {
+          ylim <- c(min(pd.y, na.rm = TRUE), max(pd.y, na.rm = TRUE))
+        }
+
         graphics::matplot(jitter(as.matrix(pd.x), amount = 0.00),
                           pd.y,
                           ylim = ylim,
@@ -233,21 +232,11 @@ plot_pds <- function(pd_name,
                           lwd = 5,
                           lty = 1,
                           col = scales::alpha("black", .025))
-      } else {
-        plot(pd.x[,1],
-             pd.y[,1],
-             xlab= '',
-             ylim = ylim,
-             ylab = "Deviation E(Logit Occurrence)",
-             type = "n")
       }
-
-      graphics::title(pd_name, line = -2)
-      graphics::abline(0, 0, col="black", lwd = 3 * graphics::par()$cex)
   }
 
   # -----------------
-  # GBM Qunatiles
+  # GBM Quantiles
   # -----------------
   if(plot_quantiles) {
     ttt <- data.frame(x = utils::stack(pd.x)[,1],
@@ -284,7 +273,27 @@ plot_pds <- function(pd_name,
 
     poly.x <- c(nd[, 1], rev(nd[, 1]))
     poly.y <- c(t.ll, rev(t.ul))
+
     if(print_plot == TRUE) {
+
+      if(stixel_pds == FALSE) {
+        qymin <- min(t.ll, na.rm = TRUE)
+        qymax <- max(t.ul, na.rm = TRUE)
+
+        if(all(is.na(ylim))) {
+          ylim <- c(qymin, qymax)
+        }
+
+        plot(pd.x[,1],
+             pd.y[,1],
+             xlab = '',
+             xlim = c(min(nd, na.rm = TRUE), max(nd, na.rm = TRUE)),
+             ylim = ylim,
+             ylab = "Deviation E(Logit Occurrence)",
+             type = "n")
+      }
+
+
       graphics::polygon(poly.x,
                         poly.y,
                         col = scales::alpha("red", 0.25),
@@ -372,6 +381,25 @@ plot_pds <- function(pd_name,
     poly.x <- c(nd[, 1], rev(nd[, 1]))
     poly.y <- c(t.ll, rev(t.ul))
     if(print_plot == TRUE) {
+
+      if(stixel_pds == FALSE & plot_quantiles == FALSE) {
+        qymin <- min(t.ll, na.rm = TRUE)
+        qymax <- max(t.ul, na.rm = TRUE)
+
+        if(all(is.na(ylim))) {
+          ylim <- c(qymin, qymax)
+        }
+
+        plot(pd.x[,1],
+             pd.y[,1],
+             xlab = '',
+             xlim = c(min(nd, na.rm = TRUE), max(nd, na.rm = TRUE)),
+             ylim = ylim,
+             ylab = "Deviation E(Logit Occurrence)",
+             type = "n")
+      }
+
+
       graphics::polygon(poly.x,
                         poly.y,
                         col = scales::alpha("blue", 0.25),
@@ -406,6 +434,11 @@ plot_pds <- function(pd_name,
                       col = scales::alpha("yellow", 0.75),
                       lwd = 2 * graphics::par()$cex)
     }
+  }
+
+  if(print_plot == TRUE) {
+    graphics::title(pd_name, line = -2)
+    graphics::abline(0, 0, col="black", lwd = 3 * graphics::par()$cex)
   }
 
   return(list(t.median = t.median, t.ul = t.ul, t.ll = t.ll))
