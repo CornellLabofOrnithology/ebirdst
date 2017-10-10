@@ -402,6 +402,10 @@ calc_effective_extent <- function(st_extent,
     stop("Unable to calculate for both PIs and PDs, supply one or the other.")
   }
 
+  if(all(is.na(st_extent))) {
+    stop("Missing spatiotemporal extent.")
+  }
+
   # projection info
   ll <- "+init=epsg:4326"
   mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
