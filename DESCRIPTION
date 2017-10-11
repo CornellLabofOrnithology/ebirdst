@@ -30,4 +30,5 @@ Imports: raster,
     PresenceAbsence,
     reshape2,
     scales,
-    methods
+    methods,
+    gridExtra

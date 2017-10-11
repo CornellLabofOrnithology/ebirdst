@@ -689,28 +689,62 @@ plot_all_ppms <- function(path, st_extent) {
 
   # columns: metric, values, type
   all_ppms_melt <- reshape2::melt(all_ppms, id = c("type"))
+  all_ppms_melt$variable <- as.character(all_ppms_melt$variable)
   all_ppms_melt <- all_ppms_melt[!(all_ppms_melt$variable %in%
                                      c("mc", "ss", "mean", "threshold",
                                        "P.DE.occ", "Spearman.occ")), ]
   all_ppms_melt <- all_ppms_melt[!(all_ppms_melt$type == "Occ Binary" &
-                                     all_ppms_melt$variable== "B.DE"), ]
+                                     all_ppms_melt$variable == "B.DE"), ]
   all_ppms_melt <- all_ppms_melt[!is.na(all_ppms_melt$value), ]
-  all_ppms_melt$type <- factor(all_ppms_melt$type,
-                               levels = c("Occ Binary",
-                                          "Occ Probability",
-                                          "Abundance"))
 
-  bp <- ggplot2::ggplot(all_ppms_melt,
-                        ggplot2::aes(all_ppms_melt$variable,
-                                     all_ppms_melt$value,
-                                     group = all_ppms_melt$variable)) +
+  # Separate
+  all_ppms_melt_ob <- all_ppms_melt[all_ppms_melt$type == "Occ Binary", ]
+
+  obp <- ggplot2::ggplot(all_ppms_melt_ob,
+                        ggplot2::aes(all_ppms_melt_ob$variable,
+                                     all_ppms_melt_ob$value,
+                                     group = all_ppms_melt_ob$variable)) +
     ggplot2::stat_boxplot(geom = "errorbar", width = 0.25) +
-    ggplot2::geom_boxplot(notch = TRUE) +
-    ggplot2::facet_grid(. ~ type, scales = "free") +
+    ggplot2::geom_boxplot(notch = FALSE) +
     ggplot2::ylim(c(0,1)) +
-    ggplot2::xlab("Metric") +
+    ggplot2::xlab("Occ Binary") +
     ggplot2::theme_light() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90),
                    axis.title.y = ggplot2::element_blank())
-  bp
+  obp
+
+  all_ppms_melt_op <- all_ppms_melt[all_ppms_melt$type == "Occ Probability", ]
+
+  opp <- ggplot2::ggplot(all_ppms_melt_op,
+                         ggplot2::aes(all_ppms_melt_op$variable,
+                                      all_ppms_melt_op$value,
+                                      group = all_ppms_melt_op$variable)) +
+    ggplot2::stat_boxplot(geom = "errorbar", width = 0.25) +
+    ggplot2::geom_boxplot(notch = FALSE) +
+    ggplot2::ylim(c(0,1)) +
+    ggplot2::xlab("Occ Probability") +
+    ggplot2::theme_light() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90),
+                   axis.title.y = ggplot2::element_blank())
+  opp
+
+  all_ppms_melt_ab <- all_ppms_melt[all_ppms_melt$type == "Abundance", ]
+  all_ppms_melt_ab[all_ppms_melt_ab$variable == "Spearman.abund", ]$variable <- "Spearman"
+
+  abp <- ggplot2::ggplot(all_ppms_melt_ab,
+                         ggplot2::aes(all_ppms_melt_ab$variable,
+                                      all_ppms_melt_ab$value,
+                                      group = all_ppms_melt_ab$variable)) +
+    ggplot2::stat_boxplot(geom = "errorbar", width = 0.25) +
+    ggplot2::geom_boxplot(notch = FALSE) +
+    ggplot2::ylim(c(0,1)) +
+    ggplot2::xlab("Abundance") +
+    ggplot2::theme_light() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90,
+                                                       size = 8),
+                   axis.title.y = ggplot2::element_blank())
+  abp
+
+  three_plots <- list(obp, opp, abp)
+  gridExtra::grid.arrange(grobs = three_plots, ncol = 3)
 }
