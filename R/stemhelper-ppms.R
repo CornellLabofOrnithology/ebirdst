@@ -201,7 +201,7 @@ load_ppm_data <- function(path) {
     stop("*_erd.test.data.csv file does not exist in the /data directory.")
   }
 
-  ppm_data <- data.table::fread(test_file)
+  ppm_data <- data.table::fread(test_file, showProgress = FALSE)
   ppm_names <- c("data.type", "row.id", "lon", "lat", "date", "obs", "pi.mean",
                  "pi.90", "pi.10", "pi.se", "pi.mu.mean", "pi.mu.90",
                  "pi.mu.10", "pi.mu.se", "pat", "pi.es")

@@ -187,7 +187,7 @@ load_summary <- function(path) {
                path, stixel_path, sep = ""))
   }
 
-  summary_vec <- data.table::fread(summary_file)
+  summary_vec <- data.table::fread(summary_file, showProgress = FALSE)
   names(summary_vec)[3] <- "stixel.id"
   names(summary_vec)[4:ncol(summary_vec)] <- summary_vec_name_vec
 
@@ -214,7 +214,7 @@ load_pis <- function(path) {
                path, stixel_path, sep = ""))
   }
 
-  pi_vec <- data.table::fread(pi_file)
+  pi_vec <- data.table::fread(pi_file, showProgress = FALSE)
   names(pi_vec)[4:ncol(pi_vec)] <- e$PI_VARS
   names(pi_vec)[3] <- "stixel.id"
 
