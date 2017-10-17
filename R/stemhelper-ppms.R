@@ -714,6 +714,9 @@ plot_all_ppms <- function(path, st_extent) {
   obp
 
   all_ppms_melt_op <- all_ppms_melt[all_ppms_melt$type == "Occ Probability", ]
+  all_ppms_melt_op$variable <- factor(all_ppms_melt_op$variable,
+                                      levels = c("AUC", "Kappa", "B.DE", "PCC",
+                                                 "Sensitivity", "Specificity"))
 
   opp <- ggplot2::ggplot(all_ppms_melt_op,
                          ggplot2::aes(all_ppms_melt_op$variable,
