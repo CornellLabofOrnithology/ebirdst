@@ -717,6 +717,14 @@ plot_all_ppms <- function(path, st_extent) {
   all_ppms_melt_op$variable <- factor(all_ppms_melt_op$variable,
                                       levels = c("AUC", "Kappa", "B.DE", "PCC",
                                                  "Sensitivity", "Specificity"))
+  # negative check of B.DE
+  medbde <- stats::median(all_ppms_melt_op[
+    all_ppms_melt_op$variable == "B.DE", ]$value)
+
+  bderep <- data.frame(type = "Occ Probability",
+                       variable = "B.DE",
+                       value = 0,
+                       stringsAsFactors = FALSE)
 
   opp <- ggplot2::ggplot(all_ppms_melt_op,
                          ggplot2::aes(all_ppms_melt_op$variable,
@@ -729,10 +737,31 @@ plot_all_ppms <- function(path, st_extent) {
     ggplot2::theme_light() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90),
                    axis.title.y = ggplot2::element_blank())
+
+  # if the median B.DE value is below 0, put a red X
+  if(medbde < 0) {
+    opp <- opp + ggplot2::geom_point(data = bderep,
+                                     ggplot2::aes(bderep$variable,
+                                                  bderep$value,
+                                                  group = bderep$variable),
+                                     shape = 4,
+                                     size = 10,
+                                     color = 'red')
+  }
+
   opp
 
   all_ppms_melt_ab <- all_ppms_melt[all_ppms_melt$type == "Abundance", ]
   all_ppms_melt_ab[all_ppms_melt_ab$variable == "Spearman.abund", ]$variable <- "Spearman"
+
+  # negative check of P.DE
+  medpde <- stats::median(all_ppms_melt_ab[
+    all_ppms_melt_ap$variable == "P.DE.abund", ]$value)
+
+  pderep <- data.frame(type = "Abundance",
+                       variable = "P.DE.abund",
+                       value = 0,
+                       stringsAsFactors = FALSE)
 
   abp <- ggplot2::ggplot(all_ppms_melt_ab,
                          ggplot2::aes(all_ppms_melt_ab$variable,
@@ -746,6 +775,18 @@ plot_all_ppms <- function(path, st_extent) {
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90,
                                                        size = 8),
                    axis.title.y = ggplot2::element_blank())
+
+  # if the median B.DE value is below 0, put a red X
+  if(medpde < 0) {
+    abp <- abp + ggplot2::geom_point(data = pderep,
+                                     ggplot2::aes(pderep$variable,
+                                                  pderep$value,
+                                                  group = pderep$variable),
+                                     shape = 4,
+                                     size = 10,
+                                     color = 'red')
+  }
+
   abp
 
   three_plots <- list(obp, opp, abp)
