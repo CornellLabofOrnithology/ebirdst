@@ -444,16 +444,16 @@ train_check <- function(y, train_data, empty_val) {
 
   # subset data to time around date
   D <- train_data
-  date_sub <- D[D$centroid.date >= as.numeric(y["date"]) - full_week &
-                D$centroid.date <= as.numeric(y["date"]) + full_week, ]
+  date_sub <- D[D$date >= as.numeric(y["date"]) - full_week &
+                D$date <= as.numeric(y["date"]) + full_week, ]
   rm(D, train_data)
 
   if(nrow(date_sub) == 0) {
     return(NA)
   } else {
     # get max and min for comparison
-    min_train <- min(date_sub$centroid.date, na.rm = TRUE)
-    max_train <- max(date_sub$centroid.date, na.rm = TRUE)
+    min_train <- min(date_sub$date, na.rm = TRUE)
+    max_train <- max(date_sub$date, na.rm = TRUE)
     rm(date_sub)
 
     # end of year present problems for checking to see if there's data
@@ -491,10 +491,10 @@ loess_fit_and_predict <- function(x, ext, input_data, type) {
   nd <- data.frame(date = SRD_DATE_VEC)
 
   if(type == "PI") {
-    D <- input_data[, c(x, "centroid.date", "centroid.lat", "centroid.lon",
-                  "stixel_width", "stixel_height")]
-    names(D) <- c("predictor", "centroid.date", "centroid.lat", "centroid.lon",
-                  "stixel_width", "stixel_height")
+    D <- input_data[, c(x, "date", "lat", "lon", "stixel_width",
+                        "stixel_height")]
+    names(D) <- c("predictor", "date", "lat", "lon", "stixel_width",
+                  "stixel_height")
     D$predictor <- log(D$predictor + 0.001)
 
     empty_val <- 0
@@ -507,15 +507,14 @@ loess_fit_and_predict <- function(x, ext, input_data, type) {
   rm(input_data)
 
   # make stixel polygons from centroids and widths and heights
-  tdsp <- sp::SpatialPointsDataFrame(coords = D[,c("centroid.lon",
-                                                   "centroid.lat")],
+  tdsp <- sp::SpatialPointsDataFrame(coords = D[, c("lon", "lat")],
                                      data = D,
                                      proj4string = sp::CRS(ll))
 
-  xPlus <- tdsp$centroid.lon + (tdsp$stixel_width/2)
-  yPlus <- tdsp$centroid.lat + (tdsp$stixel_height/2)
-  xMinus <- tdsp$centroid.lon - (tdsp$stixel_width/2)
-  yMinus <- tdsp$centroid.lat - (tdsp$stixel_height/2)
+  xPlus <- tdsp$lon + (tdsp$stixel_width/2)
+  yPlus <- tdsp$lat + (tdsp$stixel_height/2)
+  xMinus <- tdsp$lon - (tdsp$stixel_width/2)
+  yMinus <- tdsp$lat - (tdsp$stixel_height/2)
 
   ID <- row.names(tdsp)
 
@@ -555,12 +554,12 @@ loess_fit_and_predict <- function(x, ext, input_data, type) {
 
   if(type == "PI") {
     rint_d <- data.frame(predictor = rint_sub@data$predictor,
-                         date = rint_sub@data$centroid.date)
+                         date = rint_sub@data$date)
 
     y_name <- "predictor"
   } else {
     rint_d <- data.frame(slope = rint_sub@data$slope,
-                         date = rint_sub@data$centroid.date)
+                         date = rint_sub@data$date)
 
     y_name <- "slope"
   }
@@ -677,9 +676,9 @@ cake_plot <- function(path,
   rm(pd_slope)
 
   pd_w_slope <- tpds[tpds$V4 %in% cover_cols, c("stixel.id",
-                                                "centroid.date",
-                                                "centroid.lat",
-                                                "centroid.lon",
+                                                "date",
+                                                "lat",
+                                                "lon",
                                                 "stixel_width",
                                                 "stixel_height",
                                                 "V4",
@@ -691,18 +690,16 @@ cake_plot <- function(path,
   # for lesser predictors get a little weird
   pd_mean_slope <- stats::aggregate(pd_w_slope,
                                     by = list(pd_w_slope$V4,
-                                              pd_w_slope$centroid.date),
+                                              pd_w_slope$date),
                                     FUN = mean,
                                     na.rm = TRUE)
   rm(pd_w_slope)
 
   # subset and rename
-  pd_slopes <- pd_mean_slope[,c("Group.1", "centroid.date", "centroid.lat",
-                                "centroid.lon", "stixel_width", "stixel_height",
-                                "slope")]
-  names(pd_slopes) <- c("predictor", "centroid.date", "centroid.lat",
-                        "centroid.lon", "stixel_width", "stixel_height",
-                        "slope")
+  pd_slopes <- pd_mean_slope[,c("Group.1", "date", "lat", "lon", "stixel_width",
+                                "stixel_height", "slope")]
+  names(pd_slopes) <- c("predictor", "date", "lat", "lon", "stixel_width",
+                        "stixel_height", "slope")
   rm(pd_mean_slope)
 
   # temporal smoothing of predictor trajectories

@@ -235,9 +235,8 @@ map_centroids <- function(pis,
 
   # Plotting PDs
   if(plot_pds == TRUE) {
-    tpds <- unique(pds[, c("centroid.lon", "centroid.lat", "centroid.date")])
-    tpds_sp <- sp::SpatialPointsDataFrame(tpds[, c("centroid.lon",
-                                                   "centroid.lat")],
+    tpds <- unique(pds[, c("lon", "lat", "date")])
+    tpds_sp <- sp::SpatialPointsDataFrame(tpds[, c("lon", "lat")],
                                           tpds,
                                           proj4string = sp::CRS(ll))
     tpds_prj <- sp::spTransform(tpds_sp, sp::CRS(mollweide))
@@ -298,9 +297,8 @@ map_centroids <- function(pis,
 
   # Plotting PIs
   if(plot_pis == TRUE) {
-    tpis <- unique(pis[, c("centroid.lon", "centroid.lat", "centroid.date")])
-    tpis_sp <- sp::SpatialPointsDataFrame(tpis[, c("centroid.lon",
-                                                   "centroid.lat")],
+    tpis <- unique(pis[, c("lon", "lat", "date")])
+    tpis_sp <- sp::SpatialPointsDataFrame(tpis[, c("lon", "lat")],
                                           tpis,
                                           proj4string = sp::CRS(ll))
     tpis_prj <- sp::spTransform(tpis_sp, mollweide)
@@ -409,10 +407,9 @@ calc_effective_extent <- function(st_extent,
   rm(pis, pds)
 
   # subset, create spatial data, project
-  tpis <- unique(stixels[, c("centroid.lon", "centroid.lat", "centroid.date",
-                             "stixel_width", "stixel_height")])
-  tpis_sp <- sp::SpatialPointsDataFrame(tpis[,c("centroid.lon",
-                                                "centroid.lat")],
+  tpis <- unique(stixels[, c("lon", "lat", "date", "stixel_width",
+                             "stixel_height")])
+  tpis_sp <- sp::SpatialPointsDataFrame(tpis[, c("lon","lat")],
                                         tpis,
                                         proj4string = sp::CRS(ll))
   rm(tpis)
@@ -422,10 +419,10 @@ calc_effective_extent <- function(st_extent,
 
   # build stixels as polygons
   # create corners
-  xPlus <- tpis_sub$centroid.lon + (tpis_sub$stixel_width/2)
-  yPlus <- tpis_sub$centroid.lat + (tpis_sub$stixel_height/2)
-  xMinus <- tpis_sub$centroid.lon - (tpis_sub$stixel_width/2)
-  yMinus <- tpis_sub$centroid.lat - (tpis_sub$stixel_height/2)
+  xPlus <- tpis_sub$lon + (tpis_sub$stixel_width/2)
+  yPlus <- tpis_sub$lat + (tpis_sub$stixel_height/2)
+  xMinus <- tpis_sub$lon - (tpis_sub$stixel_width/2)
+  yMinus <- tpis_sub$lat - (tpis_sub$stixel_height/2)
 
   ID <- row.names(tpis_sub)
 
