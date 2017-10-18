@@ -19,6 +19,33 @@ get_sinu_ext <- function(extent) {
   return(raster::extent(extsinur))
 }
 
+#' Internal function to handle different kinds of st_extent subsetting
+#'
+st_extent_subset <- function(data, st_extent, use_time = TRUE) {
+
+  # needs to handle time-wrapping and multiple time periods
+  # needs to handle rectangles and polygons
+  # let's start by replacing existing functionality
+
+  if(st_extent$type == "rectangle") {
+    if(use_time == TRUE) {
+      subset_data <- data[data$date > st_extent$t.min &
+                          data$date <= st_extent$t.max &
+                          data$lat > st_extent$lat.min &
+                          data$lat <= st_extent$lat.max &
+                          data$lon > st_extent$lon.min &
+                          data$lon <= st_extent$lon.max, ]
+    } else {
+      subset_data <- data[data$lat > st_extent$lat.min &
+                          data$lat <= st_extent$lat.max &
+                          data$lon > st_extent$lon.min &
+                          data$lon <= st_extent$lon.max, ]
+    }
+  }
+
+  return(subset_data)
+}
+
 
 #' Load, extend, and stack all STEM .tif rasters in a directory
 #'
@@ -151,9 +178,9 @@ load_summary <- function(path) {
                                      e$PREDICTOR_LIST,
                                      sep = "_")
   summary_vec_name_vec <- c("srd.n",
-                            "centroid.lon",
-                            "centroid.lat",
-                            "centroid.date",
+                            "lon",
+                            "lat",
+                            "date",
                             "stixel_width",
                             "stixel_height",
                             "stixel_area",

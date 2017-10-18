@@ -348,13 +348,7 @@ compute_ppms <- function(path, st_extent = NA) {
   # Extract ST Subset
 
   if(!all(is.na(st_extent))) {
-    st_index <- ppm_data_list$ppm_data$date > st_extent$t.min &
-                ppm_data_list$ppm_data$date < st_extent$t.max &
-                ppm_data_list$ppm_data$lat > st_extent$lat.min &
-                ppm_data_list$ppm_data$lat < st_extent$lat.max &
-                ppm_data_list$ppm_data$lon > st_extent$lon.min &
-                ppm_data_list$ppm_data$lon < st_extent$lon.max
-    st_data <- ppm_data_list$ppm_data[st_index, ]
+    st_data <- st_extent_subset(ppm_data_list$ppm_data, st_extent, use_time = TRUE)
   } else {
     st_data <- ppm_data_list$ppm_data
   }
@@ -756,7 +750,7 @@ plot_all_ppms <- function(path, st_extent) {
 
   # negative check of P.DE
   medpde <- stats::median(all_ppms_melt_ab[
-    all_ppms_melt_ap$variable == "P.DE.abund", ]$value)
+    all_ppms_melt_ab$variable == "P.DE.abund", ]$value)
 
   pderep <- data.frame(type = "Abundance",
                        variable = "P.DE.abund",

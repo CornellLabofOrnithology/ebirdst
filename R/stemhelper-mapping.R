@@ -260,12 +260,7 @@ map_centroids <- function(pis,
                  add = TRUE)
 
     if(!all(is.na(st_extent))) {
-      tpds_sub <- tpds_sp[tpds_sp$centroid.date > st_extent$t.min &
-                          tpds_sp$centroid.date <= st_extent$t.max &
-                          tpds_sp$centroid.lat > st_extent$lat.min &
-                          tpds_sp$centroid.lat <= st_extent$lat.max &
-                          tpds_sp$centroid.lon > st_extent$lon.min &
-                          tpds_sp$centroid.lon <= st_extent$lon.max, ]
+      tpds_sub <- st_extent_subset(tpds_sp, st_extent, use_time = TRUE)
 
       tpds_region <- sp::spTransform(tpds_sub, sp::CRS(mollweide))
       rm(tpds_sub)
@@ -333,12 +328,7 @@ map_centroids <- function(pis,
                  add = TRUE)
 
     if(!all(is.na(st_extent))) {
-      tpis_sub <- tpis_sp[tpis_sp$centroid.date > st_extent$t.min &
-                          tpis_sp$centroid.date <= st_extent$t.max &
-                          tpis_sp$centroid.lat > st_extent$lat.min &
-                          tpis_sp$centroid.lat <= st_extent$lat.max &
-                          tpis_sp$centroid.lon > st_extent$lon.min &
-                          tpis_sp$centroid.lon <= st_extent$lon.max, ]
+      tpis_sub <- st_extent_subset(tpis_sp, st_extent, use_time = TRUE)
 
       tpis_region <- sp::spTransform(tpis_sub, sp::CRS(mollweide))
 
@@ -427,12 +417,7 @@ calc_effective_extent <- function(st_extent,
                                         proj4string = sp::CRS(ll))
   rm(tpis)
 
-  tpis_sub <- tpis_sp[tpis_sp$centroid.date > st_extent$t.min &
-                      tpis_sp$centroid.date <= st_extent$t.max &
-                      tpis_sp$centroid.lat > st_extent$lat.min &
-                      tpis_sp$centroid.lat <= st_extent$lat.max &
-                      tpis_sp$centroid.lon > st_extent$lon.min &
-                      tpis_sp$centroid.lon <= st_extent$lon.max, ]
+  tpis_sub <- st_extent_subset(tpis_sp, st_extent, use_time = TRUE)
   rm(tpis_sp)
 
   # build stixels as polygons

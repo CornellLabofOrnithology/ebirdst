@@ -12,12 +12,9 @@ plot_pis <- function(path,
   e <- load_config(path)
 
   # subset for extent
-  ttt <- pis[pis$centroid.date > st_extent$t.min &
-             pis$centroid.date <= st_extent$t.max &
-             pis$centroid.lat > st_extent$lat.min &
-             pis$centroid.lat <= st_extent$lat.max &
-             pis$centroid.lon > st_extent$lon.min &
-             pis$centroid.lon <= st_extent$lon.max, e$PI_VARS]
+  ttt_sub <- st_extent_subset(pis, st_extent, use_time = TRUE)
+  ttt <- ttt_sub[, e$PI_VARS]
+  rm(ttt_sub)
 
   # if aggregating by cover class
   # aggregate the fragstats into land cover classes
@@ -168,14 +165,9 @@ plot_pds <- function(pd_name,
   nd.pred.size <- PD_MAX_RESOLUTION
 
   # subset based on extent
-  pd_index <- pds$centroid.date > st_extent$t.min &
-              pds$centroid.date <= st_extent$t.max &
-              pds$centroid.lat > st_extent$lat.min &
-              pds$centroid.lat <= st_extent$lat.max &
-              pds$centroid.lon > st_extent$lon.min &
-              pds$centroid.lon <= st_extent$lon.max
-  pd_vec <- pds[pd_index, ]
-  rm(pd_index, pds)
+  pd_vec <- st_extent_subset(pds, st_extent, use_time = TRUE)
+
+  rm(pds)
 
   # Select PD Variable
   var_pd <- pd_vec[pd_vec$V4 == pd_name, ]
@@ -626,18 +618,12 @@ cake_plot <- function(path,
   mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
 
   # subset centroids
-  tpis <- pis[pis$centroid.lat > st_extent$lat.min &
-              pis$centroid.lat <= st_extent$lat.max &
-              pis$centroid.lon > st_extent$lon.min &
-              pis$centroid.lon <= st_extent$lon.max &
-              !is.na(pis[, 2]), ]
-  rm(pis)
+  tpis_sub <- st_extent_subset(pis, st_extent, use_time = FALSE)
+  tpis <- tpis_sub[!is.na(tpis_sub[, 2]), ]
+  rm(pis, tpis_sub)
 
-  tpds <- pds[pds$centroid.lat > st_extent$lat.min &
-              pds$centroid.lat <= st_extent$lat.max &
-              pds$centroid.lon > st_extent$lon.min &
-              pds$centroid.lon <= st_extent$lon.max &
-              !is.na(pds$V5), ]
+  tpds_sub <- st_extent_subset(pds, st_extent, use_time = FALSE)
+  tpds <- tpds_sub[!is.na(tpds_sub$V5), ]
   rm(pds)
 
   # subset to cover classes
