@@ -29,12 +29,21 @@ st_extent_subset <- function(data, st_extent, use_time = TRUE) {
 
   if(st_extent$type == "rectangle") {
     if(use_time == TRUE) {
-      subset_data <- data[data$date > st_extent$t.min &
-                          data$date <= st_extent$t.max &
-                          data$lat > st_extent$lat.min &
-                          data$lat <= st_extent$lat.max &
-                          data$lon > st_extent$lon.min &
-                          data$lon <= st_extent$lon.max, ]
+      if(st_extent$t.min > st_extent$t.max) {
+        subset_data <- data[(data$date > st_extent$t.min |
+                              data$date <= st_extent$t.max) &
+                              data$lat > st_extent$lat.min &
+                              data$lat <= st_extent$lat.max &
+                              data$lon > st_extent$lon.min &
+                              data$lon <= st_extent$lon.max, ]
+      } else {
+        subset_data <- data[data$date > st_extent$t.min &
+                              data$date <= st_extent$t.max &
+                              data$lat > st_extent$lat.min &
+                              data$lat <= st_extent$lat.max &
+                              data$lon > st_extent$lon.min &
+                              data$lon <= st_extent$lon.max, ]
+      }
     } else {
       subset_data <- data[data$lat > st_extent$lat.min &
                           data$lat <= st_extent$lat.max &
@@ -218,7 +227,7 @@ load_summary <- function(path) {
   names(summary_vec)[3] <- "stixel.id"
   names(summary_vec)[4:ncol(summary_vec)] <- summary_vec_name_vec
 
-  summary_nona <- summary_vec[!is.na(summary_vec$centroid.lon), ]
+  summary_nona <- summary_vec[!is.na(summary_vec$lon), ]
   rm(summary_vec, summary_file)
 
   return(summary_nona)
