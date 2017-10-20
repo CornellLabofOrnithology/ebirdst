@@ -450,12 +450,12 @@ calc_effective_extent <- function(st_extent,
   # summarize...not sure how to do this step
   tpis_r <- raster::rasterize(tdspolydf_prj,
                               stemhelper::template_raster,
-                              field="weight",
-                              fun=sum)
+                              field = "weight",
+                              fun = sum)
 
   tpis_per <- tpis_r/nrow(tpis_sub)
   rm(tpis_r)
-  tpis_per[tpis_per < 0.50] <- NA
+  #tpis_per[tpis_per < 0.50] <- NA
 
   # plot
   tpis_per_prj <- raster::projectRaster(
@@ -477,12 +477,15 @@ calc_effective_extent <- function(st_extent,
   rm(st_ext, st_extp)
 
   graphics::par(mar = c(0, 0, 0, 2))
+
   raster::plot(tpis_per_prj,
                xaxt = 'n',
                yaxt = 'n',
                bty = 'n',
+               zlim = c(0, 1),
+               breaks = c(0, seq(0.5, 1, by = 0.05)),
                ext = raster::extent(tdspolydf_moll),
-               col = viridis::viridis(100),
+               col = c(viridis(11)[1], viridis::viridis(11)[2:11]),
                maxpixels = raster::ncell(tpis_per_prj),
                legend = TRUE)
   sp::plot(ned_wh_co_moll, add = TRUE, border = 'gray')
