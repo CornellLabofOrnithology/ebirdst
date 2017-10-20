@@ -467,14 +467,20 @@ calc_effective_extent <- function(st_extent,
   tpis_sub_moll <- sp::spTransform(tpis_sub, mollweide)
 
   # convert st_extent to polygon and mollweide for plotting
-  st_ext <- raster::extent(st_extent$lon.min,
-                           st_extent$lon.max,
-                           st_extent$lat.min,
-                           st_extent$lat.max)
-  st_extp <- as(st_ext, "SpatialPolygons")
-  raster::projection(st_extp) <- sp::CRS(ll)
-  st_extp_prj <- sp::spTransform(st_extp, sp::CRS(mollweide))
-  rm(st_ext, st_extp)
+  if(st_extent$type == "rectangle") {
+    st_ext <- raster::extent(st_extent$lon.min,
+                             st_extent$lon.max,
+                             st_extent$lat.min,
+                             st_extent$lat.max)
+    st_extp <- as(st_ext, "SpatialPolygons")
+    raster::projection(st_extp) <- sp::CRS(ll)
+    st_extp_prj <- sp::spTransform(st_extp, sp::CRS(mollweide))
+    rm(st_ext, st_extp)
+  } else if(st_extent$type == "polygon") {
+    st_extp_prj <- sp::spTransform(st_extent$polygon, sp::CRS(mollweide))
+  } else {
+    stop("Spatiotemporal extent type not accepted.")
+  }
 
   graphics::par(mar = c(0, 0, 0, 2))
 
@@ -485,7 +491,7 @@ calc_effective_extent <- function(st_extent,
                zlim = c(0, 1),
                breaks = c(0, seq(0.5, 1, by = 0.05)),
                ext = raster::extent(tdspolydf_moll),
-               col = c(viridis(11)[1], viridis::viridis(11)[2:11]),
+               col = c(viridis::viridis(11)[1], viridis::viridis(11)[2:11]),
                maxpixels = raster::ncell(tpis_per_prj),
                legend = TRUE)
   sp::plot(ned_wh_co_moll, add = TRUE, border = 'gray')

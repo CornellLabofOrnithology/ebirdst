@@ -530,12 +530,18 @@ loess_fit_and_predict <- function(x, ext, input_data, type) {
   rm(tdsp)
 
   # get the full input extent
-  tdsp_ext <- methods::as(raster::extent(ext$lon.min,
-                                         ext$lon.max,
-                                         ext$lat.min,
-                                         ext$lat.max), "SpatialPolygons")
-  raster::crs(tdsp_ext) <- sp::CRS(ll)
-  tdsp_ext_moll <- sp::spTransform(tdsp_ext, sp::CRS(mollweide))
+  if(ext$type == "rectangle") {
+    tdsp_ext <- raster::extent(ext$lon.min,
+                             ext$lon.max,
+                             ext$lat.min,
+                             ext$lat.max)
+    raster::crs(tdsp_ext) <- sp::CRS(ll)
+    tdsp_ext_moll <- sp::spTransform(tdsp_ext, sp::CRS(mollweide))
+  } else if(ext$type == "polygon") {
+    tdsp_ext_moll <- sp::spTransform(ext$polygon, sp::CRS(mollweide))
+  } else {
+    stop("Spatiotemporal extent type not accepted.")
+  }
 
   # calculate area weights based on percentage of stixel covering
   # extent of interest

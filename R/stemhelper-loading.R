@@ -50,6 +50,50 @@ st_extent_subset <- function(data, st_extent, use_time = TRUE) {
                           data$lon > st_extent$lon.min &
                           data$lon <= st_extent$lon.max, ]
     }
+  } else if(st_extent$type == "polygon") {
+    ll_epsg <- "+init=epsg:4326"
+    ll <- "+proj=longlat +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
+
+    # check Polygons
+    if(is.null(st_extent$polygon)) {
+      stop("polygon data not present.")
+    }
+
+    # cast data to SpatialPoints
+    if(is.data.frame(data)) {
+      sites <- sp::SpatialPointsDataFrame(coords = data[, c("lon", "lat")],
+                                          data = data,
+                                          proj4string = sp::CRS(ll_epsg))
+    } else {
+      sites <- data
+    }
+
+    # check prj
+    if(!sp::identicalCRS(sites, st_extent$polygon)) {
+      plygn <- sp::spTransform(st_extent$polygon,
+                               sp::CRS(sp::proj4string(sites)))
+    } else {
+      plygn <- st_extent$polygon
+    }
+
+    # use for subset
+    subset_data <- sites[!is.na(over(sites, as(plygn, "SpatialPolygons"))), ]
+
+    if(is.data.frame(data)) {
+      subset_data <- subset_data@data
+    }
+
+    if(use_time == TRUE) {
+      if(st_extent$t.min > st_extent$t.max) {
+        subset_data <- subset_data[(subset_data$date > st_extent$t.min |
+                                      subset_data$date <= st_extent$t.max), ]
+      } else {
+        subset_data <- subset_data[subset_data$date > st_extent$t.min &
+                                     subset_data$date <= st_extent$t.max, ]
+      }
+    }
+  } else {
+    stop("Spatiotemporal extent type not accepted. Use either 'rectangle' or 'polygon'.")
   }
 
   return(subset_data)
