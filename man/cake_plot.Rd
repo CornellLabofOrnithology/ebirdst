@@ -5,7 +5,7 @@
 \title{Make a cake plot of the pis and pds}
 \usage{
 cake_plot(path, pis, pds, st_extent, by_cover_class = TRUE,
-  pland_and_lpi_only = TRUE)
+  pland_and_lpi_only = TRUE, return_data = FALSE)
 }
 \description{
 Make a cake plot of the pis and pds

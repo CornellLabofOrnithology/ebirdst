@@ -531,10 +531,10 @@ loess_fit_and_predict <- function(x, ext, input_data, type) {
 
   # get the full input extent
   if(ext$type == "rectangle") {
-    tdsp_ext <- raster::extent(ext$lon.min,
+    tdsp_ext <- methods::as(raster::extent(ext$lon.min,
                              ext$lon.max,
                              ext$lat.min,
-                             ext$lat.max)
+                             ext$lat.max), "SpatialPolygons")
     raster::crs(tdsp_ext) <- sp::CRS(ll)
     tdsp_ext_moll <- sp::spTransform(tdsp_ext, sp::CRS(mollweide))
   } else if(ext$type == "polygon") {
@@ -612,7 +612,8 @@ cake_plot <- function(path,
                       pds,
                       st_extent,
                       by_cover_class = TRUE,
-                      pland_and_lpi_only = TRUE) {
+                      pland_and_lpi_only = TRUE,
+                      return_data = FALSE) {
 
   # load config vars
   e <- load_config(path)
@@ -816,6 +817,10 @@ cake_plot <- function(path,
                              FUN = ccfun,
                              by_cover_class = by_cover_class)
 
+  if(return_data == TRUE) {
+    pipd_out <- pipd_short
+  }
+
   pipd_short$Date <- apply(pipd_short, 1, FUN = function(x) {
     strftime(as.Date(as.numeric(x["date"]) * 366,
                      origin = as.Date('2013-01-01')),
@@ -849,6 +854,10 @@ cake_plot <- function(path,
     ggplot2::ylab("Association Direction (Positive/Negative)") +
     ggplot2::theme(legend.key.size = ggplot2::unit(1, "line"))
   wave
+
+  if(return_data == TRUE) {
+    return(pipd_out)
+  }
 }
 
 #' Internal function for converting cover class names to readable
