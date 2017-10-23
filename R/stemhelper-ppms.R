@@ -237,7 +237,7 @@ load_ppm_data <- function(path) {
   eoa_SouthAmerica <- rep(NA, nrow(pred_DOY))
 
   # check for NA data
-  if(sum(!is.na(eoa_es_data$NorthAmerica)) > 10) {
+  if(sum(!is.na(eoa_es_data$NorthAmerica))/nrow(eoa_es_data) > (10/52)) {
     # Treat missing ES values as the minimum support value
     na_na_replace <- min(eoa_es_data$NorthAmerica, na.rm = TRUE)
     eoa_es_data$NorthAmerica[is.na(eoa_es_data$NorthAmerica)] <- na_na_replace
@@ -251,7 +251,7 @@ load_ppm_data <- function(path) {
     eoa_NorthAmerica <- stats::predict(na_gam, newdata = pred_DOY)
   }
 
-  if(sum(!is.na(eoa_es_data$SouthAmerica)) > 10) {
+  if(sum(!is.na(eoa_es_data$SouthAmerica))/nrow(eoa_es_data) > (10/52)) {
     # Treat missing ES values as the minimum support value
     sa_na_replace <- min(eoa_es_data$SouthAmerica, na.rm = TRUE)
     eoa_es_data$SouthAmerica[is.na(eoa_es_data$SouthAmerica)] <- sa_na_replace
