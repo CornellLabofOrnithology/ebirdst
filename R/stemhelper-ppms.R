@@ -236,39 +236,67 @@ load_ppm_data <- function(path) {
   eoa_NorthAmerica <- rep(NA, nrow(pred_DOY))
   eoa_SouthAmerica <- rep(NA, nrow(pred_DOY))
 
+  slope = (25 - 3)/(52 - 10)
+
   # check for NA data
-  if(sum(!is.na(eoa_es_data$NorthAmerica))/nrow(eoa_es_data) > (10/52)) {
+  na_total <- sum(!is.na(eoa_es_data$NorthAmerica))
+
+  if(na_total > 1) {
     # Treat missing ES values as the minimum support value
     na_na_replace <- min(eoa_es_data$NorthAmerica, na.rm = TRUE)
     eoa_es_data$NorthAmerica[is.na(eoa_es_data$NorthAmerica)] <- na_na_replace
 
-    # GAM Smooth EOA ES values down to Daily
-    s = mgcv::s
-    na_gam <- mgcv::gam(NorthAmerica ~ s(DOY, k = 25, bs = "cp", m = 1),
-                        gamma = 1.5,
-                        data = eoa_es_data,
-                        knots = list(DOY = c(1,366)))
-    eoa_NorthAmerica <- stats::predict(na_gam, newdata = pred_DOY)
+    if(na_total > 9) {
+      # GAM Smooth EOA ES values down to Daily
+      y = -((52 * slope - na_total * slope) - 25)
+
+      s = mgcv::s
+      na_model <- mgcv::gam(NorthAmerica ~ s(DOY,
+                                             k = round(y),
+                                             bs = "cp",
+                                             m = 1),
+                            gamma = 1.5,
+                            data = eoa_es_data,
+                            knots = list(DOY = c(1,366)))
+    } else {
+      # do a loess
+      na_model <- stats::loess(NorthAmerica ~ DOY, eoa_es_data)
+    }
+
+    eoa_NorthAmerica <- stats::predict(na_model, newdata = pred_DOY)
   }
 
-  if(sum(!is.na(eoa_es_data$SouthAmerica))/nrow(eoa_es_data) > (10/52)) {
+  # check for NA data
+  sa_total <- sum(!is.na(eoa_es_data$SouthAmerica))
+
+  if(sa_total > 1) {
     # Treat missing ES values as the minimum support value
     sa_na_replace <- min(eoa_es_data$SouthAmerica, na.rm = TRUE)
     eoa_es_data$SouthAmerica[is.na(eoa_es_data$SouthAmerica)] <- sa_na_replace
 
-    # GAM Smooth EOA ES values down to Daily
-    s = mgcv::s
-    sa_gam <- mgcv::gam(SouthAmerica ~ s(DOY, k = 25, bs = "cp", m = 1),
-                        gamma = 1.5,
-                        data = eoa_es_data,
-                        knots = list(DOY = c(1,366)))
-    eoa_SouthAmerica <- stats::predict(sa_gam, newdata = pred_DOY)
+    if(sa_total > 9) {
+      # GAM Smooth EOA ES values down to Daily
+      y = -((52 * slope - sa_total * slope) - 25)
+
+      s = mgcv::s
+      sa_model <- mgcv::gam(SouthAmerica ~ s(DOY,
+                                             k = round(y),
+                                             bs = "cp",
+                                             m = 1),
+                            gamma = 1.5,
+                            data = eoa_es_data,
+                            knots = list(DOY = c(1,366)))
+    } else {
+      sa_model <- stats::loess(SouthAmerica ~ DOY, eoa_es_data)
+    }
+
+    eoa_SouthAmerica <- stats::predict(sa_model, newdata = pred_DOY)
   }
 
   # package and return
   eoa_es_daily <- data.frame(DOY = pred_DOY,
                              NorthAmerica = eoa_NorthAmerica,
-                             SouthAmerica = eoa_SouthAmerica  )
+                             SouthAmerica = eoa_SouthAmerica)
 
   return(list(ppm_data = ppm_data,
               eoa_es_daily = eoa_es_daily))
@@ -663,7 +691,8 @@ plot_binary_by_time <- function(path,
                           limits = c(as.Date("2013-01-01"),
                                      as.Date("2013-12-31")),
                           date_breaks = "1 month") +
-    ggplot2::theme_light()
+    ggplot2::theme_light() +
+    ggplot2::theme(axis.title.y = ggplot2::element_blank())
   bp
 
 }
