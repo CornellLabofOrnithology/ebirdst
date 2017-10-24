@@ -348,7 +348,9 @@ compute_ppms <- function(path, st_extent = NA) {
   # Extract ST Subset
 
   if(!all(is.na(st_extent))) {
-    st_data <- st_extent_subset(ppm_data_list$ppm_data, st_extent, use_time = TRUE)
+    st_data <- st_extent_subset(ppm_data_list$ppm_data,
+                                st_extent,
+                                use_time = TRUE)
   } else {
     st_data <- ppm_data_list$ppm_data
   }
@@ -357,6 +359,7 @@ compute_ppms <- function(path, st_extent = NA) {
   st_data$in_eoa <- FALSE
   # Add Day of Year
   st_data$DOY <- round(st_data$date * 366)
+  st_data[st_data$DOY == 0, ]$DOY <- 1
 
   # if lat >= 12
   ttt_index <- st_data$lat >= 12
