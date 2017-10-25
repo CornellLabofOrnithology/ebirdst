@@ -2,11 +2,15 @@
 % Please edit documentation in R/stemhelper-loading.R
 \name{load_summary}
 \alias{load_summary}
-\title{Summary file loader}
+\title{Stixel summary file loader}
 \usage{
 load_summary(path)
 }
+\arguments{
+\item{path}{character; Full path to the directory containing single species
+STEM results.}
+}
 \description{
 Internal function used by load_pis() and load_pds() to get the stixel
-summary information
+summary information (from pd.txt).
 }

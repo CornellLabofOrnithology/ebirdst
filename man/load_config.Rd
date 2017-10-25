@@ -12,7 +12,8 @@ STEM results.}
 }
 \description{
 Internal function used by load_summary(), load_pis(), and load_pds() to get
-configuration variables from STEM species run information.
+configuration variables from STEM species run information
+(from *_config.RData).
 }
 \examples{
 \dontrun{

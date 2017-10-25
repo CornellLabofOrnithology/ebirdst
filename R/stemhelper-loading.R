@@ -256,7 +256,8 @@ stack_stem <- function(path,
 #' Config file loader
 #'
 #' Internal function used by load_summary(), load_pis(), and load_pds() to get
-#' configuration variables from STEM species run information.
+#' configuration variables from STEM species run information
+#' (from *_config.RData).
 #'
 #' @param path character; Full path to the directory containing single species
 #' STEM results.
@@ -287,10 +288,16 @@ load_config <- function(path) {
   return(e)
 }
 
-#' Summary file loader
+#' Stixel summary file loader
 #'
 #' Internal function used by load_pis() and load_pds() to get the stixel
-#' summary information
+#' summary information (from pd.txt).
+#'
+#' @param path character; Full path to the directory containing single species
+#' STEM results.
+#'
+#' @returns data.frame containing stixel summary information about each stixel
+#' centroid.
 load_summary <- function(path) {
   e <- load_config(path)
 
