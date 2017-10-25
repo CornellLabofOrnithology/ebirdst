@@ -2,10 +2,23 @@
 % Please edit documentation in R/stemhelper-loading.R
 \name{load_pis}
 \alias{load_pis}
-\title{Load Predictor Importance file for a single species}
+\title{Load Predictor Importance file for single species STEM results}
 \usage{
 load_pis(path)
 }
+\arguments{
+\item{path}{character; Full path to the directory containing single species
+STEM results.}
+}
 \description{
-Load Predictor Importance file for a single species
+Loads the predictor importance data (from pi.txt), joins with stixel summary
+data, sets the names from config data, and cleans up the data.frame.
+}
+\examples{
+\dontrun{
+
+sp_path <- "path to species STEM results"
+
+pis <- load_pis(sp_path)
+}
 }

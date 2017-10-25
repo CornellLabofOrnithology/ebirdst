@@ -12,5 +12,13 @@ STEM results.}
 }
 \description{
 Internal function used by load_pis() and load_pds() to get the stixel
-summary information (from pd.txt).
+summary information (from summary.txt).
+}
+\examples{
+\dontrun{
+
+sp_path <- "path to species STEM results"
+
+summaries <- load_summary(sp_path)
+}
 }

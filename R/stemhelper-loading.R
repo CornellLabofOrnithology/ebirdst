@@ -291,13 +291,21 @@ load_config <- function(path) {
 #' Stixel summary file loader
 #'
 #' Internal function used by load_pis() and load_pds() to get the stixel
-#' summary information (from pd.txt).
+#' summary information (from summary.txt).
 #'
 #' @param path character; Full path to the directory containing single species
 #' STEM results.
 #'
 #' @returns data.frame containing stixel summary information about each stixel
 #' centroid.
+#'
+#' @examples
+#' \dontrun{
+#'
+#' sp_path <- "path to species STEM results"
+#'
+#' summaries <- load_summary(sp_path)
+#' }
 load_summary <- function(path) {
   e <- load_config(path)
 
@@ -355,10 +363,28 @@ load_summary <- function(path) {
   return(summary_nona)
 }
 
-#' Load Predictor Importance file for a single species
+#' Load predictor importances for single species STEM results
+#'
+#' Loads the predictor importance data (from pi.txt), joins with stixel summary
+#' data, sets the names from `load_config()`, and cleans up the data.frame.
+#'
+#' @param path character; Full path to the directory containing single species
+#' STEM results.
+#'
+#' @returns data.frame containing predictor importance values for each stixel,
+#' as well as stixel summary information.
 #'
 #' @import data.table
+#'
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' sp_path <- "path to species STEM results"
+#'
+#' pis <- load_pis(sp_path)
+#' }
 load_pis <- function(path) {
   # load config vars
   e <- load_config(path)
