@@ -10,6 +10,10 @@ load_summary(path)
 \item{path}{character; Full path to the directory containing single species
 STEM results.}
 }
+\value{
+data.frame containing stixel summary information about each stixel
+centroid.
+}
 \description{
 Internal function used by load_pis() and load_pds() to get the stixel
 summary information (from summary.txt).

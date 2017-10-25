@@ -10,6 +10,10 @@ load_pis(path)
 \item{path}{character; Full path to the directory containing single species
 STEM results.}
 }
+\value{
+data.frame containing predictor importance values for each stixel,
+as well as stixel summary information.
+}
 \description{
 Loads the predictor importance data (from pi.txt), joins with stixel summary
 data, sets the names from \code{load_config()}, and cleans up the data.frame.

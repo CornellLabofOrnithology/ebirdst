@@ -268,7 +268,7 @@ stack_stem <- function(path,
 #' @param path character; Full path to the directory containing single species
 #' STEM results.
 #'
-#' @returns environment object containing all run parameters.
+#' @return environment object containing all run parameters.
 #'
 #' @examples
 #' \dontrun{
@@ -302,7 +302,7 @@ load_config <- function(path) {
 #' @param path character; Full path to the directory containing single species
 #' STEM results.
 #'
-#' @returns data.frame containing stixel summary information about each stixel
+#' @return data.frame containing stixel summary information about each stixel
 #' centroid.
 #'
 #' @examples
@@ -377,7 +377,7 @@ load_summary <- function(path) {
 #' @param path character; Full path to the directory containing single species
 #' STEM results.
 #'
-#' @returns data.frame containing predictor importance values for each stixel,
+#' @return data.frame containing predictor importance values for each stixel,
 #' as well as stixel summary information.
 #'
 #' @import data.table
@@ -432,7 +432,7 @@ load_pis <- function(path) {
 #' @param path character; Full path to the directory containing single species
 #' STEM results.
 #'
-#' @returns data.frame containing partial dependency values for each stixel,
+#' @return data.frame containing partial dependency values for each stixel,
 #' as well as stixel summary information.
 #'
 #' @import data.table

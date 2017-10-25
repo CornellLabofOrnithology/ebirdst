@@ -10,6 +10,10 @@ load_pds(path)
 \item{path}{character; Full path to the directory containing single species
 STEM results.}
 }
+\value{
+data.frame containing partial dependency values for each stixel,
+as well as stixel summary information.
+}
 \description{
 Loads the partial dependency data (from pd.txt), joins with stixel summary
 data, sets the names from \code{load_config()}, and cleans up the data.frame.

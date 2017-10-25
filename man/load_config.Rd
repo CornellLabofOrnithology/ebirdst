@@ -10,6 +10,9 @@ load_config(path)
 \item{path}{character; Full path to the directory containing single species
 STEM results.}
 }
+\value{
+environment object containing all run parameters.
+}
 \description{
 Internal function used by load_summary(), load_pis(), and load_pds() to get
 configuration variables from STEM species run information
