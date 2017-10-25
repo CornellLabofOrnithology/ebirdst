@@ -2,10 +2,25 @@
 % Please edit documentation in R/stemhelper-loading.R
 \name{load_pds}
 \alias{load_pds}
-\title{Loads PD data}
+\title{Load partial dependencies for single species STEM results}
 \usage{
 load_pds(path)
 }
+\arguments{
+\item{path}{character; Full path to the directory containing single species
+STEM results.}
+}
 \description{
-Loads PD data
+Loads the partial dependency data (from pd.txt), joins with stixel summary
+data, sets the names from \code{load_config()}, and cleans up the data.frame.
+This is one of the slower functions in the package, due to the size of the
+pd.txt file (usually multiple GB).
+}
+\examples{
+\dontrun{
+
+sp_path <- "path to species STEM results"
+
+pds <- load_pds(sp_path)
+}
 }

@@ -416,10 +416,30 @@ load_pis <- function(path) {
   return(as.data.frame(pi_summary))
 }
 
-#' Loads PD data
+#' Load partial dependencies for single species STEM results
+#'
+#' Loads the partial dependency data (from pd.txt), joins with stixel summary
+#' data, sets the names from `load_config()`, and cleans up the data.frame.
+#' This is one of the slower functions in the package, due to the size of the
+#' pd.txt file (usually multiple GB).
+#'
+#' @param path character; Full path to the directory containing single species
+#' STEM results.
+#'
+#' @returns data.frame containing partial dependency values for each stixel,
+#' as well as stixel summary information.
 #'
 #' @import data.table
+#'
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' sp_path <- "path to species STEM results"
+#'
+#' pds <- load_pds(sp_path)
+#' }
 load_pds <- function(path) {
   # load config vars
   e <- load_config(path)

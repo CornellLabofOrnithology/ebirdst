@@ -2,7 +2,7 @@
 % Please edit documentation in R/stemhelper-loading.R
 \name{load_pis}
 \alias{load_pis}
-\title{Load Predictor Importance file for single species STEM results}
+\title{Load predictor importances for single species STEM results}
 \usage{
 load_pis(path)
 }
@@ -12,7 +12,7 @@ STEM results.}
 }
 \description{
 Loads the predictor importance data (from pi.txt), joins with stixel summary
-data, sets the names from config data, and cleans up the data.frame.
+data, sets the names from \code{load_config()}, and cleans up the data.frame.
 }
 \examples{
 \dontrun{
