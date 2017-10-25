@@ -33,3 +33,6 @@ year_bins <- calc_bins(raster_stack)
 raster::plot(raster_stack[[1]], xaxt = 'n', yaxt = 'n', breaks = year_bins)
 }
 }
+\references{
+Ross Maciejewski, Avin Pattah, Sungahn Ko, Ryan Hafen, William S. Cleveland, David S. Ebert.  Automated Box-Cox Transformations for Improved Visual Encoding. IEEE Transactions on Visualization and Computer Graphics, 19(1): 130-140, 2013.
+}

@@ -100,6 +100,8 @@ calc_full_extent <- function(x) {
 #'
 #' @export
 #'
+#' @references Ross Maciejewski, Avin Pattah, Sungahn Ko, Ryan Hafen, William S. Cleveland, David S. Ebert.  Automated Box-Cox Transformations for Improved Visual Encoding. IEEE Transactions on Visualization and Computer Graphics, 19(1): 130-140, 2013.
+#'
 #' @examples
 #' \dontrun{
 #'
