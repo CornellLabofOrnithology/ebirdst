@@ -587,8 +587,30 @@ train_check <- function(y, train_data, empty_val) {
   }
 }
 
-# ' Loess fit and predict for cake_plot() PIs and PDs
-# '
+#' Loess fit and predict for cake_plot() PIs and PDs
+#'
+#' Internal function that performs a loess fit and predict on both PIs and PDs
+#' for smoothing each predictor.
+#'
+#' @param x character; Predictor name.
+#' @param ext list; st_extent list
+#' @param input_data data.frame; Munged PIs or PD slopes.
+#' @param type character; Either "PI" or "PD"
+#'
+#' @return Either smoothed PIs or smoother PD slopes.
+#'
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' # from cake_plot()
+#' temporal smoothing of predictor trajectories
+#' loesses <- lapply(X = unique(pd_slopes$predictor),
+#'                   FUN = loess_fit_and_predict,
+#'                   ext = st_extent,
+#'                   input_data = pd_slopes,
+#'                   type = "PD")
+#' }
 loess_fit_and_predict <- function(x, ext, input_data, type) {
   # static projections
   ll <- "+init=epsg:4326"
