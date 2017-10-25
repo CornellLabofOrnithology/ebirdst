@@ -82,22 +82,33 @@ calc_full_extent <- function(x) {
   return(map_extent)
 }
 
-#' Calculates bins based on standard deviations of log-transformed data
+#' Calculates bins (breaks) based on standard deviations of log-transformed
+#' data for mapping
 #'
-#' Mapping species abundnace across the full-annual cycle presents a challenge, in that patterns of concentration and dispersion in abundance change throughout the year, making it difficult to define color bins that suit all seasons and accurately reflect the detail of abundance predictions. To address this, we selected a method (described by Maciejewski et al. 2013) that log transforms the entire year of data, constructs bins with the log-transformed data using standard-deviations, and then untransforms the bins.
+#' Mapping species abundance across the full-annual cycle presents a challenge,
+#' in that patterns of concentration and dispersion in abundance change
+#' throughout the year, making it difficult to define color bins that suit all
+#' seasons and accurately reflect the detail of abundance predictions. To
+#' address this, we selected a method (described by Maciejewski et al. 2013)
+#' that log transforms the entire year of non-zero data, constructs bins with
+#' the log-transformed data using standard-deviations, and then untransforms
+#' the bins.
 #'
-#' @usage \code{calc_bins(x)}
+#' @param x Raster* object; usually from stem_stack() function.
 #'
-#' @param x Raster* object
+#' @return A vector containing the break points of bins.
 #'
-#' @return vector containing break points of bins
 #' @export
+#'
 #' @examples
-#' tif_path <- "~"
-#' raster_stack <- stack_stem(tif_path)
+#' \dontrun{
+#'
+#' sp_path <- "path to species STEM results"
+#' raster_stack <- stack_stem(sp_path, variable = "abundance_umean")
 #' year_bins <- calc_bins(raster_stack)
 #'
 #' raster::plot(raster_stack[[1]], xaxt = 'n', yaxt = 'n', breaks = year_bins)
+#' }
 calc_bins <- function(x) {
 
   # get a vector of all the values in the stack
