@@ -2,26 +2,30 @@
 % Please edit documentation in R/stemhelper-mapping.R
 \name{calc_full_extent}
 \alias{calc_full_extent}
-\title{Calculates spatial extent of Raster* object for plotting}
+\title{Calculates spatial extent of non-zero data from Raster* object for plotting}
 \usage{
-\code{calc_full_extent(x))}
+calc_full_extent(x)
 }
 \arguments{
-\item{stack}{Raster* object, ideally of occurrence or abundace.}
+\item{x}{Raster* object; usually from stem_stack() function.}
 }
 \value{
 raster Extent object
 }
 \description{
-After creating a stack, there are lots of NA values and plots of the
-individual raster layers are at the full extent of the template_raster. To
-show an ideal extent, this function trims away 0 and NA values and checks
-to make sure it returns a reasonable extent (based on the template_raster)
-for plotting. The returned extent object can then be used for plotting.
+After creating a RasterStack with \code{stack_stem()}, there are lots of NA values
+and plots of the individual raster layers are at the full extent of the
+\code{template_raster}. To show an ideal extent, this function trims away 0 and
+NA values and checks to make sure it returns a reasonable extent (based on
+the \code{template_raster}) for plotting. The returned Extent object can then be
+used for plotting.
 }
 \examples{
-tif_path <- "~"
-raster_stack <- stack_stem(tif_path)
+\dontrun{
+
+sp_path <- "path to species STEM results"
+raster_stack <- stack_stem(sp_path, variable = "abundance_umean")
 plot_extent <- calc_full_extent(raster_stack)
 raster::plot(raster_stack[[1]], ext = plot_extent)
+}
 }
