@@ -4,8 +4,10 @@
 #' package from lat/lon corners to a raster Extent using the same
 #' Sinusoidal projection as the `template_raster` data object.
 #'
-#' @param st_extent st_extent list with lat/lon coordinates.
+#' @param st_extent list; st_extent list with lat/lon coordinates.
+#'
 #' @return A raster Extent in Sinusoidal projection.
+#'
 #' @examples
 #' # define st_extent list
 #' ne_extent <- list(type = "rectangle",
@@ -38,14 +40,42 @@ get_sinu_ext <- function(st_extent) {
   return(raster::extent(extsinur))
 }
 
-#' Internal function to handle different kinds of st_extent subsetting
+#' Spatiotemporal subsetter for STEM result data objects
 #'
+#' Internal function that takes a data.frame or SpatialPointsDataFrame and
+#' a st_extent list and returns a subset of the data object. Currently
+#' designed to handle either a 'rectangle' as defined by a lat/lon bounding
+#' box or a 'polygon' as defined by a SpatialPolygon* object. The `use_time`
+#' parameter allows for subsetting with or without temporal information. The
+#' t.min and t.max objects in the `st_extent` list are currently able to wrap
+#' time around the year (e.g., t.min = 0.9 and t.max = 0.1 is acceptable).
+#'
+#' @param data data.frame or SpatialPointsDataFrame; originating from STEM results.
+#' @param st_extent list; st_extent list object
+#' @param use_time Boolean; indicating whether to use time in subsetting or not.
+#'
+#' @return Subset of input data as same type.
+#'
+#' @examples
+#' \dontrun{
+#'
+#' # define species STEM results location and load pis
+#' sp_path <- "path to species STEM results"
+#' pis <- load_pis(sp_path)
+#'
+#' # define st_extent list
+#' ne_extent <- list(type = "rectangle",
+#'                   lat.min = 40,
+#'                   lat.max = 47,
+#'                   lon.min = -80,
+#'                   lon.max = -70,
+#'                   t.min = 0.425,
+#'                   t.max = 0.475)
+#'
+#' #subset pis with st_extent list
+#' st_extent_subset(data = pis, st_extent = ne_extent, use_time = TRUE)
+#' }
 st_extent_subset <- function(data, st_extent, use_time = TRUE) {
-
-  # needs to handle time-wrapping and multiple time periods
-  # needs to handle rectangles and polygons
-  # let's start by replacing existing functionality
-
   if(st_extent$type == "rectangle") {
     if(use_time == TRUE) {
       if(st_extent$t.min > st_extent$t.max) {
@@ -112,7 +142,9 @@ st_extent_subset <- function(data, st_extent, use_time = TRUE) {
       }
     }
   } else {
-    stop("Spatiotemporal extent type not accepted. Use either 'rectangle' or 'polygon'.")
+    stop(paste("Spatiotemporal extent type not accepted. ",
+               "Use either 'rectangle' or 'polygon'.",
+               sep = ""))
   }
 
   return(subset_data)

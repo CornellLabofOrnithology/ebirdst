@@ -7,7 +7,7 @@
 get_sinu_ext(st_extent)
 }
 \arguments{
-\item{st_extent}{st_extent list with lat/lon coordinates.}
+\item{st_extent}{list; st_extent list with lat/lon coordinates.}
 }
 \value{
 A raster Extent in Sinusoidal projection.

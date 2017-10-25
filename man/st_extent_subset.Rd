@@ -2,10 +2,46 @@
 % Please edit documentation in R/stemhelper-loading.R
 \name{st_extent_subset}
 \alias{st_extent_subset}
-\title{Internal function to handle different kinds of st_extent subsetting}
+\title{Spatiotemporal subsetter for STEM result data objects}
 \usage{
 st_extent_subset(data, st_extent, use_time = TRUE)
 }
+\arguments{
+\item{data}{data.frame or SpatialPointsDataFrame; originating from STEM results.}
+
+\item{st_extent}{list; st_extent list object}
+
+\item{use_time}{Boolean; indicating whether to use time in subsetting or not.}
+}
+\value{
+Subset of input data as same type.
+}
 \description{
-Internal function to handle different kinds of st_extent subsetting
+Internal function that takes a data.frame or SpatialPointsDataFrame and
+a st_extent list and returns a subset of the data object. Currently
+designed to handle either a 'rectangle' as defined by a lat/lon bounding
+box or a 'polygon' as defined by a SpatialPolygon* object. The \code{use_time}
+parameter allows for subsetting with or without temporal information. The
+t.min and t.max objects in the \code{st_extent} list are currently able to wrap
+time around the year (e.g., t.min = 0.9 and t.max = 0.1 is acceptable).
+}
+\examples{
+\dontrun{
+
+# define species STEM results location and load pis
+sp_path <- "path to species STEM results"
+pis <- load_pis(sp_path)
+
+# define st_extent list
+ne_extent <- list(type = "rectangle",
+                  lat.min = 40,
+                  lat.max = 47,
+                  lon.min = -80,
+                  lon.max = -70,
+                  t.min = 0.425,
+                  t.max = 0.475)
+
+#subset pis with st_extent list
+st_extent_subset(data = pis, st_extent = ne_extent, use_time = TRUE)
+}
 }
