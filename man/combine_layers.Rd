@@ -2,10 +2,38 @@
 % Please edit documentation in R/stemhelper-mapping.R
 \name{combine_layers}
 \alias{combine_layers}
-\title{Combine zero layers and abundance to create a single layer}
+\title{Combine zero layers and abundance or occurrence to create a single layer}
 \usage{
 combine_layers(stack, path, week)
 }
+\arguments{
+\item{stack}{RasterStack; from stack_stem().}
+
+\item{path}{character; Full path to single species STEM results.}
+
+\item{week}{int; Value from 1 to 52, representing week of the year to
+combine the layers.}
+}
+\value{
+RasterLayer with zeroes.
+}
 \description{
-Combine zero layers and abundance to create a single layer
+Abundance and occurrence STEM raster layers are positive-only values. Zero
+values come in two forms. First, are predicted zeroes. These are found in the
+"abundance_ensemble_support" raster layers and can be loaded with
+\code{stack_stem()}. Second, are assumed zeros. The layers for these are stored
+internally as the data object \code{zero_es_stack}, which is a RasterStack of 52
+weeks containing all locations in the Western Hemisphere where there is
+sufficient data to assume a zero value if there is no value for abundance
+or occurrence. This function combines these two types of zeroes with a given
+RasterStack from \code{stack_stem()}.
+}
+\examples{
+\dontrun{
+
+sp_path <- "path to species STEM results"
+raster_stack <- stack_stem(sp_path, variable = "abundance_umean")
+week26 <- combine_layers(stack = raster_stack, path = sp_path, week = 26)
+
+}
 }

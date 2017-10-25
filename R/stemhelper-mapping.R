@@ -188,9 +188,36 @@ calc_bins <- function(x) {
   return(bins)
 }
 
-#' Combine zero layers and abundance to create a single layer
+#' Combine zero layers and abundance or occurrence to create a single layer
+#'
+#' Abundance and occurrence STEM raster layers are positive-only values.
+#' Additional information about zero values come in two forms. First,
+#' there are predicted zeroes. These are found in the
+#' "abundance_ensemble_support" raster layers and can be loaded with
+#' `stack_stem()`. Second, there are assumed zeros. The layers for these are
+#' stored internally as the data object `zero_es_stack`, which is a RasterStack
+#' of 52 weeks containing all locations in the Western Hemisphere where there is
+#' sufficient data to assume a zero value if there is no value for abundance
+#' or occurrence. This function combines these two types of zeroes with a given
+#' RasterStack from `stack_stem()`.
+#'
+#' @param stack RasterStack; from stack_stem().
+#' @param path character; Full path to single species STEM results.
+#' @param week int; Value from 1 to 52, representing week of the year to
+#' combine the layers.
+#'
+#' @return RasterLayer with zeroes.
 #'
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' sp_path <- "path to species STEM results"
+#' raster_stack <- stack_stem(sp_path, variable = "abundance_umean")
+#' week26 <- combine_layers(stack = raster_stack, path = sp_path, week = 26)
+#'
+#' }
 combine_layers <- function(stack, path, week) {
   e <- load_config(path)
 
