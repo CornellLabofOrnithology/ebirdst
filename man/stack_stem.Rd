@@ -2,24 +2,35 @@
 % Please edit documentation in R/stemhelper-loading.R
 \name{stack_stem}
 \alias{stack_stem}
-\title{Load, extend, and stack all STEM .tif rasters in a directory}
+\title{Load, extend, and stack all weeks of STEM rasters for a given result type}
 \usage{
-\code{stack_stem(path)}
+stack_stem(path, variable, st_extent = NA, use_analysis_extent = TRUE)
 }
 \arguments{
-\item{path}{Full path to directory containing more than one STEM .tif raster.}
+\item{path}{character; Full path to directory containing the STEM results
+for a single species.}
+
+\item{variable}{character; One of: 'abundance_ensemble_support',
+'abundance_lower', 'abundance_upper', 'abundance_umean',
+and 'occurrence_umean'.}
+
+\item{st_extent}{list; Optional, use to limit the spatial Extent that the rasters are loaded into. Must set use_analysis_extent to FALSE.}
+
+\item{use_analysis_extent}{Boolean; Default is TRUE. If STEM results were run for a custom non-global extent, that extent object is stored in the configuration file. If TRUE, uses that analysis extent for loading the rasters. If FALSE, rasters are loaded to the full extent of the \code{template_raster} object.}
 }
 \value{
-RasterStack object
+RasterStack containing all available weeks of result.
 }
 \description{
-Takes all of the .tif rasters in a directory at provided path, loads them,
-extends them to the extent of the study, and stacks them into a RasterStack.
-In practice, this will often be all 52 weeks of a single variable
-(e.g., abundance_mean), but the files could be rearranged and stacked as well
-(i.e., a single week of a single variable across multiple species).
+For one of five result types, loads all available weeks of rasters, extends
+them to the extent of the study (or to a custom extent), and stacks them
+into a RasterStack.
 }
 \examples{
-tif_path <- "~"
-raster_stack <- stack_stem(tif_path)
+\dontrun{
+
+sp_path <- "path to species STEM results"
+
+raster_stack <- stack_stem(path = sp_path, variable = "abundance_umean")
+}
 }

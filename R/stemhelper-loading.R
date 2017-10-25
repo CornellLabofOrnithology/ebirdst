@@ -150,31 +150,38 @@ st_extent_subset <- function(data, st_extent, use_time = TRUE) {
   return(subset_data)
 }
 
-
-#' Load, extend, and stack all STEM .tif rasters in a directory
+#' Load, extend, and stack all weeks of STEM rasters for a given result type
 #'
-#' Takes all of the .tif rasters in a directory at provided path, loads them,
-#' extends them to the extent of the study, and stacks them into a RasterStack.
-#' In practice, this will often be all 52 weeks of a single variable
-#' (e.g., abundance_mean), but the files could be rearranged and stacked as well
-#' (i.e., a single week of a single variable across multiple species).
+#' For one of five result types, loads all available weeks of rasters, extends
+#' them to the extent of the study (or to a custom extent), and stacks them
+#' into a RasterStack.
 #'
-#' @usage \code{stack_stem(path)}
+#' @param path character; Full path to directory containing the STEM results
+#' for a single species.
+#' @param variable character; One of: 'abundance_ensemble_support',
+#' 'abundance_lower', 'abundance_upper', 'abundance_umean',
+#' and 'occurrence_umean'.
+#' @param st_extent list; Optional, use to limit the spatial Extent that the rasters are loaded into. Must set use_analysis_extent to FALSE.
+#' @param use_analysis_extent Boolean; Default is TRUE. If STEM results were run for a custom non-global extent, that extent object is stored in the configuration file. If TRUE, uses that analysis extent for loading the rasters. If FALSE, rasters are loaded to the full extent of the `template_raster` object.
 #'
-#' @param path Full path to directory containing more than one STEM .tif raster.
+#' @return RasterStack containing all available weeks of result.
 #'
-#' @return RasterStack object
 #' @export
+#'
 #' @examples
-#' tif_path <- "~"
-#' raster_stack <- stack_stem(tif_path)
+#' \dontrun{
+#'
+#' sp_path <- "path to species STEM results"
+#'
+#' raster_stack <- stack_stem(path = sp_path, variable = "abundance_umean")
+#' }
 stack_stem <- function(path,
                        variable,
-                       ext = NA,
+                       st_extent = NA,
                        use_analysis_extent = TRUE) {
-
   poss_var <- c("abundance_ensemble_support", "abundance_lower",
                 "abundance_upper", "abundance_umean", "occurrence_umean")
+
   if(!(variable %in% poss_var)) {
     stop(paste("Selected variable is not one of the following: ",
                paste(poss_var, collapse = ", "), ".", sep = ""))
@@ -186,7 +193,7 @@ stack_stem <- function(path,
   load_extend <- FALSE
   e <- load_config(path)
 
-  if(all(is.na(ext))) {
+  if(all(is.na(st_extent))) {
     if(use_analysis_extent == TRUE) {
       # load with extent
       if(!is.null(e$SPATIAL_EXTENT_LIST)) {
@@ -205,7 +212,7 @@ stack_stem <- function(path,
     }
   } else {
     # load with extent
-    load_extent <- get_sinu_ext(ext)
+    load_extent <- get_sinu_ext(st_extent)
   }
 
   # define function to load and extend each file in path
