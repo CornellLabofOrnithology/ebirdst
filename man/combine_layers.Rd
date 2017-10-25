@@ -18,12 +18,13 @@ combine the layers.}
 RasterLayer with zeroes.
 }
 \description{
-Abundance and occurrence STEM raster layers are positive-only values. Zero
-values come in two forms. First, are predicted zeroes. These are found in the
+Abundance and occurrence STEM raster layers are positive-only values.
+Additional information about zero values come in two forms. First,
+there are predicted zeroes. These are found in the
 "abundance_ensemble_support" raster layers and can be loaded with
-\code{stack_stem()}. Second, are assumed zeros. The layers for these are stored
-internally as the data object \code{zero_es_stack}, which is a RasterStack of 52
-weeks containing all locations in the Western Hemisphere where there is
+\code{stack_stem()}. Second, there are assumed zeros. The layers for these are
+stored internally as the data object \code{zero_es_stack}, which is a RasterStack
+of 52 weeks containing all locations in the Western Hemisphere where there is
 sufficient data to assume a zero value if there is no value for abundance
 or occurrence. This function combines these two types of zeroes with a given
 RasterStack from \code{stack_stem()}.
