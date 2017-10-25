@@ -2,10 +2,47 @@
 % Please edit documentation in R/stemhelper-mapping.R
 \name{calc_effective_extent}
 \alias{calc_effective_extent}
-\title{Map extent of estimation calculated from subset of centroids}
+\title{Calculate and map effective extent of selected centroids}
 \usage{
 calc_effective_extent(st_extent, pis = NA, pds = NA)
 }
+\arguments{
+\item{st_extent}{list; st_extent list containing spatiotemporal filter}
+
+\item{pis}{data.frame; from \code{load_pis()} Must supply either pis or pds.}
+
+\item{pds}{data.frame; from \code{load_pds()} Must supply either pis or pds.}
+}
+\value{
+RasterLayer and plots the RasterLayer with centroid locations and
+st_extent boundaries.
+}
 \description{
-Map extent of estimation calculated from subset of centroids
+The selection of stixel centroids for analysis of PIs and/or PDs yields an
+effective footprint, or extent, showing the effective location of where the
+information going into the analysis with PIs and/or PDs is based. While a
+bounding box or polygon may be used to select a set of centroids, due to the
+models being fit within large rectangular areas, the information from a set
+of centroids often comes from the core of the selected area. This function
+calculates where the highest proportion of information is coming from,
+returns a raster and plots that raster, with the selected area and centroids
+for reference. The legend shows, for each pixel, what percentage of the
+selected stixels are contributing information, ranging from 0 to 1.
+}
+\examples{
+\dontrun{
+
+sp_path <- "path to species STEM results"
+pis <- load_pis(sp_path)
+
+ne_extent <- list(type = "rectangle",
+                  lat.min = 40,
+                  lat.max = 47,
+                  lon.min = -80,
+                  lon.max = -70,
+                  t.min = 0.425,
+                  t.max = 0.475)
+
+eff_lay <- calc_effective_extent(st_extent = ne_extent, pis = pis)
+}
 }
