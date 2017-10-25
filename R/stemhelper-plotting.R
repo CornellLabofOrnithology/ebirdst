@@ -948,8 +948,23 @@ cake_plot <- function(path,
   }
 }
 
-#' Internal function for converting cover class names to readable
+#' Converts cryptic cover class names to readable land cover names
 #'
+#' Internal function that converts the cryptic predictor class names to
+#' readable land cover names.
+#'
+#' @param cov_names vector; Cover class names to convert.
+#' @param by_cover_class Boolean; Default is FALSE. If TRUE, replaces fragstat
+#' cover class name with a name for the cover class as whole.
+#' @param pretty Boolean; Default is FALSE. If TRUE, Converts from capital case
+#' to title case.
+#'
+#' @return A vector of converted names.
+#'
+#' @examples
+#' cns <- c("UMD_FS_C1_1500_PLAND", "MODISWATER_FS_C7_1500_LPI")
+#'
+#' converted <- convert_classes(cov_names = cns, pretty = TRUE)
 convert_classes <- function(cov_names,
                             by_cover_class = FALSE,
                             pretty = FALSE) {

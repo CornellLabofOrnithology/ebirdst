@@ -2,10 +2,28 @@
 % Please edit documentation in R/stemhelper-plotting.R
 \name{convert_classes}
 \alias{convert_classes}
-\title{Internal function for converting cover class names to readable}
+\title{Converts cryptic cover class names to readable land cover names}
 \usage{
 convert_classes(cov_names, by_cover_class = FALSE, pretty = FALSE)
 }
+\arguments{
+\item{cov_names}{vector; Cover class names to convert.}
+
+\item{by_cover_class}{Boolean; Default is FALSE. If TRUE, replaces fragstat
+cover class name with a name for the cover class as whole.}
+
+\item{pretty}{Boolean; Default is FALSE. If TRUE, Converts from capital case
+to title case.}
+}
+\value{
+A vector of converted names.
+}
 \description{
-Internal function for converting cover class names to readable
+Internal function that converts the cryptic predictor class names to
+readable land cover names.
+}
+\examples{
+cns <- c("UMD_FS_C1_1500_PLAND", "MODISWATER_FS_C7_1500_LPI")
+
+converted <- convert_classes(cov_names = cns, pretty = TRUE)
 }
