@@ -1,6 +1,43 @@
-#' Plotting PIs as barplots
+#' Plot predictor importances as barplots
+#'
+#' For all of the available predictors in a single species STEM result set, this
+#' function makes a bar plot of those relative importances, from highest to
+#' lowest. Many function parameters allow for customized plots.
+#'
+#' @param path character; Full path to single species STEM results.
+#' @param pis data.frame; From `load_pis()`.
+#' @param st_extent list; st_extent list for spatiotemporal filtering. Required,
+#' as results are less meaningful over large spatiotemporal extents.
+#' @param by_cover_class Boolean; Default is FALSE. If TRUE, aggregate Fragstats
+#' for the land cover classes into single values for the land cover classes.
+#' @param num_top_preds int; Integer showing how many predictors to show.
+#' @param return_top Boolean; Default is FALSE. If TRUE, returns a vecotr of the
+#' top predictors, based on the `num_top_preds` param.
+#' @param pretty_names Boolean; Default is TRUE. Set to convert cryptic land
+#' cover codes to readable land cover class names.
+#' @param print_plot Boolean; Default is TRUE. Toggle to print plot, to allow
+#' only the return the top predictors, if desired.
+#'
+#' @return Plots barplot and/or returns a vector of top predictors.
 #'
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' sp_path <- "path to species STEM results"
+#' pis <- load_pis(sp_path)
+#'
+#' ne_extent <- list(type = "rectangle",
+#'                   lat.min = 40,
+#'                   lat.max = 47,
+#'                   lon.min = -80,
+#'                   lon.max = -70,
+#'                   t.min = 0.425,
+#'                   t.max = 0.475)
+#'
+#' plot_pis(path = sp_path, pis = pis, st_extent = ne_extent)
+#' }
 plot_pis <- function(path,
                      pis,
                      st_extent,
