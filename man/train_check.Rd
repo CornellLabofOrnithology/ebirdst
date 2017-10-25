@@ -33,4 +33,4 @@ results$preds <- apply(results,
                        train_data = D)
 }
 }
-\keyword{interal}
+\keyword{internal}

@@ -185,7 +185,7 @@ plot_pis <- function(path,
 #' @param mean.all.data Boolean; Default is FALSE. Daniel?
 #' @param ylim vector pair; Opportunity to pre-define plot y-min and y-max as
 #' vector pair (e.g., c(-1,1)).
-#' @print_plot Boolean; Default is TRUE. Set to FALSE to turn off plotting and
+#' @param print_plot Boolean; Default is TRUE. Set to FALSE to turn off plotting and
 #' only get return of pointwise pi values.
 
 #'
@@ -537,7 +537,7 @@ plot_pds <- function(pd_name,
 #'
 #' @return Either the loess predictions or the provided `empty_value`.
 #'
-#' @keywords interal
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
