@@ -156,15 +156,66 @@ plot_pis <- function(path,
   }
 }
 
-#' Plot PDs
+#' Plot partial dependency as line plot
+#'
+#' For all of the available predictors in a single species STEM result set, this
+#' function makes a line plot of a single partial dependency, with two options
+#' for smoothing.
+#'
+#' @param pd_name character; Single predictor name from PDs (via `load_pds()`).
+#' Unique predictors can be listed by calling `pds <- load_pds(path)` and
+#' then calling `unique(pds$V4)`.
+#' @param pds data.frame; From `load_pds()`.
+#' @param st_extent list; st_extent list for spatiotemporal filtering. Required,
+#' as results are less meaningful over large spatiotemporal extents.
+#' @param plot_quantiles Boolean; Default is FALSE. Adds a band for the
+#' upper (90th) and lower (10th) quantiles of the individual stixel PD values.
+#' @param pointwise_pi Boolean; Default is TRUE. A pointwise smoothing of
+#' individual stixel PD values. Ideal visualization of the PD values.
+#' @param stixel_pds Boolean; Default is FALSE. Toggle to plot the individual
+#' stixel PD values as semi-transparent lines.
+#' @param k.cont.res int; Default is 25. Number of knots to use in GAM based on
+#' continuining resolution of the current STEM results.
+#' @param gbm.n.trees int; Default is 500. Number of trees to use in pointwise
+#' GAM.
+#' @param nnn.bs int; Default is 100. Daniel?
+#' @param equivalent.ensemble.ss int; Default is 10. Daniel?
+#' @param ci.alpha numeric; Default is 0.05. Alpha transparency of confidence
+#' intervals.
+#' @param mean.all.data Boolean; Default is FALSE. Daniel?
+#' @param ylim vector pair; Opportunity to pre-define plot y-min and y-max as
+#' vector pair (e.g., c(-1,1)).
+#' @print_plot Boolean; Default is TRUE. Set to FALSE to turn off plotting and
+#' only get return of pointwise pi values.
+
+#'
+#' @return Plots barplot and returns a list containing the median, upper, and
+#' lower values from the pointwise pi smoothing.
 #'
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' sp_path <- "path to species STEM results"
+#' pds <- load_pds(sp_path)
+#'
+#' ne_extent <- list(type = "rectangle",
+#'                   lat.min = 40,
+#'                   lat.max = 47,
+#'                   lon.min = -80,
+#'                   lon.max = -70,
+#'                   t.min = 0.425,
+#'                   t.max = 0.475)
+#'
+#' plot_pds(pd_name = "TIME", pds = pds, st_extent = ne_extent)
+#' }
 plot_pds <- function(pd_name,
                      pds,
                      st_extent,
-                     plot_quantiles = TRUE,
+                     plot_quantiles = FALSE,
                      pointwise_pi = TRUE,
-                     stixel_pds = TRUE,
+                     stixel_pds = FALSE,
                      k.cont.res = 25,
                      gbm.n.trees = 500,
                      nnn.bs = 100,

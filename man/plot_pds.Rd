@@ -2,13 +2,73 @@
 % Please edit documentation in R/stemhelper-plotting.R
 \name{plot_pds}
 \alias{plot_pds}
-\title{Plot PDs}
+\title{Plot partial dependency as line plot}
 \usage{
-plot_pds(pd_name, pds, st_extent, plot_quantiles = TRUE,
-  pointwise_pi = TRUE, stixel_pds = TRUE, k.cont.res = 25,
+plot_pds(pd_name, pds, st_extent, plot_quantiles = FALSE,
+  pointwise_pi = TRUE, stixel_pds = FALSE, k.cont.res = 25,
   gbm.n.trees = 500, nnn.bs = 100, equivalent.ensemble.ss = 10,
   ci.alpha = 0.05, mean.all.data = FALSE, ylim = NA, print_plot = TRUE)
 }
+\arguments{
+\item{pd_name}{character; Single predictor name from PDs (via \code{load_pds()}).
+Unique predictors can be listed by calling \code{pds <- load_pds(path)} and
+then calling \code{unique(pds$V4)}.}
+
+\item{pds}{data.frame; From \code{load_pds()}.}
+
+\item{st_extent}{list; st_extent list for spatiotemporal filtering. Required,
+as results are less meaningful over large spatiotemporal extents.}
+
+\item{plot_quantiles}{Boolean; Default is FALSE. Adds a band for the
+upper (90th) and lower (10th) quantiles of the individual stixel PD values.}
+
+\item{pointwise_pi}{Boolean; Default is TRUE. A pointwise smoothing of
+individual stixel PD values. Ideal visualization of the PD values.}
+
+\item{stixel_pds}{Boolean; Default is FALSE. Toggle to plot the individual
+stixel PD values as semi-transparent lines.}
+
+\item{k.cont.res}{int; Default is 25. Number of knots to use in GAM based on
+continuining resolution of the current STEM results.}
+
+\item{gbm.n.trees}{int; Default is 500. Number of trees to use in pointwise
+GAM.}
+
+\item{nnn.bs}{int; Default is 100. Daniel?}
+
+\item{equivalent.ensemble.ss}{int; Default is 10. Daniel?}
+
+\item{ci.alpha}{numeric; Default is 0.05. Alpha transparency of confidence
+intervals.}
+
+\item{mean.all.data}{Boolean; Default is FALSE. Daniel?}
+
+\item{ylim}{vector pair; Opportunity to pre-define plot y-min and y-max as
+vector pair (e.g., c(-1,1)).}
+}
+\value{
+Plots barplot and returns a list containing the median, upper, and
+lower values from the pointwise pi smoothing.
+}
 \description{
-Plot PDs
+For all of the available predictors in a single species STEM result set, this
+function makes a line plot of a single partial dependency, with two options
+for smoothing.
+}
+\examples{
+\dontrun{
+
+sp_path <- "path to species STEM results"
+pds <- load_pds(sp_path)
+
+ne_extent <- list(type = "rectangle",
+                  lat.min = 40,
+                  lat.max = 47,
+                  lon.min = -80,
+                  lon.max = -70,
+                  t.min = 0.425,
+                  t.max = 0.475)
+
+plot_pds(pd_name = "TIME", pds = pds, st_extent = ne_extent)
+}
 }
