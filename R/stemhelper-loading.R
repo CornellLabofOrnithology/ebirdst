@@ -256,7 +256,20 @@ stack_stem <- function(path,
 #' Config file loader
 #'
 #' Internal function used by load_summary(), load_pis(), and load_pds() to get
-#' configuration variables from species run information.
+#' configuration variables from STEM species run information.
+#'
+#' @param path character; Full path to the directory containing single species
+#' STEM results.
+#'
+#' @returns environment object containing all run parameters.
+#'
+#' @examples
+#' \dontrun{
+#'
+#' sp_path <- "path to species STEM results"
+#'
+#' e <- load_config(sp_path)
+#' }
 load_config <- function(path) {
   e <- new.env()
 

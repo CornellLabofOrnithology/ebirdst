@@ -6,7 +6,19 @@
 \usage{
 load_config(path)
 }
+\arguments{
+\item{path}{character; Full path to the directory containing single species
+STEM results.}
+}
 \description{
 Internal function used by load_summary(), load_pis(), and load_pds() to get
-configuration variables from species run information.
+configuration variables from STEM species run information.
+}
+\examples{
+\dontrun{
+
+sp_path <- "path to species STEM results"
+
+e <- load_config(sp_path)
+}
 }
