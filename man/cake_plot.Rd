@@ -2,11 +2,56 @@
 % Please edit documentation in R/stemhelper-plotting.R
 \name{cake_plot}
 \alias{cake_plot}
-\title{Make a cake plot of the pis and pds}
+\title{Cake plot the PIs and PDs in a combined fasion to see directionality with
+importance for habitat association and avoidance}
 \usage{
 cake_plot(path, pis, pds, st_extent, by_cover_class = TRUE,
   pland_and_lpi_only = TRUE, return_data = FALSE)
 }
+\arguments{
+\item{path}{character; Full path to single species STEM results.}
+
+\item{pis}{data.frame; From \code{load_pis()}.}
+
+\item{pds}{data.frame; From \code{load_pds()}.}
+
+\item{st_extent}{list; st_extent list for spatiotemporal filtering. Required,
+as results are less meaningful over large spatiotemporal extents.}
+
+\item{by_cover_class}{Boolean; Default is FALSE. If TRUE, aggregate Fragstats
+for the land cover classes into single values for the land cover classes.}
+
+\item{pland_and_lpi_only}{Boolean; Default is TRUE. If TRUE, only the percent
+of land cover (PLAND) and largest patch index (LPI) fragstats are used.}
+
+\item{return_data}{Boolean; Default is FALSE. If TRUE, returns the data
+that went into the cake plot for further manipulation.}
+}
+\value{
+Plots a cake plot, or if return_data = TRUE, the data from the cake
+plot as well.
+}
 \description{
-Make a cake plot of the pis and pds
+A cake plot is a stacked area chart, showing both the relative importance of
+the land cover classes, as well as the directionality of the land cover
+classes, by showing the stacked areas above and below a 0 line. This is one
+of, if not the most, computationally expensive operations in the package.
+}
+\examples{
+\dontrun{
+
+sp_path <- "path to species STEM results"
+pis <- load_pis(sp_path)
+pds <- load_pds(sp_path)
+
+ne_extent <- list(type = "rectangle",
+                  lat.min = 40,
+                  lat.max = 47,
+                  lon.min = -80,
+                  lon.max = -70,
+                  t.min = 0.425,
+                  t.max = 0.475)
+
+cake_plot(path = sp_path, pis = pis, pds = pds, st_extent = ne_extent)
+}
 }

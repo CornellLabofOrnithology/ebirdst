@@ -736,10 +736,49 @@ loess_fit_and_predict <- function(x, ext, input_data, type) {
   return(results)
 }
 
-#' Make a cake plot of the pis and pds
+#' Cake plot the PIs and PDs in a combined fasion to see directionality with
+#' importance for habitat association and avoidance
+#'
+#' A cake plot is a stacked area chart, showing both the relative importance of
+#' the land cover classes, as well as the directionality of the land cover
+#' classes, by showing the stacked areas above and below a 0 line. This is one
+#' of, if not the most, computationally expensive operations in the package.
+#'
+#' @param path character; Full path to single species STEM results.
+#' @param pis data.frame; From `load_pis()`.
+#' @param pds data.frame; From `load_pds()`.
+#' @param st_extent list; st_extent list for spatiotemporal filtering. Required,
+#' as results are less meaningful over large spatiotemporal extents.
+#' @param by_cover_class Boolean; Default is FALSE. If TRUE, aggregate Fragstats
+#' for the land cover classes into single values for the land cover classes.
+#' @param pland_and_lpi_only Boolean; Default is TRUE. If TRUE, only the percent
+#' of land cover (PLAND) and largest patch index (LPI) fragstats are used.
+#' @param return_data Boolean; Default is FALSE. If TRUE, returns the data
+#' that went into the cake plot for further manipulation.
+#'
+#' @return Plots a cake plot, or if return_data = TRUE, the data from the cake
+#' plot as well.
 #'
 #' @import sp
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' sp_path <- "path to species STEM results"
+#' pis <- load_pis(sp_path)
+#' pds <- load_pds(sp_path)
+#'
+#' ne_extent <- list(type = "rectangle",
+#'                   lat.min = 40,
+#'                   lat.max = 47,
+#'                   lon.min = -80,
+#'                   lon.max = -70,
+#'                   t.min = 0.425,
+#'                   t.max = 0.475)
+#'
+#' cake_plot(path = sp_path, pis = pis, pds = pds, st_extent = ne_extent)
+#' }
 cake_plot <- function(path,
                       pis,
                       pds,
