@@ -524,8 +524,31 @@ plot_pds <- function(pd_name,
   return(list(t.median = t.median, t.ul = t.ul, t.ll = t.ll))
 }
 
-# ' Internal function used by cake_plot()
-# '
+#' Checks whether loess predictions exist within available training data
+#'
+#' Internal function used by `loess_fit_and_predict()` in `cake_plot()` that
+#' checks to see if there is available training data to support loess
+#' predictions. This is especially valuable for migration gaps when a species
+#' is absence for a few weeks, but loess fills in.
+#'
+#' @param y vector; Row of input data. Mostly used in apply() situation.
+#' @param train_data data.frame; Training data used for loess.
+#' @param empty_value A replacement value to use to replace loess predictions.
+#'
+#' @return Either the loess predictions or the provided `empty_value`.
+#'
+#' @keywords interal
+#'
+#' @examples
+#' \dontrun{
+#' # from loess_fit_and_predict()
+#' # do training data check and replace for gaps, edges, and corners
+#' results$preds <- apply(results,
+#'                        1,
+#'                        train_check,
+#'                        empty_val = empty_val,
+#'                        train_data = D)
+#' }
 train_check <- function(y, train_data, empty_val) {
   # static week var
   full_week <- 0.02
