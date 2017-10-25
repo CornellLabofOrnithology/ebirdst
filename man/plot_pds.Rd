@@ -45,6 +45,9 @@ intervals.}
 
 \item{ylim}{vector pair; Opportunity to pre-define plot y-min and y-max as
 vector pair (e.g., c(-1,1)).}
+
+\item{print_plot}{Boolean; Default is TRUE. Set to FALSE to turn off plotting and
+only get return of pointwise pi values.}
 }
 \value{
 Plots barplot and returns a list containing the median, upper, and

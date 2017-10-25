@@ -31,3 +31,4 @@ ne_extent <- list(type = "rectangle",
 sinu_e <- get_sinu_ext(ne_extent)
 sinu_e
 }
+\keyword{internal}

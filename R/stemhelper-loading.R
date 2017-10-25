@@ -8,6 +8,8 @@
 #'
 #' @return A raster Extent in Sinusoidal projection.
 #'
+#' @keywords internal
+#'
 #' @examples
 #' # define st_extent list
 #' ne_extent <- list(type = "rectangle",
@@ -56,6 +58,8 @@ get_sinu_ext <- function(st_extent) {
 #' @param use_time Boolean; indicating whether to use time in subsetting or not.
 #'
 #' @return Subset of input data as same type.
+#'
+#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -270,6 +274,8 @@ stack_stem <- function(path,
 #'
 #' @return environment object containing all run parameters.
 #'
+#' @keywords internal
+#'
 #' @examples
 #' \dontrun{
 #'
@@ -304,6 +310,8 @@ load_config <- function(path) {
 #'
 #' @return data.frame containing stixel summary information about each stixel
 #' centroid.
+#'
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

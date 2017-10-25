@@ -984,6 +984,8 @@ cake_plot <- function(path,
 #'
 #' @return A vector of converted names.
 #'
+#' @keywords internal
+#'
 #' @examples
 #' cns <- c("UMD_FS_C1_1500_PLAND", "MODISWATER_FS_C7_1500_LPI")
 #'

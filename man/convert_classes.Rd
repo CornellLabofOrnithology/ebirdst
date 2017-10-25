@@ -27,3 +27,4 @@ cns <- c("UMD_FS_C1_1500_PLAND", "MODISWATER_FS_C7_1500_LPI")
 
 converted <- convert_classes(cov_names = cns, pretty = TRUE)
 }
+\keyword{internal}

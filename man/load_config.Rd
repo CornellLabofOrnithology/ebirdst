@@ -26,3 +26,4 @@ sp_path <- "path to species STEM results"
 e <- load_config(sp_path)
 }
 }
+\keyword{internal}
