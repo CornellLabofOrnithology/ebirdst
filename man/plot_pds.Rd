@@ -19,13 +19,13 @@ then calling \code{unique(pds$V4)}.}
 \item{st_extent}{list; st_extent list for spatiotemporal filtering. Required,
 as results are less meaningful over large spatiotemporal extents.}
 
-\item{plot_quantiles}{Boolean; Default is FALSE. Adds a band for the
+\item{plot_quantiles}{logical; Default is FALSE. Adds a band for the
 upper (90th) and lower (10th) quantiles of the individual stixel PD values.}
 
-\item{pointwise_pi}{Boolean; Default is TRUE. A pointwise smoothing of
+\item{pointwise_pi}{logical; Default is TRUE. A pointwise smoothing of
 individual stixel PD values. Ideal visualization of the PD values.}
 
-\item{stixel_pds}{Boolean; Default is FALSE. Toggle to plot the individual
+\item{stixel_pds}{logical; Default is FALSE. Toggle to plot the individual
 stixel PD values as semi-transparent lines.}
 
 \item{k.cont.res}{int; Default is 25. Number of knots to use in GAM based on
@@ -41,12 +41,12 @@ GAM.}
 \item{ci.alpha}{numeric; Default is 0.05. Alpha transparency of confidence
 intervals.}
 
-\item{mean.all.data}{Boolean; Default is FALSE. Daniel?}
+\item{mean.all.data}{logical; Default is FALSE. Daniel?}
 
 \item{ylim}{vector pair; Opportunity to pre-define plot y-min and y-max as
 vector pair (e.g., c(-1,1)).}
 
-\item{print_plot}{Boolean; Default is TRUE. Set to FALSE to turn off plotting and
+\item{print_plot}{logical; Default is TRUE. Set to FALSE to turn off plotting and
 only get return of pointwise pi values.}
 }
 \value{

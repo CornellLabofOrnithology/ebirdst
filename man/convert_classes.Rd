@@ -9,10 +9,10 @@ convert_classes(cov_names, by_cover_class = FALSE, pretty = FALSE)
 \arguments{
 \item{cov_names}{vector; Cover class names to convert.}
 
-\item{by_cover_class}{Boolean; Default is FALSE. If TRUE, replaces fragstat
+\item{by_cover_class}{logical; Default is FALSE. If TRUE, replaces fragstat
 cover class name with a name for the cover class as whole.}
 
-\item{pretty}{Boolean; Default is FALSE. If TRUE, Converts from capital case
+\item{pretty}{logical; Default is FALSE. If TRUE, Converts from capital case
 to title case.}
 }
 \value{

@@ -14,10 +14,10 @@ map_centroids(pis, pds, st_extent = NA, plot_pis = TRUE, plot_pds = TRUE,
 
 \item{st_extent}{list; Optional spatiotemporal filter using \code{st_extent} list.}
 
-\item{plot_pis}{Boolean; Default is TRUE. Set to FALSE to hide the plotting
+\item{plot_pis}{logical; Default is TRUE. Set to FALSE to hide the plotting
 of PI stixel centroid locations.}
 
-\item{plot_pds}{Boolean; Default is TRUE. Set to FALSE to hide the plotting
+\item{plot_pds}{logical; Default is TRUE. Set to FALSE to hide the plotting
 of PD stixel centroid locations.}
 
 \item{...}{Additional parameters to pass along to plot.}

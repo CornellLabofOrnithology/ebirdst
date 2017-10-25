@@ -264,9 +264,9 @@ combine_layers <- function(stack, path, week) {
 #' @param pis data.frame; from `load_pis()`
 #' @param pds data.frame; from `load_pds()`
 #' @param st_extent list; Optional spatiotemporal filter using `st_extent` list.
-#' @param plot_pis Boolean; Default is TRUE. Set to FALSE to hide the plotting
+#' @param plot_pis logical; Default is TRUE. Set to FALSE to hide the plotting
 #' of PI stixel centroid locations.
-#' @param plot_pds Boolean; Default is TRUE. Set to FALSE to hide the plotting
+#' @param plot_pds logical; Default is TRUE. Set to FALSE to hide the plotting
 #' of PD stixel centroid locations.
 #' @param ... Additional parameters to pass along to plot.
 #'

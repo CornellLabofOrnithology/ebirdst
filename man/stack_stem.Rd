@@ -17,7 +17,7 @@ and 'occurrence_umean'.}
 \item{st_extent}{list; Optional, use to limit the spatial Extent that the
 rasters are loaded into. Must set use_analysis_extent to FALSE.}
 
-\item{use_analysis_extent}{Boolean; Default is TRUE. If STEM results were
+\item{use_analysis_extent}{logical; Default is TRUE. If STEM results were
 run for a custom non-global extent, that extent object is stored in the
 configuration file. If TRUE, uses that analysis extent for loading the
 rasters. If FALSE, rasters are loaded to the full extent of the

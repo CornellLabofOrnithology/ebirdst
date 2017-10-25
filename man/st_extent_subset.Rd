@@ -12,7 +12,7 @@ results.}
 
 \item{st_extent}{list; st_extent list object}
 
-\item{use_time}{Boolean; indicating whether to use time in subsetting or not.}
+\item{use_time}{logical; indicating whether to use time in subsetting or not.}
 }
 \value{
 Subset of input data as same type.

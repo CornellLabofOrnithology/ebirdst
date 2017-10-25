@@ -8,14 +8,14 @@
 #' @param pis data.frame; From `load_pis()`.
 #' @param st_extent list; st_extent list for spatiotemporal filtering. Required,
 #' as results are less meaningful over large spatiotemporal extents.
-#' @param by_cover_class Boolean; Default is FALSE. If TRUE, aggregate Fragstats
+#' @param by_cover_class logical; Default is FALSE. If TRUE, aggregate Fragstats
 #' for the land cover classes into single values for the land cover classes.
 #' @param num_top_preds int; Integer showing how many predictors to show.
-#' @param return_top Boolean; Default is FALSE. If TRUE, returns a vecotr of the
+#' @param return_top logical; Default is FALSE. If TRUE, returns a vecotr of the
 #' top predictors, based on the `num_top_preds` param.
-#' @param pretty_names Boolean; Default is TRUE. Set to convert cryptic land
+#' @param pretty_names logical; Default is TRUE. Set to convert cryptic land
 #' cover codes to readable land cover class names.
-#' @param print_plot Boolean; Default is TRUE. Toggle to print plot, to allow
+#' @param print_plot logical; Default is TRUE. Toggle to print plot, to allow
 #' only the return the top predictors, if desired.
 #'
 #' @return Plots barplot and/or returns a vector of top predictors.
@@ -168,11 +168,11 @@ plot_pis <- function(path,
 #' @param pds data.frame; From `load_pds()`.
 #' @param st_extent list; st_extent list for spatiotemporal filtering. Required,
 #' as results are less meaningful over large spatiotemporal extents.
-#' @param plot_quantiles Boolean; Default is FALSE. Adds a band for the
+#' @param plot_quantiles logical; Default is FALSE. Adds a band for the
 #' upper (90th) and lower (10th) quantiles of the individual stixel PD values.
-#' @param pointwise_pi Boolean; Default is TRUE. A pointwise smoothing of
+#' @param pointwise_pi logical; Default is TRUE. A pointwise smoothing of
 #' individual stixel PD values. Ideal visualization of the PD values.
-#' @param stixel_pds Boolean; Default is FALSE. Toggle to plot the individual
+#' @param stixel_pds logical; Default is FALSE. Toggle to plot the individual
 #' stixel PD values as semi-transparent lines.
 #' @param k.cont.res int; Default is 25. Number of knots to use in GAM based on
 #' continuining resolution of the current STEM results.
@@ -182,10 +182,10 @@ plot_pis <- function(path,
 #' @param equivalent.ensemble.ss int; Default is 10. Daniel?
 #' @param ci.alpha numeric; Default is 0.05. Alpha transparency of confidence
 #' intervals.
-#' @param mean.all.data Boolean; Default is FALSE. Daniel?
+#' @param mean.all.data logical; Default is FALSE. Daniel?
 #' @param ylim vector pair; Opportunity to pre-define plot y-min and y-max as
 #' vector pair (e.g., c(-1,1)).
-#' @param print_plot Boolean; Default is TRUE. Set to FALSE to turn off plotting and
+#' @param print_plot logical; Default is TRUE. Set to FALSE to turn off plotting and
 #' only get return of pointwise pi values.
 
 #'
@@ -749,11 +749,11 @@ loess_fit_and_predict <- function(x, ext, input_data, type) {
 #' @param pds data.frame; From `load_pds()`.
 #' @param st_extent list; st_extent list for spatiotemporal filtering. Required,
 #' as results are less meaningful over large spatiotemporal extents.
-#' @param by_cover_class Boolean; Default is FALSE. If TRUE, aggregate Fragstats
+#' @param by_cover_class logical; Default is FALSE. If TRUE, aggregate Fragstats
 #' for the land cover classes into single values for the land cover classes.
-#' @param pland_and_lpi_only Boolean; Default is TRUE. If TRUE, only the percent
+#' @param pland_and_lpi_only logical; Default is TRUE. If TRUE, only the percent
 #' of land cover (PLAND) and largest patch index (LPI) fragstats are used.
-#' @param return_data Boolean; Default is FALSE. If TRUE, returns the data
+#' @param return_data logical; Default is FALSE. If TRUE, returns the data
 #' that went into the cake plot for further manipulation.
 #'
 #' @return Plots a cake plot, or if return_data = TRUE, the data from the cake
@@ -1038,9 +1038,9 @@ cake_plot <- function(path,
 #' readable land cover names.
 #'
 #' @param cov_names vector; Cover class names to convert.
-#' @param by_cover_class Boolean; Default is FALSE. If TRUE, replaces fragstat
+#' @param by_cover_class logical; Default is FALSE. If TRUE, replaces fragstat
 #' cover class name with a name for the cover class as whole.
-#' @param pretty Boolean; Default is FALSE. If TRUE, Converts from capital case
+#' @param pretty logical; Default is FALSE. If TRUE, Converts from capital case
 #' to title case.
 #'
 #' @return A vector of converted names.

@@ -55,7 +55,7 @@ get_sinu_ext <- function(st_extent) {
 #' @param data data.frame or SpatialPointsDataFrame; originating from STEM
 #' results.
 #' @param st_extent list; st_extent list object
-#' @param use_time Boolean; indicating whether to use time in subsetting or not.
+#' @param use_time logical; indicating whether to use time in subsetting or not.
 #'
 #' @return Subset of input data as same type.
 #'
@@ -168,7 +168,7 @@ st_extent_subset <- function(data, st_extent, use_time = TRUE) {
 #' and 'occurrence_umean'.
 #' @param st_extent list; Optional, use to limit the spatial Extent that the
 #' rasters are loaded into. Must set use_analysis_extent to FALSE.
-#' @param use_analysis_extent Boolean; Default is TRUE. If STEM results were
+#' @param use_analysis_extent logical; Default is TRUE. If STEM results were
 #' run for a custom non-global extent, that extent object is stored in the
 #' configuration file. If TRUE, uses that analysis extent for loading the
 #' rasters. If FALSE, rasters are loaded to the full extent of the

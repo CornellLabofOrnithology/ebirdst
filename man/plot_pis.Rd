@@ -15,18 +15,18 @@ plot_pis(path, pis, st_extent, by_cover_class = FALSE, num_top_preds = 50,
 \item{st_extent}{list; st_extent list for spatiotemporal filtering. Required,
 as results are less meaningful over large spatiotemporal extents.}
 
-\item{by_cover_class}{Boolean; Default is FALSE. If TRUE, aggregate Fragstats
+\item{by_cover_class}{logical; Default is FALSE. If TRUE, aggregate Fragstats
 for the land cover classes into single values for the land cover classes.}
 
 \item{num_top_preds}{int; Integer showing how many predictors to show.}
 
-\item{return_top}{Boolean; Default is FALSE. If TRUE, returns a vecotr of the
+\item{return_top}{logical; Default is FALSE. If TRUE, returns a vecotr of the
 top predictors, based on the \code{num_top_preds} param.}
 
-\item{pretty_names}{Boolean; Default is TRUE. Set to convert cryptic land
+\item{pretty_names}{logical; Default is TRUE. Set to convert cryptic land
 cover codes to readable land cover class names.}
 
-\item{print_plot}{Boolean; Default is TRUE. Toggle to print plot, to allow
+\item{print_plot}{logical; Default is TRUE. Toggle to print plot, to allow
 only the return the top predictors, if desired.}
 }
 \value{
