@@ -1,13 +1,32 @@
-#' Internal function for transforming st_extent to sinusoidal raster extent
+#' Projects st_extent lat/lon list to sinusoidal raster Extent
 #'
-get_sinu_ext <- function(extent) {
+#' Internal function that converts the st_extent list used throughout this
+#' package from lat/lon corners to a raster Extent using the same
+#' Sinusoidal projection as the `template_raster` data object.
+#'
+#' @param st_extent st_extent list with lat/lon coordinates.
+#' @return A raster Extent in Sinusoidal projection.
+#' @examples
+#' # define st_extent list
+#' ne_extent <- list(type = "rectangle",
+#'                   lat.min = 40,
+#'                   lat.max = 47,
+#'                   lon.min = -80,
+#'                   lon.max = -70,
+#'                   t.min = 0.425,
+#'                   t.max = 0.475)
+#'
+#' # convert
+#' sinu_e <- get_sinu_ext(ne_extent)
+#' sinu_e
+get_sinu_ext <- function(st_extent) {
   # projection information
   ll <- "+init=epsg:4326"
 
-  sp_ext <- raster::extent(extent$lon.min,
-                           extent$lon.max,
-                           extent$lat.min,
-                           extent$lat.max)
+  sp_ext <- raster::extent(st_extent$lon.min,
+                           st_extent$lon.max,
+                           st_extent$lat.min,
+                           st_extent$lat.max)
   extllr <- raster::raster(ext = sp_ext)
   extllr[is.na(extllr)] <- 0
   raster::crs(extllr) <- ll

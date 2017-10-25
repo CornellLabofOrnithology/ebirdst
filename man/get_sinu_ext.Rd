@@ -2,10 +2,32 @@
 % Please edit documentation in R/stemhelper-loading.R
 \name{get_sinu_ext}
 \alias{get_sinu_ext}
-\title{Internal function for transforming st_extent to sinusoidal raster extent}
+\title{Projects st_extent lat/lon list to sinusoidal raster Extent}
 \usage{
-get_sinu_ext(extent)
+get_sinu_ext(st_extent)
+}
+\arguments{
+\item{st_extent}{st_extent list with lat/lon coordinates.}
+}
+\value{
+A raster Extent in Sinusoidal projection.
 }
 \description{
-Internal function for transforming st_extent to sinusoidal raster extent
+Internal function that converts the st_extent list used throughout this
+package from lat/lon corners to a raster Extent using the same
+Sinusoidal projection as the \code{template_raster} data object.
+}
+\examples{
+# define st_extent list
+ne_extent <- list(type = "rectangle",
+                  lat.min = 40,
+                  lat.max = 47,
+                  lon.min = -80,
+                  lon.max = -70,
+                  t.min = 0.425,
+                  t.max = 0.475)
+
+# convert
+sinu_e <- get_sinu_ext(ne_extent)
+sinu_e
 }
