@@ -256,9 +256,41 @@ combine_layers <- function(stack, path, week) {
   return(week_max)
 }
 
-#' Map PI and PD centroid locations for species
+#' Map PI and PD centroid locations
+#'
+#' Creates a map showing the stixel centroid locations for PIs and/or PDs, with
+#' an optional spatiotemporal subset using an `st_extent` list.
+#'
+#' @param pis data.frame; from `load_pis()`
+#' @param pds data.frame; from `load_pds()`
+#' @param st_extent list; Optional spatiotemporal filter using `st_extent` list.
+#' @param plot_pis Boolean; Default is TRUE. Set to FALSE to hide the plotting
+#' of PI stixel centroid locations.
+#' @param plot_pds Boolean; Default is TRUE. Set to FALSE to hide the plotting
+#' of PD stixel centroid locations.
+#' @param ... Additional parameters to pass along to plot.
+#'
+#' @return Plot showing locations of PIs and/or PDs.
 #'
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' sp_path <- "path to species STEM results"
+#' pis <- load_pis(sp_path)
+#' pds <- load_pds(sp_path)
+#'
+#' ne_extent <- list(type = "rectangle",
+#'                   lat.min = 40,
+#'                   lat.max = 47,
+#'                   lon.min = -80,
+#'                   lon.max = -70,
+#'                   t.min = 0.425,
+#'                   t.max = 0.475)
+#'
+#' map_centroids(pis = pis, pds = pds, st_extent = ne_extent)
+#' }
 map_centroids <- function(pis,
                           pds,
                           st_extent = NA,

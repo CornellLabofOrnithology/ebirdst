@@ -2,11 +2,48 @@
 % Please edit documentation in R/stemhelper-mapping.R
 \name{map_centroids}
 \alias{map_centroids}
-\title{Map PI and PD centroid locations for species}
+\title{Map PI and PD centroid locations}
 \usage{
 map_centroids(pis, pds, st_extent = NA, plot_pis = TRUE, plot_pds = TRUE,
   ...)
 }
+\arguments{
+\item{pis}{data.frame; from \code{load_pis()}}
+
+\item{pds}{data.frame; from \code{load_pds()}}
+
+\item{st_extent}{list; Optional spatiotemporal filter using \code{st_extent} list.}
+
+\item{plot_pis}{Boolean; Default is TRUE. Set to FALSE to hide the plotting
+of PI stixel centroid locations.}
+
+\item{plot_pds}{Boolean; Default is TRUE. Set to FALSE to hide the plotting
+of PD stixel centroid locations.}
+
+\item{...}{Additional parameters to pass along to plot.}
+}
+\value{
+Plot showing locations of PIs and/or PDs.
+}
 \description{
-Map PI and PD centroid locations for species
+Creates a map showing the stixel centroid locations for PIs and/or PDs, with
+an optional spatiotemporal subset using an \code{st_extent} list.
+}
+\examples{
+\dontrun{
+
+sp_path <- "path to species STEM results"
+pis <- load_pis(sp_path)
+pds <- load_pds(sp_path)
+
+ne_extent <- list(type = "rectangle",
+                  lat.min = 40,
+                  lat.max = 47,
+                  lon.min = -80,
+                  lon.max = -70,
+                  t.min = 0.425,
+                  t.max = 0.475)
+
+map_centroids(pis = pis, pds = pds, st_extent = ne_extent)
+}
 }
