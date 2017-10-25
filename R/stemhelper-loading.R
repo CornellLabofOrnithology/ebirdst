@@ -50,7 +50,8 @@ get_sinu_ext <- function(st_extent) {
 #' t.min and t.max objects in the `st_extent` list are currently able to wrap
 #' time around the year (e.g., t.min = 0.9 and t.max = 0.1 is acceptable).
 #'
-#' @param data data.frame or SpatialPointsDataFrame; originating from STEM results.
+#' @param data data.frame or SpatialPointsDataFrame; originating from STEM
+#' results.
 #' @param st_extent list; st_extent list object
 #' @param use_time Boolean; indicating whether to use time in subsetting or not.
 #'
@@ -161,8 +162,13 @@ st_extent_subset <- function(data, st_extent, use_time = TRUE) {
 #' @param variable character; One of: 'abundance_ensemble_support',
 #' 'abundance_lower', 'abundance_upper', 'abundance_umean',
 #' and 'occurrence_umean'.
-#' @param st_extent list; Optional, use to limit the spatial Extent that the rasters are loaded into. Must set use_analysis_extent to FALSE.
-#' @param use_analysis_extent Boolean; Default is TRUE. If STEM results were run for a custom non-global extent, that extent object is stored in the configuration file. If TRUE, uses that analysis extent for loading the rasters. If FALSE, rasters are loaded to the full extent of the `template_raster` object.
+#' @param st_extent list; Optional, use to limit the spatial Extent that the
+#' rasters are loaded into. Must set use_analysis_extent to FALSE.
+#' @param use_analysis_extent Boolean; Default is TRUE. If STEM results were
+#' run for a custom non-global extent, that extent object is stored in the
+#' configuration file. If TRUE, uses that analysis extent for loading the
+#' rasters. If FALSE, rasters are loaded to the full extent of the
+#' `template_raster` object.
 #'
 #' @return RasterStack containing all available weeks of result.
 #'

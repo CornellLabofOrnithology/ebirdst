@@ -7,7 +7,8 @@
 st_extent_subset(data, st_extent, use_time = TRUE)
 }
 \arguments{
-\item{data}{data.frame or SpatialPointsDataFrame; originating from STEM results.}
+\item{data}{data.frame or SpatialPointsDataFrame; originating from STEM
+results.}
 
 \item{st_extent}{list; st_extent list object}
 
