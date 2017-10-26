@@ -2,11 +2,36 @@
 % Please edit documentation in R/stemhelper-ppms.R
 \name{plot_binary_by_time}
 \alias{plot_binary_by_time}
-\title{Plot binary PPMs by time (week, month, custom)}
+\title{Plot binary occurrence metrics by time}
 \usage{
 plot_binary_by_time(path, metric = c("Kappa", "AUC", "Sensitivity",
   "Specificity"), n_time_periods = 52, st_extent = NA)
 }
+\arguments{
+\item{path}{character; Full path to single species STEM results.}
+
+\item{metric}{character; One of: "Kappa", "AUC", "Sensitivity",
+"Specificity".}
+
+\item{n_time_periods}{int; Greater than 1 (e.g., 52 for weeks).}
+
+\item{st_extent}{list; st_extent list for spatiotemporal filtering.}
+}
+\value{
+Plot of metrics by time.
+}
 \description{
-Plot binary PPMs by time (week, month, custom)
+For a specified number of time periods (ideally weeks or months), plots one
+of four (Kappa, AUC, Sensitivity, Specificity) bar plots. Use default,
+without \code{st_extent} to see range-wide predictive performance, or provide
+an \code{st_extent} to see performance within spatiotemporal extent.
+}
+\examples{
+\dontrun{
+
+sp_path <- "path to species STEM results"
+
+
+plot_binary_by_time(path = sp_path, metric = "Kappa", n_time_periods = 12)
+}
 }

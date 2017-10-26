@@ -651,9 +651,31 @@ compute_ppms <- function(path, st_extent = NA) {
               count_stats = count_stats))
 }
 
-#' Plot binary PPMs by time (week, month, custom)
+#' Plot binary occurrence metrics by time
+#'
+#' For a specified number of time periods (ideally weeks or months), plots one
+#' of four (Kappa, AUC, Sensitivity, Specificity) bar plots. Use default,
+#' without `st_extent` to see range-wide predictive performance, or provide
+#' an `st_extent` to see performance within spatiotemporal extent.
+#'
+#' @param path character; Full path to single species STEM results.
+#' @param metric character; One of: "Kappa", "AUC", "Sensitivity",
+#' "Specificity".
+#' @param n_time_periods int; Greater than 1 (e.g., 52 for weeks).
+#' @param st_extent list; st_extent list for spatiotemporal filtering.
+#'
+#' @return Plot of metrics by time.
 #'
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' sp_path <- "path to species STEM results"
+#'
+#'
+#' plot_binary_by_time(path = sp_path, metric = "Kappa", n_time_periods = 12)
+#' }
 plot_binary_by_time <- function(path,
                                 metric = c("Kappa",
                                            "AUC",
