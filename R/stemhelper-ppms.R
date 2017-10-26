@@ -128,9 +128,35 @@ load_ppm_data <- function(path) {
               eoa_es_daily = eoa_es_daily))
 }
 
-#' Compute PPMs
+#' Computes the Predictive Performance Metrics for a spatiotemporal extent
+#'
+#' Loads test data and ensemble support values and then calculates the
+#' predictive performance metrics within a spatiotemporal extent defined by
+#' `st_extent`. Use this function directly to access the computed metrics, or
+#' use `plot_all_ppms()` or `plot_binary_by_time()` to summarize the metrics.
+#'
+#' @param path character; Full path to single species STEM results.
+#' @param st_extent list; st_extent list for spatiotemporal filtering.
+#'
+#' @return list of data.frames: binary_stats, occ_stats, count_stats
 #'
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' sp_path <- "path to species STEM results"
+#'
+#' ne_extent <- list(type = "rectangle",
+#'                   lat.min = 40,
+#'                   lat.max = 47,
+#'                   lon.min = -80,
+#'                   lon.max = -70,
+#'                   t.min = 0.425,
+#'                   t.max = 0.475)
+#'
+#' ppms <- compute_ppms(path = sp_path, st_extent = ne_extent)
+#' }
 compute_ppms <- function(path, st_extent = NA) {
 
   poisson.dev <- function(obs, pred) {
