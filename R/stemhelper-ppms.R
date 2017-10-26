@@ -1,112 +1,3 @@
-#' Internal lookup.grid.cell function
-#'
-lookup.grid.cell <- function(
-  xxx,
-  yyy,
-  xlim = c(NA,NA),
-  ylim = c(NA,NA),
-  nx = 64,
-  ny = 64,
-  jitter = F ){
-  # -----------------------------------
-  cell.number <- rep(NA, length(xxx))
-  x.ll <- y.ll <- NA
-  xxx.width <- yyy.width <- NA
-  if (length(xxx)==length(yyy) & length(unique(xxx))>1){
-    if (any(is.na(xlim))) xlim <- range(xxx, na.rm=T)
-    if (any(is.na(ylim))) ylim <- range(yyy, na.rm=T)
-    xxx.width <- abs(xlim[2]-xlim[1])/nx
-    yyy.width <- abs(ylim[2]-ylim[1])/ny
-    # Lower Left Corner
-    x.ll <- min(xlim)
-    y.ll <- min(ylim)
-    # If Jittered, domain is bigger & number of grid cells increases
-    if (jitter){
-      x.ll <- x.ll - stats::runif(1)*xxx.width
-      y.ll <- y.ll - stats::runif(1)*yyy.width
-      nx <- 1 + (max(xlim) - min( c(x.ll, xlim) )) %/% xxx.width
-      ny <- 1 + (max(ylim) - min( c(y.ll, ylim) )) %/% yyy.width
-    }
-    # ID data within grid
-    ingrid.index <-
-      xxx >= x.ll & xxx <= x.ll + nx*xxx.width &
-      yyy >= y.ll & yyy <= y.ll + ny*yyy.width
-    if (sum(ingrid.index)>0){
-      # Assign Row, Column, Grid Cell Number
-      col.number <- 1 + ( xxx[ingrid.index] - x.ll ) %/% xxx.width
-      row.number <- 1 + ( yyy[ingrid.index] - y.ll ) %/% yyy.width
-      cell.number[ingrid.index] <- col.number + (row.number-1)*nx
-    }
-  }
-  return( list(
-    cell.number=cell.number,
-    # jittered bounding box
-    bb = matrix(
-      c(x.ll, y.ll, x.ll + nx*xxx.width, y.ll + ny*yyy.width), 2, 2,
-      byrow=T, dimnames=list(c("ll", "ur"), c("xxx", "yyy"))),
-    nx = nx,
-    ny = ny,
-    xwidth = xxx.width,
-    ywidth = yyy.width  ))
-}
-
-#' Internal sample.grid.cell function
-#'
-sample.grid.cell <- function(
-  xxx,
-  yyy,
-  xlim = c(NA,NA),
-  ylim = c(NA,NA),
-  nx = 64,
-  ny = 64,
-  jitter = F,
-  size = 1,
-  replace = F ){
-
-  # Stratified sample over Grid Cell Number
-  sample_fun <- function(x, size, replace){
-    # Cells without samples are excluded in the tapply call - if (length(x)==0) return(NA)
-    # Cells with a single sample cause problems, see help(sample)
-    # So, I am going to handle this situation "by hand"
-    result <- rep(NA, size)
-    if (length(x)==1 & replace==F) {
-      #cat("sf: length(x)==1 & replace==F",x,"\n")
-      result <- rep(NA, size)
-      result[1] <- x
-    }
-    if (length(x)==1 & replace==T) {
-      #cat("sf: length(x)==1 & replace==T",x,"\n")
-      result <- rep(x, size)
-    }
-    if (length(x)>1 & replace == F & size > length(x) ){
-      result <- rep(NA, size)
-      result[1:length(x)] <- x
-    }
-    if (length(x)>1 & replace == F & size <= length(x) ){
-      result <- sample(x=x, size=size, replace=replace)
-    }
-    if (length(x)>1 & replace == T ){
-      result <- sample(x=x, size=size, replace=replace)
-    }
-    return(result)
-  }
-  lgc <- lookup.grid.cell(
-    xxx, yyy, xlim, ylim, nx, ny, jitter)
-  n.index <- tapply(
-    c(1:length(xxx))[!is.na(lgc$cell.number)],
-    as.factor(lgc$cell.number[!is.na(lgc$cell.number)]),
-    sample_fun, size, replace)
-  n.index <- plyr::rbind.fill.matrix(n.index)
-  return(list(
-    cell.number = lgc$cell.number,
-    sample.index = n.index,
-    bb = lgc$bb,
-    nx = lgc$nx,
-    ny = lgc$ny,
-    xwidth = lgc$xwidth,
-    ywidth = lgc$ywidth  ))
-}
-
 #' Internal balanced binary sample function
 #'
 balanced.binary.sample <- function(
@@ -119,6 +10,113 @@ balanced.binary.sample <- function(
   ny = 50,
   min.class = 0.25,
   neg.size = NA) {
+
+  sample.grid.cell <- function(
+    xxx,
+    yyy,
+    xlim = c(NA,NA),
+    ylim = c(NA,NA),
+    nx = 64,
+    ny = 64,
+    jitter = F,
+    size = 1,
+    replace = F ){
+
+    lookup.grid.cell <- function(
+      xxx,
+      yyy,
+      xlim = c(NA,NA),
+      ylim = c(NA,NA),
+      nx = 64,
+      ny = 64,
+      jitter = F ){
+      # -----------------------------------
+      cell.number <- rep(NA, length(xxx))
+      x.ll <- y.ll <- NA
+      xxx.width <- yyy.width <- NA
+      if (length(xxx)==length(yyy) & length(unique(xxx))>1){
+        if (any(is.na(xlim))) xlim <- range(xxx, na.rm=T)
+        if (any(is.na(ylim))) ylim <- range(yyy, na.rm=T)
+        xxx.width <- abs(xlim[2]-xlim[1])/nx
+        yyy.width <- abs(ylim[2]-ylim[1])/ny
+        # Lower Left Corner
+        x.ll <- min(xlim)
+        y.ll <- min(ylim)
+        # If Jittered, domain is bigger & number of grid cells increases
+        if (jitter){
+          x.ll <- x.ll - stats::runif(1)*xxx.width
+          y.ll <- y.ll - stats::runif(1)*yyy.width
+          nx <- 1 + (max(xlim) - min( c(x.ll, xlim) )) %/% xxx.width
+          ny <- 1 + (max(ylim) - min( c(y.ll, ylim) )) %/% yyy.width
+        }
+        # ID data within grid
+        ingrid.index <-
+          xxx >= x.ll & xxx <= x.ll + nx*xxx.width &
+          yyy >= y.ll & yyy <= y.ll + ny*yyy.width
+        if (sum(ingrid.index)>0){
+          # Assign Row, Column, Grid Cell Number
+          col.number <- 1 + ( xxx[ingrid.index] - x.ll ) %/% xxx.width
+          row.number <- 1 + ( yyy[ingrid.index] - y.ll ) %/% yyy.width
+          cell.number[ingrid.index] <- col.number + (row.number-1)*nx
+        }
+      }
+      return( list(
+        cell.number=cell.number,
+        # jittered bounding box
+        bb = matrix(
+          c(x.ll, y.ll, x.ll + nx*xxx.width, y.ll + ny*yyy.width), 2, 2,
+          byrow=T, dimnames=list(c("ll", "ur"), c("xxx", "yyy"))),
+        nx = nx,
+        ny = ny,
+        xwidth = xxx.width,
+        ywidth = yyy.width  ))
+    }
+
+    # Stratified sample over Grid Cell Number
+    sample_fun <- function(x, size, replace){
+      # Cells without samples are excluded in the
+      # tapply call - if (length(x)==0) return(NA)
+      # Cells with a single sample cause problems, see help(sample)
+      # So, I am going to handle this situation "by hand"
+      result <- rep(NA, size)
+      if (length(x)==1 & replace==F) {
+        #cat("sf: length(x)==1 & replace==F",x,"\n")
+        result <- rep(NA, size)
+        result[1] <- x
+      }
+      if (length(x)==1 & replace==T) {
+        #cat("sf: length(x)==1 & replace==T",x,"\n")
+        result <- rep(x, size)
+      }
+      if (length(x)>1 & replace == F & size > length(x) ){
+        result <- rep(NA, size)
+        result[1:length(x)] <- x
+      }
+      if (length(x)>1 & replace == F & size <= length(x) ){
+        result <- sample(x=x, size=size, replace=replace)
+      }
+      if (length(x)>1 & replace == T ){
+        result <- sample(x=x, size=size, replace=replace)
+      }
+      return(result)
+    }
+    lgc <- lookup.grid.cell(
+      xxx, yyy, xlim, ylim, nx, ny, jitter)
+    n.index <- tapply(
+      c(1:length(xxx))[!is.na(lgc$cell.number)],
+      as.factor(lgc$cell.number[!is.na(lgc$cell.number)]),
+      sample_fun, size, replace)
+    n.index <- plyr::rbind.fill.matrix(n.index)
+    return(list(
+      cell.number = lgc$cell.number,
+      sample.index = n.index,
+      bb = lgc$bb,
+      nx = lgc$nx,
+      ny = lgc$ny,
+      xwidth = lgc$xwidth,
+      ywidth = lgc$ywidth  ))
+  }
+
   # ----------------------------------------------------------------------
   sgc.pos.nindex <- NULL
   sgc.neg.nindex <- NULL
