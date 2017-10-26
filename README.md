@@ -46,7 +46,11 @@ species <- "woothr-ERD2016-PROD-20170505-3f880822"
 sp_path <- paste(root_path, species, sep = "")
 
 # load a stack of rasters with the helper function stack_stem()
-abund_stack <- stack_stem(sp_path, variable = "abundance_umean")
+abund <- stack_stem(sp_path, variable = "abundance_umean")
+
+# project to Mollweide for mapping and extent calc, this takes awhile
+mollweide <- sp::CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
+abund_stack <- raster::projectRaster(abund, crs = mollweide)
 
 # calculate the full annual extent on the abundance stack (in sinusoidal projection)
 sp_ext <- calc_full_extent(abund_stack)
@@ -63,19 +67,8 @@ bin_labels[!(bin_labels %in% c(bin_labels[1],
                                round((length(bin_labels) / 4)) + 1],
                     bin_labels[length(bin_labels)]))] <- ""
 
-# define mollweide projection for plotting
-mollweide <- sp::CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
-
-# project the full annual extent to Mollweide
-extent_raster <- raster::raster(ext = sp_ext, 
-                                crs = sp::proj4string(template_raster))
-extent_raster[is.na(extent_raster)] <- 1
-sp_ext_moll <- raster::extent(raster::projectRaster(extent_raster, 
-                                                    crs = mollweide))
-
 # the helper function combine_layers() fills in with assumed and predicted zeroes
 week26 <- combine_layers(abund_stack, sp_path, week = 26)
-week26c <- raster::projectRaster(week26, crs = mollweide)
 
 # to add context, pull in some reference data to add
 wh <- rnaturalearth::ne_countries(continent = c("North America",
@@ -87,30 +80,32 @@ wh_states_moll <- sp::spTransform(wh_states, mollweide)
 # plot abundance
 
 # this is just here to properly set extent
-raster::plot(week26c, 
+raster::plot(week26, 
              xaxs = 'i',
              yaxs = 'i',
              xaxt = 'n',
              yaxt = 'n',
              bty = 'n',
-             ext = sp_ext_moll, 
+             ext = sp_ext, 
              colNA = 'black',
-             maxpixels = raster::ncell(week26c),
+             maxpixels = raster::ncell(week26),
              legend = FALSE)
+
+#sp::plot(sp_ext, col = 'red')
 
 # add gray background
 sp::plot(wh_moll, col = "#5a5a5a", add = TRUE)
 
 # add the abundance layer
-raster::plot(week26c, 
+raster::plot(week26, 
              xaxt = 'n', 
              yaxt = 'n',
              bty = 'n',
-             ext = sp_ext_moll, 
+             ext = sp_ext, 
              breaks = year_bins,
              lab.breaks = bin_labels,
              col = viridis(length(year_bins)-1),
-             maxpixels = raster::ncell(week26c),
+             maxpixels = raster::ncell(week26),
              legend = TRUE,
              add = TRUE)
 
