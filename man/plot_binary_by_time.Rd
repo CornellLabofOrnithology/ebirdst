@@ -18,11 +18,11 @@ plot_binary_by_time(path, metric = c("Kappa", "AUC", "Sensitivity",
 \item{st_extent}{list; st_extent list for spatiotemporal filtering.}
 }
 \value{
-Plot of metrics by time.
+Plot of metric box plots by time.
 }
 \description{
 For a specified number of time periods (ideally weeks or months), plots one
-of four (Kappa, AUC, Sensitivity, Specificity) bar plots. Use default,
+of four (Kappa, AUC, Sensitivity, Specificity) box plots. Use default,
 without \code{st_extent} to see range-wide predictive performance, or provide
 an \code{st_extent} to see performance within spatiotemporal extent.
 }

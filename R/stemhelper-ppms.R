@@ -654,7 +654,7 @@ compute_ppms <- function(path, st_extent = NA) {
 #' Plot binary occurrence metrics by time
 #'
 #' For a specified number of time periods (ideally weeks or months), plots one
-#' of four (Kappa, AUC, Sensitivity, Specificity) bar plots. Use default,
+#' of four (Kappa, AUC, Sensitivity, Specificity) box plots. Use default,
 #' without `st_extent` to see range-wide predictive performance, or provide
 #' an `st_extent` to see performance within spatiotemporal extent.
 #'
@@ -664,7 +664,7 @@ compute_ppms <- function(path, st_extent = NA) {
 #' @param n_time_periods int; Greater than 1 (e.g., 52 for weeks).
 #' @param st_extent list; st_extent list for spatiotemporal filtering.
 #'
-#' @return Plot of metrics by time.
+#' @return Plot of metric box plots by time.
 #'
 #' @export
 #'
@@ -760,9 +760,34 @@ plot_binary_by_time <- function(path,
 
 }
 
-#' Plot all PPMs for a spatiotemporal extent
+#' Plot all predictive performance metrics
+#'
+#' For a spatiotemporal extent, plots bar plots for all available predictive
+#' performance metrics within three sets: Binary Occurrence, Occurrence
+#' Probability, and Abundance.
+#'
+#' @param path character; Full path to single species STEM results.
+#' @param st_extent list; st_extent list for spatiotemporal filtering.
+#'
+#' @return Plot of metric box plots by category
 #'
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' sp_path <- "path to species STEM results"
+#'
+#' ne_extent <- list(type = "rectangle",
+#'                   lat.min = 40,
+#'                   lat.max = 47,
+#'                   lon.min = -80,
+#'                   lon.max = -70,
+#'                   t.min = 0.425,
+#'                   t.max = 0.475)
+#'
+#' plot_all_ppms(path = sp_path, st_extent = ne_extent)
+#' }
 plot_all_ppms <- function(path, st_extent) {
   if(all(is.na(st_extent))) {
     stop("Must provide a complete spatiotemporal extent.")
