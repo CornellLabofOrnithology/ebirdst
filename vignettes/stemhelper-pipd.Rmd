@@ -13,7 +13,7 @@ vignette: >
 knitr::opts_chunk$set(warning = FALSE, 
                       message = FALSE, 
                       out.width = "\\textwidth", 
-                      fig.height = 4, 
+                      fig.height = 5, 
                       fig.width = 7, 
                       fig.align = "center")
 devtools::load_all()
@@ -82,9 +82,8 @@ map_centroids(pis = pis, pds = pds, st_extent = ne_extent)
 # 4. Plotting Centroids and Extent of Analysis
 
 ```{r plot_extents}
-par(mfrow = c(1,2), mar = c(0,0,0,6))
+par(mfrow = c(1,1), mar = c(0,0,0,6))
 pi_extent <- calc_effective_extent(ne_extent, pis = pis)
-pd_extent <- calc_effective_extent(ne_extent, pds = pds)
 ```
 
 # 5. Predictive Performance Metrics
