@@ -233,14 +233,35 @@ combine_layers <- function(stack, path, week) {
   pos_es_stack <- stack_stem(path, variable = "abundance_ensemble_support")
   pos_es_week <- pos_es_stack[[week]]
 
+
+
   # load zero ensemble support
   zero_es_week <- stemhelper::zero_es_stack[[week]]
+
+  # check projections
+  if(raster::projection(abund_week) != raster::projection(pos_es_week)) {
+    pos_es_week <- raster::projectRaster(pos_es_week,
+                                         crs = sp::proj4string(abund_week))
+
+    zero_es_week <- raster::projectRaster(zero_es_week,
+                                          crs = sp::proj4string(abund_week))
+  }
 
   if(e$SRD_AGG_FACT == 1) {
     zero_es_week <- raster::resample(zero_es_week, pos_es_week)
     zero_es_mask <- raster::mask(zero_es_week, pos_es_week)
   } else {
-    zero_es_mask <- raster::mask(zero_es_week, stemhelper::template_raster)
+    # check projections
+    if(raster::projection(abund_week) !=
+       raster::projection(stemhelper::template_raster)) {
+      zero_es_mask <- raster::mask(zero_es_week,
+                                   raster::projectRaster(
+                                     stemhelper::template_raster,
+                                     crs = sp::proj4string(abund_week)))
+
+    } else {
+      zero_es_mask <- raster::mask(zero_es_week, stemhelper::template_raster)
+    }
   }
 
   # set zeroes
