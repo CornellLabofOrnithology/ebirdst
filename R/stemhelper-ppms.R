@@ -302,46 +302,48 @@ load_ppm_data <- function(path) {
               eoa_es_daily = eoa_es_daily))
 }
 
-#' Internal poisson.dev function
-#'
-poisson.dev <- function(obs, pred){
-  dev.mean <- NA
-  dev.model <- NA
-  dev.explained <- NA
-  meanpred <- mean(obs,na.rm=T)
-  dev.mean <- 2*sum( obs *
-                       log( ifelse( obs == 0, 1, obs / meanpred ) ) - (obs - meanpred), na.rm=T )
-  dev.model <- 2*sum( obs *
-                        log( ifelse( obs == 0, 1, obs / pred ) ) - (obs - pred) , na.rm=T )
-  dev.explained <- 1 - dev.model / dev.mean
-  return(c(
-    dev.model,
-    dev.mean,
-    dev.explained) )
-}
-
-#' Internal bernoulli.dev function
-#'
-bernoulli.dev <- function(obs, pred){
-  dev.mean <- NA
-  dev.model <- NA
-  dev.explained <- NA
-  meanpred <- mean(obs,na.rm=T)
-  dev.mean <- 2 * sum( obs*log( ifelse( meanpred == 0, 1, meanpred ) ) +
-                         (1-obs)*log( ifelse( 1-meanpred == 0, 1, 1-meanpred ) ), na.rm=T )
-  dev.model <- 2 * sum( obs*log( ifelse( pred == 0, 1, pred ) ) +
-                          (1-obs)*log( ifelse( 1-pred == 0, 1, 1-pred ) ), na.rm=T )
-  dev.explained <- 1 - dev.model / dev.mean
-  return(c(
-    dev.model,
-    dev.mean,
-    dev.explained) )
-}
-
 #' Compute PPMs
 #'
 #' @export
 compute_ppms <- function(path, st_extent = NA) {
+
+  poisson.dev <- function(obs, pred) {
+    dev.mean <- NA
+    dev.model <- NA
+    dev.explained <- NA
+
+    meanpred <- mean(obs, na.rm = TRUE)
+
+    dev.mean <- 2 * sum(obs * log(ifelse( obs == 0, 1, obs / meanpred)) -
+                          (obs - meanpred),
+                        na.rm = TRUE)
+    dev.model <- 2 * sum(obs * log(ifelse( obs == 0, 1, obs / pred)) -
+                           (obs - pred),
+                         na.rm = TRUE)
+    dev.explained <- 1 - dev.model / dev.mean
+
+    return(c(dev.model, dev.mean, dev.explained))
+  }
+
+  bernoulli.dev <- function(obs, pred) {
+    dev.mean <- NA
+    dev.model <- NA
+    dev.explained <- NA
+
+    meanpred <- mean(obs, na.rm = TRUE)
+
+    dev.mean <- 2 * sum(obs * log(ifelse(meanpred == 0, 1, meanpred)) +
+                          (1 - obs) *
+                          log(ifelse(1 - meanpred == 0, 1, 1 - meanpred)),
+                        na.rm = TRUE)
+    dev.model <- 2 * sum(obs * log(ifelse(pred == 0, 1, pred)) +
+                           (1 - obs) *
+                           log(ifelse(1 - pred == 0, 1, 1 - pred)),
+                         na.rm = TRUE)
+    dev.explained <- 1 - dev.model / dev.mean
+
+    return(c(dev.model, dev.mean, dev.explained))
+  }
 
   ppm_data_list <- load_ppm_data(path)
 
