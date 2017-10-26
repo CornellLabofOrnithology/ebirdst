@@ -524,218 +524,6 @@ plot_pds <- function(pd_name,
   return(list(t.median = t.median, t.ul = t.ul, t.ll = t.ll))
 }
 
-#' Checks whether loess predictions exist within available training data
-#'
-#' Internal function used by `loess_fit_and_predict()` in `cake_plot()` that
-#' checks to see if there is available training data to support loess
-#' predictions. This is especially valuable for migration gaps when a species
-#' is absence for a few weeks, but loess fills in.
-#'
-#' @param y vector; Row of input data. Mostly used in apply() situation.
-#' @param train_data data.frame; Training data used for loess.
-#' @param empty_value A replacement value to use to replace loess predictions.
-#'
-#' @return Either the loess predictions or the provided `empty_value`.
-#'
-#' @keywords internal
-#'
-#' @examples
-#' \dontrun{
-#' # from loess_fit_and_predict()
-#' # do training data check and replace for gaps, edges, and corners
-#' results$preds <- apply(results,
-#'                        1,
-#'                        train_check,
-#'                        empty_val = empty_val,
-#'                        train_data = D)
-#' }
-train_check <- function(y, train_data, empty_val) {
-  # static week var
-  full_week <- 0.02
-
-  # subset data to time around date
-  D <- train_data
-  date_sub <- D[D$date >= as.numeric(y["date"]) - full_week &
-                D$date <= as.numeric(y["date"]) + full_week, ]
-  rm(D, train_data)
-
-  if(nrow(date_sub) == 0) {
-    return(NA)
-  } else {
-    # get max and min for comparison
-    min_train <- min(date_sub$date, na.rm = TRUE)
-    max_train <- max(date_sub$date, na.rm = TRUE)
-    rm(date_sub)
-
-    # end of year present problems for checking to see if there's data
-    # on both sides of the prediction date, this adjusts for that
-    pred_date <- as.numeric(y["date"])
-
-    if(pred_date == 0.01) {
-      pred_date <- 0.02
-    } else if(pred_date == 0.99) {
-      pred_date <- 0.98
-    }
-
-    if(min_train < pred_date & max_train > pred_date)  {
-      # if there is data on both sides, return prediction
-      return(as.numeric(y["preds"]))
-    } else {
-      # otherwise return empty_val
-      return(empty_val)
-    }
-  }
-}
-
-#' Loess fit and predict for cake_plot() PIs and PDs
-#'
-#' Internal function that performs a loess fit and predict on both PIs and PDs
-#' for smoothing each predictor.
-#'
-#' @param x character; Predictor name.
-#' @param ext list; st_extent list
-#' @param input_data data.frame; Munged PIs or PD slopes.
-#' @param type character; Either "PI" or "PD"
-#'
-#' @return Either smoothed PIs or smoother PD slopes.
-#'
-#' @keywords internal
-#'
-#' @examples
-#' \dontrun{
-#' # from cake_plot()
-#' temporal smoothing of predictor trajectories
-#' loesses <- lapply(X = unique(pd_slopes$predictor),
-#'                   FUN = loess_fit_and_predict,
-#'                   ext = st_extent,
-#'                   input_data = pd_slopes,
-#'                   type = "PD")
-#' }
-loess_fit_and_predict <- function(x, ext, input_data, type) {
-  # static projections
-  ll <- "+init=epsg:4326"
-  mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
-
-  # for both PI and PD need to loess fit and predict for each variable
-  # for uniform date set, defined here
-  SRD_DATE_VEC <- seq(from = 0, to = 1, length = 52 + 1)
-  SRD_DATE_VEC <- (SRD_DATE_VEC[1:52] + SRD_DATE_VEC[2:(52+1)])/2
-  SRD_DATE_VEC <- round(SRD_DATE_VEC, digits = 2)
-  nd <- data.frame(date = SRD_DATE_VEC)
-
-  if(type == "PI") {
-    D <- input_data[, c(x, "date", "lat", "lon", "stixel_width",
-                        "stixel_height")]
-    names(D) <- c("predictor", "date", "lat", "lon", "stixel_width",
-                  "stixel_height")
-    D$predictor <- log(D$predictor + 0.001)
-
-    empty_val <- 0
-  } else {
-    D <- input_data[input_data$predictor == x, ]
-    D$predictor <- NULL
-
-    empty_val <- NA
-  }
-  rm(input_data)
-
-  # make stixel polygons from centroids and widths and heights
-  tdsp <- sp::SpatialPointsDataFrame(coords = D[, c("lon", "lat")],
-                                     data = D,
-                                     proj4string = sp::CRS(ll))
-
-  xPlus <- tdsp$lon + (tdsp$stixel_width/2)
-  yPlus <- tdsp$lat + (tdsp$stixel_height/2)
-  xMinus <- tdsp$lon - (tdsp$stixel_width/2)
-  yMinus <- tdsp$lat - (tdsp$stixel_height/2)
-
-  ID <- row.names(tdsp)
-
-  square <- cbind(xMinus, yPlus, xPlus, yPlus, xPlus,
-                  yMinus, xMinus, yMinus, xMinus, yPlus)
-
-  polys <- sp::SpatialPolygons(mapply(function(poly, id) {
-    xy <- matrix(poly, ncol=2, byrow=TRUE)
-    sp::Polygons(list(sp::Polygon(xy)), ID=id)
-  }, split(square, row(square)), ID), proj4string=sp::CRS(ll))
-
-  tdspolydf <- sp::SpatialPolygonsDataFrame(polys, tdsp@data)
-  rm(tdsp)
-
-  # get the full input extent
-  if(ext$type == "rectangle") {
-    tdsp_ext <- methods::as(raster::extent(ext$lon.min,
-                             ext$lon.max,
-                             ext$lat.min,
-                             ext$lat.max), "SpatialPolygons")
-    raster::crs(tdsp_ext) <- sp::CRS(ll)
-    tdsp_ext_moll <- sp::spTransform(tdsp_ext, sp::CRS(mollweide))
-  } else if(ext$type == "polygon") {
-    tdsp_ext_moll <- sp::spTransform(ext$polygon, sp::CRS(mollweide))
-  } else {
-    stop("Spatiotemporal extent type not accepted.")
-  }
-
-  # calculate area weights based on percentage of stixel covering
-  # extent of interest
-  tdsp_moll <- sp::spTransform(tdspolydf, sp::CRS(mollweide))
-  rm(tdspolydf)
-  tdsp_moll$stsqkm <- rgeos::gArea(tdsp_moll, byid = TRUE)/1000000
-
-  rint <- raster::intersect(x = tdsp_moll, y = tdsp_ext_moll)
-  rm(tdsp_moll)
-  rint$intsqkm <- rgeos::gArea(rint, byid = TRUE)/1000000
-  rint$refcov <- rint$intsqkm/rint$stsqkm
-
-  # drop any stixels that cover the are less than 10%
-  rint_sub <- rint[rint$refcov >= 0.10, ]
-  rm(rint)
-
-  if(type == "PI") {
-    rint_d <- data.frame(predictor = rint_sub@data$predictor,
-                         date = rint_sub@data$date)
-
-    y_name <- "predictor"
-  } else {
-    rint_d <- data.frame(slope = rint_sub@data$slope,
-                         date = rint_sub@data$date)
-
-    y_name <- "slope"
-  }
-
-  if(!all(is.nan(rint_d[,c(y_name)]))) {
-    d.loess <- stats::loess(formula = stats::as.formula(paste(y_name,
-                                                              " ~ date",
-                                                              sep = "")),
-                            degree = 1,
-                            data = rint_d,
-                            weights = rint_sub@data$refcov)
-    rm(rint_d, rint_sub)
-
-    loess_preds <- stats::predict(d.loess, nd)
-  } else {
-    loess_preds <- rep(empty_val, length(nd))
-  }
-
-  if(type == "PI") {
-    loess_preds <- exp(loess_preds)
-  }
-
-  results <- data.frame(predictor = x,
-                        date = nd,
-                        preds = loess_preds,
-                        stringsAsFactors = FALSE)
-
-  # do training data check and replace for gaps, edges, and corners
-  results$preds <- apply(results,
-                         1,
-                         train_check,
-                         empty_val = empty_val,
-                         train_data = D)
-
-  return(results)
-}
-
 #' Cake plot the PIs and PDs in a combined fasion to see directionality with
 #' importance for habitat association and avoidance
 #'
@@ -786,6 +574,173 @@ cake_plot <- function(path,
                       by_cover_class = TRUE,
                       pland_and_lpi_only = TRUE,
                       return_data = FALSE) {
+
+  ## internal loess_fit_and_predict function
+  loess_fit_and_predict <- function(x, ext, input_data, type) {
+
+    # internal train_check function
+    train_check <- function(y, train_data, empty_val) {
+      # static week var
+      full_week <- 0.02
+
+      # subset data to time around date
+      D <- train_data
+      date_sub <- D[D$date >= as.numeric(y["date"]) - full_week &
+                      D$date <= as.numeric(y["date"]) + full_week, ]
+      rm(D, train_data)
+
+      if(nrow(date_sub) == 0) {
+        return(NA)
+      } else {
+        # get max and min for comparison
+        min_train <- min(date_sub$date, na.rm = TRUE)
+        max_train <- max(date_sub$date, na.rm = TRUE)
+        rm(date_sub)
+
+        # end of year present problems for checking to see if there's data
+        # on both sides of the prediction date, this adjusts for that
+        pred_date <- as.numeric(y["date"])
+
+        if(pred_date == 0.01) {
+          pred_date <- 0.02
+        } else if(pred_date == 0.99) {
+          pred_date <- 0.98
+        }
+
+        if(min_train < pred_date & max_train > pred_date)  {
+          # if there is data on both sides, return prediction
+          return(as.numeric(y["preds"]))
+        } else {
+          # otherwise return empty_val
+          return(empty_val)
+        }
+      }
+    }
+
+
+    # static projections
+    ll <- "+init=epsg:4326"
+    mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
+
+    # for both PI and PD need to loess fit and predict for each variable
+    # for uniform date set, defined here
+    SRD_DATE_VEC <- seq(from = 0, to = 1, length = 52 + 1)
+    SRD_DATE_VEC <- (SRD_DATE_VEC[1:52] + SRD_DATE_VEC[2:(52+1)])/2
+    SRD_DATE_VEC <- round(SRD_DATE_VEC, digits = 2)
+    nd <- data.frame(date = SRD_DATE_VEC)
+
+    if(type == "PI") {
+      D <- input_data[, c(x, "date", "lat", "lon", "stixel_width",
+                          "stixel_height")]
+      names(D) <- c("predictor", "date", "lat", "lon", "stixel_width",
+                    "stixel_height")
+      D$predictor <- log(D$predictor + 0.001)
+
+      empty_val <- 0
+    } else {
+      D <- input_data[input_data$predictor == x, ]
+      D$predictor <- NULL
+
+      empty_val <- NA
+    }
+    rm(input_data)
+
+    # make stixel polygons from centroids and widths and heights
+    tdsp <- sp::SpatialPointsDataFrame(coords = D[, c("lon", "lat")],
+                                       data = D,
+                                       proj4string = sp::CRS(ll))
+
+    xPlus <- tdsp$lon + (tdsp$stixel_width/2)
+    yPlus <- tdsp$lat + (tdsp$stixel_height/2)
+    xMinus <- tdsp$lon - (tdsp$stixel_width/2)
+    yMinus <- tdsp$lat - (tdsp$stixel_height/2)
+
+    ID <- row.names(tdsp)
+
+    square <- cbind(xMinus, yPlus, xPlus, yPlus, xPlus,
+                    yMinus, xMinus, yMinus, xMinus, yPlus)
+
+    polys <- sp::SpatialPolygons(mapply(function(poly, id) {
+      xy <- matrix(poly, ncol=2, byrow=TRUE)
+      sp::Polygons(list(sp::Polygon(xy)), ID=id)
+    }, split(square, row(square)), ID), proj4string=sp::CRS(ll))
+
+    tdspolydf <- sp::SpatialPolygonsDataFrame(polys, tdsp@data)
+    rm(tdsp)
+
+    # get the full input extent
+    if(ext$type == "rectangle") {
+      tdsp_ext <- methods::as(raster::extent(ext$lon.min,
+                                             ext$lon.max,
+                                             ext$lat.min,
+                                             ext$lat.max), "SpatialPolygons")
+      raster::crs(tdsp_ext) <- sp::CRS(ll)
+      tdsp_ext_moll <- sp::spTransform(tdsp_ext, sp::CRS(mollweide))
+    } else if(ext$type == "polygon") {
+      tdsp_ext_moll <- sp::spTransform(ext$polygon, sp::CRS(mollweide))
+    } else {
+      stop("Spatiotemporal extent type not accepted.")
+    }
+
+    # calculate area weights based on percentage of stixel covering
+    # extent of interest
+    tdsp_moll <- sp::spTransform(tdspolydf, sp::CRS(mollweide))
+    rm(tdspolydf)
+    tdsp_moll$stsqkm <- rgeos::gArea(tdsp_moll, byid = TRUE)/1000000
+
+    rint <- raster::intersect(x = tdsp_moll, y = tdsp_ext_moll)
+    rm(tdsp_moll)
+    rint$intsqkm <- rgeos::gArea(rint, byid = TRUE)/1000000
+    rint$refcov <- rint$intsqkm/rint$stsqkm
+
+    # drop any stixels that cover the are less than 10%
+    rint_sub <- rint[rint$refcov >= 0.10, ]
+    rm(rint)
+
+    if(type == "PI") {
+      rint_d <- data.frame(predictor = rint_sub@data$predictor,
+                           date = rint_sub@data$date)
+
+      y_name <- "predictor"
+    } else {
+      rint_d <- data.frame(slope = rint_sub@data$slope,
+                           date = rint_sub@data$date)
+
+      y_name <- "slope"
+    }
+
+    if(!all(is.nan(rint_d[,c(y_name)]))) {
+      d.loess <- stats::loess(formula = stats::as.formula(paste(y_name,
+                                                                " ~ date",
+                                                                sep = "")),
+                              degree = 1,
+                              data = rint_d,
+                              weights = rint_sub@data$refcov)
+      rm(rint_d, rint_sub)
+
+      loess_preds <- stats::predict(d.loess, nd)
+    } else {
+      loess_preds <- rep(empty_val, length(nd))
+    }
+
+    if(type == "PI") {
+      loess_preds <- exp(loess_preds)
+    }
+
+    results <- data.frame(predictor = x,
+                          date = nd,
+                          preds = loess_preds,
+                          stringsAsFactors = FALSE)
+
+    # do training data check and replace for gaps, edges, and corners
+    results$preds <- apply(results,
+                           1,
+                           train_check,
+                           empty_val = empty_val,
+                           train_data = D)
+
+    return(results)
+  }
 
   # load config vars
   e <- load_config(path)
