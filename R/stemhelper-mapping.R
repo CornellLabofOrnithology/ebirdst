@@ -620,12 +620,28 @@ calc_effective_extent <- function(st_extent,
                xaxt = 'n',
                yaxt = 'n',
                bty = 'n',
-               zlim = c(0, 1),
                breaks = c(0, seq(0.5, 1, by = 0.05)),
                ext = raster::extent(tdspolydf_moll),
-               col = c(viridis::viridis(11)[1], viridis::viridis(11)[2:11]),
+               col = c(viridis::viridis(11)[1],
+                       viridis::viridis(11)[2:11]),
                maxpixels = raster::ncell(tpis_per_prj),
                legend = TRUE)
+
+  # some raster something is making some values imperceptibly higher
+  # than 1, so this needs to be done
+  tpis_per_prj1 <- tpis_per_prj > 1
+  tpis_per_prj1[tpis_per_prj1 == 0] <- NA
+
+  raster::plot(tpis_per_prj1,
+               xaxt = 'n',
+               yaxt = 'n',
+               bty = 'n',
+               ext = raster::extent(tdspolydf_moll),
+               col = viridis::viridis(11)[11],
+               maxpixels = raster::ncell(tpis_per_prj),
+               add = TRUE,
+               legend = FALSE)
+
   sp::plot(ned_wh_co_moll, add = TRUE, border = 'gray')
   sp::plot(ned_wh_st_moll, add = TRUE, border = 'gray')
   sp::plot(st_extp_prj, add = TRUE, border = 'red')
