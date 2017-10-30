@@ -230,6 +230,11 @@ plot_pds <- function(pd_name,
     stop("Predictor name not in PDs.")
   }
 
+  if(plot_quantiles == FALSE & pointwise_pi == FALSE & stixel_pds == FALSE) {
+    stop(paste("Nothing to plot! Change one of the following to TRUE: ",
+               "plot_quantiles, pointwise_pi, or stixel_pds.", sep = ""))
+  }
+
   # static variables
   PD_MAX_RESOLUTION <- 50
   t.ul <- NULL
