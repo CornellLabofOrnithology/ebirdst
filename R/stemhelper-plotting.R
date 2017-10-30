@@ -321,6 +321,9 @@ plot_pds <- function(pd_name,
   if(plot_quantiles) {
     ttt <- data.frame(x = utils::stack(pd.x)[,1],
                       y = utils::stack(pd.y)[,1])
+
+    ttt <- na.omit(ttt)
+
     d.ul <- gbm::gbm(y ~ x,
                      data = ttt,
                      distribution = list(name = "quantile",
