@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Map extent of estimation calculated from subset of centroids — calc_effective_extent • stemhelper</title>
+<title>Calculate and map effective extent of selected centroids — calc_effective_extent • stemhelper</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -80,21 +80,72 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Map extent of estimation calculated from subset of centroids</h1>
+    <h1>Calculate and map effective extent of selected centroids</h1>
     </div>
 
     
-    <p>Map extent of estimation calculated from subset of centroids</p>
+    <p>The selection of stixel centroids for analysis of PIs and/or PDs yields an
+effective footprint, or extent, showing the effective location of where the
+information going into the analysis with PIs and/or PDs is based. While a
+bounding box or polygon may be used to select a set of centroids, due to the
+models being fit within large rectangular areas, the information from a set
+of centroids often comes from the core of the selected area. This function
+calculates where the highest proportion of information is coming from,
+returns a raster and plots that raster, with the selected area and centroids
+for reference. The legend shows, for each pixel, what percentage of the
+selected stixels are contributing information, ranging from 0 to 1.</p>
     
 
     <pre class="usage"><span class='fu'>calc_effective_extent</span>(<span class='no'>st_extent</span>, <span class='kw'>pis</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>pds</span> <span class='kw'>=</span> <span class='fl'>NA</span>)</pre>
-        
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>st_extent</th>
+      <td><p>list; st_extent list containing spatiotemporal filter</p></td>
+    </tr>
+    <tr>
+      <th>pis</th>
+      <td><p>data.frame; from <code><a href='load_pis.html'>load_pis()</a></code> Must supply either pis or pds.</p></td>
+    </tr>
+    <tr>
+      <th>pds</th>
+      <td><p>data.frame; from <code><a href='load_pds.html'>load_pds()</a></code> Must supply either pis or pds.</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
+    <p>RasterLayer and plots the RasterLayer with centroid locations and
+st_extent boundaries.</p>
+    
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='st'>"path to species STEM results"</span>
+<span class='no'>pis</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='load_pis.html'>load_pis</a></span>(<span class='no'>sp_path</span>)
+
+<span class='no'>ne_extent</span> <span class='kw'>&lt;-</span> <span class='fu'>list</span>(<span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"rectangle"</span>,
+                  <span class='kw'>lat.min</span> <span class='kw'>=</span> <span class='fl'>40</span>,
+                  <span class='kw'>lat.max</span> <span class='kw'>=</span> <span class='fl'>47</span>,
+                  <span class='kw'>lon.min</span> <span class='kw'>=</span> -<span class='fl'>80</span>,
+                  <span class='kw'>lon.max</span> <span class='kw'>=</span> -<span class='fl'>70</span>,
+                  <span class='kw'>t.min</span> <span class='kw'>=</span> <span class='fl'>0.425</span>,
+                  <span class='kw'>t.max</span> <span class='kw'>=</span> <span class='fl'>0.475</span>)
+
+<span class='no'>eff_lay</span> <span class='kw'>&lt;-</span> <span class='fu'>calc_effective_extent</span>(<span class='kw'>st_extent</span> <span class='kw'>=</span> <span class='no'>ne_extent</span>, <span class='kw'>pis</span> <span class='kw'>=</span> <span class='no'>pis</span>)
+<span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-                </ul>
+      <li><a href="#arguments">Arguments</a></li>
+      
+      <li><a href="#value">Value</a></li>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
   </div>
 </div>

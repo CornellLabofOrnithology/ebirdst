@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Loads PD data — load_pds • stemhelper</title>
+<title>Load partial dependencies for single species STEM results — load_pds • stemhelper</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -80,21 +80,50 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Loads PD data</h1>
+    <h1>Load partial dependencies for single species STEM results</h1>
     </div>
 
     
-    <p>Loads PD data</p>
+    <p>Loads the partial dependency data (from pd.txt), joins with stixel summary
+data, sets the names from <code><a href='load_config.html'>load_config()</a></code>, and cleans up the data.frame.
+This is one of the slower functions in the package, due to the size of the
+pd.txt file (usually multiple GB).</p>
     
 
     <pre class="usage"><span class='fu'>load_pds</span>(<span class='no'>path</span>)</pre>
-        
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>path</th>
+      <td><p>character; Full path to the directory containing single species
+STEM results.</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
+    <p>data.frame containing partial dependency values for each stixel,
+as well as stixel summary information.</p>
+    
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='st'>"path to species STEM results"</span>
+
+<span class='no'>pds</span> <span class='kw'>&lt;-</span> <span class='fu'>load_pds</span>(<span class='no'>sp_path</span>)
+<span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-                </ul>
+      <li><a href="#arguments">Arguments</a></li>
+      
+      <li><a href="#value">Value</a></li>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
   </div>
 </div>

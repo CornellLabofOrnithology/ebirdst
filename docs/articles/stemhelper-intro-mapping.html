@@ -60,7 +60,7 @@
       <h1>stemhelper: Introduction to loading and mapping eBird STEM results</h1>
                         <h4 class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2017-10-05</h4>
+            <h4 class="date">2017-10-30</h4>
           </div>
 
     
@@ -187,7 +187,7 @@
 ## resolution  : 8339.629, 8339.629  (x, y)
 ## extent      : -20015109, -1109171, -6674483, 9229189  (xmin, xmax, ymin, ymax)
 ## coord. ref. : +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs 
-## data source : /Users/mta45/Downloads/srd2016_wh_raster_template_3xagg.tif 
+## data source : in memory
 ## names       : srd2016_wh_raster_template_3xagg 
 ## values      : 0, 0  (min, max)</code></pre>
 </div>
@@ -246,15 +246,9 @@ raster::<span class="kw">plot</span>(week1_moll,
              <span class="dt">maxpixels =</span> raster::<span class="kw">ncell</span>(week1_moll))</code></pre></div>
 <p><img src="stemhelper-intro-mapping_files/figure-html/project_stack-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 <p>Plotting the layer at the full spatial extent of the analysis area makes for a small map. The process of building the stack unifies the extent of all layers in the stack. However, this also means that plotting happens at the full spatial extent of the area of analysis, the Western Hemisphere, as seen above. If we calculate the full annual spatial extent for the species, project to Mollwide, and then map, we get an extent that works for the entire full-annual cycle of the species.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate the full annual extent on the abundance stack (in sinusoidal projection)</span>
-sp_ext &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calc_full_extent.html">calc_full_extent</a></span>(abund_stack)
-
-<span class="co"># project the full annual extent to Mollweide</span>
-extent_raster &lt;-<span class="st"> </span>raster::<span class="kw">raster</span>(<span class="dt">ext =</span> sp_ext, 
-                                <span class="dt">crs =</span> sp::<span class="kw">proj4string</span>(template_raster))
-extent_raster[<span class="kw">is.na</span>(extent_raster)] &lt;-<span class="st"> </span><span class="dv">1</span>
-sp_ext_moll &lt;-<span class="st"> </span>raster::<span class="kw">extent</span>(raster::<span class="kw">projectRaster</span>(extent_raster, 
-                                                    <span class="dt">crs =</span> mollweide))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate the full annual extent on the abundance stack (in mollweide projection)</span>
+abund_moll &lt;-<span class="st"> </span>raster::<span class="kw">projectRaster</span>(abund_stack, <span class="dt">crs =</span> mollweide)
+sp_ext &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calc_full_extent.html">calc_full_extent</a></span>(abund_moll)
 
 <span class="co"># plot the first week of the abundance stack in Mollweide</span>
 <span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">2</span>))
@@ -262,7 +256,7 @@ raster::<span class="kw">plot</span>(week1_moll,
              <span class="dt">xaxt =</span> <span class="st">'n'</span>, 
              <span class="dt">yaxt =</span> <span class="st">'n'</span>, 
              <span class="dt">bty =</span> <span class="st">'n'</span>,
-             <span class="dt">ext =</span> sp_ext_moll, 
+             <span class="dt">ext =</span> sp_ext, 
              <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="dv">20</span>),
              <span class="dt">maxpixels=</span>raster::<span class="kw">ncell</span>(week1_moll))</code></pre></div>
 <p><img src="stemhelper-intro-mapping_files/figure-html/plot_stack_extent-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
@@ -283,7 +277,7 @@ raster::<span class="kw">plot</span>(occ_week26,
              <span class="dt">xaxt =</span> <span class="st">'n'</span>, 
              <span class="dt">yaxt =</span> <span class="st">'n'</span>, 
              <span class="dt">bty =</span> <span class="st">'n'</span>,
-             <span class="dt">ext =</span> sp_ext_moll,
+             <span class="dt">ext =</span> sp_ext,
              <span class="dt">breaks =</span> occ_bins,
              <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="kw">length</span>(occ_bins) -<span class="st"> </span><span class="dv">1</span>),
              <span class="dt">maxpixels =</span> raster::<span class="kw">ncell</span>(occ_week26))</code></pre></div>
@@ -303,7 +297,7 @@ raster::<span class="kw">plot</span>(week1_moll,
              <span class="dt">xaxt =</span> <span class="st">'n'</span>, 
              <span class="dt">yaxt =</span> <span class="st">'n'</span>, 
              <span class="dt">bty =</span> <span class="st">'n'</span>,
-             <span class="dt">ext =</span> sp_ext_moll, 
+             <span class="dt">ext =</span> sp_ext, 
              <span class="dt">zlim =</span> <span class="kw">c</span>(<span class="dv">0</span>, year_max),
              <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="dv">20</span>),
              <span class="dt">maxpixels =</span> raster::<span class="kw">ncell</span>(week1_moll),
@@ -313,7 +307,7 @@ raster::<span class="kw">plot</span>(week26_moll,
              <span class="dt">xaxt =</span> <span class="st">'n'</span>, 
              <span class="dt">yaxt =</span> <span class="st">'n'</span>, 
              <span class="dt">bty =</span> <span class="st">'n'</span>,
-             <span class="dt">ext =</span> sp_ext_moll, 
+             <span class="dt">ext =</span> sp_ext, 
              <span class="dt">zlim =</span> <span class="kw">c</span>(<span class="dv">0</span>, year_max),
              <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="dv">20</span>),
              <span class="dt">maxpixels =</span> raster::<span class="kw">ncell</span>(week26_moll))</code></pre></div>
@@ -336,7 +330,7 @@ raster::<span class="kw">plot</span>(week1_moll,
              <span class="dt">xaxt =</span> <span class="st">'n'</span>, 
              <span class="dt">yaxt =</span> <span class="st">'n'</span>, 
              <span class="dt">bty =</span> <span class="st">'n'</span>,
-             <span class="dt">ext =</span> sp_ext_moll, 
+             <span class="dt">ext =</span> sp_ext, 
              <span class="dt">breaks =</span> year_bins,
              <span class="dt">lab.breaks =</span> bin_labels,
              <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="kw">length</span>(year_bins) -<span class="st"> </span><span class="dv">1</span>),
@@ -347,7 +341,7 @@ raster::<span class="kw">plot</span>(week26_moll,
              <span class="dt">xaxt =</span> <span class="st">'n'</span>, 
              <span class="dt">yaxt =</span> <span class="st">'n'</span>, 
              <span class="dt">bty =</span> <span class="st">'n'</span>,
-             <span class="dt">ext =</span> sp_ext_moll, 
+             <span class="dt">ext =</span> sp_ext, 
              <span class="dt">breaks =</span> year_bins,
              <span class="dt">lab.breaks =</span> bin_labels,
              <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="kw">length</span>(year_bins) -<span class="st"> </span><span class="dv">1</span>),
@@ -374,7 +368,7 @@ raster::<span class="kw">plot</span>(week26c,
              <span class="dt">xaxt =</span> <span class="st">'n'</span>, 
              <span class="dt">yaxt =</span> <span class="st">'n'</span>,
              <span class="dt">bty =</span> <span class="st">'n'</span>,
-             <span class="dt">ext =</span> sp_ext_moll, 
+             <span class="dt">ext =</span> sp_ext, 
              <span class="dt">breaks =</span> year_bins,
              <span class="dt">lab.breaks =</span> bin_labels,
              <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="kw">length</span>(year_bins)-<span class="dv">1</span>),
@@ -402,7 +396,7 @@ raster::<span class="kw">plot</span>(conf_week26,
              <span class="dt">xaxt =</span> <span class="st">'n'</span>, 
              <span class="dt">yaxt =</span> <span class="st">'n'</span>,
              <span class="dt">bty =</span> <span class="st">'n'</span>,
-             <span class="dt">ext =</span> sp_ext_moll,
+             <span class="dt">ext =</span> sp_ext,
              <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">magma</a></span>(<span class="dv">20</span>),
              <span class="dt">maxpixel=</span>raster::<span class="kw">ncell</span>(conf_week26))</code></pre></div>
 <p><img src="stemhelper-intro-mapping_files/figure-html/plot_confidence-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
