@@ -1,5 +1,6 @@
 ---
 output: github_document
+always_allow_html: yes
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -10,8 +11,7 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "README-",
   warning = FALSE, 
-  message = FALSE, 
-  out.width="\\textwidth",
+  message = FALSE,
   fig.width=4,
   fig.height=6,
   fig.align = "center"
