@@ -50,8 +50,9 @@ vector pair (e.g., c(-1,1)).}
 only get return of pointwise pi values.}
 }
 \value{
-Plots barplot and returns a list containing the median, upper, and
-lower values from the pointwise pi smoothing.
+Plots barplot and returns a list containing the quantiles
+(if plot_quantiles = TRUE) and/or the pointwise_pis upper, lower, and
+median (if pointwise_pi = TRUE).
 }
 \description{
 For all of the available predictors in a single species STEM result set, this

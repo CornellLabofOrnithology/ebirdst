@@ -189,8 +189,9 @@ plot_pis <- function(path,
 #' only get return of pointwise pi values.
 
 #'
-#' @return Plots barplot and returns a list containing the median, upper, and
-#' lower values from the pointwise pi smoothing.
+#' @return Plots barplot and returns a list containing the quantiles
+#' (if plot_quantiles = TRUE) and/or the pointwise_pis upper, lower, and
+#' median (if pointwise_pi = TRUE).
 #'
 #' @export
 #'
@@ -251,6 +252,8 @@ plot_pds <- function(pd_name,
   #nnn.bs <- 25
   # Number of evaluation points on x-axis / indepent var
   nd.pred.size <- PD_MAX_RESOLUTION
+
+  return_list <- list()
 
   # subset based on extent
   pd_vec <- st_extent_subset(pds, st_extent, use_time = TRUE)
@@ -382,6 +385,9 @@ plot_pds <- function(pd_name,
                         col = scales::alpha("red", 0.25),
                         border = FALSE)
     }
+
+    quantiles <- list(t.ul = t.ul, t.ll = t.ll)
+    return_list$quantiles <- quantiles
   }
 
   # -----------------
@@ -492,6 +498,9 @@ plot_pds <- function(pd_name,
                       col = scales::alpha("darkorange", 1.0),
                       lwd = 2 * graphics::par()$cex)
     }
+
+    pointwise <- list(t.median = t.median, t.ul = t.ul, t.ll = t.ll)
+    return_list$pointwise <- pointwise
   }
 
   # GAM CONDITIONAL MEAN - ALL DATA
@@ -524,7 +533,10 @@ plot_pds <- function(pd_name,
     graphics::abline(0, 0, col="black", lwd = 3 * graphics::par()$cex)
   }
 
-  return(list(t.median = t.median, t.ul = t.ul, t.ll = t.ll))
+
+  return(return_list)
+
+
 }
 
 #' Cake plot the PIs and PDs in a combined fasion to see directionality with
