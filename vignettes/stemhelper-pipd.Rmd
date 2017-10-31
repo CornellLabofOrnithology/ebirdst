@@ -118,14 +118,14 @@ mypds <- plot_pds(pd_name = "EFFORT_HRS",
                   pds = pds, 
                   st_extent = ne_extent, 
                   pointwise_pi = TRUE, 
-                  stixel_pds = TRUE)
+                  stixel_pds = FALSE)
 ```
 
 # 8. Cake Plots
 
 When PIs and PDs are combined with can get predictor importance with directionality. By week, these can be turned into a stacked area chart (we affectionately call cake plots) that show the relative predictor importance and directionality by week.
 
-```{r cake_plots}
+```{r cake_plots, fig.width = 8, fig.height = 5}
 # this requires a fair amount of computation, about 5 minutes
 cake_plot(path = sp_path,
           pis = pis,

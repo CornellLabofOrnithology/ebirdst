@@ -952,7 +952,7 @@ cake_plot <- function(path,
   pipd_short$pidir[is.nan(pipd_short$pidir)] <- 0
   rm(pipd)
 
-  # attempt to clean up the names...not working
+  # pretty the names
   ccfun <- function(x, by_cover_class) {
     convert_classes(x["predictor"],
                     by_cover_class = by_cover_class,
@@ -1000,7 +1000,8 @@ cake_plot <- function(path,
     ggplot2::xlab("Date") +
     ggplot2::ylab("Association Direction (Positive/Negative)") +
     ggplot2::theme(legend.key.size = ggplot2::unit(1, "line"))
-  wave
+
+  print(wave)
 
   if(return_data == TRUE) {
     return(pipd_out)
