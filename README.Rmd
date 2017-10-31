@@ -1,6 +1,5 @@
 ---
 output: github_document
-always_allow_html: yes
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -11,10 +10,7 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "README-",
   warning = FALSE, 
-  message = FALSE,
-  fig.width=4,
-  fig.height=6,
-  fig.align = "center"
+  message = FALSE
 )
 devtools::load_all()
 ```
@@ -47,9 +43,8 @@ After downloading results...
 
 One of the first things to do is to load a RasterStack of estimated abundance predictions and plot a week of estimates.
 
-```{r quick_start}
+```{r quick_start, fig.align = "center"}
 library(viridis)
-library(mapview)
 library(raster)
 
 # TODO set this up to do a curl of the example results first
@@ -64,23 +59,63 @@ sp_path <- paste(root_path, species, sep = "")
 # load a stack of rasters with the helper function stack_stem()
 abund <- stack_stem(sp_path, variable = "abundance_umean")
 
-# project to Mollweide for mapping and extent calc, this takes awhile
-mollweide <- CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
-abund_stack <- projectRaster(abund, crs = mollweide)
+# subset to the 26th week of the year
+abund26 <- abund[[26]]
 
-# calculate the full annual extent on the abundance stack (in sinusoidal projection)
-sp_ext <- calc_full_extent(abund_stack)
+# project to Mollweide for mapping and extent calc
+mollweide <- CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
+abund_moll <- projectRaster(abund26, crs = mollweide)
+
+# calculate the full annual extent
+# and set dimensions to set plotting size
+sp_ext <- calc_full_extent(abund_moll)
+
+xlimits <- c(sp_ext[1], sp_ext[2])
+ylimits <- c(sp_ext[3], sp_ext[4])
+
+xrange <- xlimits[2] - xlimits[1]
+yrange <- ylimits[2] - ylimits[1]
+
+# these are RMarkdown specific here, but could be passed to png()
+w_cm <- 8.5
+h_cm <- w_cm*(yrange/xrange)
+knitr::opts_chunk$set(fig.width = w_cm, fig.height = h_cm)
 
 # calculate ideal color bins for abundance values across the full year
-year_bins <- calc_bins(abund_stack)
+year_bins <- calc_bins(abund_moll)
 
-# the helper function combine_layers() fills in with assumed and predicted zeroes
-week26 <- combine_layers(abund_stack, sp_path, week = 26)
+# to add context, pull in some reference data to add
+wh <- rnaturalearth::ne_countries(continent = c("North America",
+                                                "South America"))
+wh_states <- rnaturalearth::ne_states(iso_a2 = unique(wh@data$iso_a2))
+wh_moll <- sp::spTransform(wh, mollweide)
+wh_states_moll <- sp::spTransform(wh_states, mollweide)
 
-# do a quick visualization with the mapview package
-mapviewOptions(legend = TRUE)
-mapView(week26, 
-        col.regions = viridis(length(year_bins)-1), 
-        at = year_bins,
-        maxpixels = ncell(week26))
+# start plotting
+par(mfrow = c(1, 1), mar = c(0, 0, 0, 6))
+
+# use the extent object to set the spatial extent for the plot
+sp::plot(sp_ext, col = 'white')
+
+# add background spatial context
+sp::plot(wh_states_moll, col = "grey70", add = TRUE)
+
+# plot the raster
+plot(abund_moll,
+     maxpixels = ncell(abund_moll),
+     ext = sp_ext,
+     breaks = year_bins,
+     col = viridis::viridis(length(year_bins-1)),
+     xaxt = 'n',
+     yaxt = 'n',
+     add = TRUE,
+     legend = TRUE,
+     legend.shrink = 0.97,
+     legend.width = 2,
+     axis.args = list(at = year_bins,
+                      labels = round(year_bins, 2),
+                      cex.axis = 0.7))
+
+# add state boundaries on top
+sp::plot(wh_states_moll, add = TRUE, border = 'black', lwd = 1)
 ```
