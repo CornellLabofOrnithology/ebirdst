@@ -60,7 +60,7 @@
       <h1>stemhelper: Introduction to loading and mapping eBird STEM results</h1>
                         <h4 class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2017-10-30</h4>
+            <h4 class="date">2017-10-31</h4>
           </div>
 
     
@@ -93,20 +93,27 @@
 <div id="data-structure-and-types" class="section level2">
 <h2 class="hasAnchor">
 <a href="#data-structure-and-types" class="anchor"></a>Data Structure and Types</h2>
-<p>Estimates from STEM are currently provided in the widely used GeoTiff raster format. These are easily opened with the raster package in R, as well as with a variety of GIS software tools. STEM results are structured in the following way, with the prediction GeoTiff files for each week being found under the \results\tifs\ directory.</p>
-<p>\<species>     \data     \results         \tifs<br>
-            \presentation<br>
-                \abundance_ensemble_support                 \abundance_lower                 \abundance_umean                 \abundance_upper                 \occurrence_umean</species></p>
+<p>Estimates from STEM are currently provided in the widely used GeoTiff raster format. These are easily opened with the raster package in R, as well as with a variety of GIS software tools. STEM results are structured in the following way, with the prediction GeoTiff files for each week being found under the \&lt;six_letter_code-ERD2016-PROD-date-uuid&gt;\results\tifs\ directory.</p>
+<p>\&lt;six_letter_code-ERD2016-PROD-date-uuid&gt;\<br>
+\&lt;six_letter_code-ERD2016-PROD-date-uuid&gt;\data<br>
+\&lt;six_letter_code-ERD2016-PROD-date-uuid&gt;\results<br>
+\&lt;six_letter_code-ERD2016-PROD-date-uuid&gt;\results\tifs<br>
+\&lt;six_letter_code-ERD2016-PROD-date-uuid&gt;\results\tifs\presentation<br>
+\&lt;six_letter_code-ERD2016-PROD-date-uuid&gt;\results\tifs\presentation\abundance_ensemble_support<br>
+\&lt;six_letter_code-ERD2016-PROD-date-uuid&gt;\results\tifs\presentation\abundance_lower<br>
+\&lt;six_letter_code-ERD2016-PROD-date-uuid&gt;\results\tifs\presentation\abundance_umean<br>
+\&lt;six_letter_code-ERD2016-PROD-date-uuid&gt;\results\tifs\presentation\abundance_upper<br>
+\&lt;six_letter_code-ERD2016-PROD-date-uuid&gt;\results\tifs\presentation\occurrence_umean</p>
 </div>
 <div id="raster-layer-descriptions" class="section level2">
 <h2 class="hasAnchor">
 <a href="#raster-layer-descriptions" class="anchor"></a>Raster Layer Descriptions</h2>
-<table style="width:22%;" class="table">
+<table style="width:50%;" class="table">
 <colgroup>
-<col width="5%">
-<col width="5%">
-<col width="5%">
-<col width="5%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
 </colgroup>
 <thead><tr class="header">
 <th>Type</th>
@@ -362,6 +369,17 @@ wh &lt;-<span class="st"> </span>rnaturalearth::<span class="kw">ne_countries</s
 wh_states &lt;-<span class="st"> </span>rnaturalearth::<span class="kw">ne_states</span>(<span class="dt">iso_a2 =</span> <span class="kw">unique</span>(wh@data$iso_a2))
 wh_moll &lt;-<span class="st"> </span>sp::<span class="kw">spTransform</span>(wh, mollweide)
 wh_states_moll &lt;-<span class="st"> </span>sp::<span class="kw">spTransform</span>(wh_states, mollweide)
+
+xlimits &lt;-<span class="st"> </span><span class="kw">c</span>(sp_ext[<span class="dv">1</span>], sp_ext[<span class="dv">2</span>])
+ylimits &lt;-<span class="st"> </span><span class="kw">c</span>(sp_ext[<span class="dv">3</span>], sp_ext[<span class="dv">4</span>])
+
+xrange &lt;-<span class="st"> </span>xlimits[<span class="dv">2</span>] -<span class="st"> </span>xlimits[<span class="dv">1</span>]
+yrange &lt;-<span class="st"> </span>ylimits[<span class="dv">2</span>] -<span class="st"> </span>ylimits[<span class="dv">1</span>]
+
+<span class="co"># these are RMarkdown specific here, but could be passed to png()</span>
+w_img &lt;-<span class="st"> </span><span class="dv">7</span>
+h_img &lt;-<span class="st"> </span>w_img*(yrange/xrange)
+knitr::opts_chunk$<span class="kw">set</span>(<span class="dt">fig.width =</span> w_img, <span class="dt">fig.height =</span> h_img)
 
 <span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">2</span>))
 raster::<span class="kw">plot</span>(week26c, 
