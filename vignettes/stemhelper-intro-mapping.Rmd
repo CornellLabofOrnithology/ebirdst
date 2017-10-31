@@ -45,23 +45,23 @@ Once you have access to the data, proceed to the [download page](http://ebird.or
 
 ## Data Structure and Types
 
-Estimates from STEM are currently provided in the widely used GeoTiff raster format. These are easily opened with the raster package in R, as well as with a variety of GIS software tools. STEM results are structured in the following way, with the prediction GeoTiff files for each week being found under the \\results\\tifs\\ directory.
+Estimates from STEM are currently provided in the widely used GeoTiff raster format. These are easily opened with the raster package in R, as well as with a variety of GIS software tools. STEM results are structured in the following way, with the prediction GeoTiff files for each week being found under the \\\<six_letter_code-ERD2016-PROD-date-uuid>\\results\\tifs\\ directory.
   
-\\<species>
-&nbsp;&nbsp;&nbsp;&nbsp;\\data
-&nbsp;&nbsp;&nbsp;&nbsp;\\results
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\\tifs  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\\presentation  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\\abundance_ensemble_support
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\\abundance_lower
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\\abundance_umean
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\\abundance_upper
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\\occurrence_umean
+\\\<six_letter_code-ERD2016-PROD-date-uuid>\\  
+\\\<six_letter_code-ERD2016-PROD-date-uuid>\\data  
+\\\<six_letter_code-ERD2016-PROD-date-uuid>\\results  
+\\\<six_letter_code-ERD2016-PROD-date-uuid>\\results\\tifs  
+\\\<six_letter_code-ERD2016-PROD-date-uuid>\\results\\tifs\\presentation  
+\\\<six_letter_code-ERD2016-PROD-date-uuid>\\results\\tifs\\presentation\\abundance_ensemble_support  
+\\\<six_letter_code-ERD2016-PROD-date-uuid>\\results\\tifs\\presentation\\abundance_lower  
+\\\<six_letter_code-ERD2016-PROD-date-uuid>\\results\\tifs\\presentation\\abundance_umean  
+\\\<six_letter_code-ERD2016-PROD-date-uuid>\\results\\tifs\\presentation\\abundance_upper  
+\\\<six_letter_code-ERD2016-PROD-date-uuid>\\results\\tifs\\presentation\\occurrence_umean  
     
 ## Raster Layer Descriptions
 
 | Type | Measure | Folder | File Name |
-| --- | --- | --- | --- |
+| -------- | -------- | -------- | -------- |
 | occurrence | mean | occurrence\_umean  | \*\_occurrence\_umean.tif  |
 | abundance  | mean        | abundance\_umean | \*\_abundance\_umean.tif |
 | abundance  | 10th quantile | abundance\_lower | \*\_abundance\_lower.tif  |
@@ -278,6 +278,17 @@ wh_states <- rnaturalearth::ne_states(iso_a2 = unique(wh@data$iso_a2))
 wh_moll <- sp::spTransform(wh, mollweide)
 wh_states_moll <- sp::spTransform(wh_states, mollweide)
 
+xlimits <- c(sp_ext[1], sp_ext[2])
+ylimits <- c(sp_ext[3], sp_ext[4])
+
+xrange <- xlimits[2] - xlimits[1]
+yrange <- ylimits[2] - ylimits[1]
+
+# these are RMarkdown specific here, but could be passed to png()
+w_img <- 7
+h_img <- w_img*(yrange/xrange)
+knitr::opts_chunk$set(fig.width = w_img, fig.height = h_img)
+
 par(mar = c(0,0,0,2))
 raster::plot(week26c, 
              xaxt = 'n', 
@@ -292,6 +303,11 @@ raster::plot(week26c,
 sp::plot(wh_moll, add = TRUE, border = 'gray')
 sp::plot(wh_states_moll, add = TRUE, border = 'gray', lwd = 0.5)
 ```
+
+```{r set_figures, include = FALSE}
+knitr::opts_chunk$set(fig.width = 7, fig.height = 4)
+```
+
 
 ## Mapping Abundance Confidence Intervals
 
