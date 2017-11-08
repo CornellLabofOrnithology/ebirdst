@@ -9,6 +9,14 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+<style type="text/css">
+.table {
+
+    width: 50%;
+
+}
+</style>
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning = FALSE, 
                       message = FALSE, 
@@ -41,9 +49,15 @@ Each relative abundance estimate was computed as an ensemble average of up to 10
 
 To access STEM results, begin by [creating an eBird account and signing in](https://secure.birds.cornell.edu/cassso/login). The visit the [Download Data](http://ebird.org/ebird/data/download) page. STEM data access is free; however, you will need to [request access](http://ebird.org/ebird/data/request) in order to obtain access to the STEM data. Filling out the access request form allows eBird to keep track of the number of people using the data and obtain information on the applications for which the data are used.
 
-Once you have access to the data, proceed to the [download page](http://ebird.org/ebird/data/download/ebd). Here you will be able to download data for all species or for a list of 225 individual species. TBD...
+Once you have access to the data, proceed to the [download page](http://ebird.org/ebird/data/download/ebd). Here you will be able to download data for all species or for a list of 225 individual species.
+
+**DATA ACCESS HAS NOT BEEN PROVIDED TO DATE**
+
+TODO: Serve data.
 
 ## Data Structure and Types
+
+**IMPORTANT. AFTER DOWNLOADING THE RESULTS AND UNZIPPING THEM, DO NOT CHANGE THE FILE STRUCTURE.** All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package. You can move the unzipped folder of results wherever you like, but you cannot change the structure within the folder.
 
 Estimates from STEM are currently provided in the widely used GeoTiff raster format. These are easily opened with the raster package in R, as well as with a variety of GIS software tools. STEM results are structured in the following way, with the prediction GeoTiff files for each week being found under the \\\<six_letter_code-ERD2016-PROD-date-uuid>\\results\\tifs\\ directory.
   
@@ -61,7 +75,7 @@ Estimates from STEM are currently provided in the widely used GeoTiff raster for
 ## Raster Layer Descriptions
 
 | Type | Measure | Folder | File Name |
-| -------- | -------- | -------- | -------- |
+| ---------- | ---------- | ---------- | ---------- |
 | occurrence | mean | occurrence\_umean  | \*\_occurrence\_umean.tif  |
 | abundance  | mean        | abundance\_umean | \*\_abundance\_umean.tif |
 | abundance  | 10th quantile | abundance\_lower | \*\_abundance\_lower.tif  |
@@ -100,13 +114,17 @@ template_raster
 
 ## Loading Rasters
 
-Once you have accessed and downloaded a set of STEM results, the first task is to load them into R in a way that they can be used easily. To save space on disk, each individual raster (e.g., abundance mean for Wood Thrush for January 4) has had NA values trimmed before saving (using the raster package trim() function). While this saves space on disk, it means that the rasters are not immediately comparable and trying to use the raster `stack()` function will fail. To assist with the loading of rasters, we have provided a helper function, `stack_stem()`, which uses the `template_raster` object to extend each input raster in a directory to the full extent of analysis and then returns a `RasterStack` object.
+Once you have accessed and downloaded a set of STEM results, the first task is to load them into R in a way that they can be used easily. To save space on disk, each individual raster (e.g., abundance mean for Wood Thrush for January 4) has had NA values trimmed before saving (using the `raster` package `trim()` function). While this saves space on disk, it means that the rasters are not immediately comparable and trying to use `raster::stack()` will fail. To assist with the loading of rasters, we have provided a helper function, `stack_stem()`, which uses the `template_raster` object to extend each input raster in a directory to the full extent of analysis and then returns a `RasterStack` object.
 
 ```{r load_single_raster}
 # TODO set this up to do a curl of the example results first
 
-# Note, if you currently access results you can use this path construction
-# by replacing the root_path with where your copy lives
+# SETUP PATHS
+# Once you have downloaded and unzipped the results, place the resulting folder,
+# with the unique species ID name (e.g., woothr-ERD2016-PROD-20170505-3f880822)
+# wherever you want to keep it. Then provide the root_path variable as that
+# location (without the unique species ID name) and provide the unique species 
+# ID name as the species variable below. Use the paste() functiont to combine
 root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
 species <- "woothr-ERD2016-PROD-20170505-3f880822"
 sp_path <- paste(root_path, species, sep = "")
@@ -116,117 +134,117 @@ abund_stack <- stack_stem(sp_path, variable = "abundance_umean")
 print(abund_stack)
 ```
 
-In most use cases, this function will be used to stack the 52 weeks of a single 
-variable (e.g., abundance mean) for a single species. However, if the STEM .tif
-rasters were re-arranged, the function could be used to, for example, stack 
-single weeks for a single variable across multiple species.
-
 # 3. Mapping Occurrence and Abundance
 
-One of the most common activities with STEM results is to make plots of occurrence and abundance. It is fast and easy to make plots immediately, but to get ideal plotting behavior takes a little bit of preparation. This sections describes some helper functions intended to assist with mapping.
+One of the most common activities with STEM results is to make maps of occurrence and abundance. It is fast and easy to make maps immediately, but to get ideal maps takes a little bit extra preparation. This sections describes some helper functions intended to assist with mapping.
 
 ## Projections and Calculating Full-annual Spatial Extent
 
-The sinusoidal projection that NASA provides MODIS data in, while functional because of its equal-area property, is not good for mapping because of the significant distortion of land masses across the globe. There are few global equal-area projections, including, but not limited to, Lambert Azimuthal Equal Area, Goode Homolosine, Mollweide, and Equal Area Cylindrical. Of these, we have selected Mollweide, used in the remainder of this section, for its pleasing conformal properties across the globe, ease of projection configuration within R and the proj4string construction, and the ease of setting central meridians that best display the Western Hemisphere. It is worth noting that while projecting to a more visually appealing projection is ideal for mapping, it is not necessary for quantitative analysis of STEM results, for which purposes the results can be left in the sinusoidal projection.
+The sinusoidal projection that NASA provides MODIS data in, while functional because of its equal-area property, is not good for mapping because of the significant distortion of land masses across the globe. In general, there are few global equal-area projections, including, but not limited to, Lambert Azimuthal Equal Area, Goode Homolosine, Mollweide, and Equal Area Cylindrical. Of these, we have selected Mollweide, used in the remainder of this section, for its pleasing conformal properties across the globe, ease of projection configuration within R and the proj4string construction, and the ease of setting central meridians that best display the Western Hemisphere. It is worth noting that while projecting to a more visually appealing projection is ideal for mapping, it is not necessary for quantitative analysis of STEM results, for which purposes the results can be left in the original Sinusoidal projection.
 
 ```{r project_stack}
 library(viridis)
+library(raster)
 
 # define mollweide projection
-mollweide <- sp::CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
+mollweide <- CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
 
 # project single layer from stack to mollweide
-week1_moll <- raster::projectRaster(abund_stack[[1]], crs = mollweide)
+week1_moll <- projectRaster(abund_stack[[1]], crs = mollweide)
 
 # optionally, you can project an entire stack, but it takes much longer
-#abund_stack_moll <- raster::projectRaster(abund_stack, crs = mollweide)
+#abund_stack_moll <- projectRaster(abund_stack, crs = mollweide)
 
-# plot single layer with full annual extent
-par(mar = c(0,0,0,2))
-raster::plot(week1_moll, 
-             xaxt = 'n', 
-             yaxt = 'n',
-             bty = 'n',
-             col = viridis(20),
-             maxpixels = raster::ncell(week1_moll))
+# map single layer with full annual extent
+par(mar = c(0, 0, 0, 2))
+plot(week1_moll, 
+     xaxt = 'n', 
+     yaxt = 'n',
+     bty = 'n',
+     col = viridis(20),
+     maxpixels = ncell(week1_moll))
 ```
 
-Plotting the layer at the full spatial extent of the analysis area makes for a small map. The process of building the stack unifies the extent of all layers in the stack. However, this also means that plotting happens at the full spatial extent of the area of analysis, the Western Hemisphere, as seen above. If we calculate the full annual spatial extent for the species, project to Mollwide, and then map, we get an extent that works for the entire full-annual cycle of the species.
+Mapping the layer at the full spatial extent of the analysis area makes for a small map. The process of building the stack, via `stack_stem()` unifies the extent of all layers in the stack. However, this also means that mapping happens at the full spatial extent of the area of analysis, the Western Hemisphere, as seen above. If we project the RasterStack to Mollweide, then calculate the full annual spatial extent for the species, and then map, we get an extent that works for the entire full-annual cycle of the species.
 
-```{r plot_stack_extent}
+```{r map_stack_extent}
 # calculate the full annual extent on the abundance stack (in mollweide projection)
-abund_moll <- raster::projectRaster(abund_stack, crs = mollweide)
+abund_moll <- projectRaster(abund_stack, crs = mollweide)
 sp_ext <- calc_full_extent(abund_moll)
 
-# plot the first week of the abundance stack in Mollweide
-par(mar = c(0,0,0,2))
-raster::plot(week1_moll, 
-             xaxt = 'n', 
-             yaxt = 'n', 
-             bty = 'n',
-             ext = sp_ext, 
-             col = viridis(20),
-             maxpixels=raster::ncell(week1_moll))
+# map the first week of the abundance stack in Mollweide
+par(mar = c(0, 0, 0, 2))
+plot(week1_moll, 
+     xaxt = 'n', 
+     yaxt = 'n', 
+     bty = 'n',
+     ext = sp_ext, 
+     col = viridis(20),
+     maxpixels = ncell(week1_moll))
 ```
 
 ## Mapping Occurrence
 
-Most examples in this vignette focus primarily on abundance predictions, as they're the most novel and informative. However, we also provide the probability of occurrence predictions. These are much simpler to plot than abundance, as values range between 0 and 1 throughout the year.
+Most examples in this vignette focus primarily on relative abundance estimates, as they're the most novel and informative. However, we also provide estimates for the he probability of occurrence. These are much simpler to map than abundance in terms of color scales and binning, as values range between 0 and 1 throughout the year.
 
-```{r plot_occurrence}
+```{r map_occurrence}
 # load a stack of occurrence
 occ_stack <- stack_stem(sp_path, variable = "occurrence_umean")
 
 # create breaks every 0.05 from 0 to 1
 occ_bins <- seq(0, 1, by = 0.05)
-occ_week26 <- raster::projectRaster(occ_stack[[26]], crs = mollweide)
+occ_week26 <- projectRaster(occ_stack[[26]], crs = mollweide)
 
-par(mar = c(0,0,0,2), cex = 0.7)
-raster::plot(occ_week26, 
-             xaxt = 'n', 
-             yaxt = 'n', 
-             bty = 'n',
-             ext = sp_ext,
-             breaks = occ_bins,
-             col = viridis(length(occ_bins) - 1),
-             maxpixels = raster::ncell(occ_week26))
+par(mar = c(0, 0, 0, 2), cex = 0.9)
+plot(occ_week26, 
+     xaxt = 'n', 
+     yaxt = 'n', 
+     bty = 'n',
+     ext = sp_ext,
+     breaks = occ_bins,
+     col = viridis(length(occ_bins) - 1),
+     maxpixels = ncell(occ_week26),
+     legend.width = 2,
+     legend.shrink = 0.97)
 ```
 
 ## Calculating Abundance Bins
 
-Mapping species abundance across the full-annual cycle presents a challenge, in that patterns of concentration and dispersion in abundance change throughout the year, making it difficult to define color bins that suit all seasons and accurately reflect the detail of abundance predictions. To address this, we selected a method (described by Maciejewski et al. 2013) that log transforms the entire year of data, constructs bins with the log-transformed data using standard deviations, and then un-transforms the bins for plotting.
+Mapping relative abundance estimates across the full-annual cycle presents a challenge, in that patterns of concentration and dispersion in abundance change throughout the year, making it difficult to define color bins that suit all seasons and accurately reflect the detail of abundance predictions. To address this, we selected a method (described by Maciejewski et al. 2013) that log transforms the entire year of data, constructs bins with the log-transformed data using standard deviations, and then un-transforms the bins.
 
 To compare, we first scale the colors linearly, based on the maximum from the entire year. 
 
-```{r plot_linear}
-year_max <- max(raster::maxValue(abund_stack), na.rm = TRUE)
+```{r map_linear}
+year_max <- max(maxValue(abund_stack), na.rm = TRUE)
 
-week26_moll <- raster::projectRaster(abund_stack[[26]], crs = mollweide)
+week26_moll <- projectRaster(abund_stack[[26]], crs = mollweide)
 
-par(mfrow = c(1,2), mar = c(0,0,0,0))
-raster::plot(week1_moll, 
-             xaxt = 'n', 
-             yaxt = 'n', 
-             bty = 'n',
-             ext = sp_ext, 
-             zlim = c(0, year_max),
-             col = viridis(20),
-             maxpixels = raster::ncell(week1_moll),
-             legend=FALSE)
-par(mar = c(0,0,0,4))
-raster::plot(week26_moll, 
-             xaxt = 'n', 
-             yaxt = 'n', 
-             bty = 'n',
-             ext = sp_ext, 
-             zlim = c(0, year_max),
-             col = viridis(20),
-             maxpixels = raster::ncell(week26_moll))
+par(mfrow = c(1,2), mar = c(0, 0, 0, 0))
+plot(week1_moll, 
+     xaxt = 'n', 
+     yaxt = 'n', 
+     bty = 'n',
+     ext = sp_ext, 
+     zlim = c(0, year_max),
+     col = viridis(20),
+     maxpixels = ncell(week1_moll),
+     legend = FALSE)
+
+par(mar = c(0, 0, 0, 4))
+plot(week26_moll, 
+     xaxt = 'n', 
+     yaxt = 'n', 
+     bty = 'n',
+     ext = sp_ext, 
+     zlim = c(0, year_max),
+     col = viridis(20),
+     maxpixels = ncell(week26_moll),
+     legend.shrink = 0.97)
 ```
 
-We can compare this with plots made using the binning method provided here.
+We can compare this with maps made using the `calc_bins()` method.
 
-```{r plot_bins}
+```{r map_bins}
 # calculate ideal color bins for abundance values
 year_bins <- calc_bins(abund_stack)
 
@@ -239,44 +257,46 @@ bin_labels[!(bin_labels %in% c(bin_labels[1],
                                round((length(bin_labels) / 4)) + 1],
                     bin_labels[length(bin_labels)]))] <- ""
 
-par(mfrow = c(1,2), mar = c(0,0,0,0))
-raster::plot(week1_moll, 
-             xaxt = 'n', 
-             yaxt = 'n', 
-             bty = 'n',
-             ext = sp_ext, 
-             breaks = year_bins,
-             lab.breaks = bin_labels,
-             col = viridis(length(year_bins) - 1),
-             maxpixels = raster::ncell(week1_moll),
-             legend = FALSE)
-par(mar = c(0,0,0,5))
-raster::plot(week26_moll, 
-             xaxt = 'n', 
-             yaxt = 'n', 
-             bty = 'n',
-             ext = sp_ext, 
-             breaks = year_bins,
-             lab.breaks = bin_labels,
-             col = viridis(length(year_bins) - 1),
-             maxpixels=raster::ncell(week26_moll))
+par(mfrow = c(1, 2), mar = c(0, 0, 0, 0))
+plot(week1_moll, 
+     xaxt = 'n', 
+     yaxt = 'n', 
+     bty = 'n',
+     ext = sp_ext, 
+     breaks = year_bins,
+     lab.breaks = bin_labels,
+     col = viridis(length(year_bins) - 1),
+     maxpixels = ncell(week1_moll),
+     legend = FALSE)
+par(mar = c(0, 0, 0, 5))
+plot(week26_moll, 
+     xaxt = 'n', 
+     yaxt = 'n', 
+     bty = 'n',
+     ext = sp_ext, 
+     breaks = year_bins,
+     lab.breaks = bin_labels,
+     col = viridis(length(year_bins) - 1),
+     maxpixels = ncell(week26_moll),
+     legend.shrink = 0.97)
 ```
 
 ## Mapping Abundance
 
-With a good full-annual extent and color bins, that accurately represent the data distribution, we can add in other pieces of data that represent predicted and assumed zeroes, which help display the extent of estimation.
+With a good full-annual extent and color bins that accurately represent the data distribution, we can add in other pieces of data that represent predicted and assumed zeroes, which help display the extent of estimation.
 
-```{r plot_es}
+```{r map_w_es, out.width = NULL}
+library(rnaturalearth)
+
 # the helper function combine_layers() fills in with assumed and predicted zeroes
 week26 <- combine_layers(abund_stack, sp_path, week = 26)
-week26c <- raster::projectRaster(week26, crs = mollweide)
+week26c <- projectRaster(week26, crs = mollweide)
 
 # to add context, let's pull in some reference data to add
-wh <- rnaturalearth::ne_countries(continent = c("North America",
-                                                "South America"))
-wh_states <- rnaturalearth::ne_states(iso_a2 = unique(wh@data$iso_a2))
-wh_moll <- sp::spTransform(wh, mollweide)
-wh_states_moll <- sp::spTransform(wh_states, mollweide)
+wh <- ne_countries(continent = c("North America", "South America"))
+wh_states <- ne_states(iso_a2 = unique(wh@data$iso_a2))
+wh_moll <- spTransform(wh, mollweide)
+wh_states_moll <- spTransform(wh_states, mollweide)
 
 xlimits <- c(sp_ext[1], sp_ext[2])
 ylimits <- c(sp_ext[3], sp_ext[4])
@@ -289,31 +309,36 @@ w_img <- 7
 h_img <- w_img*(yrange/xrange)
 knitr::opts_chunk$set(fig.width = w_img, fig.height = h_img)
 
-par(mar = c(0,0,0,2))
-raster::plot(week26c, 
-             xaxt = 'n', 
-             yaxt = 'n',
-             bty = 'n',
-             ext = sp_ext, 
-             breaks = year_bins,
-             lab.breaks = bin_labels,
-             col = viridis(length(year_bins)-1),
-             maxpixels = raster::ncell(week26c),
-             legend = TRUE)
-sp::plot(wh_moll, add = TRUE, border = 'gray')
-sp::plot(wh_states_moll, add = TRUE, border = 'gray', lwd = 0.5)
+par(mfrow = c(1, 1), mar = c(0, 0, 0, 6))
+
+# map the raster
+plot(week26c, 
+     xaxt = 'n', 
+     yaxt = 'n',
+     bty = 'n',
+     ext = sp_ext, 
+     breaks = year_bins,
+     lab.breaks = bin_labels,
+     col = viridis(length(year_bins)-1),
+     maxpixels = ncell(week26c),
+     legend = TRUE,
+     legend.shrink = 0.97,
+     legend.width = 2)
+
+# add boundaries on top
+plot(wh_moll, add = TRUE, border = 'gray')
+plot(wh_states_moll, add = TRUE, border = 'gray', lwd = 0.5)
 ```
 
 ```{r set_figures, include = FALSE}
 knitr::opts_chunk$set(fig.width = 7, fig.height = 4)
 ```
 
-
 ## Mapping Abundance Confidence Intervals
 
 In addition to occurrence and abundance predictions, we also provide confidence intervals at an upper value of 90% and lower value of 10%. These can be used to calculate and map a confidence band width.
 
-```{r plot_confidence}
+```{r map_confidence_band}
 # load lower and upper stacks
 lower_stack <- stack_stem(sp_path, variable = "abundance_lower")
 upper_stack <- stack_stem(sp_path, variable = "abundance_upper")
@@ -321,41 +346,32 @@ upper_stack <- stack_stem(sp_path, variable = "abundance_upper")
 # calculate band width
 conf_band <- upper_stack - lower_stack
 
-conf_week26 <- raster::projectRaster(conf_band[[26]], crs = mollweide)
+conf_week26 <- projectRaster(conf_band[[26]], crs = mollweide)
 
-par(mar = c(0,0,0,2))
-raster::plot(conf_week26, 
-             xaxt = 'n', 
-             yaxt = 'n',
-             bty = 'n',
-             ext = sp_ext,
-             col = magma(20),
-             maxpixel=raster::ncell(conf_week26))
+par(mar = c(0, 0, 0, 2))
+plot(conf_week26, 
+     xaxt = 'n', 
+     yaxt = 'n',
+     bty = 'n',
+     ext = sp_ext,
+     col = magma(20),
+     maxpixel = ncell(conf_week26))
 ```
 
 # 4. Extracting Trajectories with Uncertainty
 
-With raster stacks for abundance, upper, and lower confidence intervals, we can extract an abundnace trajectory, with uncertainty intervals and plot them across the year for a single location.
+With RasterStacks for relative abundance estimates, along with upper and lower confidence intervals, we can extract an abundance trajectory with uncertainty intervals and plot them across the year for a single location.
 
 ```{r trajectories}
 # set a point
 coords <- cbind(-76.5, 42.5)
-pt <- sp::SpatialPoints(coords, proj4string = sp::CRS("+init=epsg:4326"))
-pt_prj <- sp::spTransform(pt, sp::CRS(sp::proj4string(template_raster)))
+pt <- SpatialPoints(coords, proj4string = CRS("+init=epsg:4326"))
+pt_prj <- spTransform(pt, CRS(proj4string(template_raster)))
 
 # extract
-abund_traj <- unlist(raster::extract(abund_stack, 
-                                     pt_prj, 
-                                     fun = mean, 
-                                     na.rm = TRUE))
-upper_traj <- unlist(raster::extract(upper_stack, 
-                                     pt_prj, 
-                                     fun = mean, 
-                                     na.rm = TRUE))
-lower_traj <- unlist(raster::extract(lower_stack, 
-                                     pt_prj, 
-                                     fun = mean, 
-                                     na.rm = TRUE))
+abund_traj <- unlist(extract(abund_stack, pt_prj, fun = mean, na.rm = TRUE))
+upper_traj <- unlist(extract(upper_stack, pt_prj, fun = mean, na.rm = TRUE))
+lower_traj <- unlist(extract(lower_stack, pt_prj, fun = mean, na.rm = TRUE))
 
 # Plot trajectories
 library(ggplot2)
@@ -380,19 +396,19 @@ It is also possible to extract trajectories for regions, but it takes a little m
 
 ```{r trajectories_region}
 # set an extent based on polygon
-us <- rnaturalearth::ne_states(geounit = "United States of America")
-us_prj <- sp::spTransform(us, sp::CRS(sp::proj4string(template_raster)))
-wv <- us_prj[us_prj@data$name == "West Virginia",]
+us <- ne_states(geounit = "United States of America")
+us_prj <- spTransform(us, CRS(proj4string(template_raster)))
+wv <- us_prj[us_prj@data$name == "West Virginia", ]
 
 # extract
-# because we're using regions, we get lots of values that we need to average together
-abund_traj <- raster::extract(abund_stack, wv, fun = mean, na.rm = TRUE)
+# because we're using a region, we get lots of values that we need to average together
+abund_traj <- extract(abund_stack, wv, fun = mean, na.rm = TRUE)
 abund_traj <- apply(abund_traj, 2, mean, na.rm = TRUE)
 
-upper_traj <- raster::extract(upper_stack, wv, fun = mean, na.rm = TRUE)
+upper_traj <- extract(upper_stack, wv, fun = mean, na.rm = TRUE)
 upper_traj <- apply(upper_traj, 2, mean, na.rm = TRUE)
 
-lower_traj <- raster::extract(lower_stack, wv, fun = mean, na.rm = TRUE)
+lower_traj <- extract(lower_stack, wv, fun = mean, na.rm = TRUE)
 lower_traj <- apply(lower_traj, 2, mean, na.rm = TRUE)
 
 # Plot trajectories
@@ -421,11 +437,10 @@ The `raster` package has a lot of functionality and the RasterLayer format is us
 ```{r conversion}
 # To convert the data to a simpler geographic format and access tabularly	
 # reproject into geographic (decimal degrees) 
-abund_stack_ll <- raster::projectRaster(abund_stack[[26]], 
-                                        crs = sp::CRS("+init=epsg:4326"))
+abund_stack_ll <- projectRaster(abund_stack[[26]], crs = CRS("+init=epsg:4326"))
 
 # Convert raster object into a matrix
-p <- raster::rasterToPoints(abund_stack_ll)
+p <- rasterToPoints(abund_stack_ll)
 colnames(p) <- c("longitude", "latitude", "abundance_umean")
 head(p)
 ```
@@ -436,3 +451,7 @@ write.csv(p,
           file = paste(raster_dir, "/woothr_week26.csv", sep=""),
           row.names = FALSE)
 ```
+
+## References
+
+Ross Maciejewski, Avin Pattah, Sungahn Ko, Ryan Hafen, William S. Cleveland, David S. Ebert. Automated Box-Cox Transformations for Improved Visual Encoding. IEEE Transactions on Visualization and Computer Graphics, 19(1): 130-140, 2013.
