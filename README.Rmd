@@ -48,6 +48,7 @@ One of the most common first tasks is to load a RasterStack of relative abundanc
 ```{r quick_start, fig.align = "center"}
 library(viridis)
 library(raster)
+library(rnaturalearth)
 
 # TODO set this up to do a curl of the example results first
 # TODO make sure that the resulting unzipped folder is only single nested on both
@@ -91,28 +92,27 @@ knitr::opts_chunk$set(fig.width = w_cm, fig.height = h_cm)
 # calculate ideal color bins for abundance values across the full year
 year_bins <- calc_bins(abund_moll)
 
-# to add context, pull in some reference data to add
-wh <- rnaturalearth::ne_countries(continent = c("North America",
-                                                "South America"))
-wh_states <- rnaturalearth::ne_states(iso_a2 = unique(wh@data$iso_a2))
-wh_moll <- sp::spTransform(wh, mollweide)
-wh_states_moll <- sp::spTransform(wh_states, mollweide)
+# to add context, pull in some reference data from the rnaturalearth package
+wh <- ne_countries(continent = c("North America", "South America"))
+wh_states <- ne_states(iso_a2 = unique(wh@data$iso_a2))
+wh_moll <- spTransform(wh, mollweide)
+wh_states_moll <- spTransform(wh_states, mollweide)
 
 # start plotting
 par(mfrow = c(1, 1), mar = c(0, 0, 0, 6))
 
 # use the extent object to set the spatial extent for the plot
-sp::plot(sp_ext, col = 'white')
+plot(sp_ext, col = 'white')
 
 # add background spatial context
-sp::plot(wh_states_moll, col = "grey70", add = TRUE)
+plot(wh_states_moll, col = "grey70", add = TRUE)
 
 # plot the raster
 plot(abund_moll,
      maxpixels = ncell(abund_moll),
      ext = sp_ext,
      breaks = year_bins,
-     col = viridis::viridis(length(year_bins-1)),
+     col = viridis(length(year_bins-1)),
      xaxt = 'n',
      yaxt = 'n',
      add = TRUE,
@@ -124,5 +124,5 @@ plot(abund_moll,
                       cex.axis = 0.7))
 
 # add state boundaries on top
-sp::plot(wh_states_moll, add = TRUE, border = 'black', lwd = 1)
+plot(wh_states_moll, add = TRUE, border = 'black', lwd = 1)
 ```
