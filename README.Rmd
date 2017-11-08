@@ -35,23 +35,30 @@ devtools::install_github("CornellLabofOrnithology/stemhelper")
 
 ## Vignette
 
-For a full introduction and advanced usage, please see the package [website](https://cornelllabofornithology.github.io/stemhelper). An [introductory vignette](https://cornelllabofornithology.github.io/stemhelper/articles/stem-intro-mapping.html) is available, detailing the structure of the results and how to begin loading and mapping the results. Further, an [advanced vignette](ttps://cornelllabofornithology.github.io/stemhelper/articles/stem-pipd.html) details how to access additional information from the model results about predictor importance and directionality, as well as predictive performance metrics.
+For a full introduction and advanced usage, please see the package [website](https://cornelllabofornithology.github.io/stemhelper). An [introductory vignette](https://cornelllabofornithology.github.io/stemhelper/articles/stem-intro-mapping.html) is available, detailing the structure of the results and how to begin loading and mapping the results. Further, an [advanced vignette](https://cornelllabofornithology.github.io/stemhelper/articles/stem-pipd.html) details how to access additional information from the model results about predictor importance and directionality, as well as predictive performance metrics.
 
 ## Quick Start
 
-After downloading results...
+TODO: Add details on how to acquire results.
 
-One of the first things to do is to load a RasterStack of estimated abundance predictions and plot a week of estimates.
+**IMPORTANT. AFTER DOWNLOADING THE RESULTS AND UNZIPPING THEM, DO NOT CHANGE THE FILE STRUCTURE.** All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package. See the SETUP PATHS part of the example code below.
+
+One of the most common first tasks is to load a RasterStack of relative abundance estimates and make a map.
 
 ```{r quick_start, fig.align = "center"}
 library(viridis)
 library(raster)
 
 # TODO set this up to do a curl of the example results first
+# TODO make sure that the resulting unzipped folder is only single nested on both
+# linux and Windows (had problems with norcar)
 
 # SETUP PATHS
-# Note, if you currently access results you can use this path construction
-# by replacing the root_path with where your copy lives
+# Once you have downloaded and unzipped the results, place the resulting folder,
+# with the unique species ID name (e.g., woothr-ERD2016-PROD-20170505-3f880822)
+# wherever you want to keep it. Then provide the root_path variable as that
+# location (without the unique species ID name) and provide the unique species 
+# ID name as the species variable below. Use the paste() functiont to combine
 root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
 species <- "woothr-ERD2016-PROD-20170505-3f880822"
 sp_path <- paste(root_path, species, sep = "")
