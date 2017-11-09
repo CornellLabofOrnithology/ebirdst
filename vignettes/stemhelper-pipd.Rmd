@@ -31,7 +31,7 @@ devtools::load_all()
 
 # 1. Introduction
 
-To complete...
+Beyond estimates of occurrence and relative abundance, the STEM workflow generates information about predictor importance and partial dependencies, as well as predictive performance metrics (PPMs). The PPMs can be used to evaluate statistical performance of the models, either over the entire spatiotemporal extent of the model results, or for a specific region and season. Predictor Importances (PIs) and Partial Dependencies (PDs) can be used to understand relationships between occurrence and abundance and predictors, most notably the land cover variables used in the model. When PIs and PDs are combined, we can depict habitat association and avoidance, as well as the strength of the relationship with those habitats. The functions described in this section help load this data from the results packages, give tools for assessing predictive performance, and synthesize information about predictor importances and partial dependencies.
 
 ## Data Structure
 
