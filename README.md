@@ -80,7 +80,7 @@ knitr::opts_chunk$set(fig.width = w_cm, fig.height = h_cm)
 # calculate ideal color bins for abundance values across the full year
 year_bins <- calc_bins(abund_moll)
 
-# to add context, pull in some reference data to add
+# to add context, pull in some reference data from the rnaturalearth package
 wh <- ne_countries(continent = c("North America", "South America"))
 wh_states <- ne_states(iso_a2 = unique(wh@data$iso_a2))
 wh_moll <- spTransform(wh, mollweide)

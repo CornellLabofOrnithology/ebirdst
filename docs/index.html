@@ -62,7 +62,6 @@
     
 <div class="contents">
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-<pre><code>## Loading stemhelper</code></pre>
 <div id="stemhelper-helper-functions-for-stem-loading-mapping-plotting-and-analysis" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#stemhelper-helper-functions-for-stem-loading-mapping-plotting-and-analysis" class="anchor"></a>stemhelper: Helper functions for STEM loading, mapping, plotting, and analysis</h1></div>
@@ -80,21 +79,28 @@ devtools::<span class="kw">install_github</span>(<span class="st">"CornellLabofO
 <div id="vignette" class="section level2">
 <h2 class="hasAnchor">
 <a href="#vignette" class="anchor"></a>Vignette</h2>
-<p>For a full introduction and advanced usage, please see the package <a href="https://cornelllabofornithology.github.io/stemhelper">website</a>. An <a href="https://cornelllabofornithology.github.io/stemhelper/articles/stem-intro-mapping.html">introductory vignette</a> is available, detailing the structure of the results and how to begin loading and mapping the results. Further, an <a href="ttps://cornelllabofornithology.github.io/stemhelper/articles/stem-pipd.html">advanced vignette</a> details how to access additional information from the model results about predictor importance and directionality, as well as predictive performance metrics.</p>
+<p>For a full introduction and advanced usage, please see the package <a href="https://cornelllabofornithology.github.io/stemhelper">website</a>. An <a href="https://cornelllabofornithology.github.io/stemhelper/articles/stem-intro-mapping.html">introductory vignette</a> is available, detailing the structure of the results and how to begin loading and mapping the results. Further, an <a href="https://cornelllabofornithology.github.io/stemhelper/articles/stem-pipd.html">advanced vignette</a> details how to access additional information from the model results about predictor importance and directionality, as well as predictive performance metrics.</p>
 </div>
 <div id="quick-start" class="section level2">
 <h2 class="hasAnchor">
 <a href="#quick-start" class="anchor"></a>Quick Start</h2>
-<p>After downloading results…</p>
-<p>One of the first things to do is to load a RasterStack of estimated abundance predictions and plot a week of estimates.</p>
+<p>TODO: Add details on how to acquire results.</p>
+<p><strong>IMPORTANT. AFTER DOWNLOADING THE RESULTS AND UNZIPPING THEM, DO NOT CHANGE THE FILE STRUCTURE.</strong> All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package. See the SETUP PATHS part of the example code below.</p>
+<p>One of the most common first tasks is to load a RasterStack of relative abundance estimates and make a map.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(viridis)
 <span class="kw">library</span>(raster)
+<span class="kw">library</span>(rnaturalearth)
 
 <span class="co"># TODO set this up to do a curl of the example results first</span>
+<span class="co"># TODO make sure that the resulting unzipped folder is only single nested on both</span>
+<span class="co"># linux and Windows (had problems with norcar)</span>
 
 <span class="co"># SETUP PATHS</span>
-<span class="co"># Note, if you currently access results you can use this path construction</span>
-<span class="co"># by replacing the root_path with where your copy lives</span>
+<span class="co"># Once you have downloaded and unzipped the results, place the resulting folder,</span>
+<span class="co"># with the unique species ID name (e.g., woothr-ERD2016-PROD-20170505-3f880822)</span>
+<span class="co"># wherever you want to keep it. Then provide the root_path variable as that</span>
+<span class="co"># location (without the unique species ID name) and provide the unique species </span>
+<span class="co"># ID name as the species variable below. Use the paste() functiont to combine</span>
 root_path &lt;-<span class="st"> "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"</span>
 species &lt;-<span class="st"> "woothr-ERD2016-PROD-20170505-3f880822"</span>
 sp_path &lt;-<span class="st"> </span><span class="kw">paste</span>(root_path, species, <span class="dt">sep =</span> <span class="st">""</span>)
@@ -127,28 +133,27 @@ knitr::opts_chunk$<span class="kw">set</span>(<span class="dt">fig.width =</span
 <span class="co"># calculate ideal color bins for abundance values across the full year</span>
 year_bins &lt;-<span class="st"> </span><span class="kw"><a href="reference/calc_bins.html">calc_bins</a></span>(abund_moll)
 
-<span class="co"># to add context, pull in some reference data to add</span>
-wh &lt;-<span class="st"> </span>rnaturalearth::<span class="kw">ne_countries</span>(<span class="dt">continent =</span> <span class="kw">c</span>(<span class="st">"North America"</span>,
-                                                <span class="st">"South America"</span>))
-wh_states &lt;-<span class="st"> </span>rnaturalearth::<span class="kw">ne_states</span>(<span class="dt">iso_a2 =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/unique">unique</a></span>(wh@data$iso_a2))
-wh_moll &lt;-<span class="st"> </span>sp::<span class="kw">spTransform</span>(wh, mollweide)
-wh_states_moll &lt;-<span class="st"> </span>sp::<span class="kw">spTransform</span>(wh_states, mollweide)
+<span class="co"># to add context, pull in some reference data from the rnaturalearth package</span>
+wh &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/rnaturalearth/topics/ne_countries">ne_countries</a></span>(<span class="dt">continent =</span> <span class="kw">c</span>(<span class="st">"North America"</span>, <span class="st">"South America"</span>))
+wh_states &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/rnaturalearth/topics/ne_states">ne_states</a></span>(<span class="dt">iso_a2 =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/unique">unique</a></span>(wh@data$iso_a2))
+wh_moll &lt;-<span class="st"> </span><span class="kw">spTransform</span>(wh, mollweide)
+wh_states_moll &lt;-<span class="st"> </span><span class="kw">spTransform</span>(wh_states, mollweide)
 
 <span class="co"># start plotting</span>
 <span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>), <span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">6</span>))
 
 <span class="co"># use the extent object to set the spatial extent for the plot</span>
-sp::<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(sp_ext, <span class="dt">col =</span> <span class="st">'white'</span>)
+<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(sp_ext, <span class="dt">col =</span> <span class="st">'white'</span>)
 
 <span class="co"># add background spatial context</span>
-sp::<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(wh_states_moll, <span class="dt">col =</span> <span class="st">"grey70"</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
+<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(wh_states_moll, <span class="dt">col =</span> <span class="st">"grey70"</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
 
 <span class="co"># plot the raster</span>
 <span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(abund_moll,
      <span class="dt">maxpixels =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(abund_moll),
      <span class="dt">ext =</span> sp_ext,
      <span class="dt">breaks =</span> year_bins,
-     <span class="dt">col =</span> viridis::<span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="kw">length</span>(year_bins<span class="dv">-1</span>)),
+     <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="kw">length</span>(year_bins<span class="dv">-1</span>)),
      <span class="dt">xaxt =</span> <span class="st">'n'</span>,
      <span class="dt">yaxt =</span> <span class="st">'n'</span>,
      <span class="dt">add =</span> <span class="ot">TRUE</span>,
@@ -160,7 +165,7 @@ sp::<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topi
                       <span class="dt">cex.axis =</span> <span class="fl">0.7</span>))
 
 <span class="co"># add state boundaries on top</span>
-sp::<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(wh_states_moll, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">border =</span> <span class="st">'black'</span>, <span class="dt">lwd =</span> <span class="dv">1</span>)</code></pre></div>
+<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(wh_states_moll, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">border =</span> <span class="st">'black'</span>, <span class="dt">lwd =</span> <span class="dv">1</span>)</code></pre></div>
 <p><img src="README-quick_start-1.png" width="672" style="display: block; margin: auto;"></p>
 </div>
 </div>
