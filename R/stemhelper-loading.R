@@ -131,7 +131,9 @@ st_extent_subset <- function(data, st_extent, use_time = TRUE) {
     }
 
     # use for subset
-    subset_data <- sites[!is.na(over(sites, as(plygn, "SpatialPolygons"))), ]
+    subset_data <- sites[!is.na(over(sites,
+                                     methods::as(plygn,
+                                                 "SpatialPolygons"))), ]
 
     if(is.data.frame(data)) {
       subset_data <- subset_data@data
@@ -197,6 +199,12 @@ stack_stem <- function(path,
                paste(poss_var, collapse = ", "), ".", sep = ""))
   }
 
+  if(!all(is.na(st_extent))) {
+    if(!is.list(st_extent)) {
+      stop("The st_extent argument must be a list object.")
+    }
+  }
+
   fp <- paste(path, "/results/tifs/presentation/", variable, sep = "")
 
   load_extent <- NULL
@@ -222,7 +230,18 @@ stack_stem <- function(path,
     }
   } else {
     # load with extent
-    load_extent <- get_sinu_ext(st_extent)
+
+    if(st_extent$type == "rectangle") {
+      load_extent <- get_sinu_ext(st_extent)
+    } else {
+      # check prj
+      if(!sp::identicalCRS(template_raster, st_extent$polygon)) {
+        load_extent <- sp::spTransform(st_extent$polygon,
+                                 sp::CRS(sp::proj4string(template_raster)))
+      } else {
+        load_extent <- st_extent$polygon
+      }
+    }
   }
 
   # define function to load and extend each file in path
