@@ -291,7 +291,11 @@ load_config <- function(path) {
   config_file <- paste(path, "/data/", config_file_path, sep = "")
 
   if(!file.exists(config_file)) {
-    stop("*_config.RData file does not exist in the /data directory.")
+    stop(paste("*_config.RData file does not exist in the /data directory. ",
+               "Check your paths so that they look something like this: ",
+               "~/directory/<six_letter_code-ERD2016-PROD-date-uuid>/. ",
+               "Make sure you do not change the file structure of the results.",
+               sep = ""))
   }
 
   load(config_file, envir = e)
