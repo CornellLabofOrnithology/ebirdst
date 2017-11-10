@@ -22,7 +22,7 @@ test_that("stemhelper calc_full_extent", {
   # not a raster object
   ext_poly <- methods::as(raster::extent(abund), "SpatialPolygons")
   raster::crs(ext_poly) <- raster::crs(abund)
-  expect_error(calc_full_extent(ext_poly))
+  expect_error(calc_full_extent(ext_poly), "Input must be a Raster")
 })
 
 test_that("stemhelper calc_bins", {
@@ -47,10 +47,10 @@ test_that("stemhelper calc_bins", {
   # not a raster object
   ext_poly <- methods::as(raster::extent(abund), "SpatialPolygons")
   raster::crs(ext_poly) <- raster::crs(abund)
-  expect_error(calc_bins(ext_poly))
+  expect_error(calc_bins(ext_poly), "Input must be a Raster")
 
   # if all is NA
   abund_test <- abund[[26]]
   abund_test[!is.na(abund_test)] <- NA
-  expect_error(calc_bins(abund_test))
+  expect_error(calc_bins(abund_test), "must have non-NA values")
 })
