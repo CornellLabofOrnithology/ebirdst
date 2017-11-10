@@ -48,8 +48,12 @@ plot_pis <- function(path,
                      print_plot = TRUE) {
   e <- load_config(path)
 
+  if(is.null(st_extent$t.min) | is.null(st_extent$t.max)) {
+    stop("Must provide t.min and t.max as part of st_extent for this function.")
+  }
+
   # subset for extent
-  ttt_sub <- st_extent_subset(pis, st_extent, use_time = TRUE)
+  ttt_sub <- st_extent_subset(pis, st_extent)
   ttt <- ttt_sub[, e$PI_VARS]
   rm(ttt_sub)
 
@@ -235,6 +239,10 @@ plot_pds <- function(pd_name,
                "plot_quantiles, pointwise_pi, or stixel_pds.", sep = ""))
   }
 
+  if(is.null(st_extent$t.min) | is.null(st_extent$t.max)) {
+    stop("Must provide t.min and t.max as part of st_extent for this function.")
+  }
+
   # static variables
   PD_MAX_RESOLUTION <- 50
   t.ul <- NULL
@@ -261,7 +269,7 @@ plot_pds <- function(pd_name,
   return_list <- list()
 
   # subset based on extent
-  pd_vec <- st_extent_subset(pds, st_extent, use_time = TRUE)
+  pd_vec <- st_extent_subset(pds, st_extent)
 
   rm(pds)
 
@@ -771,11 +779,15 @@ cake_plot <- function(path,
   mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
 
   # subset centroids
-  tpis_sub <- st_extent_subset(pis, st_extent, use_time = FALSE)
+  # need to remove time from st_extent before using
+  st_extent$t.min <- NULL
+  st_extent$t.max <- NILL
+
+  tpis_sub <- st_extent_subset(pis, st_extent)
   tpis <- tpis_sub[!is.na(tpis_sub[, 2]), ]
   rm(pis, tpis_sub)
 
-  tpds_sub <- st_extent_subset(pds, st_extent, use_time = FALSE)
+  tpds_sub <- st_extent_subset(pds, st_extent)
   tpds <- tpds_sub[!is.na(tpds_sub$V5), ]
   rm(pds)
 

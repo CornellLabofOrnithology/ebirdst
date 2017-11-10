@@ -55,7 +55,8 @@ get_sinu_ext <- function(st_extent) {
 #' @param data data.frame or SpatialPointsDataFrame; originating from STEM
 #' results.
 #' @param st_extent list; st_extent list object
-#' @param use_time logical; indicating whether to use time in subsetting or not.
+#' @param use_time logical; Default is TRUE, indicating whether to use time in
+#' subsetting or not.
 #'
 #' @return Subset of input data as same type.
 #'
@@ -80,7 +81,13 @@ get_sinu_ext <- function(st_extent) {
 #' #subset pis with st_extent list
 #' st_extent_subset(data = pis, st_extent = ne_extent, use_time = TRUE)
 #' }
-st_extent_subset <- function(data, st_extent, use_time = TRUE) {
+st_extent_subset <- function(data, st_extent) {
+  if(is.null(st_extent$t.min) | is.null(st_extent$t.max)) {
+    use_time <- FALSE
+  } else {
+    use_time <- TRUE
+  }
+
   if(st_extent$type == "rectangle") {
     if(use_time == TRUE) {
       if(st_extent$t.min > st_extent$t.max) {

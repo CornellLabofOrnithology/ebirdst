@@ -308,7 +308,6 @@ combine_layers <- function(stack, path, week) {
 #' of PI stixel centroid locations.
 #' @param plot_pds logical; Default is TRUE. Set to FALSE to hide the plotting
 #' of PD stixel centroid locations.
-#' @param ... Additional parameters to pass along to plot.
 #'
 #' @return Plot showing locations of PIs and/or PDs.
 #'
@@ -335,11 +334,16 @@ map_centroids <- function(pis,
                           pds,
                           st_extent = NA,
                           plot_pis = TRUE,
-                          plot_pds = TRUE,
-                          ...) {
+                          plot_pds = TRUE) {
 
   if(plot_pds == FALSE & plot_pis == FALSE) {
     stop("Plotting of both PIs and PDs set to FALSE. Nothing to plot!")
+  }
+
+  if(!all(is.na(st_extent))) {
+    if(!is.list(st_extent)) {
+      stop("The st_extent argument must be a list object.")
+    }
   }
 
   # projection information
@@ -375,7 +379,7 @@ map_centroids <- function(pis,
                  add = TRUE)
 
     if(!all(is.na(st_extent))) {
-      tpds_sub <- st_extent_subset(tpds_sp, st_extent, use_time = TRUE)
+      tpds_sub <- st_extent_subset(tpds_sp, st_extent)
 
       tpds_region <- sp::spTransform(tpds_sub, sp::CRS(mollweide))
       rm(tpds_sub)
@@ -444,7 +448,7 @@ map_centroids <- function(pis,
                  add = TRUE)
 
     if(!all(is.na(st_extent))) {
-      tpis_sub <- st_extent_subset(tpis_sp, st_extent, use_time = TRUE)
+      tpis_sub <- st_extent_subset(tpis_sp, st_extent)
 
       tpis_region <- sp::spTransform(tpis_sub, sp::CRS(mollweide))
 
@@ -569,7 +573,7 @@ calc_effective_extent <- function(st_extent,
                                         proj4string = sp::CRS(ll))
   rm(tpis)
 
-  tpis_sub <- st_extent_subset(tpis_sp, st_extent, use_time = TRUE)
+  tpis_sub <- st_extent_subset(tpis_sp, st_extent)
   rm(tpis_sp)
 
   # build stixels as polygons
