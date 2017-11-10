@@ -4,8 +4,7 @@
 \alias{map_centroids}
 \title{Map PI and PD centroid locations}
 \usage{
-map_centroids(pis, pds, st_extent = NA, plot_pis = TRUE, plot_pds = TRUE,
-  ...)
+map_centroids(pis, pds, st_extent = NA, plot_pis = TRUE, plot_pds = TRUE)
 }
 \arguments{
 \item{pis}{data.frame; from \code{load_pis()}}
@@ -19,8 +18,6 @@ of PI stixel centroid locations.}
 
 \item{plot_pds}{logical; Default is TRUE. Set to FALSE to hide the plotting
 of PD stixel centroid locations.}
-
-\item{...}{Additional parameters to pass along to plot.}
 }
 \value{
 Plot showing locations of PIs and/or PDs.

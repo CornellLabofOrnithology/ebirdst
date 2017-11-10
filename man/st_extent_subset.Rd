@@ -4,7 +4,7 @@
 \alias{st_extent_subset}
 \title{Spatiotemporal subsetter for STEM result data objects}
 \usage{
-st_extent_subset(data, st_extent, use_time = TRUE)
+st_extent_subset(data, st_extent)
 }
 \arguments{
 \item{data}{data.frame or SpatialPointsDataFrame; originating from STEM
@@ -12,7 +12,8 @@ results.}
 
 \item{st_extent}{list; st_extent list object}
 
-\item{use_time}{logical; indicating whether to use time in subsetting or not.}
+\item{use_time}{logical; Default is TRUE, indicating whether to use time in
+subsetting or not.}
 }
 \value{
 Subset of input data as same type.
