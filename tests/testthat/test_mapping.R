@@ -68,13 +68,16 @@ test_that("stemhelper combine_layers", {
 
   # not a RasterStack
   expect_error(combine_layers(abund[[26]], sp_path, 26),
-               "stack must be of type RasterStack")
+               "stack argument must be of type RasterStack")
 
   # week is not integer
   # week outside of 1 to 52
-  expect_error(combine_layers(abund, sp_path, 4.1), "week must be an integer")
-  expect_error(combine_layers(abund, sp_path, 0), "week must be an integer")
-  expect_error(combine_layers(abund, sp_path, 101), "week must be an integer")
+  expect_error(combine_layers(abund, sp_path, 4.1),
+               "week argument must be a whole integer from 1 to 52")
+  expect_error(combine_layers(abund, sp_path, 0),
+               "week argument must be a whole integer from 1 to 52")
+  expect_error(combine_layers(abund, sp_path, 101),
+               "week argument must be a whole integer from 1 to 52")
 
   # broken path
   sp_path <- '~/some/messed/up/path/that/does/not/exist'
