@@ -254,8 +254,6 @@ combine_layers <- function(stack, path, week) {
   pos_es_stack <- stack_stem(path, variable = "abundance_ensemble_support")
   pos_es_week <- pos_es_stack[[week]]
 
-
-
   # load zero ensemble support
   zero_es_week <- stemhelper::zero_es_stack[[week]]
 
@@ -403,11 +401,13 @@ map_centroids <- function(pis,
                    cex = 1,
                    col = "#1b9377")
 
-    graphics::text(x = usr[1] + xwidth/8,
-                   y = usr[3] + yheight/9,
-                   paste("Selected PDs: ", nrow(tpds_region), sep = ""),
-                   cex = 1,
-                   col = "#b3e2cd")
+    if(!all(is.na(st_extent))) {
+      graphics::text(x = usr[1] + xwidth/8,
+                     y = usr[3] + yheight/9,
+                     paste("Selected PDs: ", nrow(tpds_region), sep = ""),
+                     cex = 1,
+                     col = "#b3e2cd")
+    }
 
     wh_extent <- raster::extent(tpds_prj)
     rm(tpds_prj, tpds_region)
@@ -469,11 +469,13 @@ map_centroids <- function(pis,
          cex = 1,
          col = "#d95f02")
 
-    text(x = usr[1] + xwidth/8,
-         y = usr[3] + yheight/17,
-         paste("Selected PIs: ", nrow(tpis_region), sep = ""),
-         cex = 1,
-         col = "#fdcdac")
+    if(!all(is.na(st_extent))) {
+      text(x = usr[1] + xwidth/8,
+           y = usr[3] + yheight/17,
+           paste("Selected PIs: ", nrow(tpis_region), sep = ""),
+           cex = 1,
+           col = "#fdcdac")
+    }
 
     rm(tpis_prj, tpis_region)
   }
