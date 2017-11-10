@@ -238,8 +238,8 @@ combine_layers <- function(stack, path, week) {
     stop("stack argument must be of type RasterStack.")
   }
 
-  if(!is.double(week) | week < 1 | week > 52) {
-    stop("week argument must be an double from 1 to 52")
+  if(week%%1 != 0 | week < 1 | week > 52) {
+    stop("week argument must be a whole integer from 1 to 52")
   }
 
   e <- load_config(path)
