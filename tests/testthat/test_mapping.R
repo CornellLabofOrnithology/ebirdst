@@ -132,3 +132,47 @@ test_that("stemhelper map_centroids", {
                              plot_pis = FALSE,
                              plot_pds = FALSE), "Plotting of both PIs and PDs")
 })
+
+test_that("stemhelper calc_effective_extent", {
+  root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
+  species <- "woothr-ERD2016-PROD-20170505-3f880822"
+  sp_path <- paste(root_path, species, sep = "")
+
+  pis <- load_pis(sp_path)
+  pds <- load_pds(sp_path)
+
+  ne_extent <- list(type = "rectangle",
+                    lat.min = 40,
+                    lat.max = 47,
+                    lon.min = -80,
+                    lon.max = -70,
+                    t.min = 0.425,
+                    t.max = 0.475)
+
+  calc_effective_extent(st_extent = ne_extent, pis = pis)
+
+  # expected
+  expect_is(calc_effective_extent(st_extent = ne_extent, pis = pis),
+            "RasterLayer")
+  expect_is(calc_effective_extent(st_extent = ne_extent, pds = pds),
+            "RasterLayer")
+  expect_error(calc_effective_extent(st_extent = ne_extent, pds = pds), NA)
+  expect_error(calc_effective_extent(st_extent = ne_extent, pis = pis), NA)
+
+  # known input error checking
+  expect_error(calc_effective_extent(st_extent = ne_extent,
+                                     pis = pis,
+                                     pds = pds),
+               "Unable to calculate for both PIs and PDs")
+  expect_error(calc_effective_extent(st_extent = ne_extent),
+               "Both PIs and PDs are NA")
+
+  # no temporal info
+  ne_extent <- list(type = "rectangle",
+                    lat.min = 40,
+                    lat.max = 47,
+                    lon.min = -80,
+                    lon.max = -70)
+  expect_warning(calc_effective_extent(st_extent = ne_extent, pis = pis),
+                 "Without temporal limits")
+})
