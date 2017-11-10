@@ -16,7 +16,8 @@ test_that("stemhelper stack_stem default", {
 
   # broken path
   sp_path <- '~/some/messed/up/path/that/does/not/exist'
-  expect_error(stack_stem(sp_path, variable = "abundance_umean"))
+  expect_error(stack_stem(sp_path, variable = "abundance_umean"),
+               "RData file does not exist")
 })
 
 test_that("stemhelper stack_stem st_extent", {
@@ -59,7 +60,8 @@ test_that("stemhelper stack_stem st_extent", {
                     t.max = 0.475)
   expect_error(stack_stem(sp_path,
                        variable = "abundance_umean",
-                       st_extent = ne_extent))
+                       st_extent = ne_extent),
+               "ymin and ymax are less than one")
 
   # missing a corner
   ne_extent <- list(type = "rectangle",
@@ -68,7 +70,8 @@ test_that("stemhelper stack_stem st_extent", {
                     lon.min = -80)
   expect_error(stack_stem(sp_path,
                           variable = "abundance_umean",
-                          st_extent = ne_extent))
+                          st_extent = ne_extent),
+               "insufficient number of elements")
 
   # st_extent is not list
   ne_extent <- c(type = "rectangle",
@@ -80,7 +83,8 @@ test_that("stemhelper stack_stem st_extent", {
                  t.max = 0.475)
   expect_error(stack_stem(sp_path,
                           variable = "abundance_umean",
-                          st_extent = ne_extent))
+                          st_extent = ne_extent),
+               "st_extent argument must be a list")
 
   # extent with shapefile
   library(sp)
@@ -124,7 +128,7 @@ test_that("stemhelpe load_pis", {
 
   # broken path
   sp_path <- '~/some/messed/up/path/that/does/not/exist'
-  expect_error(load_pis(sp_path))
+  expect_error(load_pis(sp_path), "RData file does not exist")
 })
 
 test_that("stemhelpe load_pds", {
@@ -137,5 +141,5 @@ test_that("stemhelpe load_pds", {
 
   # broken path
   sp_path <- '~/some/messed/up/path/that/does/not/exist'
-  expect_error(load_pds(sp_path))
+  expect_error(load_pds(sp_path), "RData file does not exist")
 })
