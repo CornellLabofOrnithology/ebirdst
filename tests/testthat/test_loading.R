@@ -14,6 +14,7 @@ test_that("stemhelper stack_stem default", {
                      "abundance_upper, abundance_umean, occurrence_umean.",
                      sep = ""))
 
+  # broken path
   sp_path <- '~/some/messed/up/path/that/does/not/exist'
   expect_error(stack_stem(sp_path, variable = "abundance_umean"))
 })
@@ -111,4 +112,30 @@ test_that("stemhelper stack_stem w/ use_analysis_extent", {
                       use_analysis_extent = FALSE)
   expect_is(abund, "RasterStack")
   expect_gt(raster::ncell(abund), 1)
+})
+
+test_that("stemhelpe load_pis", {
+  root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
+  species <- "woothr-ERD2016-PROD-20170505-3f880822"
+  sp_path <- paste(root_path, species, sep = "")
+
+  expect_is(load_pis(sp_path), "data.frame")
+  expect_gt(nrow(load_pis(sp_path)), 0)
+
+  # broken path
+  sp_path <- '~/some/messed/up/path/that/does/not/exist'
+  expect_error(load_pis(sp_path))
+})
+
+test_that("stemhelpe load_pds", {
+  root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
+  species <- "woothr-ERD2016-PROD-20170505-3f880822"
+  sp_path <- paste(root_path, species, sep = "")
+
+  expect_is(load_pds(sp_path), "data.frame")
+  expect_gt(nrow(load_pds(sp_path)), 0)
+
+  # broken path
+  sp_path <- '~/some/messed/up/path/that/does/not/exist'
+  expect_error(load_pds(sp_path))
 })
