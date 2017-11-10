@@ -62,9 +62,9 @@
     
 <div class="contents">
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-<div id="stemhelper-helper-functions-for-stem-loading-mapping-plotting-and-analysis" class="section level1">
+<div id="stemhelper-functions-for-stem-loading-mapping-plotting-and-analysis" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#stemhelper-helper-functions-for-stem-loading-mapping-plotting-and-analysis" class="anchor"></a>stemhelper: Helper functions for STEM loading, mapping, plotting, and analysis</h1></div>
+<a href="#stemhelper-functions-for-stem-loading-mapping-plotting-and-analysis" class="anchor"></a>stemhelper: functions for STEM loading, mapping, plotting, and analysis</h1></div>
 <!-- [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0) -->
 <p><strong>THIS PACKAGE IS UNDER ACTIVE DEVELOPMENT. FUNCTIONALITY MAY CHANGE AT ANY TIME.</strong></p>
 <p>The goal of stemhelper is to provide functionality for loading, mapping, plotting, and analyzing STEM results.</p>
@@ -91,19 +91,25 @@ devtools::<span class="kw">install_github</span>(<span class="st">"CornellLabofO
 <span class="kw">library</span>(raster)
 <span class="kw">library</span>(rnaturalearth)
 
-<span class="co"># TODO set this up to do a curl of the example results first</span>
-<span class="co"># TODO make sure that the resulting unzipped folder is only single nested on both</span>
-<span class="co"># linux and Windows (had problems with norcar)</span>
-
 <span class="co"># SETUP PATHS</span>
 <span class="co"># Once you have downloaded and unzipped the results, place the resulting folder,</span>
 <span class="co"># with the unique species ID name (e.g., woothr-ERD2016-PROD-20170505-3f880822)</span>
 <span class="co"># wherever you want to keep it. Then provide the root_path variable as that</span>
 <span class="co"># location (without the unique species ID name) and provide the unique species </span>
 <span class="co"># ID name as the species variable below. Use the paste() functiont to combine</span>
-root_path &lt;-<span class="st"> "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"</span>
-species &lt;-<span class="st"> "woothr-ERD2016-PROD-20170505-3f880822"</span>
-sp_path &lt;-<span class="st"> </span><span class="kw">paste</span>(root_path, species, <span class="dt">sep =</span> <span class="st">""</span>)
+
+<span class="co"># This example downloads example data directly</span>
+species &lt;-<span class="st"> "woothr-ERD2016-AZURE_TEST-20170504-127a3ea4"</span>
+species_url &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="st">"http://ebirddata.ornith.cornell.edu/downloads/hidden/"</span>, 
+                     species, <span class="st">".zip"</span>, <span class="dt">sep =</span> <span class="st">""</span>)
+
+temp &lt;-<span class="st"> </span><span class="kw">tempfile</span>()
+temp_dir &lt;-<span class="st"> </span><span class="kw">tempdir</span>()
+<span class="kw">download.file</span>(species_url, temp)
+<span class="kw">unzip</span>(temp, <span class="dt">exdir =</span> temp_dir)
+<span class="kw">unlink</span>(temp)
+
+sp_path &lt;-<span class="st"> </span><span class="kw">paste</span>(temp_dir, <span class="st">"/"</span>, species, <span class="dt">sep =</span> <span class="st">""</span>)
 
 <span class="co"># load a stack of rasters with the helper function stack_stem()</span>
 abund &lt;-<span class="st"> </span><span class="kw"><a href="reference/stack_stem.html">stack_stem</a></span>(sp_path, <span class="dt">variable =</span> <span class="st">"abundance_umean"</span>)
@@ -167,6 +173,9 @@ wh_states_moll &lt;-<span class="st"> </span><span class="kw">spTransform</span>
 <span class="co"># add state boundaries on top</span>
 <span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(wh_states_moll, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">border =</span> <span class="st">'black'</span>, <span class="dt">lwd =</span> <span class="dv">1</span>)</code></pre></div>
 <p><img src="README-quick_start-1.png" width="672" style="display: block; margin: auto;"></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># clean up</span>
+<span class="kw">unlink</span>(temp_dir)</code></pre></div>
 </div>
 </div>
 </div>
