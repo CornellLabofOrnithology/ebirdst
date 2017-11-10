@@ -23,6 +23,10 @@
 #' }
 calc_full_extent <- function(x) {
 
+  if(!(class(x) %in% c("RasterLayer", "RasterStack", "RasterBrick"))) {
+    stop("Input must be a Raster* object.")
+  }
+
   # aggregate stack for speed, otherwise everything else takes too long
   stack <- raster::aggregate(x, fact = 3)
 
