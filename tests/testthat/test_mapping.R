@@ -17,7 +17,7 @@ test_that("stemhelper calc_full_extent", {
 
   # projected
   abund_prj <- raster::projectRaster(abund[[26]], crs = "+init=epsg:4326")
-  expect_is(abund_prj, "Extent")
+  expect_is(calc_full_extent(abund_prj), "Extent")
 
   # not a raster object
   ext_poly <- methods::as(raster::extent(abund), "SpatialPolygons")
