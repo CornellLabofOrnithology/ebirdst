@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-stemhelper: Helper functions for STEM loading, mapping, plotting, and analysis
-==============================================================================
+stemhelper: functions for STEM loading, mapping, plotting, and analysis
+=======================================================================
 
 <!-- [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0) -->
 **THIS PACKAGE IS UNDER ACTIVE DEVELOPMENT. FUNCTIONALITY MAY CHANGE AT ANY TIME.**
@@ -38,19 +38,25 @@ library(viridis)
 library(raster)
 library(rnaturalearth)
 
-# TODO set this up to do a curl of the example results first
-# TODO make sure that the resulting unzipped folder is only single nested on both
-# linux and Windows (had problems with norcar)
-
 # SETUP PATHS
 # Once you have downloaded and unzipped the results, place the resulting folder,
 # with the unique species ID name (e.g., woothr-ERD2016-PROD-20170505-3f880822)
 # wherever you want to keep it. Then provide the root_path variable as that
 # location (without the unique species ID name) and provide the unique species 
 # ID name as the species variable below. Use the paste() functiont to combine
-root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-species <- "woothr-ERD2016-PROD-20170505-3f880822"
-sp_path <- paste(root_path, species, sep = "")
+
+# This example downloads example data directly
+species <- "woothr-ERD2016-AZURE_TEST-20170504-127a3ea4"
+species_url <- paste("http://ebirddata.ornith.cornell.edu/downloads/hidden/", 
+                     species, ".zip", sep = "")
+
+temp <- tempfile()
+temp_dir <- tempdir()
+download.file(species_url, temp)
+unzip(temp, exdir = temp_dir)
+unlink(temp)
+
+sp_path <- paste(temp_dir, "/", species, sep = "")
 
 # load a stack of rasters with the helper function stack_stem()
 abund <- stack_stem(sp_path, variable = "abundance_umean")
@@ -116,3 +122,9 @@ plot(wh_states_moll, add = TRUE, border = 'black', lwd = 1)
 ```
 
 <img src="README-quick_start-1.png" style="display: block; margin: auto;" />
+
+``` r
+
+# clean up
+unlink(temp_dir)
+```
