@@ -56,7 +56,6 @@ test_that("stemhelper calc_bins", {
 })
 
 test_that("stemhelper combine_layers", {
-
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
   species <- "woothr-ERD2016-PROD-20170505-3f880822"
   sp_path <- paste(root_path, species, sep = "")
@@ -80,4 +79,56 @@ test_that("stemhelper combine_layers", {
   # broken path
   sp_path <- '~/some/messed/up/path/that/does/not/exist'
   expect_error(combine_layers(abund, sp_path, 26), "RData file does not exist")
+})
+
+test_that("stemhelper map_centroids", {
+  root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
+  species <- "woothr-ERD2016-PROD-20170505-3f880822"
+  sp_path <- paste(root_path, species, sep = "")
+
+  pis <- load_pis(sp_path)
+  pds <- load_pds(sp_path)
+
+  # expected without st_extent
+  expect_error(map_centroids(pis = pis, pds = pds), NA)
+
+  # expected with st_extent
+  ne_extent <- list(type = "rectangle",
+                    lat.min = 40,
+                    lat.max = 47,
+                    lon.min = -80,
+                    lon.max = -70,
+                    t.min = 0.425,
+                    t.max = 0.475)
+  expect_error(map_centroids(pis = pis, pds = pds, st_extent = ne_extent), NA)
+
+  # param variations
+  expect_error(map_centroids(pis = pis,
+                             pds = pds,
+                             st_extent = ne_extent,
+                             plot_pis = FALSE), NA)
+  expect_error(map_centroids(pis = pis,
+                             pds = pds,
+                             st_extent = ne_extent,
+                             plot_pds = FALSE), NA)
+  expect_error(map_centroids(pis = pis,
+                             st_extent = ne_extent,
+                             plot_pds = FALSE), NA)
+  expect_error(map_centroids(pds = pds,
+                             st_extent = ne_extent,
+                             plot_pis = FALSE), NA)
+
+  # param mis-setting
+  expect_error(map_centroids(pis = pis,
+                             st_extent = ne_extent,
+                             plot_pis = FALSE), 'argument "pds" is missing')
+
+  expect_error(map_centroids(pds = pds,
+                             st_extent = ne_extent,
+                             plot_pds = FALSE), 'argument "pis" is missing')
+  expect_error(map_centroids(pis = pis,
+                             pds = pds,
+                             st_extent = ne_extent,
+                             plot_pis = FALSE,
+                             plot_pds = FALSE), "Plotting of both PIs and PDs")
 })
