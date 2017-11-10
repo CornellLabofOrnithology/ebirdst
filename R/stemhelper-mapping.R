@@ -117,6 +117,14 @@ calc_full_extent <- function(x) {
 #' }
 calc_bins <- function(x) {
 
+  if(!(class(x) %in% c("RasterLayer", "RasterStack", "RasterBrick"))) {
+    stop("Input must be a Raster* object.")
+  }
+
+  if(all(is.na(raster::maxValue(x))) & all(is.na(raster::minValue(x)))) {
+    stop("Input Raster* object must have non-NA values.")
+  }
+
   # get a vector of all the values in the stack
   zrv <- raster::getValues(x)
   zrv[zrv == 0] <- NA
