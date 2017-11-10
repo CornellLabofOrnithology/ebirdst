@@ -233,6 +233,15 @@ calc_bins <- function(x) {
 #'
 #' }
 combine_layers <- function(stack, path, week) {
+
+  if(class(stack) != "RasterStack") {
+    stop("stack must be of type RasterStack.")
+  }
+
+  if(!is.integer(week) | week < 1 | week > 52) {
+    stop("week must be an integer from 1 to 52")
+  }
+
   e <- load_config(path)
 
   # possible checks
