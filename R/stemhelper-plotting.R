@@ -781,7 +781,7 @@ cake_plot <- function(path,
   # subset centroids
   # need to remove time from st_extent before using
   st_extent$t.min <- NULL
-  st_extent$t.max <- NILL
+  st_extent$t.max <- NULL
 
   tpis_sub <- st_extent_subset(pis, st_extent)
   tpis <- tpis_sub[!is.na(tpis_sub[, 2]), ]
