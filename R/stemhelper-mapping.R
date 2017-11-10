@@ -551,6 +551,16 @@ calc_effective_extent <- function(st_extent,
 
   if(all(is.na(st_extent))) {
     stop("Missing spatiotemporal extent.")
+  } else {
+    if(!is.list(st_extent)) {
+      stop("The st_extent argument must be a list object.")
+    }
+  }
+
+  if(is.null(st_extent$t.min) | is.null(st_extent$t.max)) {
+    warning(paste("Without temporal limits (t.min, t.max) in st_extent, ",
+                  "function will take considerably longer to run and is ",
+                  "less informative.", sep = ""))
   }
 
   # projection info
