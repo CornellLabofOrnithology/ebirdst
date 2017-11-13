@@ -974,10 +974,7 @@ cake_plot <- function(path,
 
     pipd <- pipd_agg
   } else {
-    agg_colors <- grDevices::palette(
-      grDevices::rainbow(
-        length(
-          unique(pipd$predictor))))
+    agg_colors <- scales::hue_pal()(length(unique(pipd$predictor)))
   }
 
   # Currently, unused, but keeping it here for potential future calc
@@ -1029,17 +1026,25 @@ cake_plot <- function(path,
     ggplot2::geom_vline(xintercept = as.numeric(min_date)) +
     ggplot2::geom_vline(xintercept = as.numeric(max_date)) +
     ggplot2::ylim(-1, 1) +
-    ggplot2::scale_fill_manual(values = agg_colors,
-                               labels = pipd_short$labels,
-                               name = "Predictor") +
+    ggplot2::theme_light() +
     ggplot2::scale_x_date(date_labels = "%b",
                           limits = c(as.Date("2013-01-01"),
                                      as.Date("2013-12-31")),
                           date_breaks = "1 month") +
-    ggplot2::theme_light() +
     ggplot2::xlab("Date") +
     ggplot2::ylab("Association Direction (Positive/Negative)") +
+    ggplot2::labs(fill = "Predictor") +
     ggplot2::theme(legend.key.size = ggplot2::unit(1, "line"))
+
+  if(by_cover_class) {
+    wave <- wave + ggplot2::scale_fill_manual(values = agg_colors,
+                                              labels = pipd_short$labels,
+                                              name = "Predictor")
+  } else {
+    wave <- wave + ggplot2::scale_fill_manual(values = agg_colors,
+                                              labels = unique(pipd_short$labels),
+                                              name = "Predictor")
+  }
 
   print(wave)
 
