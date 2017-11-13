@@ -318,6 +318,12 @@ test_that("stemhelper cake_plot", {
                          pis = pis,
                          pds = pds,
                          st_extent = ne_extent,
+                         by_cover_class = FALSE,
+                         pland_and_lpi_only = FALSE), NA)
+  expect_error(cake_plot(path = sp_path,
+                         pis = pis,
+                         pds = pds,
+                         st_extent = ne_extent,
                          return_data = TRUE), NA)
 
   # checking return data
