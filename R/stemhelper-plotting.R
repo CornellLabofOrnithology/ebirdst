@@ -48,10 +48,6 @@ plot_pis <- function(path,
                      print_plot = TRUE) {
   e <- load_config(path)
 
-  if(is.null(st_extent$t.min) | is.null(st_extent$t.max)) {
-    stop("Must provide t.min and t.max as part of st_extent for this function.")
-  }
-
   if(num_top_preds < 2) {
     stop("num_top_preds must be greater than 1.")
   }
@@ -65,6 +61,11 @@ plot_pis <- function(path,
       stop("The st_extent argument must be a list object.")
     }
   }
+
+  if(is.null(st_extent$t.min) | is.null(st_extent$t.max)) {
+    stop("Must provide t.min and t.max as part of st_extent for this function.")
+  }
+
 
   # subset for extent
   ttt_sub <- st_extent_subset(pis, st_extent)
@@ -253,14 +254,14 @@ plot_pds <- function(pd_name,
                "plot_quantiles, pointwise_pi, or stixel_pds.", sep = ""))
   }
 
-  if(is.null(st_extent$t.min) | is.null(st_extent$t.max)) {
-    stop("Must provide t.min and t.max as part of st_extent for this function.")
-  }
-
   if(!all(is.na(st_extent))) {
     if(!is.list(st_extent)) {
       stop("The st_extent argument must be a list object.")
     }
+  }
+
+  if(is.null(st_extent$t.min) | is.null(st_extent$t.max)) {
+    stop("Must provide t.min and t.max as part of st_extent for this function.")
   }
 
   # static variables
