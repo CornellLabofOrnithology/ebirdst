@@ -52,6 +52,14 @@ plot_pis <- function(path,
     stop("Must provide t.min and t.max as part of st_extent for this function.")
   }
 
+  if(num_top_preds < 2) {
+    stop("num_top_preds must be greater than 1.")
+  }
+
+  if(print_plot == FALSE & return_top == FALSE) {
+    stop("Both print and return params are FALSE. Nothing to do!")
+  }
+
   # subset for extent
   ttt_sub <- st_extent_subset(pis, st_extent)
   ttt <- ttt_sub[, e$PI_VARS]
@@ -122,7 +130,7 @@ plot_pis <- function(path,
 
   # find the top preds based on function variable num_top_preds
   top_names <- names(pi_median)[order(pi_median,
-                                      decreasing = T)][1:num_top_preds]
+                                      decreasing = T)][1:round(num_top_preds)]
   rm(pi_median)
   top_names <- stats::na.omit(top_names)
 
