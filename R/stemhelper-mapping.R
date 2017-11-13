@@ -289,6 +289,11 @@ combine_layers <- function(stack, path, week) {
   zero_es_mask[zero_es_mask == 0] <- NA
   zero_es_mask[zero_es_mask == 1] <- 0
 
+  # check that extents are the same
+  if(raster::extent(abund_week) != raster::extent(zero_es_mask)) {
+    zero_es_mask <- raster::crop(zero_es_mask, extent(abund_week))
+  }
+
   # stack and max
   week_stack <- raster::stack(pos_es_week, zero_es_mask, abund_week)
   week_max <- raster::calc(week_stack, max, na.rm = TRUE)
