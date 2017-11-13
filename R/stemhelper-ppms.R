@@ -384,6 +384,12 @@ compute_ppms <- function(path, st_extent = NA) {
         neg.nindex = sgc.neg.nindex ))
   }
 
+  if(!all(is.na(st_extent))) {
+    if(!is.list(st_extent)) {
+      stop("The st_extent argument must be a list object.")
+    }
+  }
+
   ppm_data_list <- load_ppm_data(path)
 
   # static vars
