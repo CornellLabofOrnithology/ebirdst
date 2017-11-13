@@ -58,7 +58,7 @@ library(rnaturalearth)
 # ID name as the species variable below. Use the paste() functiont to combine
 
 # This example downloads example data directly
-species <- "woothr-ERD2016-AZURE_TEST-20170504-127a3ea4"
+species <- "amerob-ERD2016-EXAMPLE_DATA-20171110-6d6fca4a"
 species_url <- paste("http://ebirddata.ornith.cornell.edu/downloads/hidden/", 
                      species, ".zip", sep = "")
 
