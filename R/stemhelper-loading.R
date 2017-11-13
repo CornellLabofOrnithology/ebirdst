@@ -82,6 +82,25 @@ get_sinu_ext <- function(st_extent) {
 #' st_extent_subset(data = pis, st_extent = ne_extent, use_time = TRUE)
 #' }
 st_extent_subset <- function(data, st_extent) {
+
+  if(is.null(st_extent$lon.max)) {
+    stop("Missing max longitude")
+  } else if(is.null(st_extent$lon.min)) {
+    stop("Missing min longitude")
+  } else if(is.null(st_extent$lat.max)) {
+    stop("Missing max latitude")
+  } else if(is.null(st_extent$lat.min)) {
+    stop("Missing min latitude")
+  }
+
+  if(st_extent$lon.max < st_extent$lon.min) {
+    stop("Longitude maximum is less than longitude minimum.")
+  }
+
+  if(st_extent$lat.max < st_extent$lat.min) {
+    stop("Latitude maximum is less than latitude minimum.")
+  }
+
   if(is.null(st_extent$t.min) | is.null(st_extent$t.max)) {
     use_time <- FALSE
   } else {
