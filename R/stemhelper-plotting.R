@@ -586,7 +586,7 @@ plot_pds <- function(pd_name,
 #' @param pds data.frame; From `load_pds()`.
 #' @param st_extent list; st_extent list for spatiotemporal filtering. Required,
 #' as results are less meaningful over large spatiotemporal extents.
-#' @param by_cover_class logical; Default is FALSE. If TRUE, aggregate Fragstats
+#' @param by_cover_class logical; Default is TRUE. If TRUE, aggregate Fragstats
 #' for the land cover classes into single values for the land cover classes.
 #' @param pland_and_lpi_only logical; Default is TRUE. If TRUE, only the percent
 #' of land cover (PLAND) and largest patch index (LPI) fragstats are used.
@@ -791,6 +791,12 @@ cake_plot <- function(path,
     return(results)
   }
 
+  if(!all(is.na(st_extent))) {
+    if(!is.list(st_extent)) {
+      stop("The st_extent argument must be a list object.")
+    }
+  }
+
   # load config vars
   e <- load_config(path)
 
@@ -800,7 +806,11 @@ cake_plot <- function(path,
   mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
 
   # subset centroids
-  # need to remove time from st_extent before using
+  # need to remove time from st_extent before using to subset
+  # but first save the min and max for plotting
+  min_date <- as.Date(st_extent$t.min * 366, origin = as.Date('2013-01-01'))
+  max_date <- as.Date(st_extent$t.max * 366, origin = as.Date('2013-01-01'))
+
   st_extent$t.min <- NULL
   st_extent$t.max <- NULL
 
@@ -1009,9 +1019,6 @@ cake_plot <- function(path,
 
   pipd_short$Date <- as.Date(pipd_short$Date)
   pipd_short$date <- NULL
-
-  min_date <- as.Date(st_extent$t.min * 366, origin = as.Date('2013-01-01'))
-  max_date <- as.Date(st_extent$t.max * 366, origin = as.Date('2013-01-01'))
 
   # ggplot
   wave <- ggplot2::ggplot(pipd_short, ggplot2::aes(x = pipd_short$Date,
