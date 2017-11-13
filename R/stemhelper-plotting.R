@@ -60,6 +60,12 @@ plot_pis <- function(path,
     stop("Both print and return params are FALSE. Nothing to do!")
   }
 
+  if(!all(is.na(st_extent))) {
+    if(!is.list(st_extent)) {
+      stop("The st_extent argument must be a list object.")
+    }
+  }
+
   # subset for extent
   ttt_sub <- st_extent_subset(pis, st_extent)
   ttt <- ttt_sub[, e$PI_VARS]
@@ -249,6 +255,12 @@ plot_pds <- function(pd_name,
 
   if(is.null(st_extent$t.min) | is.null(st_extent$t.max)) {
     stop("Must provide t.min and t.max as part of st_extent for this function.")
+  }
+
+  if(!all(is.na(st_extent))) {
+    if(!is.list(st_extent)) {
+      stop("The st_extent argument must be a list object.")
+    }
   }
 
   # static variables
