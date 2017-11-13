@@ -681,14 +681,27 @@ compute_ppms <- function(path, st_extent = NA) {
 #' plot_binary_by_time(path = sp_path, metric = "Kappa", n_time_periods = 12)
 #' }
 plot_binary_by_time <- function(path,
-                                metric = c("Kappa",
-                                           "AUC",
-                                           "Sensitivity",
-                                           "Specificity"),
+                                metric,
                                 n_time_periods = 52,
                                 st_extent = NA) {
 
+  if(!(metric %in% c("Kappa", "AUC", "Sensitivity", "Specificity"))) {
+    stop(paste("Predictive performance metric must be one of: ",
+               "Kappa, AUC, Sensitivity, Specificity.",
+               sep = ""))
+  }
+
+  if(n_time_periods < 2) {
+    stop("n_time_periods argument must be more than 1")
+  }
+
   seasonal_ppms <- list(NA)
+
+  if(!all(is.na(st_extent))) {
+    if(!is.list(st_extent)) {
+      stop("The st_extent argument must be a list object.")
+    }
+  }
 
   if(all(is.na(st_extent))) {
     st_extent <- list()
@@ -795,6 +808,14 @@ plot_binary_by_time <- function(path,
 plot_all_ppms <- function(path, st_extent) {
   if(all(is.na(st_extent))) {
     stop("Must provide a complete spatiotemporal extent.")
+  } else {
+    if(!is.list(st_extent)) {
+      stop("The st_extent argument must be a list object.")
+    }
+  }
+
+  if(is.null(st_extent$t.min) | is.null(st_extent$t.max)) {
+    stop("Must provide temporal limits (t.min, t.max) in st_extent.")
   }
 
   ppm_data <- compute_ppms(path, st_extent)
