@@ -142,13 +142,6 @@ test_that("stemhelper plot_all_ppms", {
   # expected
   expect_error(plot_all_ppms(path = sp_path, st_extent = ne_extent), NA)
 
-  # broken path
-  sp_path <- '~/some/messed/up/path/that/does/not/exist'
-  expect_error(plot_all_ppms(path = sp_path, st_extent = ne_extent),
-               "file does not exist")
-
-  sp_path <- paste(root_path, species, sep = "")
-
   # missing temporal info
   ne_extent <- list(type = "rectangle",
                     lat.min = 40,
@@ -166,7 +159,7 @@ test_that("stemhelper plot_all_ppms", {
                     lon.max = -70,
                     t.min = 0.425,
                     t.max = 0.475)
-  expect_error(compute_ppms(sp_path, st_extent = ne_extent),
+  expect_error(plot_all_ppms(path = sp_path, st_extent = ne_extent),
                "Latitude maximum is less than latitude minimum")
 
   # missing a corner
@@ -176,7 +169,7 @@ test_that("stemhelper plot_all_ppms", {
                     lon.min = -80,
                     t.min = 0.425,
                     t.max = 0.475)
-  expect_error(compute_ppms(sp_path, st_extent = ne_extent),
+  expect_error(plot_all_ppms(path = sp_path, st_extent = ne_extent),
                "Missing max longitude")
 
   # st_extent is not list
@@ -187,6 +180,19 @@ test_that("stemhelper plot_all_ppms", {
                  lon.max = -70,
                  t.min = 0.425,
                  t.max = 0.475)
-  expect_error(compute_ppms(sp_path, st_extent = ne_extent),
+  expect_error(plot_all_ppms(path = sp_path, st_extent = ne_extent),
                "st_extent argument must be a list")
+
+  # broken path
+
+  ne_extent <- list(type = "rectangle",
+                    lat.min = 40,
+                    lat.max = 47,
+                    lon.min = -80,
+                    lon.max = -70,
+                    t.min = 0.425,
+                    t.max = 0.475)
+  sp_path <- '~/some/messed/up/path/that/does/not/exist'
+  expect_error(plot_all_ppms(path = sp_path, st_extent = ne_extent),
+               "file does not exist")
 })
