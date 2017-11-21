@@ -10,7 +10,8 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "README-",
   warning = FALSE, 
-  message = FALSE
+  message = FALSE,
+  fig.align="center"
 )
 devtools::load_all()
 ```
@@ -45,7 +46,7 @@ TODO: Add details on how to acquire results.
 
 One of the most common first tasks is to load a RasterStack of relative abundance estimates and make a map.
 
-```{r quick_start, fig.align = "center"}
+```{r quick_start}
 library(viridis)
 library(raster)
 library(rnaturalearth)
@@ -71,18 +72,14 @@ unlink(temp)
 sp_path <- paste(temp_dir, "/", species, sep = "")
 
 # load a stack of rasters with the helper function stack_stem()
-abund <- stack_stem(sp_path, variable = "abundance_umean")
-
-# subset to the 26th week of the year
-abund26 <- abund[[26]]
+abund <- stack_stem(sp_path, variable = "abundance_umean", week = 26)
 
 # project to Mollweide for mapping and extent calc
 mollweide <- CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
-abund_moll <- projectRaster(abund26, crs = mollweide)
+abund_moll <- projectRaster(abund, crs = mollweide)
 
-# calculate the full annual extent
-# and set dimensions to set plotting size
-sp_ext <- calc_full_extent(abund_moll)
+# calculate extent
+sp_ext <- extent(abund_moll)
 
 xlimits <- c(sp_ext[1], sp_ext[2])
 ylimits <- c(sp_ext[3], sp_ext[4])
@@ -95,8 +92,8 @@ w_cm <- 8.5
 h_cm <- w_cm*(yrange/xrange)
 knitr::opts_chunk$set(fig.width = w_cm, fig.height = h_cm)
 
-# calculate ideal color bins for abundance values across the full year
-year_bins <- calc_bins(abund_moll)
+# calculate ideal color bins for abundance values for this week
+week_bins <- calc_bins(abund_moll)
 
 # to add context, pull in some reference data from the rnaturalearth package
 wh <- ne_countries(continent = c("North America", "South America"))
@@ -117,16 +114,16 @@ plot(wh_states_moll, col = "grey70", add = TRUE)
 plot(abund_moll,
      maxpixels = ncell(abund_moll),
      ext = sp_ext,
-     breaks = year_bins,
-     col = viridis(length(year_bins-1)),
+     breaks = week_bins,
+     col = viridis(length(week_bins-1)),
      xaxt = 'n',
      yaxt = 'n',
-     add = TRUE,
      legend = TRUE,
+     add = TRUE,
      legend.shrink = 0.97,
      legend.width = 2,
-     axis.args = list(at = year_bins,
-                      labels = round(year_bins, 2),
+     axis.args = list(at = week_bins,
+                      labels = round(week_bins, 2),
                       cex.axis = 0.7))
 
 # add state boundaries on top
