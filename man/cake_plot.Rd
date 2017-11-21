@@ -18,7 +18,7 @@ cake_plot(path, pis, pds, st_extent, by_cover_class = TRUE,
 \item{st_extent}{list; st_extent list for spatiotemporal filtering. Required,
 as results are less meaningful over large spatiotemporal extents.}
 
-\item{by_cover_class}{logical; Default is FALSE. If TRUE, aggregate Fragstats
+\item{by_cover_class}{logical; Default is TRUE. If TRUE, aggregate Fragstats
 for the land cover classes into single values for the land cover classes.}
 
 \item{pland_and_lpi_only}{logical; Default is TRUE. If TRUE, only the percent

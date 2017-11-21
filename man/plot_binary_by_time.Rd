@@ -4,8 +4,7 @@
 \alias{plot_binary_by_time}
 \title{Plot binary occurrence metrics by time}
 \usage{
-plot_binary_by_time(path, metric = c("Kappa", "AUC", "Sensitivity",
-  "Specificity"), n_time_periods = 52, st_extent = NA)
+plot_binary_by_time(path, metric, n_time_periods = 52, st_extent = NA)
 }
 \arguments{
 \item{path}{character; Full path to single species STEM results.}
