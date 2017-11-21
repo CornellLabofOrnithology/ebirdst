@@ -185,9 +185,9 @@ st_extent_subset <- function(data, st_extent) {
 
 #' Load, extend, and stack all weeks of STEM rasters for a given result type
 #'
-#' For one of five result types, loads all available weeks of rasters, extends
+#' For one of four result types, loads all available weeks of rasters, extends
 #' them to the extent of the study (or to a custom extent), and stacks them
-#' into a RasterStack.
+#' into a RasterStack, with zeroes added (option to turn this off).
 #'
 #' @param path character; Full path to directory containing the STEM results
 #' for a single species.
@@ -196,6 +196,11 @@ st_extent_subset <- function(data, st_extent) {
 #' and 'occurrence_umean'.
 #' @param st_extent list; Optional, use to limit the spatial Extent that the
 #' rasters are loaded into. Must set use_analysis_extent to FALSE.
+#' @param add_zeroes logical; Default is TRUE. Adds predicted and assumed zero
+#' values to the resulting layers. Set to FALSE to turn this behavior off.
+#' @param weeks numeric; Optional, a single integer or vector of integers from 1
+#' to 52, representing the week(s) of the year to load. Defaults to all
+#' available. Note that if some weeks are not present, they will not be loaded.
 #' @param use_analysis_extent logical; Default is TRUE. If STEM results were
 #' run for a custom non-global extent, that extent object is stored in the
 #' configuration file. If TRUE, uses that analysis extent for loading the
@@ -216,9 +221,11 @@ st_extent_subset <- function(data, st_extent) {
 stack_stem <- function(path,
                        variable,
                        st_extent = NA,
+                       add_zeroes = TRUE,
+                       weeks = NA,
                        use_analysis_extent = TRUE) {
-  poss_var <- c("abundance_ensemble_support", "abundance_lower",
-                "abundance_upper", "abundance_umean", "occurrence_umean")
+  poss_var <- c("abundance_lower", "abundance_upper",
+                "abundance_umean", "occurrence_umean")
 
   if(!(variable %in% poss_var)) {
     stop(paste("Selected variable is not one of the following: ",
@@ -231,7 +238,15 @@ stack_stem <- function(path,
     }
   }
 
+  if(!any(is.na(weeks))) {
+    if(any(weeks%%1 != 0) | any(weeks %in% 1:52 == FALSE)) {
+      stop("weeks argument must contain whole integers from 1 to 52")
+    }
+  }
+
   fp <- paste(path, "/results/tifs/presentation/", variable, sep = "")
+  fpaes <- paste(path, "/results/tifs/presentation/abundance_ensemble_support/",
+                 sep = "")
 
   load_extent <- NULL
   load_extend <- FALSE
@@ -271,19 +286,87 @@ stack_stem <- function(path,
   }
 
   # define function to load and extend each file in path
-  load_and_extend <- function(x, ext, use_extend) {
-    if(tools::file_ext(x) == "tif") {
+  load_and_extend <- function(x, ext, use_extend, add_zeroes) {
+    if(tools::file_ext(list.files(fp)[x]) == "tif") {
       if(!is.null(ext)) {
         r <- raster::crop(
           raster::extend(
-            raster::raster(paste(fp, "/", x, sep = "")), ext), ext)
+            raster::raster(paste(fp, "/", list.files(fp)[x], sep = "")),
+            ext),
+          ext)
+
+        if(add_zeroes == TRUE) {
+          pes <- raster::crop(
+            raster::extend(
+              raster::raster(paste(fpaes, "/", list.files(fpaes)[x], sep = "")),
+              ext),
+            ext)
+
+          zes <- raster::crop(
+            raster::extend(
+              stemhelper::zero_es_stack[[x]],
+              ext),
+            ext)
+        }
       } else {
         if(use_extend == TRUE) {
-          r <- raster::extend(raster::raster(paste(fp, "/", x, sep = "")),
+          r <- raster::extend(raster::raster(paste(fp, "/",
+                                                   list.files(fp)[x],
+                                                   sep = "")),
                               stemhelper::template_raster)
+
+          if(add_zeroes == TRUE) {
+            pes <- raster::extend(raster::raster(paste(fpaes, "/",
+                                                       list.files(fpaes)[x],
+                                                       sep = "")),
+                                  stemhelper::template_raster)
+
+            zes <- raster::extend(stemhelper::zero_es_stack[[x]],
+                                  stemhelper::template_raster)
+          }
         } else {
-          r <- raster::raster(paste(fp, "/", x, sep = ""))
+          r <- raster::raster(paste(fp, "/", list.files(fp)[x],
+                                    sep = ""))
+
+          if(add_zeroes == TRUE) {
+            pes <- raster::raster(paste(fpaes, "/", list.files(fpaes)[x],
+                                        sep = ""))
+
+            zes <- stemhelper::zero_es_stack[[x]]
+          }
         }
+      }
+
+      if(add_zeroes == TRUE) {
+        pes[pes] <- 0
+
+        if(!is.null(ext) & all(is.na(st_extent))) {
+          week_stack <- raster::stack(r, pes)
+        } else {
+          zes <- zes >= 99
+          zes[zes == 0] <- NA
+          zes[zes == 1] <- 0
+
+          # TODO: in the future this needs to use the run-specific template raster
+          if(e$SRD_AGG_FACT == 1) {
+            zes <- raster::resample(zes, pes)
+            # i don't love this, but don't have another way to do it right now
+            # it should be using a run-specific template raster
+            zes <- raster::mask(zes, pes)
+          } else {
+            if(!is.null(ext)) {
+              zes <- raster::mask(zes, raster::crop(stemhelper::template_raster,
+                                                    ext))
+            } else {
+              zes <- raster::mask(zes, stemhelper::template_raster)
+            }
+
+          }
+
+          week_stack <- raster::stack(r, pes, zes)
+        }
+
+        r <- raster::calc(week_stack, max, na.rm = TRUE)
       }
 
       return(r)
@@ -295,14 +378,23 @@ stack_stem <- function(path,
     stop("Directory does not contain at least 2 .tif files.")
   }
 
-  all_lays <- lapply(X = list.files(fp),
+  if(any(is.na(weeks))) {
+    weeks <- 1:length(list.files(fp))
+  }
+
+  all_lays <- lapply(X = weeks,
                      FUN = load_and_extend,
                      ext = load_extent,
-                     use_extend = load_extend)
+                     use_extend = load_extend,
+                     add_zeroes = add_zeroes)
 
   all_lays <- all_lays[!sapply(all_lays, is.null)]
 
-  st <- raster::stack(all_lays)
+  if(length(all_lays) == 1) {
+    st <- all_lays[[1]]
+  } else {
+    st <- raster::stack(all_lays)
+  }
   rm(all_lays)
 
   return(st)

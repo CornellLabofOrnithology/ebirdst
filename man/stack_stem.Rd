@@ -4,7 +4,8 @@
 \alias{stack_stem}
 \title{Load, extend, and stack all weeks of STEM rasters for a given result type}
 \usage{
-stack_stem(path, variable, st_extent = NA, use_analysis_extent = TRUE)
+stack_stem(path, variable, st_extent = NA, add_zeroes = TRUE, weeks = NA,
+  use_analysis_extent = TRUE)
 }
 \arguments{
 \item{path}{character; Full path to directory containing the STEM results
@@ -17,6 +18,13 @@ and 'occurrence_umean'.}
 \item{st_extent}{list; Optional, use to limit the spatial Extent that the
 rasters are loaded into. Must set use_analysis_extent to FALSE.}
 
+\item{add_zeroes}{logical; Default is TRUE. Adds predicted and assumed zero
+values to the resulting layers. Set to FALSE to turn this behavior off.}
+
+\item{weeks}{numeric; Optional, a single integer or vector of integers from 1
+to 52, representing the week(s) of the year to load. Defaults to all
+available. Note that if some weeks are not present, they will not be loaded.}
+
 \item{use_analysis_extent}{logical; Default is TRUE. If STEM results were
 run for a custom non-global extent, that extent object is stored in the
 configuration file. If TRUE, uses that analysis extent for loading the
@@ -27,9 +35,9 @@ rasters. If FALSE, rasters are loaded to the full extent of the
 RasterStack containing all available weeks of result.
 }
 \description{
-For one of five result types, loads all available weeks of rasters, extends
+For one of four result types, loads all available weeks of rasters, extends
 them to the extent of the study (or to a custom extent), and stacks them
-into a RasterStack.
+into a RasterStack, with zeroes added (option to turn this off).
 }
 \examples{
 \dontrun{

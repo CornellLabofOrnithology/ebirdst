@@ -8,9 +8,12 @@ test_that("stemhelper stack_stem default", {
   abund <- stack_stem(sp_path, variable = "abundance_umean")
   expect_is(abund, "RasterStack")
 
+  abund <- stack_stem(sp_path, variable = "abundance_umean", week = 26)
+  expect_is(abund, "RasterLayer")
+
   expect_error(stack_stem(sp_path, variable = "misspelled"),
                paste("Selected variable is not one of the following: ",
-                     "abundance_ensemble_support, abundance_lower, ",
+                     "abundance_lower, ",
                      "abundance_upper, abundance_umean, occurrence_umean.",
                      sep = ""))
 
@@ -35,8 +38,9 @@ test_that("stemhelper stack_stem st_extent", {
                     t.max = 0.475)
   abund <- stack_stem(sp_path,
                       variable = "abundance_umean",
-                      st_extent = ne_extent)
-  expect_is(abund, "RasterStack")
+                      st_extent = ne_extent,
+                      week = 26)
+  expect_is(abund, "RasterLayer")
   expect_gt(raster::ncell(abund), 1)
 
   # missing temporal info
@@ -47,8 +51,9 @@ test_that("stemhelper stack_stem st_extent", {
                     lon.max = -70)
   expect_is(stack_stem(sp_path,
                        variable = "abundance_umean",
-                       st_extent = ne_extent),
-            "RasterStack")
+                       st_extent = ne_extent,
+                       week = 26),
+            "RasterLayer")
 
   # reversed min max
   ne_extent <- list(type = "rectangle",
@@ -59,8 +64,9 @@ test_that("stemhelper stack_stem st_extent", {
                     t.min = 0.425,
                     t.max = 0.475)
   expect_error(stack_stem(sp_path,
-                       variable = "abundance_umean",
-                       st_extent = ne_extent),
+                          variable = "abundance_umean",
+                          st_extent = ne_extent,
+                          week = 26),
                "ymin and ymax are less than one")
 
   # missing a corner
@@ -96,12 +102,12 @@ test_that("stemhelper stack_stem st_extent", {
                     polygon = e_polys,
                     t.min = 0.425,
                     t.max = 0.475)
-  expect_is(stack_stem(sp_path,
-                       variable = "abundance_umean",
-                       st_extent = ne_extent), "RasterStack")
-  expect_gt(raster::ncell(stack_stem(sp_path,
-                                     variable = "abundance_umean",
-                                     st_extent = ne_extent)), 1)
+  abund <- stack_stem(sp_path,
+                      variable = "abundance_umean",
+                      st_extent = ne_extent,
+                      week = 26)
+  expect_is(abund, "RasterLayer")
+  expect_gt(raster::ncell(abund), 1)
 
 })
 
@@ -113,8 +119,9 @@ test_that("stemhelper stack_stem w/ use_analysis_extent", {
   # expected
   abund <- stack_stem(sp_path,
                       variable = "abundance_umean",
-                      use_analysis_extent = FALSE)
-  expect_is(abund, "RasterStack")
+                      use_analysis_extent = FALSE,
+                      week = 26)
+  expect_is(abund, "RasterLayer")
   expect_gt(raster::ncell(abund), 1)
 })
 
