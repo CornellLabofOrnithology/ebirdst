@@ -55,35 +55,6 @@ test_that("stemhelper calc_bins", {
   expect_error(calc_bins(abund_test), "must have non-NA values")
 })
 
-test_that("stemhelper combine_layers", {
-  root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-PROD-20170505-3f880822"
-  sp_path <- paste(root_path, species, sep = "")
-
-  abund <- stack_stem(sp_path, variable = "abundance_umean")
-
-  # expected
-  expect_is(combine_layers(abund, sp_path, 26), "RasterLayer")
-  expect_false(is.na(raster::maxValue(combine_layers(abund, sp_path, 26))))
-
-  # not a RasterStack
-  expect_error(combine_layers(abund[[26]], sp_path, 26),
-               "stack argument must be of type RasterStack")
-
-  # week is not integer
-  # week outside of 1 to 52
-  expect_error(combine_layers(abund, sp_path, 4.1),
-               "week argument must be a whole integer from 1 to 52")
-  expect_error(combine_layers(abund, sp_path, 0),
-               "week argument must be a whole integer from 1 to 52")
-  expect_error(combine_layers(abund, sp_path, 101),
-               "week argument must be a whole integer from 1 to 52")
-
-  # broken path
-  sp_path <- '~/some/messed/up/path/that/does/not/exist'
-  expect_error(combine_layers(abund, sp_path, 26), "RData file does not exist")
-})
-
 test_that("stemhelper map_centroids", {
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
   species <- "woothr-ERD2016-PROD-20170505-3f880822"
