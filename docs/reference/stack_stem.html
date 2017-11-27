@@ -84,12 +84,13 @@
     </div>
 
     
-    <p>For one of five result types, loads all available weeks of rasters, extends
+    <p>For one of four result types, loads all available weeks of rasters, extends
 them to the extent of the study (or to a custom extent), and stacks them
-into a RasterStack.</p>
+into a RasterStack, with zeroes added (option to turn this off).</p>
     
 
-    <pre class="usage"><span class='fu'>stack_stem</span>(<span class='no'>path</span>, <span class='no'>variable</span>, <span class='kw'>st_extent</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>use_analysis_extent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>stack_stem</span>(<span class='no'>path</span>, <span class='no'>variable</span>, <span class='kw'>st_extent</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>add_zeroes</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>weeks</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='kw'>use_analysis_extent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
@@ -109,6 +110,17 @@ and 'occurrence_umean'.</p></td>
       <th>st_extent</th>
       <td><p>list; Optional, use to limit the spatial Extent that the
 rasters are loaded into. Must set use_analysis_extent to FALSE.</p></td>
+    </tr>
+    <tr>
+      <th>add_zeroes</th>
+      <td><p>logical; Default is TRUE. Adds predicted and assumed zero
+values to the resulting layers. Set to FALSE to turn this behavior off.</p></td>
+    </tr>
+    <tr>
+      <th>weeks</th>
+      <td><p>numeric; Optional, a single integer or vector of integers from 1
+to 52, representing the week(s) of the year to load. Defaults to all
+available. Note that if some weeks are not present, they will not be loaded.</p></td>
     </tr>
     <tr>
       <th>use_analysis_extent</th>

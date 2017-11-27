@@ -60,7 +60,7 @@
       <h1>Using Predictor Importance and Partial Dependence Information</h1>
                         <h4 class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2017-11-13</h4>
+            <h4 class="date">2017-11-27</h4>
           </div>
 
     
@@ -102,17 +102,25 @@
 <h1 class="hasAnchor">
 <a href="#loading-centroids" class="anchor"></a>2. Loading Centroids</h1>
 <p>The first step when working with stixel centroid data is to load the Predictor Importances (PIs) and the Partial Dependencies (PDs). These files will be used for all of the functions in this vignette and are the input to many of the functions in <code>stemhelper</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># TODO set this up to do a curl of the example results first</span>
-
-<span class="co"># SETUP PATHS</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># SETUP PATHS</span>
 <span class="co"># Once you have downloaded and unzipped the results, place the resulting folder,</span>
 <span class="co"># with the unique species ID name (e.g., woothr-ERD2016-PROD-20170505-3f880822)</span>
 <span class="co"># wherever you want to keep it. Then provide the root_path variable as that</span>
 <span class="co"># location (without the unique species ID name) and provide the unique species </span>
-<span class="co"># ID name as the species variable below. Use the paste() functiont to combine</span>
-root_path &lt;-<span class="st"> "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"</span>
-species &lt;-<span class="st"> "woothr-ERD2016-PROD-20170505-3f880822"</span>
-sp_path &lt;-<span class="st"> </span><span class="kw">paste</span>(root_path, species, <span class="dt">sep =</span> <span class="st">""</span>)
+<span class="co"># ID name as the species variable below. Use the paste() function to combine</span>
+
+<span class="co"># This example downloads example data directly</span>
+species &lt;-<span class="st"> "amerob-ERD2016-EXAMPLE_DATA-20171122-5a9e702e"</span>
+species_url &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="st">"http://ebirddata.ornith.cornell.edu/downloads/hidden/"</span>, 
+                     species, <span class="st">".zip"</span>, <span class="dt">sep =</span> <span class="st">""</span>)
+
+temp &lt;-<span class="st"> </span><span class="kw">tempfile</span>()
+temp_dir &lt;-<span class="st"> </span><span class="kw">tempdir</span>()
+<span class="kw">download.file</span>(species_url, temp)
+<span class="kw">unzip</span>(temp, <span class="dt">exdir =</span> temp_dir)
+<span class="kw">unlink</span>(temp)
+
+sp_path &lt;-<span class="st"> </span><span class="kw">paste</span>(temp_dir, <span class="st">"/"</span>, species, <span class="dt">sep =</span> <span class="st">""</span>)
 
 pis &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_pis.html">load_pis</a></span>(sp_path)
 pds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_pds.html">load_pds</a></span>(sp_path)</code></pre></div>
@@ -122,10 +130,10 @@ pds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_pd
 <a href="#selecting-region-and-season" class="anchor"></a>3. Selecting Region and Season</h1>
 <p>When working with Predictive Performance Metrics (PPMs), PIs, and/or PDs, it is very common to select a subset of space and time for analysis. In <code>stemhelper</code> this is done with a list object that has the following structure. This defines the region and season for analysis and is passed to many functions in <code>stemhelper</code>. To review the available stixel centroids associated with both PIs and PDs and to see which have been selected by a spatiotemporal subset, use the <code>map_centroids</code> function, which will map and summarize this information.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ne_extent &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">type =</span> <span class="st">"rectangle"</span>,
-                  <span class="dt">lat.min =</span> <span class="dv">40</span>,  
-                      <span class="dt">lat.max =</span> <span class="dv">47</span>,
-                      <span class="dt">lon.min =</span> -<span class="dv">80</span>,
-                      <span class="dt">lon.max =</span> -<span class="dv">70</span>,
+                  <span class="dt">lat.min =</span> <span class="dv">41</span>,  
+                      <span class="dt">lat.max =</span> <span class="dv">45</span>,
+                      <span class="dt">lon.min =</span> -<span class="dv">76</span>,
+                      <span class="dt">lon.max =</span> -<span class="dv">72</span>,
                       <span class="dt">t.min =</span> <span class="fl">0.425</span>,
                       <span class="dt">t.max =</span> <span class="fl">0.475</span>)
 
@@ -193,6 +201,8 @@ pi_extent &lt;-<span class="st"> </span><span class="kw"><a href="../reference/c
           <span class="dt">by_cover_class =</span> <span class="ot">TRUE</span>,
           <span class="dt">pland_and_lpi_only =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <p><img src="stemhelper-pipd_files/figure-html/cake_plots-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># clean up</span>
+<span class="kw">unlink</span>(temp_dir)</code></pre></div>
 </div>
 </div>
   </div>

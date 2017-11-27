@@ -96,10 +96,10 @@ devtools::<span class="kw">install_github</span>(<span class="st">"CornellLabofO
 <span class="co"># with the unique species ID name (e.g., woothr-ERD2016-PROD-20170505-3f880822)</span>
 <span class="co"># wherever you want to keep it. Then provide the root_path variable as that</span>
 <span class="co"># location (without the unique species ID name) and provide the unique species </span>
-<span class="co"># ID name as the species variable below. Use the paste() functiont to combine</span>
+<span class="co"># ID name as the species variable below. Use the paste() function to combine</span>
 
 <span class="co"># This example downloads example data directly</span>
-species &lt;-<span class="st"> "amerob-ERD2016-EXAMPLE_DATA-20171110-6d6fca4a"</span>
+species &lt;-<span class="st"> "amerob-ERD2016-EXAMPLE_DATA-20171122-5a9e702e"</span>
 species_url &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="st">"http://ebirddata.ornith.cornell.edu/downloads/hidden/"</span>, 
                      species, <span class="st">".zip"</span>, <span class="dt">sep =</span> <span class="st">""</span>)
 
@@ -112,17 +112,13 @@ temp_dir &lt;-<span class="st"> </span><span class="kw">tempdir</span>()
 sp_path &lt;-<span class="st"> </span><span class="kw">paste</span>(temp_dir, <span class="st">"/"</span>, species, <span class="dt">sep =</span> <span class="st">""</span>)
 
 <span class="co"># load a stack of rasters with the helper function stack_stem()</span>
-abund &lt;-<span class="st"> </span><span class="kw"><a href="reference/stack_stem.html">stack_stem</a></span>(sp_path, <span class="dt">variable =</span> <span class="st">"abundance_umean"</span>)
-
-<span class="co"># subset to the 26th week of the year</span>
-abund26 &lt;-<span class="st"> </span>abund[[<span class="dv">26</span>]]
+abund &lt;-<span class="st"> </span><span class="kw"><a href="reference/stack_stem.html">stack_stem</a></span>(sp_path, <span class="dt">variable =</span> <span class="st">"abundance_umean"</span>, <span class="dt">week =</span> <span class="dv">26</span>)
 
 <span class="co"># project to Mollweide for mapping and extent calc</span>
 mollweide &lt;-<span class="st"> </span><span class="kw">CRS</span>(<span class="st">"+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"</span>)
-abund_moll &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/projectRaster">projectRaster</a></span>(abund26, <span class="dt">crs =</span> mollweide)
+abund_moll &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/projectRaster">projectRaster</a></span>(abund, <span class="dt">crs =</span> mollweide)
 
-<span class="co"># calculate the full annual extent</span>
-<span class="co"># and set dimensions to set plotting size</span>
+<span class="co"># calculate extent</span>
 sp_ext &lt;-<span class="st"> </span><span class="kw"><a href="reference/calc_full_extent.html">calc_full_extent</a></span>(abund_moll)
 
 xlimits &lt;-<span class="st"> </span><span class="kw">c</span>(sp_ext[<span class="dv">1</span>], sp_ext[<span class="dv">2</span>])
@@ -136,8 +132,8 @@ w_cm &lt;-<span class="st"> </span><span class="fl">8.5</span>
 h_cm &lt;-<span class="st"> </span>w_cm*(yrange/xrange)
 knitr::opts_chunk$<span class="kw">set</span>(<span class="dt">fig.width =</span> w_cm, <span class="dt">fig.height =</span> h_cm)
 
-<span class="co"># calculate ideal color bins for abundance values across the full year</span>
-year_bins &lt;-<span class="st"> </span><span class="kw"><a href="reference/calc_bins.html">calc_bins</a></span>(abund_moll)
+<span class="co"># calculate ideal color bins for abundance values for this week</span>
+week_bins &lt;-<span class="st"> </span><span class="kw"><a href="reference/calc_bins.html">calc_bins</a></span>(abund_moll)
 
 <span class="co"># to add context, pull in some reference data from the rnaturalearth package</span>
 wh &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/rnaturalearth/topics/ne_countries">ne_countries</a></span>(<span class="dt">continent =</span> <span class="kw">c</span>(<span class="st">"North America"</span>, <span class="st">"South America"</span>))
@@ -158,17 +154,30 @@ wh_states_moll &lt;-<span class="st"> </span><span class="kw">spTransform</span>
 <span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(abund_moll,
      <span class="dt">maxpixels =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(abund_moll),
      <span class="dt">ext =</span> sp_ext,
-     <span class="dt">breaks =</span> year_bins,
-     <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="kw">length</span>(year_bins<span class="dv">-1</span>)),
+     <span class="dt">breaks =</span> week_bins,
+     <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="kw">length</span>(week_bins<span class="dv">-1</span>)),
      <span class="dt">xaxt =</span> <span class="st">'n'</span>,
      <span class="dt">yaxt =</span> <span class="st">'n'</span>,
-     <span class="dt">add =</span> <span class="ot">TRUE</span>,
-     <span class="dt">legend =</span> <span class="ot">TRUE</span>,
+     <span class="dt">legend =</span> <span class="ot">FALSE</span>,
+     <span class="dt">add =</span> <span class="ot">TRUE</span>)
+
+<span class="co"># for legend plotting create a smaller set of bin labels and do it separately</span>
+bin_labels &lt;-<span class="st"> </span><span class="kw">format</span>(<span class="kw">round</span>(week_bins, <span class="dv">3</span>), <span class="dt">nsmall =</span> <span class="dv">2</span>)
+bin_labels[!(bin_labels %in%<span class="st"> </span><span class="kw">c</span>(bin_labels[<span class="dv">1</span>],
+                    bin_labels[<span class="kw">round</span>((<span class="kw">length</span>(bin_labels) /<span class="st"> </span><span class="dv">4</span>)) +<span class="st"> </span><span class="dv">1</span>], 
+                    bin_labels[<span class="kw">round</span>((<span class="kw">length</span>(bin_labels) /<span class="st"> </span><span class="dv">2</span>)) +<span class="st"> </span><span class="dv">1</span>],
+                    bin_labels[<span class="kw">length</span>(bin_labels) -<span class="st"> </span>
+<span class="st">                               </span><span class="kw">round</span>((<span class="kw">length</span>(bin_labels) /<span class="st"> </span><span class="dv">4</span>)) +<span class="st"> </span><span class="dv">1</span>],
+                    bin_labels[<span class="kw">length</span>(bin_labels)]))] &lt;-<span class="st"> ""</span>
+
+<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(<span class="kw">log</span>(abund_moll),
+     <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="kw">length</span>(week_bins) -<span class="st"> </span><span class="dv">1</span>),
+     <span class="dt">legend.only =</span> <span class="ot">TRUE</span>,
+     <span class="dt">breaks =</span> <span class="kw">c</span>(<span class="kw">log</span>(<span class="fl">0.0001</span>), <span class="kw">log</span>(week_bins[week_bins !=<span class="st"> </span><span class="dv">0</span>])),
+     <span class="dt">lab.breaks =</span> bin_labels,
      <span class="dt">legend.shrink =</span> <span class="fl">0.97</span>,
      <span class="dt">legend.width =</span> <span class="dv">2</span>,
-     <span class="dt">axis.args =</span> <span class="kw">list</span>(<span class="dt">at =</span> year_bins,
-                      <span class="dt">labels =</span> <span class="kw">round</span>(year_bins, <span class="dv">2</span>),
-                      <span class="dt">cex.axis =</span> <span class="fl">0.7</span>))
+     <span class="dt">axis.args =</span> <span class="kw">list</span>(<span class="dt">cex.axis =</span> <span class="fl">0.9</span>))
 
 <span class="co"># add state boundaries on top</span>
 <span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(wh_states_moll, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">border =</span> <span class="st">'black'</span>, <span class="dt">lwd =</span> <span class="dv">1</span>)</code></pre></div>
