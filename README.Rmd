@@ -56,10 +56,10 @@ library(rnaturalearth)
 # with the unique species ID name (e.g., woothr-ERD2016-PROD-20170505-3f880822)
 # wherever you want to keep it. Then provide the root_path variable as that
 # location (without the unique species ID name) and provide the unique species 
-# ID name as the species variable below. Use the paste() functiont to combine
+# ID name as the species variable below. Use the paste() function to combine
 
 # This example downloads example data directly
-species <- "amerob-ERD2016-EXAMPLE_DATA-20171110-6d6fca4a"
+species <- "amerob-ERD2016-EXAMPLE_DATA-20171122-5a9e702e"
 species_url <- paste("http://ebirddata.ornith.cornell.edu/downloads/hidden/", 
                      species, ".zip", sep = "")
 
@@ -79,7 +79,7 @@ mollweide <- CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
 abund_moll <- projectRaster(abund, crs = mollweide)
 
 # calculate extent
-sp_ext <- extent(abund_moll)
+sp_ext <- calc_full_extent(abund_moll)
 
 xlimits <- c(sp_ext[1], sp_ext[2])
 ylimits <- c(sp_ext[3], sp_ext[4])
@@ -118,13 +118,26 @@ plot(abund_moll,
      col = viridis(length(week_bins-1)),
      xaxt = 'n',
      yaxt = 'n',
-     legend = TRUE,
-     add = TRUE,
+     legend = FALSE,
+     add = TRUE)
+
+# for legend plotting create a smaller set of bin labels and do it separately
+bin_labels <- format(round(week_bins, 3), nsmall = 2)
+bin_labels[!(bin_labels %in% c(bin_labels[1],
+                    bin_labels[round((length(bin_labels) / 4)) + 1], 
+                    bin_labels[round((length(bin_labels) / 2)) + 1],
+                    bin_labels[length(bin_labels) - 
+                               round((length(bin_labels) / 4)) + 1],
+                    bin_labels[length(bin_labels)]))] <- ""
+
+plot(log(abund_moll),
+     col = viridis(length(week_bins) - 1),
+     legend.only = TRUE,
+     breaks = c(log(0.0001), log(week_bins[week_bins != 0])),
+     lab.breaks = bin_labels,
      legend.shrink = 0.97,
      legend.width = 2,
-     axis.args = list(at = week_bins,
-                      labels = round(week_bins, 2),
-                      cex.axis = 0.7))
+     axis.args = list(cex.axis = 0.9))
 
 # add state boundaries on top
 plot(wh_states_moll, add = TRUE, border = 'black', lwd = 1)
