@@ -117,17 +117,25 @@ template_raster
 Once you have accessed and downloaded a set of STEM results, the first task is to load them into R in a way that they can be used easily. To save space on disk, each individual raster (e.g., abundance mean for Wood Thrush for January 4) has had NA values trimmed before saving (using the `raster` package `trim()` function). While this saves space on disk, it means that the rasters are not immediately comparable and trying to use `raster::stack()` will fail. To assist with the loading of rasters, we have provided a helper function, `stack_stem()`, which uses the `template_raster` object to extend each input raster in a directory to the full extent of analysis and then returns a `RasterStack` object.
 
 ```{r load_single_raster}
-# TODO set this up to do a curl of the example results first
-
 # SETUP PATHS
 # Once you have downloaded and unzipped the results, place the resulting folder,
 # with the unique species ID name (e.g., woothr-ERD2016-PROD-20170505-3f880822)
 # wherever you want to keep it. Then provide the root_path variable as that
 # location (without the unique species ID name) and provide the unique species 
-# ID name as the species variable below. Use the paste() functiont to combine
-root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-species <- "woothr-ERD2016-PROD-20170505-3f880822"
-sp_path <- paste(root_path, species, sep = "")
+# ID name as the species variable below. Use the paste() function to combine
+
+# This example downloads example data directly
+species <- "amerob-ERD2016-EXAMPLE_DATA-20171122-5a9e702e"
+species_url <- paste("http://ebirddata.ornith.cornell.edu/downloads/hidden/", 
+                     species, ".zip", sep = "")
+
+temp <- tempfile()
+temp_dir <- tempdir()
+download.file(species_url, temp)
+unzip(temp, exdir = temp_dir)
+unlink(temp)
+
+sp_path <- paste(temp_dir, "/", species, sep = "")
 
 # load a stack of rasters with the helper function stack_stem()
 abund_stack <- stack_stem(sp_path, variable = "abundance_umean")
@@ -150,19 +158,19 @@ library(raster)
 mollweide <- CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
 
 # project single layer from stack to mollweide
-week1_moll <- projectRaster(abund_stack[[1]], crs = mollweide)
+week51_moll <- projectRaster(abund_stack[[51]], crs = mollweide)
 
 # optionally, you can project an entire stack, but it takes much longer
 #abund_stack_moll <- projectRaster(abund_stack, crs = mollweide)
 
 # map single layer with full annual extent
 par(mar = c(0, 0, 0, 2))
-plot(week1_moll, 
+plot(week51_moll, 
      xaxt = 'n', 
      yaxt = 'n',
      bty = 'n',
      col = viridis(20),
-     maxpixels = ncell(week1_moll))
+     maxpixels = ncell(week51_moll))
 ```
 
 Mapping the layer at the full spatial extent of the analysis area makes for a small map. The process of building the stack, via `stack_stem()` unifies the extent of all layers in the stack. However, this also means that mapping happens at the full spatial extent of the area of analysis, the Western Hemisphere, as seen above. If we project the RasterStack to Mollweide, then calculate the full annual spatial extent for the species, and then map, we get an extent that works for the entire full-annual cycle of the species.
@@ -174,13 +182,13 @@ sp_ext <- calc_full_extent(abund_moll)
 
 # map the first week of the abundance stack in Mollweide
 par(mar = c(0, 0, 0, 2))
-plot(week1_moll, 
+plot(week51_moll, 
      xaxt = 'n', 
      yaxt = 'n', 
      bty = 'n',
      ext = sp_ext, 
      col = viridis(20),
-     maxpixels = ncell(week1_moll))
+     maxpixels = ncell(week51_moll))
 ```
 
 ## Mapping Occurrence
@@ -189,11 +197,11 @@ Most examples in this vignette focus primarily on relative abundance estimates, 
 
 ```{r map_occurrence}
 # load a stack of occurrence
-occ_stack <- stack_stem(sp_path, variable = "occurrence_umean")
+occ_week <- stack_stem(sp_path, variable = "occurrence_umean", week = 26)
 
 # create breaks every 0.05 from 0 to 1
 occ_bins <- seq(0, 1, by = 0.05)
-occ_week26 <- projectRaster(occ_stack[[26]], crs = mollweide)
+occ_week26 <- projectRaster(occ_week, crs = mollweide)
 
 par(mar = c(0, 0, 0, 2), cex = 0.9)
 plot(occ_week26, 
@@ -212,7 +220,7 @@ plot(occ_week26,
 
 Mapping relative abundance estimates across the full-annual cycle presents a challenge, in that patterns of concentration and dispersion in abundance change throughout the year, making it difficult to define color bins that suit all seasons and accurately reflect the detail of abundance predictions. To address this, we selected a method (described by Maciejewski et al. 2013) that log transforms the entire year of data, constructs bins with the log-transformed data using standard deviations, and then un-transforms the bins.
 
-To compare, we first scale the colors linearly, based on the maximum from the entire year. 
+To compare, we first scale the colors linearly, based on the maximum from the entire year. Since the max is quite high, times of the year with low concentration appear flat.
 
 ```{r map_linear}
 year_max <- max(maxValue(abund_stack), na.rm = TRUE)
@@ -220,14 +228,14 @@ year_max <- max(maxValue(abund_stack), na.rm = TRUE)
 week26_moll <- projectRaster(abund_stack[[26]], crs = mollweide)
 
 par(mfrow = c(1,2), mar = c(0, 0, 0, 0))
-plot(week1_moll, 
+plot(week51_moll, 
      xaxt = 'n', 
      yaxt = 'n', 
      bty = 'n',
      ext = sp_ext, 
      zlim = c(0, year_max),
      col = viridis(20),
-     maxpixels = ncell(week1_moll),
+     maxpixels = ncell(week51_moll),
      legend = FALSE)
 
 par(mar = c(0, 0, 0, 4))
@@ -250,35 +258,42 @@ year_bins <- calc_bins(abund_stack)
 
 # create a thinner set of labels
 bin_labels <- format(round(year_bins, 2), nsmall = 2)
-bin_labels[!(bin_labels %in% c(bin_labels[1], 
+bin_labels[!(bin_labels %in% c(bin_labels[1], bin_labels[2],
                     bin_labels[round((length(bin_labels) / 4)) + 1], 
                     bin_labels[round((length(bin_labels) / 2)) + 1],
                     bin_labels[length(bin_labels) - 
                                round((length(bin_labels) / 4)) + 1],
+                    bin_labels[length(bin_labels)-1],
                     bin_labels[length(bin_labels)]))] <- ""
 
-par(mfrow = c(1, 2), mar = c(0, 0, 0, 0))
-plot(week1_moll, 
+par(mfrow = c(1, 2), mar = c(0, 0, 0, 6))
+plot(week51_moll, 
      xaxt = 'n', 
      yaxt = 'n', 
      bty = 'n',
      ext = sp_ext, 
      breaks = year_bins,
-     lab.breaks = bin_labels,
      col = viridis(length(year_bins) - 1),
-     maxpixels = ncell(week1_moll),
+     maxpixels = ncell(week51_moll),
      legend = FALSE)
-par(mar = c(0, 0, 0, 5))
+par(mar = c(0, 0, 0, 6))
 plot(week26_moll, 
      xaxt = 'n', 
      yaxt = 'n', 
      bty = 'n',
      ext = sp_ext, 
      breaks = year_bins,
-     lab.breaks = bin_labels,
+     legend = FALSE,
      col = viridis(length(year_bins) - 1),
-     maxpixels = ncell(week26_moll),
-     legend.shrink = 0.97)
+     maxpixels = ncell(week26_moll))
+
+plot(log(week26_moll),
+     col = viridis(length(year_bins) - 1),
+     legend.only = TRUE,
+     breaks = c(log(0.0001), log(year_bins[year_bins != 0])),
+     lab.breaks = bin_labels,
+     legend.shrink = 0.97,
+     legend.width = 2)
 ```
 
 ## Mapping Abundance
@@ -287,10 +302,6 @@ With a good full-annual extent and color bins that accurately represent the data
 
 ```{r map_w_es, out.width = NULL}
 library(rnaturalearth)
-
-# the helper function combine_layers() fills in with assumed and predicted zeroes
-week26 <- combine_layers(abund_stack, sp_path, week = 26)
-week26c <- projectRaster(week26, crs = mollweide)
 
 # to add context, let's pull in some reference data to add
 wh <- ne_countries(continent = c("North America", "South America"))
@@ -311,17 +322,29 @@ knitr::opts_chunk$set(fig.width = w_img, fig.height = h_img)
 
 par(mfrow = c(1, 1), mar = c(0, 0, 0, 6))
 
+# use the extent object to set the spatial extent for the plot
+plot(sp_ext, col = 'white')
+
+# add background spatial context
+plot(wh_states_moll, col = "grey70", add = TRUE)
+
 # map the raster
-plot(week26c, 
+plot(week26_moll, 
      xaxt = 'n', 
      yaxt = 'n',
      bty = 'n',
      ext = sp_ext, 
      breaks = year_bins,
-     lab.breaks = bin_labels,
      col = viridis(length(year_bins)-1),
-     maxpixels = ncell(week26c),
-     legend = TRUE,
+     maxpixels = ncell(week26_moll),
+     legend = FALSE,
+     add = TRUE)
+
+plot(log(week26_moll),
+     col = viridis(length(year_bins) - 1),
+     legend.only = TRUE,
+     breaks = c(log(0.0001), log(year_bins[year_bins != 0])),
+     lab.breaks = bin_labels,
      legend.shrink = 0.97,
      legend.width = 2)
 
@@ -450,6 +473,11 @@ head(p)
 write.csv(p, 
           file = paste(raster_dir, "/woothr_week26.csv", sep=""),
           row.names = FALSE)
+```
+
+```{r cleanup}
+# clean up
+unlink(temp_dir)
 ```
 
 ## References
