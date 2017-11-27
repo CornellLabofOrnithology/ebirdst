@@ -54,17 +54,25 @@ The `stemhelper` package provides functions for accessing these, such that you s
 The first step when working with stixel centroid data is to load the Predictor Importances (PIs) and the Partial Dependencies (PDs). These files will be used for all of the functions in this vignette and are the input to many of the functions in `stemhelper`.
 
 ```{r load_pipd}
-# TODO set this up to do a curl of the example results first
-
 # SETUP PATHS
 # Once you have downloaded and unzipped the results, place the resulting folder,
 # with the unique species ID name (e.g., woothr-ERD2016-PROD-20170505-3f880822)
 # wherever you want to keep it. Then provide the root_path variable as that
 # location (without the unique species ID name) and provide the unique species 
-# ID name as the species variable below. Use the paste() functiont to combine
-root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-species <- "woothr-ERD2016-PROD-20170505-3f880822"
-sp_path <- paste(root_path, species, sep = "")
+# ID name as the species variable below. Use the paste() function to combine
+
+# This example downloads example data directly
+species <- "amerob-ERD2016-EXAMPLE_DATA-20171122-5a9e702e"
+species_url <- paste("http://ebirddata.ornith.cornell.edu/downloads/hidden/", 
+                     species, ".zip", sep = "")
+
+temp <- tempfile()
+temp_dir <- tempdir()
+download.file(species_url, temp)
+unzip(temp, exdir = temp_dir)
+unlink(temp)
+
+sp_path <- paste(temp_dir, "/", species, sep = "")
 
 pis <- load_pis(sp_path)
 pds <- load_pds(sp_path)
@@ -76,10 +84,10 @@ When working with Predictive Performance Metrics (PPMs), PIs, and/or PDs, it is 
 
 ```{r map_centroids}
 ne_extent <- list(type = "rectangle",
-                  lat.min = 40,  
-		              lat.max = 47,
-		              lon.min = -80,
-		              lon.max = -70,
+                  lat.min = 41,  
+		              lat.max = 45,
+		              lon.min = -76,
+		              lon.max = -72,
 		              t.min = 0.425,
 	 	              t.max = 0.475)
 
@@ -153,4 +161,8 @@ cake_plot(path = sp_path,
           st_extent = ne_extent,
           by_cover_class = TRUE,
           pland_and_lpi_only = TRUE)
+```
+```{r cleanup}
+# clean up
+unlink(temp_dir)
 ```
