@@ -6,7 +6,7 @@
 #' @param path character; Full path to single species STEM results.
 #'
 #' @return list with data.frame of ppm_data and data.frame of interpolated
-#' daily ensemble support values for both North America and South America.
+#' daily ensemble support values for the Western Hemisphere.
 #'
 #' @keywords internal
 #'
@@ -41,13 +41,12 @@ load_ppm_data <- function(path) {
   es_files <- list.files(es_dir)
 
   eoa_es_data <- data.frame(Week = NA,
-                            NorthAmerica = NA,
-                            SouthAmerica = NA)
+                            WesternHemisphere = NA)
 
   for (iii in 1:length(es_files)) {
     ttt <- utils::read.csv(paste(es_dir, es_files[iii], sep = ""))
     eoa_es_data[iii, 1] <- as.character(ttt[1, 2])
-    eoa_es_data[iii, 2:3] <- ttt[1, 3:4]
+    eoa_es_data[iii, 2] <- ttt[1, 3]
   }
 
   # add day of year
@@ -59,25 +58,24 @@ load_ppm_data <- function(path) {
 
   # init
   pred_DOY <- data.frame(DOY = c(1:366))
-  eoa_NorthAmerica <- rep(NA, nrow(pred_DOY))
-  eoa_SouthAmerica <- rep(NA, nrow(pred_DOY))
+  eoa_WesternHemisphere <- rep(NA, nrow(pred_DOY))
 
   slope = (25 - 3)/(52 - 10)
 
   # check for NA data
-  na_total <- sum(!is.na(eoa_es_data$NorthAmerica))
+  na_total <- sum(!is.na(eoa_es_data$WesternHemisphere))
 
   if(na_total > 1) {
     # Treat missing ES values as the minimum support value
-    na_na_replace <- min(eoa_es_data$NorthAmerica, na.rm = TRUE)
-    eoa_es_data$NorthAmerica[is.na(eoa_es_data$NorthAmerica)] <- na_na_replace
+    na_na_replace <- min(eoa_es_data$WesternHemisphere, na.rm = TRUE)
+    eoa_es_data$WesternHemisphere[is.na(eoa_es_data$WesternHemisphere)] <- na_na_replace
 
     if(na_total > 9) {
       # GAM Smooth EOA ES values down to Daily
       y = -((52 * slope - na_total * slope) - 25)
 
       s = mgcv::s
-      na_model <- mgcv::gam(NorthAmerica ~ s(DOY,
+      na_model <- mgcv::gam(WesternHemisphere ~ s(DOY,
                                              k = round(y),
                                              bs = "cp",
                                              m = 1),
@@ -86,43 +84,15 @@ load_ppm_data <- function(path) {
                             knots = list(DOY = c(1,366)))
     } else {
       # do a loess
-      na_model <- stats::loess(NorthAmerica ~ DOY, eoa_es_data)
+      na_model <- stats::loess(WesternHemisphere ~ DOY, eoa_es_data)
     }
 
-    eoa_NorthAmerica <- stats::predict(na_model, newdata = pred_DOY)
-  }
-
-  # check for NA data
-  sa_total <- sum(!is.na(eoa_es_data$SouthAmerica))
-
-  if(sa_total > 1) {
-    # Treat missing ES values as the minimum support value
-    sa_na_replace <- min(eoa_es_data$SouthAmerica, na.rm = TRUE)
-    eoa_es_data$SouthAmerica[is.na(eoa_es_data$SouthAmerica)] <- sa_na_replace
-
-    if(sa_total > 9) {
-      # GAM Smooth EOA ES values down to Daily
-      y = -((52 * slope - sa_total * slope) - 25)
-
-      s = mgcv::s
-      sa_model <- mgcv::gam(SouthAmerica ~ s(DOY,
-                                             k = round(y),
-                                             bs = "cp",
-                                             m = 1),
-                            gamma = 1.5,
-                            data = eoa_es_data,
-                            knots = list(DOY = c(1,366)))
-    } else {
-      sa_model <- stats::loess(SouthAmerica ~ DOY, eoa_es_data)
-    }
-
-    eoa_SouthAmerica <- stats::predict(sa_model, newdata = pred_DOY)
+    eoa_WesternHemisphere <- stats::predict(na_model, newdata = pred_DOY)
   }
 
   # package and return
   eoa_es_daily <- data.frame(DOY = pred_DOY,
-                             NorthAmerica = eoa_NorthAmerica,
-                             SouthAmerica = eoa_SouthAmerica)
+                             WesternHemisphere = eoa_WesternHemisphere)
 
   return(list(ppm_data = ppm_data,
               eoa_es_daily = eoa_es_daily))
@@ -428,25 +398,13 @@ compute_ppms <- function(path, st_extent = NA) {
     st_data <- ppm_data_list$ppm_data
   }
 
-  # Add Extent of Analysis - NA & SA
+  # Add Extent of Analysis
   st_data$in_eoa <- FALSE
   # Add Day of Year
   st_data$DOY <- round(st_data$date * 366)
   st_data[st_data$DOY == 0, ]$DOY <- 1
-
-  # if lat >= 12
-  ttt_index <- st_data$lat >= 12
-  # by day of year
-  st_data$in_eoa[ttt_index] <-
-    st_data$pi.es[ttt_index] >
-    ppm_data_list$eoa_es_daily$NorthAmerica[st_data$DOY[ttt_index]]
-
-  # if lat < 12
-  ttt_index <- st_data$lat < 12
-  # by day of year
-  st_data$in_eoa[ttt_index] <-
-    st_data$pi.es[ttt_index] >
-    ppm_data_list$eoa_es_daily$SouthAmerica[st_data$DOY[ttt_index]]
+  st_data$in_eoa <- st_data$pi.es >
+    ppm_data_list$eoa_es_daily$WesternHemisphere[st_data$DOY]
 
   # Remove data that is out of extent
   st_data <- st_data[st_data$in_eoa, ]
