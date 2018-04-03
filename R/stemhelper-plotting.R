@@ -625,12 +625,12 @@ cake_plot <- function(path,
                       return_data = FALSE) {
 
   ## internal loess_fit_and_predict function
-  loess_fit_and_predict <- function(x, ext, input_data, type) {
+  loess_fit_and_predict <- function(x, ext, input_data, type, e) {
 
     # internal train_check function
-    train_check <- function(y, train_data, empty_val) {
+    train_check <- function(y, train_data, empty_val, e) {
       # static week var
-      full_week <- 0.02
+      full_week <- 7/366
 
       # subset data to time around date
       D <- train_data
@@ -650,10 +650,10 @@ cake_plot <- function(path,
         # on both sides of the prediction date, this adjusts for that
         pred_date <- as.numeric(y["date"])
 
-        if(pred_date == 0.01) {
-          pred_date <- 0.02
-        } else if(pred_date == 0.99) {
-          pred_date <- 0.98
+        if(pred_date == e$SRD_DATE_VEC[1]) {
+          pred_date <- e$SRD_DATE_VEC[2]
+        } else if(pred_date == e$SRD_DATE_VEC[length(e$SRD_DATE_VEC)]) {
+          pred_date <- e$SRD_DATE_VEC[length(e$SRD_DATE_VEC) - 1]
         }
 
         if(min_train < pred_date & max_train > pred_date)  {
@@ -666,17 +666,13 @@ cake_plot <- function(path,
       }
     }
 
-
     # static projections
     ll <- "+init=epsg:4326"
     mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
 
     # for both PI and PD need to loess fit and predict for each variable
     # for uniform date set, defined here
-    SRD_DATE_VEC <- seq(from = 0, to = 1, length = 52 + 1)
-    SRD_DATE_VEC <- (SRD_DATE_VEC[1:52] + SRD_DATE_VEC[2:(52+1)])/2
-    SRD_DATE_VEC <- round(SRD_DATE_VEC, digits = 2)
-    nd <- data.frame(date = SRD_DATE_VEC)
+    nd <- data.frame(date = e$SRD_DATE_VEC)
 
     if(type == "PI") {
       D <- input_data[, c(x, "date", "lat", "lon", "stixel_width",
@@ -742,7 +738,7 @@ cake_plot <- function(path,
     rint$intsqkm <- rgeos::gArea(rint, byid = TRUE)/1000000
     rint$refcov <- rint$intsqkm/rint$stsqkm
 
-    # drop any stixels that cover the are less than 10%
+    # drop any stixels that cover the area less than 10%
     rint_sub <- rint[rint$refcov >= 0.10, ]
     rm(rint)
 
@@ -786,7 +782,8 @@ cake_plot <- function(path,
                            1,
                            train_check,
                            empty_val = empty_val,
-                           train_data = D)
+                           train_data = D,
+                           e = e)
 
     return(results)
   }
@@ -904,7 +901,8 @@ cake_plot <- function(path,
                     FUN = loess_fit_and_predict,
                     ext = st_extent,
                     input_data = pd_slopes,
-                    type = "PD")
+                    type = "PD",
+                    e = e)
   smooth_pds <- dplyr::bind_rows(loesses)
   rm(loesses, pd_slopes)
 
@@ -919,7 +917,8 @@ cake_plot <- function(path,
                      FUN = loess_fit_and_predict,
                      ext = st_extent,
                      input_data = tpis,
-                     type = "PI")
+                     type = "PI",
+                     e = e)
   smooth_pis <- dplyr::bind_rows(pi_loess)
   rm(pi_loess, tpis)
 
