@@ -754,7 +754,8 @@ cake_plot <- function(path,
       y_name <- "slope"
     }
 
-    if(!all(is.nan(rint_d[,c(y_name)]))) {
+    if(!all(is.nan(rint_d[, c(y_name)])) &
+       sum(!is.nan(rint_d[, c(y_name)]), na.rm = TRUE) > 1) {
       d.loess <- stats::loess(formula = stats::as.formula(paste(y_name,
                                                                 " ~ date",
                                                                 sep = "")),
