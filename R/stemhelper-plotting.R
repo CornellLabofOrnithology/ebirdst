@@ -651,9 +651,9 @@ cake_plot <- function(path,
         pred_date <- as.numeric(y["date"])
 
         if(pred_date == e$SRD_DATE_VEC[1]) {
-          pred_date <- e$SRD_DATE_VEC[2]
+          pred_date <- e$SRD_DATE_VEC[1] + (full_week / 2)
         } else if(pred_date == e$SRD_DATE_VEC[length(e$SRD_DATE_VEC)]) {
-          pred_date <- e$SRD_DATE_VEC[length(e$SRD_DATE_VEC) - 1]
+          pred_date <- e$SRD_DATE_VEC[length(e$SRD_DATE_VEC)] - (full_week / 2)
         }
 
         if(min_train < pred_date & max_train > pred_date)  {
