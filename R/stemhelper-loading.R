@@ -225,7 +225,8 @@ stack_stem <- function(path,
                        weeks = NA,
                        use_analysis_extent = TRUE) {
   poss_var <- c("abundance_lower", "abundance_upper",
-                "abundance_umean", "occurrence_umean")
+                "abundance_umean", "occurrence_umean",
+                "pat_mean")
 
   if(!(variable %in% poss_var)) {
     stop(paste("Selected variable is not one of the following: ",
@@ -244,7 +245,12 @@ stack_stem <- function(path,
     }
   }
 
-  fp <- paste(path, "/results/tifs/presentation/", variable, sep = "")
+  if(variable == "pat_mean") {
+    fp <- paste(path, "/results/tifs/all_layers/", variable, sep = "")
+  } else {
+    fp <- paste(path, "/results/tifs/presentation/", variable, sep = "")
+  }
+
   fpaes <- paste(path, "/results/tifs/presentation/abundance_ensemble_support/",
                  sep = "")
 
