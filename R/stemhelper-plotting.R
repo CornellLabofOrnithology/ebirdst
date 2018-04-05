@@ -690,6 +690,20 @@ cake_plot <- function(path,
     }
     rm(input_data)
 
+    # safety check to make sure input date range is as wide as predict dates
+    if(min(D$date, na.rm = TRUE) > min(nd)) {
+      if((max(D$date, na.rm = TRUE) - 1) == 0) {
+        # duplicate 1 as 0
+        dup <- D[D$date == 1, ]
+        dup$date <- 0
+
+        D <- rbind(D, dup)
+      } else {
+        # change min date to 0
+        D[D$date == min(D$date, na.rm = TRUE), ]$date <- 0
+      }
+    }
+
     # make stixel polygons from centroids and widths and heights
     tdsp <- sp::SpatialPointsDataFrame(coords = D[, c("lon", "lat")],
                                        data = D,
