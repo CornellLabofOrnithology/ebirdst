@@ -1039,6 +1039,7 @@ cake_plot <- function(path,
     ggplot2::geom_area() +
     ggplot2::geom_vline(xintercept = as.numeric(min_date)) +
     ggplot2::geom_vline(xintercept = as.numeric(max_date)) +
+    ggplot2::geom_hline(yintercept = 0, size = 2) +
     ggplot2::ylim(-1, 1) +
     ggplot2::theme_light() +
     ggplot2::scale_x_date(date_labels = "%b",
