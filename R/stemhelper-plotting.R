@@ -859,11 +859,15 @@ cake_plot <- function(path,
 
   ## Calculate PD slopes for each centroid
   calc_slope <- function(y) {
-    x <- as.data.frame(tpds[y, ])
+    x <- as.data.frame(tpds_covs[y, ])
 
     x_vals <- as.numeric(x[(PD_MAX_RESOLUTION+4):(2*PD_MAX_RESOLUTION+3)])
     y_vals <- as.numeric(x[3:(PD_MAX_RESOLUTION+2)]) -
       mean(as.numeric(x[3:(PD_MAX_RESOLUTION+2)]), na.rm = T)
+
+    if(all(is.na(y_vals))) {
+      return(NA)
+    }
 
     sm <- stats::lm(x_vals ~ y_vals)
 
@@ -880,19 +884,15 @@ cake_plot <- function(path,
     }
   }
 
-  pd_slope <- lapply(X = 1:nrow(tpds), FUN=calc_slope)
-  tpds$slope <- unlist(pd_slope)
+  tpds_covs <- tpds[tpds$V4 %in% cover_cols, ]
+  rm(tpds)
+
+  pd_slope <- lapply(X = 1:nrow(tpds_covs), FUN=calc_slope)
+  tpds_covs$slope <- unlist(pd_slope)
   rm(pd_slope)
 
-  pd_w_slope <- tpds[tpds$V4 %in% cover_cols, c("stixel.id",
-                                                "date",
-                                                "lat",
-                                                "lon",
-                                                "stixel_width",
-                                                "stixel_height",
-                                                "V4",
-                                                "slope")]
-  rm(tpds)
+  pd_w_slope <- tpds_covs[, c("stixel.id", "date", "lat", "lon", "stixel_width",
+                              "stixel_height", "V4", "slope")]
 
   # this aggregation is both for speed and stability of loess
   # without this agg, some of the pd trajectories
