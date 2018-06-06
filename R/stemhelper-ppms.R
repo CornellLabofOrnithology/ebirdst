@@ -41,12 +41,15 @@ load_ppm_data <- function(path) {
   es_files <- list.files(es_dir)
 
   eoa_es_data <- data.frame(Week = NA,
-                            WesternHemisphere = NA)
+                            WesternHemisphere = NA,
+                            Pat = NA)
 
+  # TODO...how does this behave if there are less than 52 weeks of data?
   for (iii in 1:length(es_files)) {
     ttt <- utils::read.csv(paste(es_dir, es_files[iii], sep = ""))
     eoa_es_data[iii, 1] <- as.character(ttt[1, 2])
     eoa_es_data[iii, 2] <- ttt[1, 3]
+    eoa_es_data[iii, 3] <- ttt[1, 4]
   }
 
   # add day of year
@@ -58,24 +61,25 @@ load_ppm_data <- function(path) {
 
   # init
   pred_DOY <- data.frame(DOY = c(1:366))
-  eoa_WesternHemisphere <- rep(NA, nrow(pred_DOY))
+  eoa_WesternHemisphere <- rep(50, nrow(pred_DOY))
+  eoa_Pat <- rep(NA, nrow(pred_DOY))
 
   slope = (25 - 3)/(52 - 10)
 
   # check for NA data
-  na_total <- sum(!is.na(eoa_es_data$WesternHemisphere))
+  na_total <- sum(!is.na(eoa_es_data$Pat))
 
   if(na_total > 1) {
-    # Treat missing ES values as the minimum support value
-    na_na_replace <- min(eoa_es_data$WesternHemisphere, na.rm = TRUE)
-    eoa_es_data$WesternHemisphere[is.na(eoa_es_data$WesternHemisphere)] <- na_na_replace
+    # Treat missing Pat values as the minimum support value
+    pat_na_replace <- min(eoa_es_data$Pat, na.rm = TRUE)
+    eoa_es_data$Pat[is.na(eoa_es_data$Pat)] <- pat_na_replace
 
     if(na_total > 9) {
       # GAM Smooth EOA ES values down to Daily
       y = -((52 * slope - na_total * slope) - 25)
 
       s = mgcv::s
-      na_model <- mgcv::gam(WesternHemisphere ~ s(DOY,
+      na_model <- mgcv::gam(Pat ~ s(DOY,
                                              k = round(y),
                                              bs = "cp",
                                              m = 1),
@@ -84,15 +88,16 @@ load_ppm_data <- function(path) {
                             knots = list(DOY = c(1,366)))
     } else {
       # do a loess
-      na_model <- stats::loess(WesternHemisphere ~ DOY, eoa_es_data)
+      na_model <- stats::loess(Pat ~ DOY, eoa_es_data)
     }
 
-    eoa_WesternHemisphere <- stats::predict(na_model, newdata = pred_DOY)
+    eoa_Pat <- stats::predict(na_model, newdata = pred_DOY)
   }
 
   # package and return
   eoa_es_daily <- data.frame(DOY = pred_DOY,
-                             WesternHemisphere = eoa_WesternHemisphere)
+                             WesternHemisphere = eoa_WesternHemisphere,
+                             Pat = eoa_Pat)
 
   return(list(ppm_data = ppm_data,
               eoa_es_daily = eoa_es_daily))
