@@ -408,15 +408,35 @@ compute_ppms <- function(path, st_extent = NA) {
   # Add Day of Year
   st_data$DOY <- round(st_data$date * 366)
   st_data[st_data$DOY == 0, ]$DOY <- 1
-  st_data$in_eoa <- st_data$pi.es >
+  st_data$in_eoa <- st_data$pi.es >=
     ppm_data_list$eoa_es_daily$WesternHemisphere[st_data$DOY]
+
+  pates <- st_data$pi.es
+  pates[pates >= 75] <- 75
+  pates[pates <= 49] <- 49
+  pates <- (pates - 48) ^ 4
+
+  if(min(pates, na.rm = TRUE) == max(pates, na.rm = TRUE)) {
+    if(min(pates, na.rm = TRUE) <= 49) {
+      scaled_es <- rep(0, length(st_data$pi.es))
+    } else {
+      scaled_es <- rep(1, length(st_data$pi.es))
+    }
+  } else {
+    scaled_es <- (pates - min(pates, na.rm = TRUE)) /
+      (max(pates, na.rm = TRUE) - min(pates, na.rm = TRUE))
+  }
+
+  st_data$pat <- st_data$pat * scaled_es
 
   # Remove data that is out of extent
   st_data <- st_data[st_data$in_eoa, ]
 
   # Add Binary Prediction
   # Occupied if EOA & PAT >= 0.05
-  st_data$binary <- as.numeric(st_data$in_eoa & st_data$pat >= 0.05)
+  st_data$binary <- as.numeric(st_data$in_eoa &
+                                 st_data$pat >=
+                                 ppm_data_list$eoa_es_daily$Pat[st_data$DOY])
 
   # Remove rows where binary = NA (inherited from PAT = NA)
   st_data <- st_data[!is.na(st_data$binary), ]
