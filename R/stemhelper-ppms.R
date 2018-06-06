@@ -411,6 +411,7 @@ compute_ppms <- function(path, st_extent = NA) {
   st_data$in_eoa <- st_data$pi.es >=
     ppm_data_list$eoa_es_daily$WesternHemisphere[st_data$DOY]
 
+  # Scale PAT values between ES of 50 and 75 based on power curve
   pates <- st_data$pi.es
   pates[pates >= 75] <- 75
   pates[pates <= 49] <- 49
@@ -433,7 +434,7 @@ compute_ppms <- function(path, st_extent = NA) {
   st_data <- st_data[st_data$in_eoa, ]
 
   # Add Binary Prediction
-  # Occupied if EOA & PAT >= 0.05
+  # Occupied if EOA & PAT >= interpolated mean occurrence threshold
   st_data$binary <- as.numeric(st_data$in_eoa &
                                  st_data$pat >=
                                  ppm_data_list$eoa_es_daily$Pat[st_data$DOY])
