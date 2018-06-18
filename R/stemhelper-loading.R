@@ -294,6 +294,11 @@ stack_stem <- function(path,
   # define function to load and extend each file in path
   load_and_extend <- function(x, ext, use_extend, add_zeroes) {
     if(tools::file_ext(list.files(fp)[x]) == "tif") {
+      date_start_pos <- gregexpr("_week_", list.files(fp)[x])[[1]][1]
+      parsed_date <- substr(list.files(fp)[x],
+                            date_start_pos + 1,
+                            date_start_pos + 6 + 4)
+
       if(!is.null(ext)) {
         r <- raster::crop(
           raster::extend(
@@ -374,6 +379,8 @@ stack_stem <- function(path,
 
         r <- raster::calc(week_stack, max, na.rm = TRUE)
       }
+
+      names(r) <- parsed_date
 
       return(r)
     }
