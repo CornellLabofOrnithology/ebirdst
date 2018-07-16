@@ -511,7 +511,8 @@ load_summary <- function(path) {
                             "train_covariate_entropy",
                             "srd_elevation_mean",
                             srd_covariate_means_names, #k-covariate values
-                            "srd_covariate_entropy")
+                            "srd_covariate_entropy",
+                            "max_time")
 
   stixel_path <- "/results/abund_preds/unpeeled_folds/"
   summary_file <- paste(path, stixel_path, "summary.txt", sep = "")
