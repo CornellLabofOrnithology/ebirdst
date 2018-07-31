@@ -859,19 +859,17 @@ cake_plot <- function(path,
 
   ## Calculate PD slopes for each centroid
   calc_slope <- function(y) {
-    x <- as.data.frame(tpds_covs[y, ])
-
-    x_vals <- as.numeric(x[(PD_MAX_RESOLUTION+4):(2*PD_MAX_RESOLUTION+3)])
-    y_vals <- as.numeric(x[3:(PD_MAX_RESOLUTION+2)]) -
-      mean(as.numeric(x[3:(PD_MAX_RESOLUTION+2)]), na.rm = T)
+    x_vals <- as.numeric(tpds_covs[y, (PD_MAX_RESOLUTION+4):(2*PD_MAX_RESOLUTION+3)])
+    y_vals <- as.numeric(tpds_covs[y, 3:(PD_MAX_RESOLUTION+2)]) -
+      mean(as.numeric(tpds_covs[y, 3:(PD_MAX_RESOLUTION+2)]), na.rm = T)
 
     if(all(is.na(y_vals))) {
       return(NA)
     }
 
-    sm <- stats::lm(x_vals ~ y_vals)
-
-    sl <- sm$coefficients[[2]]
+    nnn <- length(x_vals)
+    xxx <- matrix(cbind(rep(1, nnn), y_vals), nnn, 2)
+    sl <- .lm.fit(x = xxx, y = x_vals)$coefficients[[2]]
 
     if(!is.na(sl)) {
       if(sl > 0) {
@@ -1066,6 +1064,7 @@ cake_plot <- function(path,
   if(return_data == TRUE) {
     return(pipd_out)
   }
+
 }
 
 #' Converts cryptic cover class names to readable land cover names
