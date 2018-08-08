@@ -427,7 +427,7 @@ compute_ppms <- function(path, st_extent = NA) {
 
   # FDR
   binom_test_p <- function(x) {
-    binom.test(round(as.numeric(x["pat"]) * as.numeric(e$FOLD_N), 0),
+    binom.test(round(as.numeric(x["pat"]) * as.numeric(x["pi.es"]), 0),
                as.numeric(x["pi.es"]),
                0.5,
                alternative = "two.sided")$p.value
