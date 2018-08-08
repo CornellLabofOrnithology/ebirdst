@@ -28,10 +28,9 @@ load_ppm_data <- function(path) {
   }
 
   ppm_data <- data.table::fread(test_file, showProgress = FALSE)
-  ppm_names <- c("data.type", "res", "full_date", "row.id", "lon", "lat", "date", "obs", "pi.mean",
+  ppm_names <- c("data.type", "row.id", "lon", "lat", "date", "obs", "pi.mean",
                  "pi.90", "pi.10", "pi.se", "pi.mu.mean", "pi.mu.90",
-                 "pi.mu.10", "pi.mu.se", "pat", "pi.es", "sf_es", "sf_n",
-                 "sf_mean", "sf_umean", "sf_upper", "sf_lower")
+                 "pi.mu.10", "pi.mu.se", "pat", "pi.es")
   names(ppm_data) <- ppm_names
 
   # load ensemble support values that define weekly extent of analysis
@@ -366,7 +365,22 @@ compute_ppms <- function(path, st_extent = NA) {
     }
   }
 
-  ppm_data_list <- load_ppm_data(path)
+  e <- load_config(path)
+
+  # load the test data and assign names
+  test_file <- paste(path,
+                     "/results/abund_preds/unpeeled_folds/test.pred.ave.txt",
+                     sep = "")
+
+  if(!file.exists(test_file)) {
+    stop("*_erd.test.data.csv file does not exist in the /data directory.")
+  }
+
+  ppm_data <- data.table::fread(test_file, showProgress = FALSE)
+  ppm_names <- c("data.type", "row.id", "lon", "lat", "date", "obs", "pi.mean",
+                 "pi.90", "pi.10", "pi.se", "pi.mu.mean", "pi.mu.90",
+                 "pi.mu.10", "pi.mu.se", "pat", "pi.es")
+  names(ppm_data) <- ppm_names
 
   # static vars
   n_mc <- 25
@@ -399,46 +413,31 @@ compute_ppms <- function(path, st_extent = NA) {
   # Extract ST Subset
 
   if(!all(is.na(st_extent))) {
-    st_data <- st_extent_subset(ppm_data_list$ppm_data, st_extent)
+    st_data <- st_extent_subset(ppm_data, st_extent)
   } else {
-    st_data <- ppm_data_list$ppm_data
+    st_data <- ppm_data
   }
 
   # Add Extent of Analysis
   st_data$in_eoa <- FALSE
-  # Add Day of Year
-  st_data$DOY <- round(st_data$date * 366)
-  st_data[st_data$DOY == 0, ]$DOY <- 1
-  st_data$in_eoa <- st_data$pi.es >=
-    ppm_data_list$eoa_es_daily$WesternHemisphere[st_data$DOY]
-
-  # Scale PAT values between ES of 50 and 75 based on power curve
-  pates <- st_data$pi.es
-  pates[pates >= 75] <- 75
-  pates[pates <= 49] <- 49
-  pates <- (pates - 48) ^ 4
-
-  if(min(pates, na.rm = TRUE) == max(pates, na.rm = TRUE)) {
-    if(min(pates, na.rm = TRUE) <= 49) {
-      scaled_es <- rep(0, length(st_data$pi.es))
-    } else {
-      scaled_es <- rep(1, length(st_data$pi.es))
-    }
-  } else {
-    scaled_es <- (pates - min(pates, na.rm = TRUE)) /
-      (max(pates, na.rm = TRUE) - min(pates, na.rm = TRUE))
-  }
-
-  st_data$pat <- st_data$pat * scaled_es
+  st_data$in_eoa <- st_data$pi.es >= 75
 
   # Remove data that is out of extent
   st_data <- st_data[st_data$in_eoa, ]
 
+  # FDR
+  binom_test_p <- function(x) {
+    binom.test(round(as.numeric(x["pat"]) * as.numeric(e$FOLD_N), 0),
+               as.numeric(x["pi.es"]),
+               0.5,
+               alternative = "two.sided")$p.value
+  }
+
+  p_values <- apply(st_data, 1, binom_test_p)
+  p_adj <- p.adjust(p_values, "fdr")
+
   # Add Binary Prediction
-  # Occupied if EOA & PAT >= interpolated mean occurrence threshold
-  st_data$binary <- as.numeric(st_data$in_eoa &
-                                 st_data$pat >=
-                                 ppm_data_list$eoa_es_daily$Pat[st_data$DOY])
+  st_data$binary <- as.numeric(p_adj < 0.05)
 
   # Remove rows where binary = NA (inherited from PAT = NA)
   st_data <- st_data[!is.na(st_data$binary), ]
