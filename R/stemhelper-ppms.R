@@ -419,14 +419,14 @@ compute_ppms <- function(path, st_extent = NA) {
   }
 
   # Split data into within extent and out of extent
-  st_data_zeroes <- st_data[st_data$pi.es < 70, ]
-  st_data <- st_data[st_data$pi.es >= 70, ]
+  st_data_zeroes <- st_data[st_data$pi.es < 75, ]
+  st_data <- st_data[st_data$pi.es >= 75, ]
 
   # FDR
   binom_test_p <- function(x) {
     binom.test(round(as.numeric(x["pat"]) * as.numeric(x["pi.es"]), 0),
                as.numeric(x["pi.es"]),
-               (1/7),
+               0.10,
                alternative = "greater")$p.value
   }
 
