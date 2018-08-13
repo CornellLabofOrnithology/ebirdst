@@ -418,26 +418,28 @@ compute_ppms <- function(path, st_extent = NA) {
     st_data <- ppm_data
   }
 
-  # Add Extent of Analysis
-  st_data$in_eoa <- FALSE
-  st_data$in_eoa <- st_data$pi.es >= 75
-
-  # Remove data that is out of extent
-  st_data <- st_data[st_data$in_eoa, ]
+  # Split data into within extent and out of extent
+  st_data_zeroes <- st_data[st_data$pi.es < 75, ]
+  st_data <- st_data[st_data$pi.es >= 75, ]
 
   # FDR
   binom_test_p <- function(x) {
     binom.test(round(as.numeric(x["pat"]) * as.numeric(x["pi.es"]), 0),
                as.numeric(x["pi.es"]),
-               0.5,
-               alternative = "two.sided")$p.value
+               0.10,
+               alternative = "greater")$p.value
   }
 
   p_values <- apply(st_data, 1, binom_test_p)
   p_adj <- p.adjust(p_values, "fdr")
 
   # Add Binary Prediction
-  st_data$binary <- as.numeric(p_adj < 0.05)
+  st_data$binary <- as.numeric(p_adj < 0.001)
+
+  # Readd test data out of extent with binary as 0
+  st_data_zeroes$binary <- 0
+
+  st_data <- rbind(st_data, st_data_zeroes)
 
   # Remove rows where binary = NA (inherited from PAT = NA)
   st_data <- st_data[!is.na(st_data$binary), ]
