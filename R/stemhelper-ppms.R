@@ -418,6 +418,35 @@ compute_ppms <- function(path, st_extent = NA) {
     st_data <- ppm_data
   }
 
+  rm(ppm_data)
+
+  print("---")
+  print(st_extent$t.min)
+  print(nrow(st_data))
+
+  # stack stem for the week
+  time_stack <- stack_stem(path, variable = "abundance_umean", res = "high",
+                           year = 2016, st_extent = st_extent,
+                           add_zeroes = TRUE)
+
+  # TODO add logic for averaging if there are more than one
+
+  # spatialize the st_data
+  st_data_sp <- sp::SpatialPointsDataFrame(st_data[, c("lon", "lat")],
+                                           st_data,
+                                           proj4string =
+                                             sp::CRS("+init=epsg:4326"))
+  sinu <- sp::CRS(sp::proj4string(stemhelper::template_raster))
+  st_data_prj <- sp::spTransform(st_data_sp, sinu)
+  rm(st_data_sp)
+
+  st_data_e <- raster::extract(time_stack, st_data_prj)
+
+  print(nrow(st_data_e))
+
+  st_data <- st_data[!is.na(st_data_e), ]
+  rm(st_data_e, time_stack, st_data_prj, sinu)
+
   # Split data into within extent and out of extent
   st_data_zeroes <- st_data[st_data$pi.es < 75, ]
   st_data <- st_data[st_data$pi.es >= 75, ]
@@ -444,9 +473,14 @@ compute_ppms <- function(path, st_extent = NA) {
   # Remove rows where binary = NA (inherited from PAT = NA)
   st_data <- st_data[!is.na(st_data$binary), ]
 
+  print(sum(st_data$binary == 0))
+  print(sum(st_data$binary == 1))
+
   if(nrow(st_data) == 0) {
     return(NA)
   }
+
+
 
   # -------------------------------------------------------------
   # Monte Carlo Samples for PPMs Binary, Spatially Balanced Sample
