@@ -420,10 +420,6 @@ compute_ppms <- function(path, st_extent = NA) {
 
   rm(ppm_data)
 
-  print("---")
-  print(st_extent$t.min)
-  print(nrow(st_data))
-
   # stack stem for the week
   time_stack <- stack_stem(path, variable = "abundance_umean", res = "high",
                            year = 2016, st_extent = st_extent,
@@ -442,7 +438,7 @@ compute_ppms <- function(path, st_extent = NA) {
 
   st_data_e <- raster::extract(time_stack, st_data_prj)
 
-  print(nrow(st_data_e))
+  print(sum(is.na(st_data_e)))
 
   st_data <- st_data[!is.na(st_data_e), ]
   rm(st_data_e, time_stack, st_data_prj, sinu)
@@ -473,14 +469,9 @@ compute_ppms <- function(path, st_extent = NA) {
   # Remove rows where binary = NA (inherited from PAT = NA)
   st_data <- st_data[!is.na(st_data$binary), ]
 
-  print(sum(st_data$binary == 0))
-  print(sum(st_data$binary == 1))
-
   if(nrow(st_data) == 0) {
     return(NA)
   }
-
-
 
   # -------------------------------------------------------------
   # Monte Carlo Samples for PPMs Binary, Spatially Balanced Sample
@@ -540,6 +531,11 @@ compute_ppms <- function(path, st_extent = NA) {
 
     # Index back to full vector
     sample.nindex <- c(1:nrow(st_data))[c(bbs$pos.nindex, bbs$neg.nindex)]
+
+    print(length(bbs$pos.nindex))
+    print(length(bbs$neg.nindex))
+    print((length(bbs$pos.nindex) / length(bbs$neg.nindex)) * 100)
+
     ttt.data <- st_data[sample.nindex, ]
 
     # -------------------------------------------------------------
