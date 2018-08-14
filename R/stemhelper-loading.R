@@ -220,17 +220,32 @@ st_extent_subset <- function(data, st_extent) {
 #' }
 stack_stem <- function(path,
                        variable,
+                       res,
+                       year,
                        st_extent = NA,
                        add_zeroes = TRUE,
-                       weeks = NA,
                        use_analysis_extent = TRUE) {
   poss_var <- c("abundance_lower", "abundance_upper",
                 "abundance_umean", "occurrence_umean",
                 "pat_mean")
 
+  poss_res <- c("low", "high")
+
   if(!(variable %in% poss_var)) {
     stop(paste("Selected variable is not one of the following: ",
                paste(poss_var, collapse = ", "), ".", sep = ""))
+  }
+
+  if(!(res %in% poss_res)) {
+    stop("Selected resolution needs to be either 'low' or 'high'.")
+  }
+
+  if(!(year %in% 2004:2016)) {
+    stop("Year needs to be between 2004 and 2016.")
+  }
+
+  if((year %in% 2004:2015) & res == "high") {
+    stop("High resolution results only available for 2016.")
   }
 
   if(!all(is.na(st_extent))) {
@@ -239,20 +254,23 @@ stack_stem <- function(path,
     }
   }
 
-  if(!any(is.na(weeks))) {
-    if(any(weeks%%1 != 0) | any(weeks %in% 1:52 == FALSE)) {
-      stop("weeks argument must contain whole integers from 1 to 52")
-    }
+  if(res == "high") {
+    res_label <- "hr"
+  } else {
+    res_label <- "lr"
   }
 
   if(variable == "pat_mean") {
-    fp <- paste(path, "/results/tifs/all_layers/", variable, sep = "")
+    fp <- paste(path, "/results/tifs/all_layers/", variable, "/", year, "/",
+                sep = "")
   } else {
-    fp <- paste(path, "/results/tifs/presentation/", variable, sep = "")
+    fp <- paste(path, "/results/tifs/presentation/", variable, "/", year, "/",
+                sep = "")
   }
 
   fpaes <- paste(path, "/results/tifs/presentation/abundance_ensemble_support/",
-                 sep = "")
+                 year, "/", sep = "")
+  fpzes <- paste(path, "/results/tifs/all_layers/zero_es/", sep = "")
 
   load_extent <- NULL
   load_extend <- FALSE
@@ -282,6 +300,8 @@ stack_stem <- function(path,
       load_extent <- get_sinu_ext(st_extent)
     } else {
       # check prj
+      # TODO...replace this use of template_raster with _srd_raster_template in data
+      # TODO...need to aggregate if res = 'low'
       if(!sp::identicalCRS(template_raster, st_extent$polygon)) {
         load_extent <- sp::spTransform(st_extent$polygon,
                                  sp::CRS(sp::proj4string(template_raster)))
@@ -292,58 +312,64 @@ stack_stem <- function(path,
   }
 
   # define function to load and extend each file in path
-  load_and_extend <- function(x, ext, use_extend, add_zeroes) {
-    if(tools::file_ext(list.files(fp)[x]) == "tif") {
-      date_start_pos <- gregexpr("_week_", list.files(fp)[x])[[1]][1]
-      parsed_date <- substr(list.files(fp)[x],
-                            date_start_pos + 1,
+  load_and_extend <- function(x, ext, res, year, use_extend, add_zeroes) {
+
+    this_f <- list.files(fp, pattern = paste("*_", res, "_*", sep = ""))[x]
+    this_aes <- list.files(fpaes, pattern = paste("*_", res, "_*", sep = ""))[x]
+
+    if(tools::file_ext(this_f) == "tif") {
+      date_start_pos <- gregexpr(paste("_", year, "-", sep = ""),
+                                 this_f)[[1]][1]
+      parsed_date <- substr(this_f,
+                            date_start_pos + 6,
                             date_start_pos + 6 + 4)
 
       if(!is.null(ext)) {
         r <- raster::crop(
           raster::extend(
-            raster::raster(paste(fp, "/", list.files(fp)[x], sep = "")),
+            raster::raster(paste(fp, "/", this_f, sep = "")),
             ext),
           ext)
 
         if(add_zeroes == TRUE) {
           pes <- raster::crop(
             raster::extend(
-              raster::raster(paste(fpaes, "/", list.files(fpaes)[x], sep = "")),
+              raster::raster(paste(fpaes, "/", this_aes, sep = "")),
               ext),
             ext)
 
           zes <- raster::crop(
             raster::extend(
-              stemhelper::zero_es_stack[[x]],
+              raster::raster(paste(fpzes, "/", list.files(fpzes)[x], sep = "")),
               ext),
             ext)
         }
       } else {
         if(use_extend == TRUE) {
           r <- raster::extend(raster::raster(paste(fp, "/",
-                                                   list.files(fp)[x],
+                                                   this_f,
                                                    sep = "")),
                               stemhelper::template_raster)
 
           if(add_zeroes == TRUE) {
             pes <- raster::extend(raster::raster(paste(fpaes, "/",
-                                                       list.files(fpaes)[x],
+                                                       this_aes,
                                                        sep = "")),
                                   stemhelper::template_raster)
 
-            zes <- raster::extend(stemhelper::zero_es_stack[[x]],
+            zes <- raster::extend(raster::raster(paste(fpzes, "/",
+                                                       list.files(fpzes)[x],
+                                                       sep = "")),
                                   stemhelper::template_raster)
           }
         } else {
-          r <- raster::raster(paste(fp, "/", list.files(fp)[x],
-                                    sep = ""))
+          r <- raster::raster(paste(fp, "/", this_f, sep = ""))
 
           if(add_zeroes == TRUE) {
-            pes <- raster::raster(paste(fpaes, "/", list.files(fpaes)[x],
-                                        sep = ""))
+            pes <- raster::raster(paste(fpaes, "/", this_aes, sep = ""))
 
-            zes <- stemhelper::zero_es_stack[[x]]
+            zes <- raster::raster(paste(fpzes, "/", list.files(fpzes)[x],
+                                        sep = ""))
           }
         }
       }
@@ -351,33 +377,22 @@ stack_stem <- function(path,
       if(add_zeroes == TRUE) {
         pes[pes] <- 0
 
-        if(!is.null(ext) & all(is.na(st_extent))) {
-          week_stack <- raster::stack(r, pes)
-        } else {
-          zes <- zes >= 99
-          zes[zes == 0] <- NA
-          zes[zes == 1] <- 0
+        zes <- zes >= 95
+        zes[zes == 0] <- NA
+        zes[zes == 1] <- 0
 
-          # TODO: in the future this needs to use the run-specific template raster
-          if(e$SRD_AGG_FACT == 1) {
-            zes <- raster::resample(zes, pes)
-            # i don't love this, but don't have another way to do it right now
-            # it should be using a run-specific template raster
-            zes <- raster::mask(zes, pes)
+        if(e$SRD_AGG_FACT != 1) {
+          if(!is.null(ext)) {
+            zes <- raster::mask(zes, raster::crop(stemhelper::template_raster,
+                                                  ext))
           } else {
-            if(!is.null(ext)) {
-              zes <- raster::mask(zes, raster::crop(stemhelper::template_raster,
-                                                    ext))
-            } else {
-              zes <- raster::mask(zes, stemhelper::template_raster)
-            }
-
+            zes <- raster::mask(zes, stemhelper::template_raster)
           }
-
-          week_stack <- raster::stack(r, pes, zes)
         }
 
-        r <- raster::calc(week_stack, max, na.rm = TRUE)
+        week_stack <- raster::stack(r, pes, zes)
+
+        r <- suppressWarnings(raster::calc(week_stack, max, na.rm = TRUE))
       }
 
       names(r) <- parsed_date
@@ -387,17 +402,50 @@ stack_stem <- function(path,
   }
 
   # check to see if path contains more than 1 geotiff file
-  if( sum(tools::file_ext(list.files(fp)) == "tif", na.rm = TRUE) < 2 ) {
+  if( sum(tools::file_ext(list.files(fp,
+                                     pattern = paste("*_", res_label, "_*",
+                                                     sep = ""))) == "tif",
+          na.rm = TRUE) < 2 ) {
     stop("Directory does not contain at least 2 .tif files.")
   }
 
-  if(any(is.na(weeks))) {
-    weeks <- 1:length(list.files(fp))
+  if(is.null(st_extent[["t.min"]]) | is.null(st_extent[["t.max"]])) {
+    st_extent$t.min <- NA
+    st_extent$t.max <- NA
+  }
+
+  if(is.na(st_extent$t.min) | is.na(st_extent$t.max)) {
+    weeks <- 1:length(list.files(fp, pattern = paste("*_", res_label, "_*",
+                                                     sep = "")))
+  } else {
+    p_time <- strptime(x = paste(round(e$SRD_DATE_VEC * 366), 2015), "%j %Y")
+    date_names <- paste(formatC(p_time$mon + 1, width = 2, format = "d", flag = "0"),
+                        formatC(p_time$mday, width = 2, format = "d", flag = "0"),
+                        sep = "-")
+
+    # select from e$SRD_DATE_VEC where between st_extent$t.min and st_extent$t.max
+    if(st_extent$t.min > st_extent$t.max) {
+      # date wrapping case
+      weeks <- c(which(date_names[e$SRD_DATE_VEC >= st_extent$t.min] %in%
+                         date_names),
+                 which(date_names[e$SRD_DATE_VEC <= st_extent$t.max] %in%
+                         date_names))
+    } else {
+      weeks <- which(date_names[e$SRD_DATE_VEC >= st_extent$t.min &
+                                  e$SRD_DATE_VEC <= st_extent$t.max] %in%
+                       date_names)
+    }
+
+    if(length(weeks) < 1) {
+      stop("Time period in st_extent does not included any weeks of the year.")
+    }
   }
 
   all_lays <- lapply(X = weeks,
                      FUN = load_and_extend,
                      ext = load_extent,
+                     res = res_label,
+                     year = year,
                      use_extend = load_extend,
                      add_zeroes = add_zeroes)
 
