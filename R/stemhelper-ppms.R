@@ -575,7 +575,7 @@ compute_ppms <- function(path, st_extent = NA) {
     # -------------------------------------------------------------
     if(occ_prob | count) {
       # Limit ttt.data to within Range
-      ttt.data <- ttt.data[ttt.data$binary > 0, ]
+      ttt.data <- ttt.data[ttt.data$binary > 0 & ttt.data$pi.es >= 75, ]
     }
 
     if(occ_prob) {
