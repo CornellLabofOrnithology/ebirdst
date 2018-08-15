@@ -1,108 +1,3 @@
-#' Load Predictive Performance Metrics Data
-#'
-#' Internal function that loads test data and filters it against ensemble
-#' support data.
-#'
-#' @param path character; Full path to single species STEM results.
-#'
-#' @return list with data.frame of ppm_data and data.frame of interpolated
-#' daily ensemble support values for the Western Hemisphere.
-#'
-#' @keywords internal
-#'
-#' @examples
-#' \dontrun{
-#'
-#' sp_path <- "path to species STEM results"
-#'
-#' ppm_data <- load_ppm_data(sp_path)
-#' }
-load_ppm_data <- function(path) {
-  # load the test data and assign names
-  test_file <- paste(path,
-                     "/results/abund_preds/unpeeled_folds/test.pred.ave.txt",
-                     sep = "")
-
-  if(!file.exists(test_file)) {
-    stop("*_erd.test.data.csv file does not exist in the /data directory.")
-  }
-
-  ppm_data <- data.table::fread(test_file, showProgress = FALSE)
-  ppm_names <- c("data.type", "row.id", "lon", "lat", "date", "obs", "pi.mean",
-                 "pi.90", "pi.10", "pi.se", "pi.mu.mean", "pi.mu.90",
-                 "pi.mu.10", "pi.mu.se", "pat", "pi.es")
-  names(ppm_data) <- ppm_names
-
-  # load ensemble support values that define weekly extent of analysis
-  es_dir <- paste(path,
-                  "/results/tifs/presentation/",
-                  "abundance_ensemble_support_values/",
-                  sep = "")
-  es_files <- list.files(es_dir)
-
-  eoa_es_data <- data.frame(Week = NA,
-                            WesternHemisphere = NA,
-                            Pat = NA)
-
-  # TODO...how does this behave if there are less than 52 weeks of data?
-  for (iii in 1:length(es_files)) {
-    ttt <- utils::read.csv(paste(es_dir, es_files[iii], sep = ""))
-    eoa_es_data[iii, 1] <- as.character(ttt[1, 2])
-    eoa_es_data[iii, 2] <- ttt[1, 3]
-    eoa_es_data[iii, 3] <- ttt[1, 4]
-  }
-
-  # add day of year
-  eoa_es_data$DOY <- as.numeric(format(strptime(x = eoa_es_data$Week,
-                                                format = "%m-%d"),
-                                       "%j"))
-
-  # smooth the extent of estimate ensemble support values to day
-
-  # init
-  pred_DOY <- data.frame(DOY = c(1:366))
-  eoa_WesternHemisphere <- rep(50, nrow(pred_DOY))
-  eoa_Pat <- rep(NA, nrow(pred_DOY))
-
-  slope = (25 - 3)/(52 - 10)
-
-  # check for NA data
-  na_total <- sum(!is.na(eoa_es_data$Pat))
-
-  if(na_total > 1) {
-    # Treat missing Pat values as the minimum support value
-    pat_na_replace <- min(eoa_es_data$Pat, na.rm = TRUE)
-    eoa_es_data$Pat[is.na(eoa_es_data$Pat)] <- pat_na_replace
-
-    if(na_total > 9) {
-      # GAM Smooth EOA ES values down to Daily
-      y = -((52 * slope - na_total * slope) - 25)
-
-      s = mgcv::s
-      na_model <- mgcv::gam(Pat ~ s(DOY,
-                                             k = round(y),
-                                             bs = "cp",
-                                             m = 1),
-                            gamma = 1.5,
-                            data = eoa_es_data,
-                            knots = list(DOY = c(1,366)))
-    } else {
-      # do a loess
-      na_model <- stats::loess(Pat ~ DOY, eoa_es_data)
-    }
-
-    eoa_Pat <- stats::predict(na_model, newdata = pred_DOY)
-  }
-
-  # package and return
-  eoa_es_daily <- data.frame(DOY = pred_DOY,
-                             WesternHemisphere = eoa_WesternHemisphere,
-                             Pat = eoa_Pat)
-
-  return(list(ppm_data = ppm_data,
-              eoa_es_daily = eoa_es_daily))
-}
-
 #' Computes the Predictive Performance Metrics for a spatiotemporal extent
 #'
 #' Loads test data and ensemble support values and then calculates the
@@ -365,7 +260,12 @@ compute_ppms <- function(path, st_extent = NA) {
     }
   }
 
+  # load configs
   e <- load_config(path)
+
+  # load template raster
+  template_raster <- raster::raster(paste(path, "/data/", e$RUN_NAME,
+                                  "_srd_raster_template.tif", sep = ""))
 
   # load the test data and assign names
   test_file <- paste(path,
@@ -432,7 +332,7 @@ compute_ppms <- function(path, st_extent = NA) {
                                            st_data,
                                            proj4string =
                                              sp::CRS("+init=epsg:4326"))
-  sinu <- sp::CRS(sp::proj4string(stemhelper::template_raster))
+  sinu <- sp::CRS(sp::proj4string(template_raster))
   st_data_prj <- sp::spTransform(st_data_sp, sinu)
   rm(st_data_sp)
 
@@ -508,7 +408,7 @@ compute_ppms <- function(path, st_extent = NA) {
                                              st_data,
                                              proj4string =
                                                sp::CRS("+init=epsg:4326"))
-    sinu <- sp::CRS(sp::proj4string(stemhelper::template_raster))
+    sinu <- sp::CRS(sp::proj4string(template_raster))
     st_data_prj <- sp::spTransform(st_data_sp, sinu)
 
     xrange <- range(st_data_prj@coords[, 1], na.rm = TRUE)
