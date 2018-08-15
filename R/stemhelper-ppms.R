@@ -67,85 +67,80 @@ compute_ppms <- function(path, st_extent = NA) {
     return(c(dev.model, dev.mean, dev.explained))
   }
 
-  balanced.binary.sample <- function(
-    binary.outcome,
-    x,
-    y,
-    xlim = NA,
-    ylim = NA,
-    nx = 50,
-    ny = 50,
-    min.class = 0.25,
-    neg.size = NA) {
-
-    sample.grid.cell <- function(
-      xxx,
-      yyy,
-      xlim = c(NA,NA),
-      ylim = c(NA,NA),
-      nx = 64,
-      ny = 64,
-      jitter = F,
-      size = 1,
-      replace = F ){
-
-      lookup.grid.cell <- function(
-        xxx,
-        yyy,
-        xlim = c(NA,NA),
-        ylim = c(NA,NA),
-        nx = 64,
-        ny = 64,
-        jitter = F ){
-        # -----------------------------------
-        cell.number <- rep(NA, length(xxx))
-        x.ll <- y.ll <- NA
-        xxx.width <- yyy.width <- NA
-        if (length(xxx)==length(yyy) & length(unique(xxx))>1){
-          if (any(is.na(xlim))) xlim <- range(xxx, na.rm=T)
-          if (any(is.na(ylim))) ylim <- range(yyy, na.rm=T)
-          xxx.width <- abs(xlim[2]-xlim[1])/nx
-          yyy.width <- abs(ylim[2]-ylim[1])/ny
-          # Lower Left Corner
-          x.ll <- min(xlim)
-          y.ll <- min(ylim)
-          # If Jittered, domain is bigger & number of grid cells increases
-          if (jitter){
-            x.ll <- x.ll - stats::runif(1)*xxx.width
-            y.ll <- y.ll - stats::runif(1)*yyy.width
-            nx <- 1 + (max(xlim) - min( c(x.ll, xlim) )) %/% xxx.width
-            ny <- 1 + (max(ylim) - min( c(y.ll, ylim) )) %/% yyy.width
-          }
-          # ID data within grid
-          ingrid.index <-
-            xxx >= x.ll & xxx <= x.ll + nx*xxx.width &
-            yyy >= y.ll & yyy <= y.ll + ny*yyy.width
-          if (sum(ingrid.index)>0){
-            # Assign Row, Column, Grid Cell Number
-            col.number <- 1 + ( xxx[ingrid.index] - x.ll ) %/% xxx.width
-            row.number <- 1 + ( yyy[ingrid.index] - y.ll ) %/% yyy.width
-            cell.number[ingrid.index] <- col.number + (row.number-1)*nx
-          }
-        }
-        return( list(
-          cell.number=cell.number,
-          # jittered bounding box
-          bb = matrix(
-            c(x.ll, y.ll, x.ll + nx*xxx.width, y.ll + ny*yyy.width), 2, 2,
-            byrow=T, dimnames=list(c("ll", "ur"), c("xxx", "yyy"))),
-          nx = nx,
-          ny = ny,
-          xwidth = xxx.width,
-          ywidth = yyy.width  ))
+  lookup.grid.cell <- function(
+    xxx,
+    yyy,
+    ttt = NA,
+    xxx.width,
+    yyy.width,
+    ttt.width = NA,
+    jitter.cells = F ){
+    # -----------------------------------
+    cell.number <- rep(NA, length(xxx))
+    x.ll <- y.ll <- t.ll <- NA
+    nx <- ny <- nt <- NA
+    if (
+      length(xxx) > 0 & length(yyy) > 0 &
+      length(xxx)==length(yyy) &
+      xxx.width > 0 & yyy.width > 0 ){
+      # Lower Left Corner
+      x.ll <- min(xxx)
+      y.ll <- min(yyy)
+      t.ll <- min(ttt)
+      # If Jittered, domain is bigger & number of grid cells increases
+      if (jitter.cells){
+        x.ll <- x.ll - runif(1)*xxx.width
+        y.ll <- y.ll - runif(1)*yyy.width
+        t.ll <- t.ll - runif(1)*ttt.width
       }
+      nx <- 1 + (max(xxx) - x.ll ) %/% xxx.width
+      ny <- 1 + (max(yyy) - y.ll ) %/% yyy.width
+      nt <- 1 + (max(ttt) - t.ll ) %/% ttt.width
+      # Assign Row, Column, Grid Cell Number
+      x.number <- 1 + ( xxx - x.ll ) %/% xxx.width
+      y.number <- 1 + ( yyy - y.ll ) %/% yyy.width
+      t.number <- 1 + ( ttt - t.ll ) %/% ttt.width
+      # Turn OFF t.number if NA
+      if (all(is.na(t.number))) t.number <- 1
+      cell.number <- x.number + (y.number-1)*nx + (t.number-1)*nx*ny
+    }
+    return( list(
+      cell.number=cell.number,
+      # jittered bounding box
+      bb = matrix(
+        c(x.ll, y.ll, t.ll,
+          x.ll + nx*xxx.width, y.ll + ny*yyy.width, t.ll + nt*ttt.width),
+        2, 3,
+        byrow=T,
+        dimnames=list(c("ll", "ur"), c("xxx", "yyy", "ttt"))),
+      xxx.width = xxx.width,
+      yyy.width = yyy.width,
+      ttt.width = ttt.width,
+      nx = nx,
+      ny = ny,
+      nt = nt  ))
+  }
 
-      # Stratified sample over Grid Cell Number
-      sample_fun <- function(x, size, replace){
-        # Cells without samples are excluded in the
-        # tapply call - if (length(x)==0) return(NA)
-        # Cells with a single sample cause problems, see help(sample)
-        # So, I am going to handle this situation "by hand"
-        result <- rep(NA, size)
+  st.grid.sampler <- function(
+    xxx,
+    yyy,
+    ttt = NA,
+    xxx.width,
+    yyy.width,
+    ttt.width = NA,
+    jitter.cells = F,
+    sample.size.per.cell = 1,
+    sample.cell.probability = 1,
+    replace = F ){
+    # Stratified sample over Grid Cell Number
+    sample_fun <- function(x, size, prob, replace){
+      # Cells without samples are excluded in the tapply call -
+      # if (length(x)==0) return(NA)
+      # Cells with a single sample cause problems, see help(sample)
+      # So, I am going to handle this situation "by hand"
+      result <- rep(NA, size)
+      # Flip coin to determine if cell is sampled
+      if (runif(1) < prob){
         if (length(x)==1 & replace==F) {
           #cat("sf: length(x)==1 & replace==F",x,"\n")
           result <- rep(NA, size)
@@ -160,99 +155,38 @@ compute_ppms <- function(path, st_extent = NA) {
           result[1:length(x)] <- x
         }
         if (length(x)>1 & replace == F & size <= length(x) ){
-          result <- sample(x=x, size=size, replace=replace)
+          result <- base::sample(x=x, size=size, replace=replace)
         }
         if (length(x)>1 & replace == T ){
-          result <- sample(x=x, size=size, replace=replace)
+          result <- base::sample(x=x, size=size, replace=replace)
         }
-        return(result)
-      }
-      lgc <- lookup.grid.cell(
-        xxx, yyy, xlim, ylim, nx, ny, jitter)
-      n.index <- tapply(
-        c(1:length(xxx))[!is.na(lgc$cell.number)],
-        as.factor(lgc$cell.number[!is.na(lgc$cell.number)]),
-        sample_fun, size, replace)
-      n.index <- plyr::rbind.fill.matrix(n.index)
-      return(list(
-        cell.number = lgc$cell.number,
-        sample.index = n.index,
-        bb = lgc$bb,
-        nx = lgc$nx,
-        ny = lgc$ny,
-        xwidth = lgc$xwidth,
-        ywidth = lgc$ywidth  ))
-    }
-
-    # ----------------------------------------------------------------------
-    sgc.pos.nindex <- NULL
-    sgc.neg.nindex <- NULL
-    jjj.max <- 20 # Maximum spatially balanced oversampling iterations
-    if (is.na(neg.size)) neg.size <- 1
-    if (any(is.na(xlim))) xlim = range(x, na.rm=T)
-    if (any(is.na(ylim))) ylim = range(y, na.rm=T)
-    if (length(binary.outcome)==length(x) &
-        length(x)==length(y) &
-        length(binary.outcome)>1){
-      # -----------------------
-      # Check for negatives
-      if (sum(binary.outcome==0) > 0) {
-        ttt.nindex <- c(1:length(binary.outcome))[ binary.outcome == 0 ]
-        xxx <- x[ttt.nindex]
-        yyy <- y[ttt.nindex]
-        sgc.neg <- sample.grid.cell(
-          xxx, yyy, xlim, ylim, nx, ny, jitter = T,
-          size = neg.size,
-          replace = F )
-        # Remember to strip out NA's from grid
-        sgc.neg$sample.index <- sgc.neg$sample.index[!is.na(sgc.neg$sample.index)]
-        # Index back to original data.frame
-        sgc.neg.nindex <- ttt.nindex[ sgc.neg$sample.index ]
-      }
-      # -----------------------
-      # Check for positives
-      if (sum(binary.outcome>0) > 0) {
-        ttt.nindex <- c(1:length(binary.outcome))[ binary.outcome != 0 ]
-        xxx <- x[ttt.nindex]
-        yyy <- y[ttt.nindex]
-        # Check Positive Classs Proportion
-        # Compared to Balanced Neg Sample
-        ncut <- round(min.class/(1-min.class)*length(sgc.neg.nindex))
-        if ( length(ttt.nindex) < ncut) {
-          # Oversample positives
-          sgc.pos.nindex <-  sample(
-            ttt.nindex,
-            size = 1+ncut,
-            replace = T)
-        }
-        # Else Spatial Sample
-        if ( length(ttt.nindex) >= ncut ) {
-          sgc.pos <- sample.grid.cell(
-            xxx, yyy, xlim, ylim, nx, ny, jitter = T, size = 1, replace = F )
-          sgc.pos$sample.index <- sgc.pos$sample.index[!is.na(sgc.pos$sample.index)]
-          sgc.pos.nindex <- ttt.nindex[ sgc.pos$sample.index ]
-          # Check proportion
-          # If less than min.class then increase sample per cell until
-          # minimum proportion achieved.
-          jjj <- 1
-          while ( length(sgc.pos.nindex) < ncut & jjj < jjj.max ) {
-            jjj <- jjj+1
-            #print(jjj)
-            sgc.pos <- sample.grid.cell(
-              xxx, yyy, xlim, ylim, nx, ny, jitter = T,
-              size = jjj,
-              replace = F )
-            sgc.pos$sample.index <- sgc.pos$sample.index[!is.na(sgc.pos$sample.index)]
-            sgc.pos.nindex <- ttt.nindex[ sgc.pos$sample.index ]
-          }
-        } # END else spatial sample
-      } # End check for positives
-    }# Check input parameter lengths
-    return(
-      list(
-        pos.nindex = sgc.pos.nindex,
-        neg.nindex = sgc.neg.nindex ))
-  }
+      } # END if coin flip
+      return(result)
+    } # END sample_fun
+    lgc <- lookup.grid.cell(
+      xxx = xxx,
+      yyy = yyy,
+      ttt = ttt,
+      xxx.width = xxx.width,
+      yyy.width = yyy.width,
+      ttt.width = ttt.width,
+      jitter.cells = jitter.cells)
+    n.index <- tapply(
+      c(1:length(xxx))[!is.na(lgc$cell.number)],
+      as.factor(lgc$cell.number[!is.na(lgc$cell.number)]),
+      sample_fun, sample.size.per.cell, sample.cell.probability, replace)
+    n.index <- plyr::rbind.fill.matrix(n.index)
+    return(list(
+      cell.number = lgc$cell.number,
+      sample.index = n.index,
+      bb = lgc$bb,
+      nx = lgc$nx,
+      ny = lgc$ny,
+      nt = lgc$nt,
+      xxx.width = lgc$xxx.width,
+      yyy.width = lgc$yyy.width,
+      ttt.width = lgc$ttt.width ) )
+  } # END FUNCTION
 
   if(!all(is.na(st_extent))) {
     if(!is.list(st_extent)) {
@@ -391,17 +325,6 @@ compute_ppms <- function(path, st_extent = NA) {
     # -------------------------------------------------------------
     # Sampling
     # -------------------------------------------------------------
-    # Spatially Balanced Case Control Sampling
-    # (NOTE NO!!! oversampling)
-    #bbs <- balanced.binary.sample(binary.outcome = as.numeric(st_data$obs > 0),
-    #                              x = st_data$lon,
-    #                              y = st_data$lat,
-    #                              xlim = range(st_data$lon, na.rm = TRUE),
-    #                              ylim = range(st_data$lat, na.rm = TRUE),
-    #                              nx = 50,
-    #                              ny = 50,
-    #                              min.class = 0.0,
-    #                              neg.size = 1)
 
     # projected bbs
     st_data_sp <- sp::SpatialPointsDataFrame(st_data[, c("lon", "lat")],
@@ -427,8 +350,20 @@ compute_ppms <- function(path, st_extent = NA) {
                                   min.class = 0.0,
                                   neg.size = 1)
 
+    bbs <- st.grid.sampler(
+      xxx = st_data_prj@coords[, 1],
+      yyy = st_data_prj@coords[, 2],
+      ttt = st_data$date,
+      xxx.width = 10000,
+      yyy.width = 10000,
+      ttt.width = 7/365,
+      jitter.cells = TRUE,
+      sample.size.per.cell = 1,
+      sample.cell.probability = 0.5,
+      replace = FALSE )
+
     # Index back to full vector
-    sample.nindex <- c(1:nrow(st_data))[c(bbs$pos.nindex, bbs$neg.nindex)]
+    sample.nindex <- c(1:nrow(st_data))[bbs$sample.index]
     ttt.data <- st_data[sample.nindex, ]
 
     # -------------------------------------------------------------
