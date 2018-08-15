@@ -276,7 +276,7 @@ compute_ppms <- function(path, st_extent = NA) {
   rm(st_data_e, time_stack, st_data_prj, sinu)
 
   # Split data into within extent and out of extent
-  st_data_zeroes <- st_data[st_data$pi.es < 75, ]
+  #st_data_zeroes <- st_data[st_data$pi.es < 75, ]
   st_data <- st_data[st_data$pi.es >= 75, ]
 
   # FDR
@@ -294,9 +294,8 @@ compute_ppms <- function(path, st_extent = NA) {
   st_data$binary <- as.numeric(p_adj < 0.001)
 
   # Readd test data out of extent with binary as 0
-  st_data_zeroes$binary <- 0
-
-  st_data <- rbind(st_data, st_data_zeroes)
+  #st_data_zeroes$binary <- 0
+  #st_data <- rbind(st_data, st_data_zeroes)
 
   # Remove rows where binary = NA (inherited from PAT = NA)
   st_data <- st_data[!is.na(st_data$binary), ]
