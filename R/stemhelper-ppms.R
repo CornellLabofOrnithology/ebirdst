@@ -343,14 +343,14 @@ compute_ppms <- function(path, st_extent = NA) {
     bbs <- st.grid.sampler(
       xxx = st_data_prj@coords[, 1],
       yyy = st_data_prj@coords[, 2],
-      ttt = st_data$date,
+      ttt = st_data_prj@data$date,
       xxx.width = 10000,
       yyy.width = 10000,
       ttt.width = 7/365,
       jitter.cells = TRUE,
       sample.size.per.cell = 1,
       sample.cell.probability = 0.5,
-      replace = FALSE )
+      replace = FALSE)
 
     # Index back to full vector
     #sample.nindex <- c(1:nrow(st_data))[bbs$sample.index]
