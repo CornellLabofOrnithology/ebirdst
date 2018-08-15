@@ -354,7 +354,7 @@ compute_ppms <- function(path, st_extent = NA) {
 
     # Index back to full vector
     #sample.nindex <- c(1:nrow(st_data))[bbs$sample.index]
-    ttt.data <- st_data[na.omit(bbs$sample.index), ]
+    ttt.data <- st_data_prj@data[na.omit(bbs$sample.index), ]
 
     # -------------------------------------------------------------
     # Binary Occupancy PPMs
