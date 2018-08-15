@@ -23,7 +23,7 @@
 #' # convert
 #' sinu_e <- get_sinu_ext(ne_extent)
 #' sinu_e
-get_sinu_ext <- function(st_extent) {
+get_sinu_ext <- function(path, st_extent) {
   # projection information
   ll <- "+init=epsg:4326"
 
@@ -35,9 +35,13 @@ get_sinu_ext <- function(st_extent) {
   extllr[is.na(extllr)] <- 0
   raster::crs(extllr) <- ll
 
+  # load template raster
+  e <- load_config(path)
+  template_raster <- raster::raster(paste(path, "/data/", e$RUN_NAME,
+                                          "_srd_raster_template.tif", sep = ""))
+
   extsinur <- raster::projectRaster(extllr,
-                                    crs = sp::proj4string(
-                                      stemhelper::template_raster))
+                                    crs = sp::proj4string(template_raster))
 
   return(raster::extent(extsinur))
 }
@@ -276,11 +280,15 @@ stack_stem <- function(path,
   load_extend <- FALSE
   e <- load_config(path)
 
+  # load template raster
+  template_raster <- raster::raster(paste(path, "/data/", e$RUN_NAME,
+                                          "_srd_raster_template.tif", sep = ""))
+
   if(all(is.na(st_extent))) {
     if(use_analysis_extent == TRUE) {
       # load with extent
       if(!is.null(e$SPATIAL_EXTENT_LIST)) {
-        load_extent <- get_sinu_ext(e$SPATIAL_EXTENT_LIST)
+        load_extent <- get_sinu_ext(path, e$SPATIAL_EXTENT_LIST)
       } else {
         load_extend <- TRUE
       }
@@ -297,10 +305,9 @@ stack_stem <- function(path,
     # load with extent
 
     if(st_extent$type == "rectangle") {
-      load_extent <- get_sinu_ext(st_extent)
+      load_extent <- get_sinu_ext(path, st_extent)
     } else {
       # check prj
-      # TODO...replace this use of template_raster with _srd_raster_template in data
       # TODO...need to aggregate if res = 'low'
       if(!sp::identicalCRS(template_raster, st_extent$polygon)) {
         load_extent <- sp::spTransform(st_extent$polygon,
@@ -348,19 +355,18 @@ stack_stem <- function(path,
         if(use_extend == TRUE) {
           r <- raster::extend(raster::raster(paste(fp, "/",
                                                    this_f,
-                                                   sep = "")),
-                              stemhelper::template_raster)
+                                                   sep = "")), template_raster)
 
           if(add_zeroes == TRUE) {
             pes <- raster::extend(raster::raster(paste(fpaes, "/",
                                                        this_aes,
                                                        sep = "")),
-                                  stemhelper::template_raster)
+                                  template_raster)
 
             zes <- raster::extend(raster::raster(paste(fpzes, "/",
                                                        list.files(fpzes)[x],
                                                        sep = "")),
-                                  stemhelper::template_raster)
+                                  template_raster)
           }
         } else {
           r <- raster::raster(paste(fp, "/", this_f, sep = ""))
@@ -380,15 +386,6 @@ stack_stem <- function(path,
         zes <- zes >= 95
         zes[zes == 0] <- NA
         zes[zes == 1] <- 0
-
-        if(e$SRD_AGG_FACT != 1) {
-          if(!is.null(ext)) {
-            zes <- raster::mask(zes, raster::crop(stemhelper::template_raster,
-                                                  ext))
-          } else {
-            zes <- raster::mask(zes, stemhelper::template_raster)
-          }
-        }
 
         week_stack <- raster::stack(r, pes, zes)
 
