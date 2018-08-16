@@ -188,6 +188,287 @@ compute_ppms <- function(path, st_extent = NA) {
       ttt.width = lgc$ttt.width ) )
   } # END FUNCTION
 
+  st.grid.sampler.by.year <- function(
+    xxx,
+    yyy,
+    ttt = NA, 		#continuous measure of time
+    year = NA,
+    xxx.width ,
+    yyy.width ,
+    ttt.width = NA,
+    max.ss.per.year = NA,
+    reference.year = NA,
+    jitter.cells = T,
+    sample.size.per.cell = 1,
+    sample.cell.probability = 1,
+    replace = F ){
+    # --------------------
+    # Default to a single year
+    if (all(is.na(year))) year <- rep(1, length(xxx))
+    # Check for numeric & integer year values
+    if (!is.numeric(year))
+      write("st.grid.sampler.by.year: non-numeric value of year",stderr() )
+    if (!all.equal(year, trunc(year)))
+      write("st.grid.sampler.by.year: non-integer value of year",stderr() )
+    # Enumerate unique years
+    year.vec <- sort(unique(year))
+    # --------------------
+    # Check for reference year
+    # If it matches a year in year.vec, then adjust the
+    # year.vec so that the reference year is sampled the first
+    # and used to set the max.ss.per.year for the rest of the years.
+    if (!is.na(reference.year)){
+      if (sum(reference.year == year.vec)==1){
+        #year.vec <- c(1:10)
+        #reference.year <- 5
+        ry.nindex <- c(1:length(year.vec))[ reference.year == year.vec]
+        year.vec <- c(reference.year, year.vec[-ry.nindex])
+        #year.vec
+      }
+      if (sum(reference.year == year.vec)!=1) reference.year <- NA
+    }
+    # --------------------
+    spatial.balance.nindex <- NULL
+    for (iii.year in year.vec){
+      ttt.index <- year == iii.year
+      ttt.nindex <- c(1:length(xxx))[ttt.index]
+      ttt.xxx <- xxx[ttt.nindex]
+      ttt.yyy <- yyy[ttt.nindex]
+      ttt.ttt <- ttt[ttt.nindex]
+      sgc <- st.grid.sampler(
+        xxx = ttt.xxx,
+        yyy = ttt.yyy,
+        ttt = ttt.ttt,
+        xxx.width = xxx.width,
+        yyy.width = yyy.width,
+        ttt.width = ttt.width,
+        jitter.cells = jitter.cells,
+        sample.size.per.cell = sample.size.per.cell,
+        sample.cell.probability = sample.cell.probability,
+        replace = replace )
+      # -----------------------------
+      # Check for Reference Year and set Max SS per YEAR
+      if (!is.na(reference.year)){
+        if(iii.year == reference.year){
+          max.ss.per.year <- length(sgc$sample.index)
+        }}
+      # -----------------------------
+      # Check for Max SS per YEAR
+      if (!is.na(max.ss.per.year)){
+        if (length(sgc$sample.index) > max.ss.per.year){
+          my.index <- sample(
+            c(1:length(sgc$sample.index)),
+            size = max.ss.per.year)
+          sgc$sample.index <- sgc$sample.index[my.index]
+        }}
+      # -----------------------------
+      spatial.balance.nindex <- c(
+        spatial.balance.nindex, ttt.nindex[sgc$sample.index])
+    } # END jjj
+    return(list(
+      sample.index = spatial.balance.nindex  ))
+  }
+
+  st.case.control.sampler <- function(
+    binary.outcome,
+    xxx,
+    yyy,
+    ttt = NA, 		#continuous measure of time
+    year = NA,
+    xxx.width ,
+    yyy.width ,
+    ttt.width = NA,
+    max.ss.per.year = NA,
+    reference.year = NA,
+    jitter.cells = T,
+    sample.size.per.cell = 1,
+    sample.cell.probability = 1,
+    replace = F,
+    min.class.proportion = -1,
+    predictor.data = NA,
+    jitter.predictors = NA,
+    jitter.sd = 0.25,
+    oversampling.iter.max = 20)  {
+    # ----------------------------------------------------------------------
+    sgc.pos.nindex <- NULL
+    sgc.neg.nindex <- NULL
+    sampling.offset <- NA
+    #
+    p1 <- NA
+    new.predictor.data <- NULL
+
+
+    if (is.na(sample.size.per.cell)) sample.size.per.cell <- 1
+    if (
+      length(binary.outcome)==length(xxx) &
+      length(xxx)==length(yyy) &
+      length(binary.outcome)>1){
+      # -----------------------
+      # Lat/Lon to Sinusoidal Area Preserving Projection
+      ptsll <- sp::SpatialPoints(coords = cbind(xxx, yyy),
+                             proj4string = sp::CRS("+init=epsg:4326"))
+      sinucrs <- sp::CRS("+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs")
+      ptsinu <- sp::spTransform(ptsll, sinucrs)
+      x <- ptsinu@coords[, 1]
+      y <- ptsinu@coords[, 2]
+      # -----------------------
+      # Sample negatives
+      if (sum(binary.outcome == 0, na.rm = TRUE) > 0) {
+        ttt.nindex <- c(1:length(binary.outcome))[ binary.outcome == 0 ]
+        ttt.xxx <- x[ttt.nindex]
+        ttt.yyy <- y[ttt.nindex]
+        ttt.ttt <- NA
+        if (is.numeric(ttt)) ttt.ttt <- ttt[ttt.nindex]
+        ttt.year <- NA
+        if (is.numeric(year)) ttt.year <- year[ttt.nindex]
+        sgc.neg <- st.grid.sampler.by.year(
+          xxx = ttt.xxx,
+          yyy = ttt.yyy,
+          ttt = ttt.ttt,
+          year = ttt.year,
+          xxx.width = xxx.width,
+          yyy.width = yyy.width,
+          ttt.width = ttt.width,
+          reference.year = reference.year,
+          max.ss.per.year = max.ss.per.year,
+          jitter.cells = jitter.cells,
+          sample.size.per.cell = sample.size.per.cell,
+          sample.cell.probability = sample.cell.probability,
+          replace = replace )
+        # Remember to strip out NA's from grid
+        sgc.neg$sample.index <- sgc.neg$sample.index[!is.na(sgc.neg$sample.index)]
+        # Index back to original data.frame
+        sgc.neg.nindex <- ttt.nindex[ sgc.neg$sample.index ]
+      }
+      # -----------------------
+      # Sample positives
+      if (sum(binary.outcome > 0, na.rm = TRUE) > 0) {
+        # Identify Positives
+        ttt.nindex <- c(1:length(binary.outcome))[ binary.outcome != 0 ]
+        # First Sample
+        ttt.xxx <- x[ttt.nindex]
+        ttt.yyy <- y[ttt.nindex]
+        ttt.ttt <- NA
+        if (is.numeric(ttt)) ttt.ttt <- ttt[ttt.nindex]
+        ttt.year <- NA
+        if (is.numeric(year)) ttt.year <- year[ttt.nindex]
+        sgc.pos <- st.grid.sampler.by.year(
+          xxx = ttt.xxx,
+          yyy = ttt.yyy,
+          ttt = ttt.ttt,
+          year = ttt.year,
+          xxx.width = xxx.width,
+          yyy.width = yyy.width,
+          ttt.width = ttt.width,
+          reference.year = reference.year,
+          max.ss.per.year = max.ss.per.year,
+          jitter.cells = jitter.cells,
+          sample.size.per.cell = sample.size.per.cell,
+          sample.cell.probability = sample.cell.probability,
+          replace = replace )
+        sgc.pos$sample.index <- sgc.pos$sample.index[!is.na(sgc.pos$sample.index)]
+        sgc.pos.nindex <- ttt.nindex[ sgc.pos$sample.index ]
+        # ------------------------------------------------------------
+        # Oversampling
+        # If proportion of pos less than min.class.proportion of the negative sample (sgc.pos.nindex)
+        # then repeatedly take st grid samples until until minimum proportion achieved.
+        # ------------------------------------------------------------
+        ncut <- round(min.class.proportion/(1-min.class.proportion)*length(sgc.neg.nindex))
+        jjj <- 1
+        while ( length(sgc.pos.nindex) < ncut & jjj < oversampling.iter.max ) {
+          jjj <- jjj+1
+          #print(jjj)
+          ttt.xxx <- x[ttt.nindex]
+          ttt.yyy <- y[ttt.nindex]
+          ttt.ttt <- NA
+          if (is.numeric(ttt)) ttt.ttt <- ttt[ttt.nindex]
+          ttt.year <- NA
+          if (is.numeric(year)) ttt.year <- year[ttt.nindex]
+          sgc.pos <- st.grid.sampler.by.year(
+            xxx = ttt.xxx,
+            yyy = ttt.yyy,
+            ttt = ttt.ttt,
+            year = ttt.year,
+            xxx.width = xxx.width,
+            yyy.width = yyy.width,
+            ttt.width = ttt.width,
+            reference.year = reference.year,
+            max.ss.per.year = max.ss.per.year,
+            jitter.cells = jitter.cells,
+            sample.size.per.cell = sample.size.per.cell,
+            sample.cell.probability = sample.cell.probability,
+            replace = replace )
+          sgc.pos$sample.index <- sgc.pos$sample.index[!is.na(sgc.pos$sample.index)]
+          sgc.pos.nindex <- c(sgc.pos.nindex, ttt.nindex[ sgc.pos$sample.index ])
+        } # END WHILE
+      } # END sample positives
+      # ------------------------------------------------------------
+      # Assemble Results into Data Frame
+      # ------------------------------------------------------------
+      if (all(!is.na(predictor.data)) & all(!is.na(jitter.predictors))) {
+        # sample rows from predictor.data but do NOT jitter.predictors
+        if (all(is.na(jitter.predictors))) {
+          # Put together Sampled Data
+          # 1) Negative data
+          # 2) Positive data
+          new.predictor.data <- predictor.data[ c(sgc.pos.nindex, sgc.neg.nindex) , ]
+        }
+        # IF jitter.predictors
+        if (all(!is.na(jitter.predictors))){
+          # Jitter Repeated Positives
+          ttt.data <- NULL
+          if ( sum(duplicated(sgc.pos.nindex)) > 0 ){
+            # Calculate Variances for Predictor columns
+            pred.sd <- apply(predictor.data, 2, sd, na.rm=T)
+            pred.sd[ !names(pred.sd) %in% jitter.predictors] <- 0
+            # Extract Duplicated Records
+            ttt.data <- predictor.data[
+              sgc.pos.nindex[duplicated(sgc.pos.nindex)],  ]
+            # Matrix of random values
+            ttt.rand.matrix <- matrix(
+              runif( nrow(ttt.data)*ncol(ttt.data), min=-1, max=1 ),
+              nrow(ttt.data),
+              ncol(ttt.data))
+            # Scale random values & Add to original values
+            ttt.rand.matrix <- sweep(ttt.rand.matrix, MARGIN=2, pred.sd*jitter.sd, "*")
+            ttt.data <- ttt.data + ttt.rand.matrix
+            rm(ttt.rand.matrix)
+          }
+          # Put together Sampled Data
+          # 1) Negative data
+          # 2) Positive unduplicated data
+          # 3) Positive duplicated, jittered data
+          new.predictor.data <- predictor.data[
+            c(sgc.neg.nindex, sgc.pos.nindex[!duplicated(sgc.pos.nindex)]),  ]
+          new.predictor.data <- rbind(new.predictor.data, ttt.data)
+          # ------------------------------------
+          # When Oversampling, Compute Offset and Weigths
+          # ------------------------------------
+          # Prob of event in final sample sample (with oversampling)
+          r1 <- length(sgc.pos.nindex) /
+            length(c(sgc.neg.nindex, sgc.pos.nindex))
+          if( !is.nan(r1) & !is.null(r1)){
+            # Prob of event without oversampling in the (st balanced) population.
+            # This is the best, simple pt estimate of the proportion.
+            p1 <- length(sgc.pos.nindex[!duplicated(sgc.pos.nindex)]) /
+              length(c(sgc.neg.nindex, sgc.pos.nindex[!duplicated(sgc.pos.nindex)]))
+            #print(paste("r1 = ", r1, " p1=",p1))
+            if (p1 > 0 & r1 > 0) {
+              # Offset scalar
+              sampling.offset <-  log( (r1*(1-p1)) / ((1-r1)*p1) )
+            }}
+        }# END jitter predictors
+      }# END sample rows from predictor.data
+    } # END input vector length checks
+    # ------------------------------------
+    return(
+      list(predictor.data = new.predictor.data,
+           pos.nindex = sgc.pos.nindex,	#train.sample$pos.nindex,
+           neg.nindex = sgc.neg.nindex, 	#train.sample$neg.nindex,
+           sampling.offset = sampling.offset,
+           st.proportion = p1))
+  }
+
   if(!all(is.na(st_extent))) {
     if(!is.list(st_extent)) {
       stop("The st_extent argument must be a list object.")
@@ -254,27 +535,6 @@ compute_ppms <- function(path, st_extent = NA) {
 
   rm(ppm_data)
 
-  # stack stem for the week
-  time_stack <- stack_stem(path, variable = "abundance_umean", res = "high",
-                           year = 2016, st_extent = st_extent,
-                           add_zeroes = TRUE)
-
-  # TODO add logic for averaging if there are more than one
-
-  # spatialize the st_data
-  st_data_sp <- sp::SpatialPointsDataFrame(st_data[, c("lon", "lat")],
-                                           st_data,
-                                           proj4string =
-                                             sp::CRS("+init=epsg:4326"))
-  sinu <- sp::CRS(sp::proj4string(template_raster))
-  st_data_prj <- sp::spTransform(st_data_sp, sinu)
-  rm(st_data_sp)
-
-  st_data_e <- raster::extract(time_stack, st_data_prj)
-
-  st_data <- st_data[!is.na(st_data_e), ]
-  rm(st_data_e, time_stack, st_data_prj, sinu)
-
   # Split data into within extent and out of extent
   #st_data_zeroes <- st_data[st_data$pi.es < 75, ]
   st_data <- st_data[st_data$pi.es >= 75, ]
@@ -325,35 +585,26 @@ compute_ppms <- function(path, st_extent = NA) {
     # Sampling
     # -------------------------------------------------------------
 
-    # projected bbs
-    st_data_sp <- sp::SpatialPointsDataFrame(st_data[, c("lon", "lat")],
-                                             st_data,
-                                             proj4string =
-                                               sp::CRS("+init=epsg:4326"))
-    sinu <- sp::CRS(sp::proj4string(template_raster))
-    st_data_prj <- sp::spTransform(st_data_sp, sinu)
-
-    xrange <- range(st_data_prj@coords[, 1], na.rm = TRUE)
-    yrange <- range(st_data_prj@coords[, 2], na.rm = TRUE)
-
-    xwidth <- xrange[2] - xrange[1]
-    yheight <- yrange[2] - yrange[1]
-
-    bbs <- st.grid.sampler(
-      xxx = st_data_prj@coords[, 1],
-      yyy = st_data_prj@coords[, 2],
-      ttt = st_data_prj@data$date,
-      xxx.width = 10000,
-      yyy.width = 10000,
-      ttt.width = 7/365,
+    bbs <- st.case.control.sampler (
+      binary.outcome = st_data$obs,
+      xxx = st_data$lon,
+      yyy = st_data$lat,
+      ttt = st_data$date,
+      xxx.width = 10000,  # 10 km
+      yyy.width = 10000,	# 10 km
+      ttt.width = 7/365, 	# 1 week
+      max.ss.per.year = NA,
+      reference.year = NA,
       jitter.cells = TRUE,
       sample.size.per.cell = 1,
       sample.cell.probability = 0.5,
-      replace = FALSE)
+      replace = FALSE,
+      min.class.proportion = 0.0,
+      jitter.sd = 0.25)
 
     # Index back to full vector
-    #sample.nindex <- c(1:nrow(st_data))[bbs$sample.index]
-    ttt.data <- st_data_prj@data[na.omit(bbs$sample.index), ]
+    sample.nindex <- c(1:nrow(st_data))[c(bbs$pos.nindex, bbs$neg.nindex)]
+    ttt.data <- st_data[sample.nindex, ]
 
     # -------------------------------------------------------------
     # Binary Occupancy PPMs
@@ -392,7 +643,7 @@ compute_ppms <- function(path, st_extent = NA) {
     # -------------------------------------------------------------
     if(occ_prob | count) {
       # Limit ttt.data to within Range
-      ttt.data <- ttt.data[ttt.data$binary > 0 & ttt.data$pi.es >= 75, ]
+      ttt.data <- ttt.data[ttt.data$binary > 0, ]
     }
 
     if(occ_prob) {
