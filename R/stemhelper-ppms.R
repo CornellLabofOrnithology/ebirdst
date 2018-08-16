@@ -535,9 +535,17 @@ compute_ppms <- function(path, st_extent = NA) {
 
   rm(ppm_data)
 
+  if(nrow(st_data) == 0) {
+    return(NA)
+  }
+
   # Split data into within extent and out of extent
   #st_data_zeroes <- st_data[st_data$pi.es < 75, ]
   st_data <- st_data[st_data$pi.es >= 75, ]
+
+  if(nrow(st_data) == 0) {
+    return(NA)
+  }
 
   # FDR
   binom_test_p <- function(x) {
