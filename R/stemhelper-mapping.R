@@ -21,7 +21,7 @@
 #' plot_extent <- calc_full_extent(raster_stack)
 #' raster::plot(raster_stack[[1]], ext = plot_extent)
 #' }
-calc_full_extent <- function(x) {
+calc_full_extent <- function(x, path) {
 
   if(!(class(x) %in% c("RasterLayer", "RasterStack", "RasterBrick"))) {
     stop("Input must be a Raster* object.")
@@ -48,7 +48,10 @@ calc_full_extent <- function(x) {
 
   # if stack projection is different from template_raster,
   # project template_raster
-  tr <- stemhelper::template_raster
+  # load template raster
+  e <- load_config(path)
+  tr <- raster::raster(paste(path, "/data/", e$RUN_NAME,
+                             "_srd_raster_template.tif", sep = ""))
 
   if(raster::projection(tr) != raster::projection(stack)) {
     this_template_raster <- raster::projectRaster(tr,
