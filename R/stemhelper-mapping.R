@@ -448,7 +448,8 @@ map_centroids <- function(pis,
 #' }
 calc_effective_extent <- function(st_extent,
                                   pis = NA,
-                                  pds = NA) {
+                                  pds = NA,
+                                  path) {
 
   if(is.null(nrow(pis)) & is.null(nrow(pds))) {
     stop("Both PIs and PDs are NA. Nothing to calculate.")
@@ -475,6 +476,11 @@ calc_effective_extent <- function(st_extent,
   # projection info
   ll <- "+init=epsg:4326"
   mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
+
+  # load template raster
+  e <- load_config(path)
+  template_raster <- raster::raster(paste(path, "/data/", e$RUN_NAME,
+                                          "_srd_raster_template.tif", sep = ""))
 
   # set object based on whether using PIs or PDs
   if(!is.null(nrow(pis))) {
@@ -521,14 +527,11 @@ calc_effective_extent <- function(st_extent,
   # project to template raster
   tdspolydf_prj <- sp::spTransform(tdspolydf,
                                    sp::CRS(
-                                     sp::proj4string(
-                                       stemhelper::template_raster)))
+                                     sp::proj4string(template_raster)))
   rm(tdspolydf)
 
   # summarize...not sure how to do this step
-  tpis_r <- raster::rasterize(tdspolydf_prj,
-                              stemhelper::template_raster,
-                              field = "weight",
+  tpis_r <- raster::rasterize(tdspolydf_prj, template_raster, field = "weight",
                               fun = sum)
 
   tpis_per <- tpis_r/nrow(tpis_sub)
@@ -536,8 +539,8 @@ calc_effective_extent <- function(st_extent,
   #tpis_per[tpis_per < 0.50] <- NA
 
   # plot
-  tpis_per_prj <- raster::projectRaster(
-    raster::mask(tpis_per, stemhelper::template_raster), crs = mollweide)
+  tpis_per_prj <- raster::projectRaster(raster::mask(tpis_per, template_raster),
+                                        crs = mollweide)
 
   tdspolydf_moll <- sp::spTransform(tdspolydf_prj, mollweide)
 
