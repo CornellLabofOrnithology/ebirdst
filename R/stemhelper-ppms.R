@@ -475,13 +475,6 @@ compute_ppms <- function(path, st_extent = NA) {
     }
   }
 
-  # load configs
-  e <- load_config(path)
-
-  # load template raster
-  template_raster <- raster::raster(paste(path, "/data/", e$RUN_NAME,
-                                  "_srd_raster_template.tif", sep = ""))
-
   # load the test data and assign names
   test_file <- paste(path,
                      "/results/abund_preds/unpeeled_folds/test.pred.ave.txt",
