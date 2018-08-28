@@ -33,4 +33,5 @@ Imports: raster,
     scales,
     methods,
     gridExtra,
-    rgdal
+    rgdal,
+    car
