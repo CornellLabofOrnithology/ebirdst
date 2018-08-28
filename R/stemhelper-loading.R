@@ -26,6 +26,28 @@
 #' sinu_e <- get_sinu_ext(path, ne_extent)
 #' sinu_e
 get_sinu_ext <- function(path, st_extent) {
+  if(!all(is.na(st_extent))) {
+    if(!is.list(st_extent)) {
+      stop("The st_extent argument must be a list object.")
+    }
+
+    if(!is.null(st_extent$lat.min) & !is.null(st_extent$lat.max)) {
+      if(st_extent$lat.min > st_extent$lat.max) {
+        stop("Minimum latitude is greater than maximum latitude")
+      }
+    } else {
+      stop("Either lat.min or lat.max missing.")
+    }
+
+    if(!is.null(st_extent$lon.min) & !is.null(st_extent$lon.max)) {
+      if(st_extent$lon.min > st_extent$lon.max) {
+        stop("Minimum longitude is greater than maximum longitude")
+      }
+    } else {
+      stop("Either lon.min or lon.max missing.")
+    }
+  }
+
   # projection information
   ll <- "+init=epsg:4326"
 
@@ -498,7 +520,7 @@ load_config <- function(path) {
 
   if(!file.exists(config_file)) {
     stop(paste("*_config.RData file does not exist in the /data directory. ",
-               "Check your paths so that they look something like this: ",
+               "Check your paths so that they look like this: ",
                "~/directory/<six_letter_code-ERD2016-PROD-date-uuid>/. ",
                "Make sure you do not change the file structure of the results.",
                sep = ""))
