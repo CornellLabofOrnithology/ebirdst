@@ -224,8 +224,8 @@ st_extent_subset <- function(data, st_extent) {
 #' }
 stack_stem <- function(path,
                        variable,
-                       res,
-                       year,
+                       year = 2016,
+                       res = "hr",
                        st_extent = NA,
                        add_zeroes = TRUE,
                        use_analysis_extent = TRUE) {
