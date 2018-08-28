@@ -132,7 +132,7 @@ calc_bins <- function(x) {
 
   # get a vector of all the values in the stack
   zrv <- raster::getValues(x)
-  zrv[zrv == 0] <- NA
+  zrv[zrv <= 0] <- NA
 
   # BoxCox transform
   pt <- car::powerTransform(zrv[!is.na(zrv)])
