@@ -4,6 +4,8 @@
 #' package from lat/lon corners to a raster Extent using the same
 #' Sinusoidal projection as the `template_raster` data object.
 #'
+#' @param path character; Full path to directory containing the STEM results
+#' for a single species.
 #' @param st_extent list; st_extent list with lat/lon coordinates.
 #'
 #' @return A raster Extent in Sinusoidal projection.
@@ -21,7 +23,7 @@
 #'                   t.max = 0.475)
 #'
 #' # convert
-#' sinu_e <- get_sinu_ext(ne_extent)
+#' sinu_e <- get_sinu_ext(path, ne_extent)
 #' sinu_e
 get_sinu_ext <- function(path, st_extent) {
   # projection information
@@ -189,22 +191,24 @@ st_extent_subset <- function(data, st_extent) {
 
 #' Load, extend, and stack all weeks of STEM rasters for a given result type
 #'
-#' For one of four result types, loads all available weeks of rasters, extends
-#' them to the extent of the study (or to a custom extent), and stacks them
-#' into a RasterStack, with zeroes added (option to turn this off).
+#' For one of four result variables, loads all available weeks of rasters
+#' (or temporal subset), extends them to the extent of the study
+#' (or to a custom extent), and stacks them into a RasterStack, with zeroes
+#' added (option to turn this off).
 #'
 #' @param path character; Full path to directory containing the STEM results
 #' for a single species.
 #' @param variable character; One of: 'abundance_ensemble_support',
 #' 'abundance_lower', 'abundance_upper', 'abundance_umean',
 #' and 'occurrence_umean'.
+#' @param year numeric; Default is 2016. Other years are available at
+#' res = "low" for inter-year variation analysis.
+#' @param res character; Default is "high". Use "low" for inter-year variation
+#' analysis to load other years of data.
 #' @param st_extent list; Optional, use to limit the spatial Extent that the
 #' rasters are loaded into. Must set use_analysis_extent to FALSE.
 #' @param add_zeroes logical; Default is TRUE. Adds predicted and assumed zero
 #' values to the resulting layers. Set to FALSE to turn this behavior off.
-#' @param weeks numeric; Optional, a single integer or vector of integers from 1
-#' to 52, representing the week(s) of the year to load. Defaults to all
-#' available. Note that if some weeks are not present, they will not be loaded.
 #' @param use_analysis_extent logical; Default is TRUE. If STEM results were
 #' run for a custom non-global extent, that extent object is stored in the
 #' configuration file. If TRUE, uses that analysis extent for loading the
@@ -225,7 +229,7 @@ st_extent_subset <- function(data, st_extent) {
 stack_stem <- function(path,
                        variable,
                        year = 2016,
-                       res = "hr",
+                       res = "high",
                        st_extent = NA,
                        add_zeroes = TRUE,
                        use_analysis_extent = TRUE) {
@@ -406,35 +410,42 @@ stack_stem <- function(path,
     stop("Directory does not contain at least 2 .tif files.")
   }
 
-  if(is.null(st_extent[["t.min"]]) | is.null(st_extent[["t.max"]])) {
-    st_extent$t.min <- NA
-    st_extent$t.max <- NA
-  }
-
-  if(is.na(st_extent$t.min) | is.na(st_extent$t.max)) {
+  if(all(is.na(st_extent))) {
     weeks <- 1:length(list.files(fp, pattern = paste("*_", res_label, "_*",
                                                      sep = "")))
   } else {
-    p_time <- strptime(x = paste(round(e$SRD_DATE_VEC * 366), 2015), "%j %Y")
-    date_names <- paste(formatC(p_time$mon + 1, width = 2, format = "d", flag = "0"),
-                        formatC(p_time$mday, width = 2, format = "d", flag = "0"),
-                        sep = "-")
-
-    # select from e$SRD_DATE_VEC where between st_extent$t.min and st_extent$t.max
-    if(st_extent$t.min > st_extent$t.max) {
-      # date wrapping case
-      weeks <- c(which(date_names[e$SRD_DATE_VEC >= st_extent$t.min] %in%
-                         date_names),
-                 which(date_names[e$SRD_DATE_VEC <= st_extent$t.max] %in%
-                         date_names))
-    } else {
-      weeks <- which(date_names[e$SRD_DATE_VEC >= st_extent$t.min &
-                                  e$SRD_DATE_VEC <= st_extent$t.max] %in%
-                       date_names)
+    if(is.null(st_extent[["t.min"]]) | is.null(st_extent[["t.max"]])) {
+      st_extent$t.min <- NA
+      st_extent$t.max <- NA
     }
 
-    if(length(weeks) < 1) {
-      stop("Time period in st_extent does not included any weeks of the year.")
+    if(is.na(st_extent$t.min) | is.na(st_extent$t.max)) {
+      weeks <- 1:length(list.files(fp, pattern = paste("*_", res_label, "_*",
+                                                       sep = "")))
+    } else {
+      p_time <- strptime(x = paste(round(e$SRD_DATE_VEC * 366), 2015), "%j %Y")
+      date_names <- paste(formatC(p_time$mon + 1, width = 2, format = "d",
+                                  flag = "0"),
+                          formatC(p_time$mday, width = 2, format = "d",
+                                  flag = "0"),
+                          sep = "-")
+
+      # select from e$SRD_DATE_VEC where between st_extent$t.min and st_extent$t.max
+      if(st_extent$t.min > st_extent$t.max) {
+        # date wrapping case
+        weeks <- c(which(date_names %in%
+                           date_names[e$SRD_DATE_VEC >= st_extent$t.min]),
+                   which(date_names %in%
+                           date_names[e$SRD_DATE_VEC <= st_extent$t.max]))
+      } else {
+        weeks <- which(date_names %in%
+                         date_names[e$SRD_DATE_VEC >= st_extent$t.min &
+                                    e$SRD_DATE_VEC <= st_extent$t.max])
+      }
+
+      if(length(weeks) < 1) {
+        stop("Time period in st_extent does not included any weeks of the year.")
+      }
     }
   }
 
