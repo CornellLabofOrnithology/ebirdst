@@ -596,8 +596,9 @@ plot_pds <- function(pd_name,
 #' @return Plots a cake plot, or if return_data = TRUE, the data from the cake
 #' plot as well.
 #'
+#' @keywords internal
+#'
 #' @import sp
-#' @export
 #'
 #' @examples
 #' \dontrun{
