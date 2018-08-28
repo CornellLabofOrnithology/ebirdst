@@ -8,6 +8,8 @@
 #' used for plotting.
 #'
 #' @param x Raster* object; usually from stem_stack() function.
+#' @param path character; Full path to directory containing the STEM results
+#' for a single species.
 #'
 #' @return raster Extent object
 #'
@@ -18,7 +20,7 @@
 #'
 #' sp_path <- "path to species STEM results"
 #' raster_stack <- stack_stem(sp_path, variable = "abundance_umean")
-#' plot_extent <- calc_full_extent(raster_stack)
+#' plot_extent <- calc_full_extent(raster_stack, path)
 #' raster::plot(raster_stack[[1]], ext = plot_extent)
 #' }
 calc_full_extent <- function(x, path) {
@@ -132,10 +134,17 @@ calc_bins <- function(x) {
   zrv <- raster::getValues(x)
   zrv[zrv == 0] <- NA
 
-  # log transform the non-NA values
-  # there shouldn't be zero values in here based on how the data is stored
-  # however, it might be worth a check
-  lzwk <- log(zrv[!is.na(zrv)])
+  # BoxCox transform
+  pt <- car::powerTransform(zrv[!is.na(zrv)])
+  this_power <- pt$lambda
+
+  print(paste("BoxCox power:", this_power, sep = " "))
+
+  if(this_power < 0) {
+    lzwk <- log(zrv[!is.na(zrv)])
+  } else {
+    lzwk <- zrv[!is.na(zrv)] ^ this_power
+  }
   rm(zrv)
 
   # setup the binning structure
@@ -173,6 +182,10 @@ calc_bins <- function(x) {
 
   # lots of checks for values outside of the upper and lower bounds
 
+  if(this_power >= 0) {
+    log_sd <- log_sd[log_sd >= 0]
+  }
+
   # remove +3 SD break if it is greater than max
   if(maxl < mdl + (3.00 * sdl)) {
     log_sd <- log_sd[1:length(log_sd)-1]
@@ -193,9 +206,15 @@ calc_bins <- function(x) {
     log_sd <- append(log_sd, minl, after = 0)
   }
 
-  # if the untransformed min is greater than 0, add a zero break
-  if(exp(minl) > 0) {
-    log_sd <- append(log_sd, -Inf, after = 0)
+  # if the first break is less than 0.01 untransformed, add a break at 0.01
+  if(this_power < 0) {
+    if(exp(log_sd[1]) < 0.01) {
+      log_sd[1] <- log(0.01)
+    }
+  } else {
+    if(log_sd[1] ^ (1 / this_power) < 0.01) {
+      log_sd[1] <- 0.01 ^ this_power
+    }
   }
 
   # untransform
@@ -423,6 +442,8 @@ map_centroids <- function(pis,
 #' @param st_extent list; st_extent list containing spatiotemporal filter
 #' @param pis data.frame; from `load_pis()` Must supply either pis or pds.
 #' @param pds data.frame; from `load_pds()` Must supply either pis or pds.
+#' @param path character; Full path to directory containing the STEM results
+#' for a single species.
 #'
 #' @return RasterLayer and plots the RasterLayer with centroid locations and
 #' st_extent boundaries.
