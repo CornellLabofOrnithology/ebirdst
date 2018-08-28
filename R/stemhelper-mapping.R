@@ -291,20 +291,14 @@ map_centroids <- function(pis,
     rm(tpds)
 
     # start plot with all possible PDs
-    raster::plot(tpds_prj,
-                 ext = raster::extent(tpds_prj),
-                 col = "#1b9377",
-                 cex = 0.01,
-                 pch = 16)
+    suppressWarnings(raster::plot(tpds_prj, ext = raster::extent(tpds_prj),
+                                  col = "#1b9377", cex = 0.01, pch = 16))
 
-    sp::plot(ned_wh_co_moll, col = "#5a5a5a", add = TRUE)
+    suppressWarnings(sp::plot(ned_wh_co_moll, col = "#5a5a5a", add = TRUE))
 
-    raster::plot(tpds_prj,
-                 ext = raster::extent(tpds_prj),
-                 col = "#1b9377",
-                 cex = 0.4,
-                 pch = 16,
-                 add = TRUE)
+    suppressWarnings(raster::plot(tpds_prj, ext = raster::extent(tpds_prj),
+                                  col = "#1b9377", cex = 0.4, pch = 16,
+                                  add = TRUE))
 
     if(!all(is.na(st_extent))) {
       tpds_sub <- st_extent_subset(tpds_sp, st_extent)
@@ -313,12 +307,10 @@ map_centroids <- function(pis,
       rm(tpds_sub)
 
       # plot PDs in st_extent
-      raster::plot(tpds_region,
-                   ext = raster::extent(tpds_prj),
-                   col = "#b3e2cd",
-                   cex = 0.4,
-                   pch = 16,
-                   add = TRUE)
+      suppressWarnings(raster::plot(tpds_region, ext = raster::extent(tpds_prj),
+                                    col = "#b3e2cd", cex = 0.4, pch = 16,
+                                    add = TRUE))
+      rm(tpds_region)
     }
     rm(tpds_sp)
 
@@ -342,7 +334,7 @@ map_centroids <- function(pis,
     }
 
     wh_extent <- raster::extent(tpds_prj)
-    rm(tpds_prj, tpds_region)
+    rm(tpds_prj)
   }
 
   # Plotting PIs
@@ -358,22 +350,15 @@ map_centroids <- function(pis,
       wh_extent <- raster::extent(tpis_prj)
 
       # start plot with all possible PDs
-      raster::plot(tpis_prj,
-                   ext = wh_extent,
-                   col = "#1b9377",
-                   cex = 0.01,
-                   pch = 16)
+      suppressWarnings(raster::plot(tpis_prj, ext = wh_extent, col = "#1b9377",
+                                    cex = 0.01, pch = 16))
 
-      sp::plot(ned_wh_co_moll, col = "#5a5a5a", add = TRUE)
+      suppressWarnings(sp::plot(ned_wh_co_moll, col = "#5a5a5a", add = TRUE))
     }
 
     # start plot with all possible PIs
-    raster::plot(tpis_prj,
-                 ext = wh_extent,
-                 col = "#d95f02",
-                 cex = 0.4,
-                 pch = 16,
-                 add = TRUE)
+    suppressWarnings(raster::plot(tpis_prj, ext = wh_extent, col = "#d95f02",
+                                  cex = 0.4, pch = 16, add = TRUE))
 
     if(!all(is.na(st_extent))) {
       tpis_sub <- st_extent_subset(tpis_sp, st_extent)
@@ -381,17 +366,15 @@ map_centroids <- function(pis,
       tpis_region <- sp::spTransform(tpis_sub, sp::CRS(mollweide))
 
       # plot PIs in st_extent
-      raster::plot(tpis_region,
-                   ext = wh_extent,
-                   col = "#fdcdac",
-                   cex = 0.4,
-                   pch = 16,
-                   add = TRUE)
+      suppressWarnings(raster::plot(tpis_region, ext = wh_extent,
+                                    col = "#fdcdac", cex = 0.4, pch = 16,
+                                    add = TRUE))
+      rm(tpis_region)
     }
     rm(tpis_sp)
 
     # xmin, xmax, ymin, ymax
-    usr <- graphics::par("usr")
+    usr <- suppressWarnings(graphics::par("usr"))
     xwidth <- usr[2] - usr[1]
     yheight <- usr[4] - usr[3]
 
@@ -409,21 +392,15 @@ map_centroids <- function(pis,
            col = "#fdcdac")
     }
 
-    rm(tpis_prj, tpis_region)
+    rm(tpis_prj)
   }
 
   # plot reference data
-  raster::plot(ned_wh_co_moll,
-               ext = wh_extent,
-               lwd = 0.25,
-               border = 'black',
-               add = TRUE)
+  suppressWarnings(raster::plot(ned_wh_co_moll, ext = wh_extent, lwd = 0.25,
+                                border = 'black', add = TRUE))
 
-  raster::plot(ned_wh_st_moll,
-               ext = wh_extent,
-               lwd = 0.25,
-               border = 'black',
-               add = TRUE)
+  suppressWarnings(raster::plot(ned_wh_st_moll, ext = wh_extent, lwd = 0.25,
+                                border = 'black', add = TRUE))
 }
 
 #' Calculate and map effective extent of selected centroids
