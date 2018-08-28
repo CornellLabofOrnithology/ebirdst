@@ -55,3 +55,4 @@ ne_extent <- list(type = "rectangle",
 cake_plot(path = sp_path, pis = pis, pds = pds, st_extent = ne_extent)
 }
 }
+\keyword{internal}

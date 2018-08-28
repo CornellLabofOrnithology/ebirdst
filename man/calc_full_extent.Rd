@@ -4,10 +4,13 @@
 \alias{calc_full_extent}
 \title{Calculates spatial extent of non-zero data from Raster* object for plotting}
 \usage{
-calc_full_extent(x)
+calc_full_extent(x, path)
 }
 \arguments{
 \item{x}{Raster* object; usually from stem_stack() function.}
+
+\item{path}{character; Full path to directory containing the STEM results
+for a single species.}
 }
 \value{
 raster Extent object
@@ -25,7 +28,7 @@ used for plotting.
 
 sp_path <- "path to species STEM results"
 raster_stack <- stack_stem(sp_path, variable = "abundance_umean")
-plot_extent <- calc_full_extent(raster_stack)
+plot_extent <- calc_full_extent(raster_stack, path)
 raster::plot(raster_stack[[1]], ext = plot_extent)
 }
 }

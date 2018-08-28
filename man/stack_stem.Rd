@@ -4,8 +4,8 @@
 \alias{stack_stem}
 \title{Load, extend, and stack all weeks of STEM rasters for a given result type}
 \usage{
-stack_stem(path, variable, st_extent = NA, add_zeroes = TRUE, weeks = NA,
-  use_analysis_extent = TRUE)
+stack_stem(path, variable, year = 2016, res = "high", st_extent = NA,
+  add_zeroes = TRUE, use_analysis_extent = TRUE)
 }
 \arguments{
 \item{path}{character; Full path to directory containing the STEM results
@@ -15,15 +15,17 @@ for a single species.}
 'abundance_lower', 'abundance_upper', 'abundance_umean',
 and 'occurrence_umean'.}
 
+\item{year}{numeric; Default is 2016. Other years are available at
+res = "low" for inter-year variation analysis.}
+
+\item{res}{character; Default is "high". Use "low" for inter-year variation
+analysis to load other years of data.}
+
 \item{st_extent}{list; Optional, use to limit the spatial Extent that the
 rasters are loaded into. Must set use_analysis_extent to FALSE.}
 
 \item{add_zeroes}{logical; Default is TRUE. Adds predicted and assumed zero
 values to the resulting layers. Set to FALSE to turn this behavior off.}
-
-\item{weeks}{numeric; Optional, a single integer or vector of integers from 1
-to 52, representing the week(s) of the year to load. Defaults to all
-available. Note that if some weeks are not present, they will not be loaded.}
 
 \item{use_analysis_extent}{logical; Default is TRUE. If STEM results were
 run for a custom non-global extent, that extent object is stored in the
@@ -35,9 +37,10 @@ rasters. If FALSE, rasters are loaded to the full extent of the
 RasterStack containing all available weeks of result.
 }
 \description{
-For one of four result types, loads all available weeks of rasters, extends
-them to the extent of the study (or to a custom extent), and stacks them
-into a RasterStack, with zeroes added (option to turn this off).
+For one of four result variables, loads all available weeks of rasters
+(or temporal subset), extends them to the extent of the study
+(or to a custom extent), and stacks them into a RasterStack, with zeroes
+added (option to turn this off).
 }
 \examples{
 \dontrun{
