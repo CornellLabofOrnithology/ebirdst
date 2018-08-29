@@ -529,16 +529,16 @@ calc_effective_extent <- function(st_extent,
   rm(tdspolydf)
 
   # summarize...not sure how to do this step
-  tpis_r <- raster::rasterize(tdspolydf_prj, template_raster, field = "weight",
-                              fun = sum)
+  tpis_r <- raster::crop(raster::rasterize(tdspolydf_prj, template_raster,
+                                           field = "weight", fun = sum),
+                         raster::extent(tdspolydf_prj))
 
-  tpis_per <- tpis_r/nrow(tpis_sub)
+  tpis_per <- tpis_r / nrow(tpis_sub)
   rm(tpis_r)
   #tpis_per[tpis_per < 0.50] <- NA
 
   # plot
-  tpis_per_prj <- raster::projectRaster(raster::mask(tpis_per, template_raster),
-                                        crs = mollweide)
+  tpis_per_prj <- raster::projectRaster(tpis_per, crs = mollweide)
 
   tdspolydf_moll <- sp::spTransform(tdspolydf_prj, mollweide)
 
@@ -563,31 +563,17 @@ calc_effective_extent <- function(st_extent,
 
   graphics::par(mar = c(0, 0, 0, 2))
 
+  tpis_per_prj[tpis_per_prj >= 1] <- 1
+
   raster::plot(tpis_per_prj,
                xaxt = 'n',
                yaxt = 'n',
                bty = 'n',
                breaks = c(0, seq(0.5, 1, by = 0.05)),
                ext = raster::extent(tdspolydf_moll),
-               col = c(viridis::viridis(11)[1],
-                       viridis::viridis(11)[2:11]),
+               col = viridis::viridis(11),
                maxpixels = raster::ncell(tpis_per_prj),
                legend = TRUE)
-
-  # some raster something is making some values imperceptibly higher
-  # than 1, so this needs to be done
-  tpis_per_prj1 <- tpis_per_prj > 1
-  tpis_per_prj1[tpis_per_prj1 == 0] <- NA
-
-  raster::plot(tpis_per_prj1,
-               xaxt = 'n',
-               yaxt = 'n',
-               bty = 'n',
-               ext = raster::extent(tdspolydf_moll),
-               col = viridis::viridis(11)[11],
-               maxpixels = raster::ncell(tpis_per_prj),
-               add = TRUE,
-               legend = FALSE)
 
   sp::plot(ned_wh_co_moll, add = TRUE, border = 'gray')
   sp::plot(ned_wh_st_moll, add = TRUE, border = 'gray')
