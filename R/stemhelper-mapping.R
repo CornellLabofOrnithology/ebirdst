@@ -310,7 +310,6 @@ map_centroids <- function(pis,
       suppressWarnings(raster::plot(tpds_region, ext = raster::extent(tpds_prj),
                                     col = "#b3e2cd", cex = 0.4, pch = 16,
                                     add = TRUE))
-      rm(tpds_region)
     }
     rm(tpds_sp)
 
@@ -331,6 +330,8 @@ map_centroids <- function(pis,
                      paste("Selected PDs: ", nrow(tpds_region), sep = ""),
                      cex = 1,
                      col = "#b3e2cd")
+
+      rm(tpds_region)
     }
 
     wh_extent <- raster::extent(tpds_prj)
@@ -369,7 +370,6 @@ map_centroids <- function(pis,
       suppressWarnings(raster::plot(tpis_region, ext = wh_extent,
                                     col = "#fdcdac", cex = 0.4, pch = 16,
                                     add = TRUE))
-      rm(tpis_region)
     }
     rm(tpis_sp)
 
@@ -383,6 +383,7 @@ map_centroids <- function(pis,
          paste("Available PIs: ", nrow(tpis_prj), sep = ""),
          cex = 1,
          col = "#d95f02")
+    rm(tpis_prj)
 
     if(!all(is.na(st_extent))) {
       text(x = usr[1] + xwidth/8,
@@ -390,9 +391,8 @@ map_centroids <- function(pis,
            paste("Selected PIs: ", nrow(tpis_region), sep = ""),
            cex = 1,
            col = "#fdcdac")
+      rm(tpis_region)
     }
-
-    rm(tpis_prj)
   }
 
   # plot reference data
