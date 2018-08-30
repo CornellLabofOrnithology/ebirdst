@@ -25,9 +25,9 @@ devtools::load_all()
 2. Loading Centroids
 3. Selecting Region and Season
 4. Plotting Centroids and Extent of Analysis
-5. Plot Predictor Importance
-6. Plot Partial Dependencies
-7. Cake Plots
+5. Predictive Performance Metrics
+6. Plot Predictor Importance
+7. Plot Partial Depedencies
 
 # 1. Introduction
 
@@ -149,19 +149,6 @@ mypds <- plot_pds(pd_name = "EFFORT_HRS",
                   stixel_pds = FALSE)
 ```
 
-# 8. Cake Plots
-
-Finally, when PIs and PDs are combined, it is possible to view predictor importance with directionality. By week, these can be turned into a stacked area chart (we affectionately call a "cake plot"") that show the relative predictor importance and directionality by week. Here too, it is possible to aggregate Fragstats by land cover class or to leave them separate.
-
-```{r cake_plots, fig.width = 8, fig.height = 5}
-# this requires a fair amount of computation, about 5 minutes
-cake_plot(path = sp_path,
-          pis = pis,
-          pds = pds,
-          st_extent = ne_extent,
-          by_cover_class = TRUE,
-          pland_and_lpi_only = TRUE)
-```
 ```{r cleanup}
 # clean up
 unlink(temp_dir)
