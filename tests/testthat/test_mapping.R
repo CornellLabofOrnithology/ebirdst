@@ -1,47 +1,70 @@
 context("Mapping functions")
+context("calc_full_extent")
 
 test_that("stemhelper calc_full_extent", {
   library(sp)
 
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-PROD-20170505-3f880822"
+  species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
   sp_path <- paste(root_path, species, sep = "")
 
-  abund <- stack_stem(sp_path, variable = "abundance_umean")
+  ne_extent <- list(type = "rectangle",
+                    lat.min = 40,
+                    lat.max = 47,
+                    lon.min = -80,
+                    lon.max = -70,
+                    t.min = 0.425,
+                    t.max = 0.475)
+
+  abund <- stack_stem(sp_path, variable = "abundance_umean",
+                      st_extent = ne_extent)
 
   # expected RasterStack
-  expect_is(calc_full_extent(abund), "Extent")
+  expect_is(calc_full_extent(abund, sp_path), "Extent")
 
   # RasterLayer
-  expect_is(calc_full_extent(abund[[26]]), "Extent")
+  expect_is(calc_full_extent(abund[[2]], sp_path), "Extent")
 
   # projected
-  abund_prj <- raster::projectRaster(abund[[26]], crs = "+init=epsg:4326")
-  expect_is(calc_full_extent(abund_prj), "Extent")
+  abund_prj <- suppressWarnings(raster::projectRaster(abund[[2]],
+                                                      crs = "+init=epsg:4326"))
+  expect_is(calc_full_extent(abund_prj, sp_path), "Extent")
 
   # not a raster object
   ext_poly <- methods::as(raster::extent(abund), "SpatialPolygons")
   raster::crs(ext_poly) <- raster::crs(abund)
-  expect_error(calc_full_extent(ext_poly), "Input must be a Raster")
+  expect_error(calc_full_extent(ext_poly, sp_path), "Input must be a Raster")
 })
+
+context("calc_bins")
 
 test_that("stemhelper calc_bins", {
   library(sp)
 
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-PROD-20170505-3f880822"
+  species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
   sp_path <- paste(root_path, species, sep = "")
 
-  abund <- stack_stem(sp_path, variable = "abundance_umean")
+  ne_extent <- list(type = "rectangle",
+                    lat.min = 40,
+                    lat.max = 47,
+                    lon.min = -80,
+                    lon.max = -70,
+                    t.min = 0.425,
+                    t.max = 0.475)
+
+  abund <- stack_stem(sp_path, variable = "abundance_umean",
+                      st_extent = ne_extent)
 
   # expected RasterStack
   expect_gt(length(calc_bins(abund)), 1)
 
   # RasterLayer
-  expect_gt(length(calc_bins(abund[[26]])), 1)
+  expect_gt(length(calc_bins(abund[[2]])), 1)
 
   # projected
-  abund_prj <- raster::projectRaster(abund[[26]], crs = "+init=epsg:4326")
+  abund_prj <- suppressWarnings(raster::projectRaster(abund[[2]],
+                                                      crs = "+init=epsg:4326"))
   expect_gt(length(calc_bins(abund_prj)), 1)
 
   # not a raster object
@@ -50,14 +73,16 @@ test_that("stemhelper calc_bins", {
   expect_error(calc_bins(ext_poly), "Input must be a Raster")
 
   # if all is NA
-  abund_test <- abund[[26]]
+  abund_test <- abund[[2]]
   abund_test[!is.na(abund_test)] <- NA
   expect_error(calc_bins(abund_test), "must have non-NA values")
 })
 
+context("map_centroids")
+
 test_that("stemhelper map_centroids", {
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-PROD-20170505-3f880822"
+  species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
   sp_path <- paste(root_path, species, sep = "")
 
   pis <- load_pis(sp_path)
@@ -107,46 +132,46 @@ test_that("stemhelper map_centroids", {
                              plot_pds = FALSE), "Plotting of both PIs and PDs")
 })
 
+context("calc_effective_extent")
+
 test_that("stemhelper calc_effective_extent", {
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-PROD-20170505-3f880822"
+  species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
   sp_path <- paste(root_path, species, sep = "")
 
   pis <- load_pis(sp_path)
   pds <- load_pds(sp_path)
 
   ne_extent <- list(type = "rectangle",
-                    lat.min = 40,
-                    lat.max = 47,
-                    lon.min = -80,
-                    lon.max = -70,
+                    lat.min = 41,
+                    lat.max = 43,
+                    lon.min = -78,
+                    lon.max = -76,
                     t.min = 0.425,
                     t.max = 0.475)
 
-  calc_effective_extent(st_extent = ne_extent, pis = pis)
-
   # expected
-  expect_is(calc_effective_extent(st_extent = ne_extent, pis = pis),
+  expect_is(calc_effective_extent(st_extent = ne_extent, pis = pis,
+                                  path = sp_path),
             "RasterLayer")
-  expect_is(calc_effective_extent(st_extent = ne_extent, pds = pds),
-            "RasterLayer")
-  expect_error(calc_effective_extent(st_extent = ne_extent, pds = pds), NA)
-  expect_error(calc_effective_extent(st_extent = ne_extent, pis = pis), NA)
+  expect_error(calc_effective_extent(st_extent = ne_extent, pis = pis,
+                                     path = sp_path),
+               NA)
 
   # known input error checking
-  expect_error(calc_effective_extent(st_extent = ne_extent,
-                                     pis = pis,
-                                     pds = pds),
+  expect_error(calc_effective_extent(st_extent = ne_extent, pis = pis,
+                                     pds = pds, path = sp_path),
                "Unable to calculate for both PIs and PDs")
-  expect_error(calc_effective_extent(st_extent = ne_extent),
+  expect_error(calc_effective_extent(st_extent = ne_extent, path = sp_path),
                "Both PIs and PDs are NA")
 
   # no temporal info
   ne_extent <- list(type = "rectangle",
-                    lat.min = 40,
-                    lat.max = 47,
-                    lon.min = -80,
-                    lon.max = -70)
-  expect_warning(calc_effective_extent(st_extent = ne_extent, pis = pis),
+                    lat.min = 41,
+                    lat.max = 42,
+                    lon.min = -78,
+                    lon.max = -77)
+  expect_warning(calc_effective_extent(st_extent = ne_extent, pis = pis,
+                                       path = sp_path),
                  "Without temporal limits")
 })

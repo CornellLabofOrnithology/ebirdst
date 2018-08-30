@@ -1,8 +1,9 @@
 context("PPM functions")
+context("compute_ppms")
 
 test_that("stemhelper compute_ppms", {
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-PROD-20170505-3f880822"
+  species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
   sp_path <- paste(root_path, species, sep = "")
 
   # expected
@@ -87,21 +88,13 @@ test_that("stemhelper compute_ppms", {
                "st_extent argument must be a list")
 })
 
+context("plot_binary_by_time")
+
 # plot binary by time
 test_that("stemhelper plot_binary_by_time", {
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-PROD-20170505-3f880822"
+  species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
   sp_path <- paste(root_path, species, sep = "")
-
-  # checking metrics
-  expect_error(plot_binary_by_time(sp_path, metric = "Kappa"), NA)
-  expect_error(plot_binary_by_time(sp_path, metric = "AUC"), NA)
-  expect_error(plot_binary_by_time(sp_path, metric = "Sensitivity"), NA)
-  expect_error(plot_binary_by_time(sp_path, metric = "Specificity"), NA)
-
-  # wrong metric
-  expect_error(plot_binary_by_time(sp_path, metric = "WrongMetric"),
-               "Predictive performance metric must be one of")
 
   # with st_extent
   ne_extent <- list(type = "rectangle",
@@ -112,9 +105,20 @@ test_that("stemhelper plot_binary_by_time", {
                     t.min = 0.425,
                     t.max = 0.475)
 
-  expect_error(plot_binary_by_time(path = sp_path,
-                                   metric = "Kappa",
+  # checking metrics
+  expect_error(plot_binary_by_time(sp_path, metric = "Kappa",
                                    st_extent = ne_extent), NA)
+  expect_error(plot_binary_by_time(sp_path, metric = "AUC",
+                                   st_extent = ne_extent), NA)
+  expect_error(plot_binary_by_time(sp_path, metric = "Sensitivity",
+                                   st_extent = ne_extent), NA)
+  expect_error(plot_binary_by_time(sp_path, metric = "Specificity",
+                                   st_extent = ne_extent), NA)
+
+  # wrong metric
+  expect_error(plot_binary_by_time(sp_path, metric = "WrongMetric",
+                                   st_extent = ne_extent),
+               "Predictive performance metric must be one of")
 
   # n_time_periods
   expect_error(plot_binary_by_time(path = sp_path,
@@ -124,11 +128,11 @@ test_that("stemhelper plot_binary_by_time", {
                "n_time_periods argument must be more than 1")
 })
 
-# plot all ppms
+context("plot_all_ppms")
 
 test_that("stemhelper plot_all_ppms", {
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-PROD-20170505-3f880822"
+  species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
   sp_path <- paste(root_path, species, sep = "")
 
   ne_extent <- list(type = "rectangle",

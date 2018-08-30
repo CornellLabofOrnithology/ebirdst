@@ -1,14 +1,32 @@
 context("Loading functions")
+context("stack_stem")
 
 test_that("stemhelper stack_stem default", {
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-PROD-20170505-3f880822"
+  species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
   sp_path <- paste(root_path, species, sep = "")
 
-  abund <- stack_stem(sp_path, variable = "abundance_umean")
+  ne_extent <- list(type = "rectangle",
+                    lat.min = 40,
+                    lat.max = 47,
+                    lon.min = -80,
+                    lon.max = -70,
+                    t.min = 0.425,
+                    t.max = 0.475)
+
+  abund <- stack_stem(sp_path, variable = "abundance_umean", st_extent = ne_extent)
   expect_is(abund, "RasterStack")
 
-  abund <- stack_stem(sp_path, variable = "abundance_umean", week = 26)
+  ne_extent <- list(type = "rectangle",
+                    lat.min = 40,
+                    lat.max = 47,
+                    lon.min = -80,
+                    lon.max = -70,
+                    t.min = 0.425,
+                    t.max = 0.435)
+
+  abund <- stack_stem(sp_path, variable = "abundance_umean",
+                      st_extent = ne_extent)
   expect_is(abund, "RasterLayer")
 
   expect_error(stack_stem(sp_path, variable = "misspelled"),
@@ -25,7 +43,7 @@ test_that("stemhelper stack_stem default", {
 
 test_that("stemhelper stack_stem st_extent", {
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-PROD-20170505-3f880822"
+  species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
   sp_path <- paste(root_path, species, sep = "")
 
   # expected
@@ -35,11 +53,9 @@ test_that("stemhelper stack_stem st_extent", {
                     lon.min = -80,
                     lon.max = -70,
                     t.min = 0.425,
-                    t.max = 0.475)
-  abund <- stack_stem(sp_path,
-                      variable = "abundance_umean",
-                      st_extent = ne_extent,
-                      week = 26)
+                    t.max = 0.435)
+  abund <- stack_stem(sp_path, variable = "abundance_umean",
+                      st_extent = ne_extent)
   expect_is(abund, "RasterLayer")
   expect_gt(raster::ncell(abund), 1)
 
@@ -49,11 +65,9 @@ test_that("stemhelper stack_stem st_extent", {
                     lat.max = 47,
                     lon.min = -80,
                     lon.max = -70)
-  expect_is(stack_stem(sp_path,
-                       variable = "abundance_umean",
-                       st_extent = ne_extent,
-                       week = 26),
-            "RasterLayer")
+  expect_is(stack_stem(sp_path, variable = "abundance_umean",
+                       st_extent = ne_extent),
+            "RasterStack")
 
   # reversed min max
   ne_extent <- list(type = "rectangle",
@@ -63,21 +77,18 @@ test_that("stemhelper stack_stem st_extent", {
                     lon.max = -70,
                     t.min = 0.425,
                     t.max = 0.475)
-  expect_error(stack_stem(sp_path,
-                          variable = "abundance_umean",
-                          st_extent = ne_extent,
-                          week = 26),
-               "ymin and ymax are less than one")
+  expect_error(stack_stem(sp_path, variable = "abundance_umean",
+                          st_extent = ne_extent),
+               "Minimum latitude is greater than maximum latitude")
 
   # missing a corner
   ne_extent <- list(type = "rectangle",
-                    lat.min = 47,
-                    lat.max = 40,
+                    lat.min = 40,
+                    lat.max = 47,
                     lon.min = -80)
-  expect_error(stack_stem(sp_path,
-                          variable = "abundance_umean",
+  expect_error(stack_stem(sp_path, variable = "abundance_umean",
                           st_extent = ne_extent),
-               "insufficient number of elements")
+               "Either lon.min or lon.max missing")
 
   # st_extent is not list
   ne_extent <- c(type = "rectangle",
@@ -87,8 +98,7 @@ test_that("stemhelper stack_stem st_extent", {
                  lon.max = -70,
                  t.min = 0.425,
                  t.max = 0.475)
-  expect_error(stack_stem(sp_path,
-                          variable = "abundance_umean",
+  expect_error(stack_stem(sp_path, variable = "abundance_umean",
                           st_extent = ne_extent),
                "st_extent argument must be a list")
 
@@ -101,11 +111,9 @@ test_that("stemhelper stack_stem st_extent", {
   ne_extent <- list(type = "polygon",
                     polygon = e_polys,
                     t.min = 0.425,
-                    t.max = 0.475)
-  abund <- stack_stem(sp_path,
-                      variable = "abundance_umean",
-                      st_extent = ne_extent,
-                      week = 26)
+                    t.max = 0.435)
+  abund <- stack_stem(sp_path, variable = "abundance_umean",
+                      st_extent = ne_extent)
   expect_is(abund, "RasterLayer")
   expect_gt(raster::ncell(abund), 1)
 
@@ -113,21 +121,30 @@ test_that("stemhelper stack_stem st_extent", {
 
 test_that("stemhelper stack_stem w/ use_analysis_extent", {
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-PROD-20170505-3f880822"
+  species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
   sp_path <- paste(root_path, species, sep = "")
 
   # expected
+  ne_extent <- list(type = "rectangle",
+                    lat.min = 40,
+                    lat.max = 47,
+                    lon.min = -80,
+                    lon.max = -70,
+                    t.min = 0.425,
+                    t.max = 0.435)
   abund <- stack_stem(sp_path,
                       variable = "abundance_umean",
-                      use_analysis_extent = FALSE,
-                      week = 26)
+                      st_extent = ne_extent,
+                      use_analysis_extent = FALSE)
   expect_is(abund, "RasterLayer")
   expect_gt(raster::ncell(abund), 1)
 })
 
-test_that("stemhelpe load_pis", {
+context("load_pis")
+
+test_that("stemhelper load_pis", {
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-PROD-20170505-3f880822"
+  species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
   sp_path <- paste(root_path, species, sep = "")
 
   expect_is(load_pis(sp_path), "data.frame")
@@ -138,9 +155,11 @@ test_that("stemhelpe load_pis", {
   expect_error(load_pis(sp_path), "RData file does not exist")
 })
 
+context("load_pds")
+
 test_that("stemhelpe load_pds", {
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-PROD-20170505-3f880822"
+  species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
   sp_path <- paste(root_path, species, sep = "")
 
   expect_is(load_pds(sp_path), "data.frame")
