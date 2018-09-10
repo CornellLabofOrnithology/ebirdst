@@ -385,33 +385,6 @@ raster_st_subset <- function(raster_data, st_extent) {
     raster_data <- label_raster_stack(raster_data)
   }
 
-  # crop
-  if(st_extent$type == "rectangle") {
-    raster_data <- raster::crop(raster_data, sinu_ext)
-  } else if(st_extent$type == "polygon") {
-    ll_epsg <- "+init=epsg:4326"
-    ll <- "+proj=longlat +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
-
-    # check Polygons
-    if(is.null(st_extent$polygon)) {
-      stop("polygon data not present.")
-    }
-
-    # check prj
-    if(!sp::identicalCRS(raster_data, st_extent$polygon)) {
-      plygn <- sp::spTransform(st_extent$polygon,
-                               sp::CRS(sp::proj4string(raster_data)))
-    } else {
-      plygn <- st_extent$polygon
-    }
-
-    raster_data <- raster::mask(raster_data, plygn)
-  } else {
-    stop(paste("Spatiotemporal extent type not accepted. ",
-               "Use either 'rectangle' or 'polygon'.",
-               sep = ""))
-  }
-
   # subset stack for time
   if(use_time == TRUE) {
     SRD_DATE_VEC <- seq(from = 0, to= 1, length = 52 + 1)
@@ -443,6 +416,33 @@ raster_st_subset <- function(raster_data, st_extent) {
     }
 
     raster_data <- raster_data[[weeks]]
+  }
+
+  # crop
+  if(st_extent$type == "rectangle") {
+    raster_data <- raster::crop(raster_data, sinu_ext)
+  } else if(st_extent$type == "polygon") {
+    ll_epsg <- "+init=epsg:4326"
+    ll <- "+proj=longlat +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
+
+    # check Polygons
+    if(is.null(st_extent$polygon)) {
+      stop("polygon data not present.")
+    }
+
+    # check prj
+    if(!sp::identicalCRS(raster_data, st_extent$polygon)) {
+      plygn <- sp::spTransform(st_extent$polygon,
+                               sp::CRS(sp::proj4string(raster_data)))
+    } else {
+      plygn <- st_extent$polygon
+    }
+
+    raster_data <- raster::mask(raster_data, plygn)
+  } else {
+    stop(paste("Spatiotemporal extent type not accepted. ",
+               "Use either 'rectangle' or 'polygon'.",
+               sep = ""))
   }
 
   return(raster_data)
