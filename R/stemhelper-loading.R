@@ -464,7 +464,10 @@ raster_st_subset <- function(raster_data, st_extent) {
       plygn <- st_extent$polygon
     }
 
-    raster_data <- raster::mask(raster_data, plygn)
+    raster_data <- raster::trim(raster::mask(raster::crop(raster_data,
+                                                          raster::extent(plygn)),
+                                             plygn),
+                                values = NA)
   } else {
     stop(paste("Spatiotemporal extent type not accepted. ",
                "Use either 'rectangle' or 'polygon'.",
