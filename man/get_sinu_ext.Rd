@@ -4,12 +4,9 @@
 \alias{get_sinu_ext}
 \title{Projects st_extent lat/lon list to sinusoidal raster Extent}
 \usage{
-get_sinu_ext(path, st_extent)
+get_sinu_ext(st_extent)
 }
 \arguments{
-\item{path}{character; Full path to directory containing the STEM results
-for a single species.}
-
 \item{st_extent}{list; st_extent list with lat/lon coordinates.}
 }
 \value{
@@ -31,7 +28,7 @@ ne_extent <- list(type = "rectangle",
                   t.max = 0.475)
 
 # convert
-sinu_e <- get_sinu_ext(path, ne_extent)
+sinu_e <- get_sinu_ext(ne_extent)
 sinu_e
 }
 \keyword{internal}

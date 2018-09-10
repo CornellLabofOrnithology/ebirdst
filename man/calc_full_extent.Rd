@@ -7,27 +7,26 @@
 calc_full_extent(x, path)
 }
 \arguments{
-\item{x}{Raster* object; usually from stem_stack() function.}
+\item{x}{Raster* object; either full RasterStack or subset.}
 
-\item{path}{character; Full path to directory containing the STEM results
+\item{path}{character; Full path to directory containing the results
 for a single species.}
 }
 \value{
 raster Extent object
 }
 \description{
-After creating a RasterStack with \code{stack_stem()}, there are lots of NA values
+After loading a RasterStack of results, there are lots of NA values
 and plots of the individual raster layers are at the full extent of the
-\code{template_raster}. To show an ideal extent, this function trims away 0 and
-NA values and checks to make sure it returns a reasonable extent (based on
-the \code{template_raster}) for plotting. The returned Extent object can then be
-used for plotting.
+study extent. To show an ideal extent, this function trims away 0 and
+NA values and checks to make sure it returns a reasonable extent for
+plotting. The returned Extent object can then be used for plotting.
 }
 \examples{
 \dontrun{
 
 sp_path <- "path to species STEM results"
-raster_stack <- stack_stem(sp_path, variable = "abundance_umean")
+raster_stack <- stack(sp_path)
 plot_extent <- calc_full_extent(raster_stack, path)
 raster::plot(raster_stack[[1]], ext = plot_extent)
 }
