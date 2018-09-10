@@ -150,43 +150,55 @@ label_raster_stack <- function(raster_data) {
 #' data_st_subset(data = pis, st_extent = ne_extent, use_time = TRUE)
 #' }
 data_st_subset <- function(data, st_extent) {
+  # check st_extent object
   if(!all(is.na(st_extent))) {
     if(!is.list(st_extent)) {
       stop("The st_extent argument must be a list object.")
     }
 
-    if(is.null(st_extent$lon.max)) {
-      stop("Missing max longitude")
-    } else if(is.null(st_extent$lon.min)) {
-      stop("Missing min longitude")
-    } else if(is.null(st_extent$lat.max)) {
-      stop("Missing max latitude")
-    } else if(is.null(st_extent$lat.min)) {
-      stop("Missing min latitude")
-    }
-
-    if(!is.null(st_extent$lat.min) & !is.null(st_extent$lat.max)) {
-      if(st_extent$lat.min > st_extent$lat.max) {
-        stop("Minimum latitude is greater than maximum latitude")
+    if(st_extent$type == "rectangle") {
+      if(is.null(st_extent$lon.max)) {
+        stop("Missing max longitude")
+      } else if(is.null(st_extent$lon.min)) {
+        stop("Missing min longitude")
+      } else if(is.null(st_extent$lat.max)) {
+        stop("Missing max latitude")
+      } else if(is.null(st_extent$lat.min)) {
+        stop("Missing min latitude")
       }
 
-      if(st_extent$lat.max < st_extent$lat.min) {
-        stop("Latitude maximum is less than latitude minimum.")
+      if(!is.null(st_extent$lat.min) & !is.null(st_extent$lat.max)) {
+        if(st_extent$lat.min > st_extent$lat.max) {
+          stop("Minimum latitude is greater than maximum latitude")
+        }
+
+        if(st_extent$lat.max < st_extent$lat.min) {
+          stop("Latitude maximum is less than latitude minimum.")
+        }
+      } else {
+        stop("Either lat.min or lat.max missing.")
+      }
+
+      if(!is.null(st_extent$lon.min) & !is.null(st_extent$lon.max)) {
+        if(st_extent$lon.min > st_extent$lon.max) {
+          stop("Minimum longitude is greater than maximum longitude")
+        }
+
+        if(st_extent$lon.max < st_extent$lon.min) {
+          stop("Longitude maximum is less than longitude minimum.")
+        }
+      } else {
+        stop("Either lon.min or lon.max missing.")
+      }
+    } else if(st_extent$type == "polygon") {
+      # check Polygons
+      if(is.null(st_extent$polygon)) {
+        stop("polygon data not present.")
       }
     } else {
-      stop("Either lat.min or lat.max missing.")
-    }
-
-    if(!is.null(st_extent$lon.min) & !is.null(st_extent$lon.max)) {
-      if(st_extent$lon.min > st_extent$lon.max) {
-        stop("Minimum longitude is greater than maximum longitude")
-      }
-
-      if(st_extent$lon.max < st_extent$lon.min) {
-        stop("Longitude maximum is less than longitude minimum.")
-      }
-    } else {
-      stop("Either lon.min or lon.max missing.")
+      stop(paste("Spatiotemporal extent type not accepted. ",
+                 "Use either 'rectangle' or 'polygon'.",
+                 sep = ""))
     }
   } else {
     stop("st_extent object is empty.")
@@ -327,38 +339,49 @@ raster_st_subset <- function(raster_data, st_extent) {
       stop("The st_extent argument must be a list object.")
     }
 
-    if(is.null(st_extent$lon.max)) {
-      stop("Missing max longitude")
-    } else if(is.null(st_extent$lon.min)) {
-      stop("Missing min longitude")
-    } else if(is.null(st_extent$lat.max)) {
-      stop("Missing max latitude")
-    } else if(is.null(st_extent$lat.min)) {
-      stop("Missing min latitude")
-    }
-
-    if(!is.null(st_extent$lat.min) & !is.null(st_extent$lat.max)) {
-      if(st_extent$lat.min > st_extent$lat.max) {
-        stop("Minimum latitude is greater than maximum latitude")
+    if(st_extent$type == "rectangle") {
+      if(is.null(st_extent$lon.max)) {
+        stop("Missing max longitude")
+      } else if(is.null(st_extent$lon.min)) {
+        stop("Missing min longitude")
+      } else if(is.null(st_extent$lat.max)) {
+        stop("Missing max latitude")
+      } else if(is.null(st_extent$lat.min)) {
+        stop("Missing min latitude")
       }
 
-      if(st_extent$lat.max < st_extent$lat.min) {
-        stop("Latitude maximum is less than latitude minimum.")
+      if(!is.null(st_extent$lat.min) & !is.null(st_extent$lat.max)) {
+        if(st_extent$lat.min > st_extent$lat.max) {
+          stop("Minimum latitude is greater than maximum latitude")
+        }
+
+        if(st_extent$lat.max < st_extent$lat.min) {
+          stop("Latitude maximum is less than latitude minimum.")
+        }
+      } else {
+        stop("Either lat.min or lat.max missing.")
+      }
+
+      if(!is.null(st_extent$lon.min) & !is.null(st_extent$lon.max)) {
+        if(st_extent$lon.min > st_extent$lon.max) {
+          stop("Minimum longitude is greater than maximum longitude")
+        }
+
+        if(st_extent$lon.max < st_extent$lon.min) {
+          stop("Longitude maximum is less than longitude minimum.")
+        }
+      } else {
+        stop("Either lon.min or lon.max missing.")
+      }
+    } else if(st_extent$type == "polygon") {
+      # check Polygons
+      if(is.null(st_extent$polygon)) {
+        stop("polygon data not present.")
       }
     } else {
-      stop("Either lat.min or lat.max missing.")
-    }
-
-    if(!is.null(st_extent$lon.min) & !is.null(st_extent$lon.max)) {
-      if(st_extent$lon.min > st_extent$lon.max) {
-        stop("Minimum longitude is greater than maximum longitude")
-      }
-
-      if(st_extent$lon.max < st_extent$lon.min) {
-        stop("Longitude maximum is less than longitude minimum.")
-      }
-    } else {
-      stop("Either lon.min or lon.max missing.")
+      stop(paste("Spatiotemporal extent type not accepted. ",
+                 "Use either 'rectangle' or 'polygon'.",
+                 sep = ""))
     }
   } else {
     stop("st_extent object is empty.")
@@ -372,7 +395,10 @@ raster_st_subset <- function(raster_data, st_extent) {
   }
 
   # convert st_extent to sinu
-  sinu_ext <- get_sinu_ext(st_extent)
+  if(st_extent$type == "rectangle") {
+    sinu_ext <- get_sinu_ext(st_extent)
+  }
+
 
   # check length
   if((raster::nlayers(raster_data) != 52)) {
