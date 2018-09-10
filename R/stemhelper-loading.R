@@ -4,8 +4,6 @@
 #' package from lat/lon corners to a raster Extent using the same
 #' Sinusoidal projection as the `template_raster` data object.
 #'
-#' @param path character; Full path to directory containing the STEM results
-#' for a single species.
 #' @param st_extent list; st_extent list with lat/lon coordinates.
 #'
 #' @return A raster Extent in Sinusoidal projection.
@@ -23,9 +21,9 @@
 #'                   t.max = 0.475)
 #'
 #' # convert
-#' sinu_e <- get_sinu_ext(path, ne_extent)
+#' sinu_e <- get_sinu_ext(ne_extent)
 #' sinu_e
-get_sinu_ext <- function(path, st_extent) {
+get_sinu_ext <- function(st_extent) {
   if(!all(is.na(st_extent))) {
     if(!is.list(st_extent)) {
       stop("The st_extent argument must be a list object.")
@@ -50,6 +48,7 @@ get_sinu_ext <- function(path, st_extent) {
 
   # projection information
   ll <- "+init=epsg:4326"
+  sinu <- "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs"
 
   sp_ext <- raster::extent(st_extent$lon.min,
                            st_extent$lon.max,
@@ -59,15 +58,59 @@ get_sinu_ext <- function(path, st_extent) {
   extllr[is.na(extllr)] <- 0
   raster::crs(extllr) <- ll
 
-  # load template raster
-  e <- load_config(path)
-  template_raster <- raster::raster(paste(path, "/data/", e$RUN_NAME,
-                                          "_srd_raster_template.tif", sep = ""))
-
-  extsinur <- raster::projectRaster(extllr,
-                                    crs = sp::proj4string(template_raster))
+  extsinur <- raster::projectRaster(extllr, crs = sinu)
 
   return(raster::extent(extsinur))
+}
+
+#' Labels 52 week RasterStack with the dates for each band
+#'
+#' The raster package does not allow layer names to be saved with the bands of a
+#' multi-band GeoTiff. Accordingly, all eBird Science Product raster results
+#' cover the entire 52 week temporal extent of analysis. For convenience, this
+#' function labels the RasterStack once it has been loaded in R with the dates
+#' for each band.
+#'
+#' @param raster_data RasterStack or RasterBrick; original eBird Science Product
+#' raster GeoTiff with 52 bands, one for each week
+#'
+#' @return A RasterStack or Rasterbrick with names assigned for the dates in
+#' the format of "XYYY.MM.DD" per raster package constraints.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' rs <- stack("/path to GeoTiff)
+#' rs
+#'
+#' rs_labeled <- label_raster_stack(raster_data)
+#' rs_labeled
+label_raster_stack <- function(raster_data) {
+  # check raster_data is either RasterLayer or RasterStack or RasterBrick
+  if(!(class(raster_data) %in% c("RasterStack", "RasterBrick"))) {
+    stop("The raster_data object must be either RasterStack or RasterBrick.")
+  }
+
+  # check length
+  if((raster::nlayers(raster_data) != 52)) {
+    stop(paste0("The raster_data object must be full stack or brick of 52",
+                " layers as originally provided."))
+  }
+
+  SRD_DATE_VEC <- seq(from = 0, to= 1, length = 52 + 1)
+  SRD_DATE_VEC <- (SRD_DATE_VEC[1:52] + SRD_DATE_VEC[2:(52 + 1)]) / 2
+  SRD_DATE_VEC <- round(SRD_DATE_VEC, digits = 4)
+
+  year_seq <- 2015
+  p_time <- strptime(x = paste(round(SRD_DATE_VEC * 366), year_seq), "%j %Y")
+  date_names <- paste(formatC(p_time$mon + 1, width = 2, format="d", flag="0"),
+                      formatC(p_time$mday, width = 2, format="d", flag="0"),
+                      sep = "-")
+
+  names(raster_data) <- paste(2016, date_names, sep = "-")
+
+  return(raster_data)
 }
 
 #' Spatiotemporal subsetter for STEM result data objects
@@ -75,16 +118,13 @@ get_sinu_ext <- function(path, st_extent) {
 #' Internal function that takes a data.frame or SpatialPointsDataFrame and
 #' a st_extent list and returns a subset of the data object. Currently
 #' designed to handle either a 'rectangle' as defined by a lat/lon bounding
-#' box or a 'polygon' as defined by a SpatialPolygon* object. The `use_time`
-#' parameter allows for subsetting with or without temporal information. The
-#' t.min and t.max objects in the `st_extent` list are currently able to wrap
-#' time around the year (e.g., t.min = 0.9 and t.max = 0.1 is acceptable).
+#' box or a 'polygon' as defined by a SpatialPolygon* object. The function
+#' will use temporal information if provided. The t.min and t.max objects in
+#' the `st_extent` list are currently able to wrap time around the year
+#' (e.g., t.min = 0.9 and t.max = 0.1 is acceptable).
 #'
-#' @param data data.frame or SpatialPointsDataFrame; originating from STEM
-#' results.
+#' @param data data.frame or SpatialPointsDataFrame; originating from results.
 #' @param st_extent list; st_extent list object
-#' @param use_time logical; Default is TRUE, indicating whether to use time in
-#' subsetting or not.
 #'
 #' @return Subset of input data as same type.
 #'
@@ -107,29 +147,54 @@ get_sinu_ext <- function(path, st_extent) {
 #'                   t.max = 0.475)
 #'
 #' #subset pis with st_extent list
-#' st_extent_subset(data = pis, st_extent = ne_extent, use_time = TRUE)
+#' data_st_subset(data = pis, st_extent = ne_extent, use_time = TRUE)
 #' }
-st_extent_subset <- function(data, st_extent) {
+data_st_subset <- function(data, st_extent) {
+  if(!all(is.na(st_extent))) {
+    if(!is.list(st_extent)) {
+      stop("The st_extent argument must be a list object.")
+    }
 
-  if(is.null(st_extent$lon.max)) {
-    stop("Missing max longitude")
-  } else if(is.null(st_extent$lon.min)) {
-    stop("Missing min longitude")
-  } else if(is.null(st_extent$lat.max)) {
-    stop("Missing max latitude")
-  } else if(is.null(st_extent$lat.min)) {
-    stop("Missing min latitude")
+    if(is.null(st_extent$lon.max)) {
+      stop("Missing max longitude")
+    } else if(is.null(st_extent$lon.min)) {
+      stop("Missing min longitude")
+    } else if(is.null(st_extent$lat.max)) {
+      stop("Missing max latitude")
+    } else if(is.null(st_extent$lat.min)) {
+      stop("Missing min latitude")
+    }
+
+    if(!is.null(st_extent$lat.min) & !is.null(st_extent$lat.max)) {
+      if(st_extent$lat.min > st_extent$lat.max) {
+        stop("Minimum latitude is greater than maximum latitude")
+      }
+
+      if(st_extent$lat.max < st_extent$lat.min) {
+        stop("Latitude maximum is less than latitude minimum.")
+      }
+    } else {
+      stop("Either lat.min or lat.max missing.")
+    }
+
+    if(!is.null(st_extent$lon.min) & !is.null(st_extent$lon.max)) {
+      if(st_extent$lon.min > st_extent$lon.max) {
+        stop("Minimum longitude is greater than maximum longitude")
+      }
+
+      if(st_extent$lon.max < st_extent$lon.min) {
+        stop("Longitude maximum is less than longitude minimum.")
+      }
+    } else {
+      stop("Either lon.min or lon.max missing.")
+    }
+  } else {
+    stop("st_extent object is empty.")
   }
 
-  if(st_extent$lon.max < st_extent$lon.min) {
-    stop("Longitude maximum is less than longitude minimum.")
-  }
-
-  if(st_extent$lat.max < st_extent$lat.min) {
-    stop("Latitude maximum is less than latitude minimum.")
-  }
-
+  # check to see if the time parts of the extent parameter are there
   if(is.null(st_extent$t.min) | is.null(st_extent$t.max)) {
+    warning("Temporal information missing or incomplete. This may be intentional.")
     use_time <- FALSE
   } else {
     use_time <- TRUE
@@ -211,284 +276,176 @@ st_extent_subset <- function(data, st_extent) {
   return(subset_data)
 }
 
-#' Load, extend, and stack all weeks of STEM rasters for a given result type
+#' Spatiotemporal subsetter for STEM result data objects
 #'
-#' For one of four result variables, loads all available weeks of rasters
-#' (or temporal subset), extends them to the extent of the study
-#' (or to a custom extent), and stacks them into a RasterStack, with zeroes
-#' added (option to turn this off).
+#' Internal function that takes a RasterStack or RasterBrick and a st_extent
+#' list and returns a spatiotemporal subset of the data object. Currently
+#' designed to handle either a 'rectangle' as defined by a lat/lon bounding
+#' box or a 'polygon' as defined by a SpatialPolygon* object. The function
+#' will use temporal information if provided. The t.min and t.max objects in
+#' the `st_extent` list are currently able to wrap time around the year
+#' (e.g., t.min = 0.9 and t.max = 0.1 is acceptable). This function will also
+#' returned a date labeled RasterStack or RasterBrick, so there is no need
+#' to use the label_raster_stack() directly if subsetting.
 #'
-#' @param path character; Full path to directory containing the STEM results
-#' for a single species.
-#' @param variable character; One of: 'abundance_ensemble_support',
-#' 'abundance_lower', 'abundance_upper', 'abundance_umean',
-#' and 'occurrence_umean'.
-#' @param year numeric; Default is 2016. Other years are available at
-#' res = "low" for inter-year variation analysis.
-#' @param res character; Default is "high". Use "low" for inter-year variation
-#' analysis to load other years of data.
-#' @param st_extent list; Optional, use to limit the spatial Extent that the
-#' rasters are loaded into. Must set use_analysis_extent to FALSE.
-#' @param add_zeroes logical; Default is TRUE. Adds predicted and assumed zero
-#' values to the resulting layers. Set to FALSE to turn this behavior off.
-#' @param use_analysis_extent logical; Default is TRUE. If STEM results were
-#' run for a custom non-global extent, that extent object is stored in the
-#' configuration file. If TRUE, uses that analysis extent for loading the
-#' rasters. If FALSE, rasters are loaded to the full extent of the
-#' `template_raster` object.
+#' @param data RasterStack or RasterBrick; one of four GeoTiff files provided
+#' with results
+#' @param st_extent list; st_extent list object
 #'
-#' @return RasterStack containing all available weeks of result.
+#' @return Subset of input data as same type, with layers labeled with dates
+#' from label_raster_stack().
 #'
 #' @export
 #'
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species STEM results"
+#' rs <- stack("/path to GeoTiff")
+#' rs
 #'
-#' raster_stack <- stack_stem(path = sp_path, variable = "abundance_umean")
+#' # define st_extent list
+#' ne_extent <- list(type = "rectangle",
+#'                   lat.min = 40,
+#'                   lat.max = 47,
+#'                   lon.min = -80,
+#'                   lon.max = -70,
+#'                   t.min = 0.5,
+#'                   t.max = 0.6)
+#'
+#' # subset stack with extent
+#' rs_sub <- raster_st_subset(rs, st_extent = ne_extent)
 #' }
-stack_stem <- function(path,
-                       variable,
-                       year = 2016,
-                       res = "high",
-                       st_extent = NA,
-                       add_zeroes = TRUE,
-                       use_analysis_extent = TRUE) {
-  poss_var <- c("abundance_lower", "abundance_upper",
-                "abundance_umean", "occurrence_umean",
-                "pat_mean")
-
-  poss_res <- c("low", "high")
-
-  if(!(variable %in% poss_var)) {
-    stop(paste("Selected variable is not one of the following: ",
-               paste(poss_var, collapse = ", "), ".", sep = ""))
+raster_st_subset <- function(raster_data, st_extent) {
+  # check raster_data is either RasterLayer or RasterStack or RasterBrick
+  if(!(class(raster_data) %in% c("RasterStack", "RasterBrick"))) {
+    stop("raster_data object must be either RasterStack or RasterBrick")
   }
 
-  if(!(res %in% poss_res)) {
-    stop("Selected resolution needs to be either 'low' or 'high'.")
-  }
-
-  if(!(year %in% 2004:2016)) {
-    stop("Year needs to be between 2004 and 2016.")
-  }
-
-  if((year %in% 2004:2015) & res == "high") {
-    stop("High resolution results only available for 2016.")
-  }
-
+  # check st_extent object
   if(!all(is.na(st_extent))) {
     if(!is.list(st_extent)) {
       stop("The st_extent argument must be a list object.")
     }
-  }
 
-  if(res == "high") {
-    res_label <- "hr"
-  } else {
-    res_label <- "lr"
-  }
+    if(is.null(st_extent$lon.max)) {
+      stop("Missing max longitude")
+    } else if(is.null(st_extent$lon.min)) {
+      stop("Missing min longitude")
+    } else if(is.null(st_extent$lat.max)) {
+      stop("Missing max latitude")
+    } else if(is.null(st_extent$lat.min)) {
+      stop("Missing min latitude")
+    }
 
-  if(variable == "pat_mean") {
-    fp <- paste(path, "/results/tifs/all_layers/", variable, "/", year, "/",
-                sep = "")
-  } else {
-    fp <- paste(path, "/results/tifs/presentation/", variable, "/", year, "/",
-                sep = "")
-  }
+    if(!is.null(st_extent$lat.min) & !is.null(st_extent$lat.max)) {
+      if(st_extent$lat.min > st_extent$lat.max) {
+        stop("Minimum latitude is greater than maximum latitude")
+      }
 
-  fpaes <- paste(path, "/results/tifs/presentation/abundance_ensemble_support/",
-                 year, "/", sep = "")
-  fpzes <- paste(path, "/results/tifs/all_layers/zero_es/", sep = "")
-
-  load_extent <- NULL
-  load_extend <- FALSE
-  e <- load_config(path)
-
-  # load template raster
-  template_raster <- raster::raster(paste(path, "/data/", e$RUN_NAME,
-                                          "_srd_raster_template.tif", sep = ""))
-
-  if(all(is.na(st_extent))) {
-    if(use_analysis_extent == TRUE) {
-      # load with extent
-      if(!is.null(e$SPATIAL_EXTENT_LIST)) {
-        load_extent <- get_sinu_ext(path, e$SPATIAL_EXTENT_LIST)
-      } else {
-        load_extend <- TRUE
+      if(st_extent$lat.max < st_extent$lat.min) {
+        stop("Latitude maximum is less than latitude minimum.")
       }
     } else {
-      if(e$SRD_AGG_FACT == 1) {
-        # load without extend
-        load_extend <- FALSE
-      } else {
-        # load with extend
-        load_extend <- TRUE
-      }
+      stop("Either lat.min or lat.max missing.")
     }
-  } else {
-    # load with extent
 
-    if(st_extent$type == "rectangle") {
-      load_extent <- get_sinu_ext(path, st_extent)
+    if(!is.null(st_extent$lon.min) & !is.null(st_extent$lon.max)) {
+      if(st_extent$lon.min > st_extent$lon.max) {
+        stop("Minimum longitude is greater than maximum longitude")
+      }
+
+      if(st_extent$lon.max < st_extent$lon.min) {
+        stop("Longitude maximum is less than longitude minimum.")
+      }
     } else {
-      # check prj
-      # TODO...need to aggregate if res = 'low'
-      if(!sp::identicalCRS(template_raster, st_extent$polygon)) {
-        load_extent <- sp::spTransform(st_extent$polygon,
-                                 sp::CRS(sp::proj4string(template_raster)))
-      } else {
-        load_extent <- st_extent$polygon
-      }
+      stop("Either lon.min or lon.max missing.")
     }
-  }
-
-  # define function to load and extend each file in path
-  load_and_extend <- function(x, ext, res, year, use_extend, add_zeroes) {
-
-    this_f <- list.files(fp, pattern = paste("*_", res, "_*", sep = ""))[x]
-    this_aes <- list.files(fpaes, pattern = paste("*_", res, "_*", sep = ""))[x]
-
-    if(tools::file_ext(this_f) == "tif") {
-      date_start_pos <- gregexpr(paste("_", year, "-", sep = ""),
-                                 this_f)[[1]][1]
-      parsed_date <- substr(this_f,
-                            date_start_pos + 6,
-                            date_start_pos + 6 + 4)
-
-      if(!is.null(ext)) {
-        r <- raster::crop(
-          raster::extend(
-            raster::raster(paste(fp, "/", this_f, sep = "")),
-            ext),
-          ext)
-
-        if(add_zeroes == TRUE) {
-          pes <- raster::crop(
-            raster::extend(
-              raster::raster(paste(fpaes, "/", this_aes, sep = "")),
-              ext),
-            ext)
-
-          zes <- raster::crop(
-            raster::extend(
-              raster::raster(paste(fpzes, "/", list.files(fpzes)[x], sep = "")),
-              ext),
-            ext)
-        }
-      } else {
-        if(use_extend == TRUE) {
-          r <- raster::extend(raster::raster(paste(fp, "/",
-                                                   this_f,
-                                                   sep = "")), template_raster)
-
-          if(add_zeroes == TRUE) {
-            pes <- raster::extend(raster::raster(paste(fpaes, "/",
-                                                       this_aes,
-                                                       sep = "")),
-                                  template_raster)
-
-            zes <- raster::extend(raster::raster(paste(fpzes, "/",
-                                                       list.files(fpzes)[x],
-                                                       sep = "")),
-                                  template_raster)
-          }
-        } else {
-          r <- raster::raster(paste(fp, "/", this_f, sep = ""))
-
-          if(add_zeroes == TRUE) {
-            pes <- raster::raster(paste(fpaes, "/", this_aes, sep = ""))
-
-            zes <- raster::raster(paste(fpzes, "/", list.files(fpzes)[x],
-                                        sep = ""))
-          }
-        }
-      }
-
-      if(add_zeroes == TRUE) {
-        pes[pes] <- 0
-
-        zes <- zes >= 95
-        zes[zes == 0] <- NA
-        zes[zes == 1] <- 0
-
-        week_stack <- raster::stack(r, pes, zes)
-
-        r <- suppressWarnings(raster::calc(week_stack, max, na.rm = TRUE))
-      }
-
-      names(r) <- parsed_date
-
-      return(r)
-    }
-  }
-
-  # check to see if path contains more than 1 geotiff file
-  if( sum(tools::file_ext(list.files(fp,
-                                     pattern = paste("*_", res_label, "_*",
-                                                     sep = ""))) == "tif",
-          na.rm = TRUE) < 2 ) {
-    stop("Directory does not contain at least 2 .tif files.")
-  }
-
-  if(all(is.na(st_extent))) {
-    weeks <- 1:length(list.files(fp, pattern = paste("*_", res_label, "_*",
-                                                     sep = "")))
   } else {
-    if(is.null(st_extent[["t.min"]]) | is.null(st_extent[["t.max"]])) {
-      st_extent$t.min <- NA
-      st_extent$t.max <- NA
+    stop("st_extent object is empty.")
+  }
+
+  if(is.null(st_extent$t.min) | is.null(st_extent$t.max)) {
+    warning("Temporal information missing or incomplete. This may be intentional.")
+    use_time <- FALSE
+  } else {
+    use_time <- TRUE
+  }
+
+  # convert st_extent to sinu
+  sinu_ext <- get_sinu_ext(st_extent)
+
+  # check length
+  if((raster::nlayers(raster_data) != 52)) {
+    stop(paste0("The raster_data object must be full stack or brick of 52",
+                " layers as originally provided."))
+  }
+
+  # check names
+  if(length(grep("X2016.", names(raster_data)[1])) == 0) {
+    raster_data <- label_raster_stack(raster_data)
+  }
+
+  # crop
+  if(st_extent$type == "rectangle") {
+    raster_data <- raster::crop(raster_data, sinu_ext)
+  } else if(st_extent$type == "polygon") {
+    ll_epsg <- "+init=epsg:4326"
+    ll <- "+proj=longlat +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
+
+    # check Polygons
+    if(is.null(st_extent$polygon)) {
+      stop("polygon data not present.")
     }
 
-    if(is.na(st_extent$t.min) | is.na(st_extent$t.max)) {
-      weeks <- 1:length(list.files(fp, pattern = paste("*_", res_label, "_*",
-                                                       sep = "")))
+    # check prj
+    if(!sp::identicalCRS(raster_data, st_extent$polygon)) {
+      plygn <- sp::spTransform(st_extent$polygon,
+                               sp::CRS(sp::proj4string(raster_data)))
     } else {
-      p_time <- strptime(x = paste(round(e$SRD_DATE_VEC * 366), 2015), "%j %Y")
-      date_names <- paste(formatC(p_time$mon + 1, width = 2, format = "d",
-                                  flag = "0"),
-                          formatC(p_time$mday, width = 2, format = "d",
-                                  flag = "0"),
-                          sep = "-")
-
-      # select from e$SRD_DATE_VEC where between st_extent$t.min and st_extent$t.max
-      if(st_extent$t.min > st_extent$t.max) {
-        # date wrapping case
-        weeks <- c(which(date_names %in%
-                           date_names[e$SRD_DATE_VEC >= st_extent$t.min]),
-                   which(date_names %in%
-                           date_names[e$SRD_DATE_VEC <= st_extent$t.max]))
-      } else {
-        weeks <- which(date_names %in%
-                         date_names[e$SRD_DATE_VEC >= st_extent$t.min &
-                                    e$SRD_DATE_VEC <= st_extent$t.max])
-      }
-
-      if(length(weeks) < 1) {
-        stop("Time period in st_extent does not included any weeks of the year.")
-      }
+      plygn <- st_extent$polygon
     }
-  }
 
-  all_lays <- lapply(X = weeks,
-                     FUN = load_and_extend,
-                     ext = load_extent,
-                     res = res_label,
-                     year = year,
-                     use_extend = load_extend,
-                     add_zeroes = add_zeroes)
-
-  all_lays <- all_lays[!sapply(all_lays, is.null)]
-
-  if(length(all_lays) == 1) {
-    st <- all_lays[[1]]
+    raster_data <- raster::mask(raster_data, plygn)
   } else {
-    st <- raster::stack(all_lays)
+    stop(paste("Spatiotemporal extent type not accepted. ",
+               "Use either 'rectangle' or 'polygon'.",
+               sep = ""))
   }
-  rm(all_lays)
 
-  return(st)
+  # subset stack for time
+  if(use_time == TRUE) {
+    SRD_DATE_VEC <- seq(from = 0, to= 1, length = 52 + 1)
+    SRD_DATE_VEC <- (SRD_DATE_VEC[1:52] + SRD_DATE_VEC[2:(52 + 1)]) / 2
+    SRD_DATE_VEC <- round(SRD_DATE_VEC, digits = 4)
+
+    p_time <- strptime(x = paste(round(SRD_DATE_VEC * 366), 2015), "%j %Y")
+    date_names <- paste(formatC(p_time$mon + 1, width = 2, format = "d",
+                                flag = "0"),
+                        formatC(p_time$mday, width = 2, format = "d",
+                                flag = "0"),
+                        sep = "-")
+
+    # select from SRD_DATE_VEC where between st_extent$t.min and st_extent$t.max
+    if(st_extent$t.min > st_extent$t.max) {
+      # date wrapping case
+      weeks <- c(which(date_names %in%
+                         date_names[SRD_DATE_VEC >= st_extent$t.min]),
+                 which(date_names %in%
+                         date_names[SRD_DATE_VEC <= st_extent$t.max]))
+    } else {
+      weeks <- which(date_names %in%
+                       date_names[SRD_DATE_VEC >= st_extent$t.min &
+                                    SRD_DATE_VEC <= st_extent$t.max])
+    }
+
+    if(length(weeks) < 1) {
+      stop("Time period in st_extent does not included any weeks of the year.")
+    }
+
+    raster_data <- raster_data[[weeks]]
+  }
+
+  return(raster_data)
 }
 
 #' Config file loader

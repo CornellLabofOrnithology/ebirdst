@@ -1,14 +1,13 @@
 #' Calculates spatial extent of non-zero data from Raster* object for plotting
 #'
-#' After creating a RasterStack with `stack_stem()`, there are lots of NA values
+#' After loading a RasterStack of results, there are lots of NA values
 #' and plots of the individual raster layers are at the full extent of the
-#' `template_raster`. To show an ideal extent, this function trims away 0 and
-#' NA values and checks to make sure it returns a reasonable extent (based on
-#' the `template_raster`) for plotting. The returned Extent object can then be
-#' used for plotting.
+#' study extent. To show an ideal extent, this function trims away 0 and
+#' NA values and checks to make sure it returns a reasonable extent for
+#' plotting. The returned Extent object can then be used for plotting.
 #'
-#' @param x Raster* object; usually from stem_stack() function.
-#' @param path character; Full path to directory containing the STEM results
+#' @param x Raster* object; either full RasterStack or subset.
+#' @param path character; Full path to directory containing the results
 #' for a single species.
 #'
 #' @return raster Extent object
@@ -19,7 +18,7 @@
 #' \dontrun{
 #'
 #' sp_path <- "path to species STEM results"
-#' raster_stack <- stack_stem(sp_path, variable = "abundance_umean")
+#' raster_stack <- stack(sp_path)
 #' plot_extent <- calc_full_extent(raster_stack, path)
 #' raster::plot(raster_stack[[1]], ext = plot_extent)
 #' }
@@ -115,7 +114,7 @@ calc_full_extent <- function(x, path) {
 #' \dontrun{
 #'
 #' sp_path <- "path to species STEM results"
-#' raster_stack <- stack_stem(sp_path, variable = "abundance_umean")
+#' raster_stack <- stack(sp_path)
 #' year_bins <- calc_bins(raster_stack)
 #'
 #' raster::plot(raster_stack[[1]], xaxt = 'n', yaxt = 'n', breaks = year_bins)
@@ -301,7 +300,7 @@ map_centroids <- function(pis,
                                   add = TRUE))
 
     if(!all(is.na(st_extent))) {
-      tpds_sub <- st_extent_subset(tpds_sp, st_extent)
+      tpds_sub <- data_st_subset(tpds_sp, st_extent)
 
       tpds_region <- sp::spTransform(tpds_sub, sp::CRS(mollweide))
       rm(tpds_sub)
@@ -362,7 +361,7 @@ map_centroids <- function(pis,
                                   cex = 0.4, pch = 16, add = TRUE))
 
     if(!all(is.na(st_extent))) {
-      tpis_sub <- st_extent_subset(tpis_sp, st_extent)
+      tpis_sub <- data_st_subset(tpis_sp, st_extent)
 
       tpis_region <- sp::spTransform(tpis_sub, sp::CRS(mollweide))
 
@@ -496,7 +495,7 @@ calc_effective_extent <- function(st_extent,
                                         proj4string = sp::CRS(ll))
   rm(tpis)
 
-  tpis_sub <- st_extent_subset(tpis_sp, st_extent)
+  tpis_sub <- data_st_subset(tpis_sp, st_extent)
   rm(tpis_sp)
 
   # build stixels as polygons
