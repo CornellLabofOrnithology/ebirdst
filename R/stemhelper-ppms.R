@@ -306,7 +306,7 @@ compute_ppms <- function(path, st_extent = NA) {
       # -----------------------
       # Lat/Lon to Sinusoidal Area Preserving Projection
       ptsll <- sp::SpatialPoints(coords = cbind(xxx, yyy),
-                             proj4string = sp::CRS("+init=epsg:4326"))
+                                 proj4string = sp::CRS("+init=epsg:4326"))
       sinucrs <- sp::CRS("+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs")
       ptsinu <- sp::spTransform(ptsll, sinucrs)
       x <- ptsinu@coords[, 1]
@@ -481,7 +481,8 @@ compute_ppms <- function(path, st_extent = NA) {
                      sep = "")
 
   if(!file.exists(test_file)) {
-    stop("*_erd.test.data.csv file does not exist in the /data directory.")
+    stop(paste0("test.pred.ave.txt file does not exist in the ",
+                "/results/abund_preds/unpeeled_folds/ directory."))
   }
 
   ppm_data <- data.table::fread(test_file, showProgress = FALSE)
@@ -489,6 +490,24 @@ compute_ppms <- function(path, st_extent = NA) {
                  "pi.90", "pi.10", "pi.se", "pi.mu.mean", "pi.mu.90",
                  "pi.mu.10", "pi.mu.se", "pat", "pi.es")
   names(ppm_data) <- ppm_names
+
+  # load raw test data
+  test_raw <- paste0(path, "/data/", list.files(paste0(path, "/data/"),
+                                                pattern = "*_erd.test.data.csv"))
+
+  if(!file.exists(test_raw)) {
+    stop("*_erd.test.data.csv file does not exist in the /data directory.")
+  }
+
+  ppm_data_raw <- data.table::fread(test_raw, showProgress = FALSE)
+  ppm_data_raw <- ppm_data_raw[, c("type", "row_id", "LONGITUDE", "LATITUDE",
+                                   "DATES", "y")]
+  names(ppm_data_raw) <- c("data.type", "row.id", "lon", "lat", "date", "obs")
+  ppm_data_raw$date <- ppm_data_raw$date - floor(ppm_data_raw$date)
+  ppm_data_raw <- ppm_data_raw[!(ppm_data_raw$row.id %in% ppm_data$row.id)]
+
+  ppm_data <- rbind(ppm_data, ppm_data_raw, fill = TRUE)
+  rm(ppm_data_raw)
 
   # static vars
   n_mc <- 25
@@ -521,7 +540,7 @@ compute_ppms <- function(path, st_extent = NA) {
   # Extract ST Subset
 
   if(!all(is.na(st_extent))) {
-    st_data <- data_st_subset(ppm_data, st_extent)
+    st_data <- st_extent_subset(ppm_data, st_extent)
   } else {
     st_data <- ppm_data
   }
@@ -533,7 +552,7 @@ compute_ppms <- function(path, st_extent = NA) {
   }
 
   # Split data into within extent and out of extent
-  #st_data_zeroes <- st_data[st_data$pi.es < 75, ]
+  st_data_zeroes <- st_data[st_data$pi.es < 75 | is.na(st_data$pi.es), ]
   st_data <- st_data[st_data$pi.es >= 75, ]
 
   if(nrow(st_data) == 0) {
@@ -544,7 +563,7 @@ compute_ppms <- function(path, st_extent = NA) {
   binom_test_p <- function(x) {
     binom.test(round(as.numeric(x["pat"]) * as.numeric(x["pi.es"]), 0),
                as.numeric(x["pi.es"]),
-               0.10,
+               (1 / 7),
                alternative = "greater")$p.value
   }
 
@@ -555,10 +574,11 @@ compute_ppms <- function(path, st_extent = NA) {
   st_data$binary <- as.numeric(p_adj < 0.001)
 
   # Readd test data out of extent with binary as 0
-  #st_data_zeroes$binary <- 0
-  #st_data <- rbind(st_data, st_data_zeroes)
+  st_data_zeroes$binary <- 0
+  st_data <- rbind(st_data, st_data_zeroes)
 
   # Remove rows where binary = NA (inherited from PAT = NA)
+  # this may be historic
   st_data <- st_data[!is.na(st_data$binary), ]
 
   if(nrow(st_data) == 0) {
@@ -614,8 +634,9 @@ compute_ppms <- function(path, st_extent = NA) {
       binary_stats$ss[iii.mc] <- nrow(ttt.data)
       binary_stats$mean[iii.mc] <- mean(as.numeric(ttt.data$obs > 0))
 
-      if(nrow(ttt.data) >= occ_min_ss &
-         mean(as.numeric(ttt.data$obs > 0)) >= occ_min_mean) {
+      # &
+      #mean(as.numeric(ttt.data$obs > 0)) >= occ_min_mean
+      if(nrow(ttt.data) >= occ_min_ss ) {
         # ------------
         pa.df <- data.frame(
           "space.holder.tag",
@@ -657,7 +678,7 @@ compute_ppms <- function(path, st_extent = NA) {
       occ_stats$mean[iii.mc] <- mean(as.numeric(ttt.data$obs > 0))
 
       if(nrow(ttt.data) >= occ_min_ss &
-          mean(as.numeric(ttt.data$obs > 0)) >= occ_min_mean ) {
+         mean(as.numeric(ttt.data$obs > 0)) >= occ_min_mean ) {
         # ------------
         pa2.df <- data.frame("space.holder.tag",
                              obs = as.numeric(ttt.data$obs > 0),
