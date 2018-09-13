@@ -64,7 +64,7 @@ test_that("stemhelper compute_ppms", {
                     t.min = 0.425,
                     t.max = 0.475)
   expect_error(compute_ppms(sp_path, st_extent = ne_extent),
-               "Latitude maximum is less than latitude minimum")
+               "Minimum latitude is greater than maximum latitude")
 
   # missing a corner
   ne_extent <- list(type = "rectangle",
@@ -74,7 +74,7 @@ test_that("stemhelper compute_ppms", {
                     t.min = 0.425,
                     t.max = 0.475)
   expect_error(compute_ppms(sp_path, st_extent = ne_extent),
-               "Missing max longitude")
+               "Minimum latitude is greater than maximum latitude")
 
   # st_extent is not list
   ne_extent <- c(type = "rectangle",
