@@ -108,7 +108,7 @@ test_that("stemhelper plot_pis", {
   expect_error(plot_pis(path = sp_path,
                         pis = pis,
                         st_extent = ne_extent),
-               "Latitude maximum is less than latitude minimum")
+               "Minimum latitude is greater than maximum latitude")
 
   # missing a corner
   ne_extent <- list(type = "rectangle",
@@ -256,7 +256,7 @@ test_that("stemhelper plot_pds", {
   expect_error(plot_pds(pd_name = "EFFORT_HRS",
                         pds = pds,
                         st_extent = ne_extent),
-               "Latitude maximum is less than latitude minimum")
+               "Minimum latitude is greater than maximum latitude")
 
   # missing a corner
   ne_extent <- list(type = "rectangle",

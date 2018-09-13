@@ -16,8 +16,9 @@ test_that("stemhelper calc_full_extent", {
                     t.min = 0.425,
                     t.max = 0.475)
 
-  abund <- stack_stem(sp_path, variable = "abundance_umean",
-                      st_extent = ne_extent)
+  abund <- raster::stack(paste0(sp_path, "/results/tifs/", species,
+                                "_hr_2016_abundance_umean.tif"))
+  abund <- raster_st_subset(abund, ne_extent)
 
   # expected RasterStack
   expect_is(calc_full_extent(abund, sp_path), "Extent")
@@ -53,8 +54,9 @@ test_that("stemhelper calc_bins", {
                     t.min = 0.425,
                     t.max = 0.475)
 
-  abund <- stack_stem(sp_path, variable = "abundance_umean",
-                      st_extent = ne_extent)
+  abund <- raster::stack(paste0(sp_path, "/results/tifs/", species,
+                                "_hr_2016_abundance_umean.tif"))
+  abund <- raster_st_subset(abund, ne_extent)
 
   # expected RasterStack
   expect_gt(length(calc_bins(abund)), 1)
