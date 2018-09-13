@@ -540,7 +540,7 @@ compute_ppms <- function(path, st_extent = NA) {
   # Extract ST Subset
 
   if(!all(is.na(st_extent))) {
-    st_data <- st_extent_subset(ppm_data, st_extent)
+    st_data <- data_st_subset(ppm_data, st_extent)
   } else {
     st_data <- ppm_data
   }
