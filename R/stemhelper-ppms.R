@@ -621,7 +621,7 @@ compute_ppms <- function(path, st_extent = NA) {
       sample.cell.probability = 1,
       replace = FALSE,
       min.class.proportion = 0.0,
-      jitter.sd = 0.25)
+      jitter.sd = 0.1)
 
     # Index back to full vector
     sample.nindex <- c(1:nrow(st_data))[c(bbs$pos.nindex, bbs$neg.nindex)]
