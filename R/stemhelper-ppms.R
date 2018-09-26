@@ -366,8 +366,13 @@ compute_ppms <- function(path, st_extent = NA) {
           sample.size.per.cell = sample.size.per.cell,
           sample.cell.probability = sample.cell.probability,
           replace = replace )
+
         sgc.pos$sample.index <- sgc.pos$sample.index[!is.na(sgc.pos$sample.index)]
         sgc.pos.nindex <- ttt.nindex[ sgc.pos$sample.index ]
+
+        # Prob of event without oversampling in the (st balanced) population.
+        # This is the best, simple pt estimate of the proportion.
+        p1 <- length(sgc.pos.nindex) / length(c(sgc.neg.nindex, sgc.pos.nindex))
         # ------------------------------------------------------------
         # Oversampling
         # If proportion of pos less than min.class.proportion of the negative sample (sgc.pos.nindex)
@@ -445,18 +450,13 @@ compute_ppms <- function(path, st_extent = NA) {
           # When Oversampling, Compute Offset and Weigths
           # ------------------------------------
           # Prob of event in final sample sample (with oversampling)
-          r1 <- length(sgc.pos.nindex) /
-            length(c(sgc.neg.nindex, sgc.pos.nindex))
-          if( !is.nan(r1) & !is.null(r1)){
-            # Prob of event without oversampling in the (st balanced) population.
-            # This is the best, simple pt estimate of the proportion.
-            p1 <- length(sgc.pos.nindex[!duplicated(sgc.pos.nindex)]) /
-              length(c(sgc.neg.nindex, sgc.pos.nindex[!duplicated(sgc.pos.nindex)]))
-            #print(paste("r1 = ", r1, " p1=",p1))
+          r1 <- length(sgc.pos.nindex) / length(c(sgc.neg.nindex, sgc.pos.nindex))
+          if(!is.nan(r1) & !is.null(r1)) {
             if (p1 > 0 & r1 > 0) {
               # Offset scalar
-              sampling.offset <-  log( (r1*(1-p1)) / ((1-r1)*p1) )
-            }}
+              sampling.offset <- log((r1 * (1 - p1)) / ((1 - r1) * p1))
+            }
+          }
         }# END jitter predictors
       }# END sample rows from predictor.data
     } # END input vector length checks
