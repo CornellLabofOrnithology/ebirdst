@@ -1,12 +1,12 @@
-Package: stemhelper
-Title: STEM Loading, Mapping, Plotting and Analysis
-Version: 0.0.0.9000
+Package: ebirdst
+Title: Tools for Loading, Mapping, Plotting and Analysis of eBird Status and Trends Data Products
+Version: 0.1
 Authors@R: c(person("Tom", "Auer", email = "mta45@cornell.edu", role = c("aut", "cre")),
              person("Daniel", "Fink", email = "df36@cornell.edu", role = "aut"),
              person("Cornell Lab of Ornithology", role = "cph"))
-URL: https://github.com/CornellLabofOrnithology/stemhelper
-BugReports: https://github.com/CornellLabofOrnithology/stemhelper/issues
-Description: Helper functions to assist with the loading, plotting, mapping and analysis of results from eBird Spatiotemporal Exploratory Models (STEM) (<http://ebird.org/content/ebird/stem/>).
+URL: https://github.com/CornellLabofOrnithology/ebirdst
+BugReports: https://github.com/CornellLabofOrnithology/ebirdst/issues
+Description: Tools for loading, plotting, mapping, and analyzing eBird Status and Trends data products (<https://test.demo.ebird.org/science/status-and-trends>).
 Depends: R (>= 3.3.0)
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
