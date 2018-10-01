@@ -4,7 +4,7 @@
 \alias{calc_effective_extent}
 \title{Calculate and map effective extent of selected centroids}
 \usage{
-calc_effective_extent(st_extent, pis = NA, pds = NA)
+calc_effective_extent(st_extent, pis = NA, pds = NA, path)
 }
 \arguments{
 \item{st_extent}{list; st_extent list containing spatiotemporal filter}
@@ -12,6 +12,9 @@ calc_effective_extent(st_extent, pis = NA, pds = NA)
 \item{pis}{data.frame; from \code{load_pis()} Must supply either pis or pds.}
 
 \item{pds}{data.frame; from \code{load_pds()} Must supply either pis or pds.}
+
+\item{path}{character; Full path to directory containing the STEM results
+for a single species.}
 }
 \value{
 RasterLayer and plots the RasterLayer with centroid locations and

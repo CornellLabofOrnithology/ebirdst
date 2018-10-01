@@ -27,7 +27,7 @@ the bins.
 \dontrun{
 
 sp_path <- "path to species STEM results"
-raster_stack <- stack_stem(sp_path, variable = "abundance_umean")
+raster_stack <- stack(sp_path)
 year_bins <- calc_bins(raster_stack)
 
 raster::plot(raster_stack[[1]], xaxt = 'n', yaxt = 'n', breaks = year_bins)
