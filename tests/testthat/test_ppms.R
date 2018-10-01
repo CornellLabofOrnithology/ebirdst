@@ -1,7 +1,7 @@
 context("PPM functions")
 context("compute_ppms")
 
-test_that("stemhelper compute_ppms", {
+test_that("ebirdst compute_ppms", {
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
   species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
   sp_path <- paste(root_path, species, sep = "")
@@ -91,7 +91,7 @@ test_that("stemhelper compute_ppms", {
 context("plot_binary_by_time")
 
 # plot binary by time
-test_that("stemhelper plot_binary_by_time", {
+test_that("ebirdst plot_binary_by_time", {
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
   species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
   sp_path <- paste(root_path, species, sep = "")
@@ -130,7 +130,7 @@ test_that("stemhelper plot_binary_by_time", {
 
 context("plot_all_ppms")
 
-test_that("stemhelper plot_all_ppms", {
+test_that("ebirdst plot_all_ppms", {
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
   species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
   sp_path <- paste(root_path, species, sep = "")

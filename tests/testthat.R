@@ -1,4 +1,4 @@
 library(testthat)
-library(stemhelper)
+library(ebirdst)
 
-test_check("stemhelper")
+test_check("ebirdst")

@@ -1,7 +1,7 @@
 context("Loading functions")
 context("raster_st_subset")
 
-test_that("stemhelper raster_st_subset", {
+test_that("ebirdst raster_st_subset", {
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
   species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
   sp_path <- paste(root_path, species, sep = "")
@@ -95,7 +95,7 @@ test_that("stemhelper raster_st_subset", {
 
 context("label_raster_stack")
 
-test_that("stemhelper label_raster_stack", {
+test_that("ebirdst label_raster_stack", {
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
   species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
   sp_path <- paste(root_path, species, sep = "")
@@ -116,7 +116,7 @@ test_that("stemhelper label_raster_stack", {
 
 context("load_pis")
 
-test_that("stemhelper load_pis", {
+test_that("ebirdst load_pis", {
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
   species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
   sp_path <- paste(root_path, species, sep = "")

@@ -2,7 +2,7 @@ context("Plotting functions")
 context("plot_pis")
 
 # plot_pis
-test_that("stemhelper plot_pis", {
+test_that("ebirdst plot_pis", {
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
   species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
   sp_path <- paste(root_path, species, sep = "")
@@ -139,7 +139,7 @@ test_that("stemhelper plot_pis", {
 context("plot_pds")
 
 # plot_pds
-test_that("stemhelper plot_pds", {
+test_that("ebirdst plot_pds", {
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
   species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
   sp_path <- paste(root_path, species, sep = "")

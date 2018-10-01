@@ -1,7 +1,7 @@
 context("Mapping functions")
 context("calc_full_extent")
 
-test_that("stemhelper calc_full_extent", {
+test_that("ebirst calc_full_extent", {
   library(sp)
 
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
@@ -39,7 +39,7 @@ test_that("stemhelper calc_full_extent", {
 
 context("calc_bins")
 
-test_that("stemhelper calc_bins", {
+test_that("ebirst calc_bins", {
   library(sp)
 
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
@@ -82,7 +82,7 @@ test_that("stemhelper calc_bins", {
 
 context("map_centroids")
 
-test_that("stemhelper map_centroids", {
+test_that("ebirst map_centroids", {
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
   species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
   sp_path <- paste(root_path, species, sep = "")
@@ -136,7 +136,7 @@ test_that("stemhelper map_centroids", {
 
 context("calc_effective_extent")
 
-test_that("stemhelper calc_effective_extent", {
+test_that("ebirst calc_effective_extent", {
   root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
   species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
   sp_path <- paste(root_path, species, sep = "")
