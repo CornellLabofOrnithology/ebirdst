@@ -81,11 +81,13 @@ get_sinu_ext <- function(st_extent) {
 #'
 #' @examples
 #' \dontrun{
-#' rs <- stack("/path to GeoTiff)
+#'
+#' rs <- stack("/path to GeoTiff/")
 #' rs
 #'
 #' rs_labeled <- label_raster_stack(raster_data)
 #' rs_labeled
+#' }
 label_raster_stack <- function(raster_data) {
   # check raster_data is either RasterLayer or RasterStack or RasterBrick
   if(!(class(raster_data) %in% c("RasterStack", "RasterBrick"))) {
