@@ -131,63 +131,39 @@ calc_bins <- function(x) {
 
   # get a vector of all the values in the stack
   zrv <- raster::getValues(x)
-  zrv[zrv <= 0] <- NA
+  vals_for_pt <- zrv[!is.na(zrv) & zrv > 0]
 
   # BoxCox transform
-  pt <- car::powerTransform(zrv[!is.na(zrv)])
+  pt <- car::powerTransform(vals_for_pt)
   this_power <- pt$lambda
 
-  print(paste("BoxCox power:", this_power, sep = " "))
-
-  if(this_power < 0) {
-    lzwk <- log(zrv[!is.na(zrv)])
-  } else {
-    lzwk <- zrv[!is.na(zrv)] ^ this_power
-  }
+  lzwk <- vals_for_pt ^ this_power
   rm(zrv)
 
   # setup the binning structure
   # calculate metrics
-  maxl <- max(lzwk)
-  minl <- min(lzwk)
-  mdl <- mean(lzwk)
-  sdl <- stats::sd(lzwk)
+  maxl <- max(lzwk, na.rm = TRUE)
+  minl <- min(lzwk, na.rm = TRUE)
+  mdl <- mean(lzwk, na.rm = TRUE)
+  sdl <- stats::sd(lzwk, na.rm = TRUE)
   rm(lzwk)
 
   # build a vector of bins
-  log_sd <- c(mdl - (3.00 * sdl),
-              mdl - (2.50 * sdl),
-              mdl - (2.00 * sdl),
-              mdl - (1.75 * sdl),
-              mdl - (1.50 * sdl),
-              mdl - (1.25 * sdl),
-              mdl - (1.00 * sdl),
-              mdl - (0.75 * sdl),
-              mdl - (0.50 * sdl),
-              mdl - (0.25 * sdl),
-              mdl - (0.125 * sdl),
+  log_sd <- c(mdl - (3.00 * sdl), mdl - (2.50 * sdl), mdl - (2.00 * sdl),
+              mdl - (1.75 * sdl), mdl - (1.50 * sdl), mdl - (1.25 * sdl),
+              mdl - (1.00 * sdl), mdl - (0.75 * sdl), mdl - (0.50 * sdl),
+              mdl - (0.25 * sdl), mdl - (0.125 * sdl),
               mdl,
-              mdl + (0.125 * sdl),
-              mdl + (0.25 * sdl),
-              mdl + (0.50 * sdl),
-              mdl + (0.75 * sdl),
-              mdl + (1.00 * sdl),
-              mdl + (1.25 * sdl),
-              mdl + (1.50 * sdl),
-              mdl + (1.75 * sdl),
-              mdl + (2.00 * sdl),
-              mdl + (2.50 * sdl),
-              mdl + (3.00 * sdl))
+              mdl + (0.125 * sdl), mdl + (0.25 * sdl),
+              mdl + (0.50 * sdl), mdl + (0.75 * sdl), mdl + (1.00 * sdl),
+              mdl + (1.25 * sdl), mdl + (1.50 * sdl), mdl + (1.75 * sdl),
+              mdl + (2.00 * sdl), mdl + (2.50 * sdl), mdl + (3.00 * sdl))
 
   # lots of checks for values outside of the upper and lower bounds
 
-  if(this_power >= 0) {
-    log_sd <- log_sd[log_sd >= 0]
-  }
-
   # remove +3 SD break if it is greater than max
   if(maxl < mdl + (3.00 * sdl)) {
-    log_sd <- log_sd[1:length(log_sd)-1]
+    log_sd <- log_sd[1:length(log_sd) - 1]
   }
 
   # add max if the max is greater than +3 SD break
@@ -205,22 +181,20 @@ calc_bins <- function(x) {
     log_sd <- append(log_sd, minl, after = 0)
   }
 
-  # if the first break is less than 0.01 untransformed, add a break at 0.01
-  if(this_power < 0) {
-    if(exp(log_sd[1]) < 0.01) {
-      log_sd[1] <- log(0.01)
-    }
-  } else {
-    if(log_sd[1] ^ (1 / this_power) < 0.01) {
-      log_sd[1] <- 0.01 ^ this_power
-    }
+  if(log_sd[1] ^ (1 / this_power) < 0.01) {
+    log_sd[1] <- 0.01 ^ this_power
   }
 
   # untransform
-  bins <- exp(log_sd)
+  bins <- log_sd ^ (1 / this_power)
   rm(log_sd)
 
-  return(bins)
+  # if transform power was negative, flip bins
+  if(this_power < 0) {
+    bins <- rev(bins)
+  }
+
+  return(list(bins = bins, power = this_power))
 }
 
 #' Map PI and PD centroid locations
