@@ -1,12 +1,12 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-ebirdst: Tools for Loading, Mapping, Plotting and Analysis of eBird Status and Trends Data Products
-===================================================================================================
+ebirdst: Tools to Load, Map, Plot, and Analyze eBird Status and Trends Data Products
+====================================================================================
 
 <!-- [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0) -->
 **THIS PACKAGE IS UNDER ACTIVE DEVELOPMENT. FUNCTIONALITY MAY CHANGE AT ANY TIME.**
 
-The goal of this package is to providet tools for loading, mapping, plotting, and analysis of eBird Status and Trends data products. If you're looking for the previous version (known as stemhelper), which is no longer being maintained, please access the stemhelper\_archive branch.
+The goal of this package is to providet tools for loading, mapping, plotting, and analyzing eBird Status and Trends data products. If you're looking for the previous version (known as stemhelper), which is no longer being maintained, please access the stemhelper\_archive branch.
 
 Installation
 ------------
