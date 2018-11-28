@@ -8,7 +8,7 @@ plot_pis(path, pis, st_extent, by_cover_class = FALSE, num_top_preds = 50,
   return_top = FALSE, pretty_names = TRUE, print_plot = TRUE)
 }
 \arguments{
-\item{path}{character; Full path to single species STEM results.}
+\item{path}{character; Full path to single species eBird Status and Trends products.}
 
 \item{pis}{data.frame; From \code{load_pis()}.}
 
@@ -33,14 +33,15 @@ only the return the top predictors, if desired.}
 Plots barplot and/or returns a vector of top predictors.
 }
 \description{
-For all of the available predictors in a single species STEM result set, this
-function makes a bar plot of those relative importances, from highest to
-lowest. Many function parameters allow for customized plots.
+For all of the available predictors in a single set of species eBird
+Status and Trends products, this function makes a bar plot of those relative
+importances, from highest to lowest. Many function parameters allow for
+customized plots.
 }
 \examples{
 \dontrun{
 
-sp_path <- "path to species STEM results"
+sp_path <- "path to species eBird Status and Trends products"
 pis <- load_pis(sp_path)
 
 ne_extent <- list(type = "rectangle",

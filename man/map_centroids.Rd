@@ -29,7 +29,7 @@ an optional spatiotemporal subset using an \code{st_extent} list.
 \examples{
 \dontrun{
 
-sp_path <- "path to species STEM results"
+sp_path <- "path to species eBird Status and Trends products"
 pis <- load_pis(sp_path)
 pds <- load_pds(sp_path)
 

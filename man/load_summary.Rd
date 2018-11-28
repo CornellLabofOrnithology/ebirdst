@@ -8,7 +8,7 @@ load_summary(path)
 }
 \arguments{
 \item{path}{character; Full path to the directory containing single species
-STEM results.}
+eBird Status and Trends products.}
 }
 \value{
 data.frame containing stixel summary information about each stixel
@@ -21,7 +21,7 @@ summary information (from summary.txt).
 \examples{
 \dontrun{
 
-sp_path <- "path to species STEM results"
+sp_path <- "path to species eBird Status and Trends products"
 
 summaries <- load_summary(sp_path)
 }

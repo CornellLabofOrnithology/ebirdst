@@ -2,7 +2,7 @@
 % Please edit documentation in R/ebirdst-loading.R
 \name{raster_st_subset}
 \alias{raster_st_subset}
-\title{Spatiotemporal subsetter for STEM result data objects}
+\title{Spatiotemporal subsetter for eBird Status and Trends products raster}
 \usage{
 raster_st_subset(raster_data, st_extent)
 }

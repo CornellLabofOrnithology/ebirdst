@@ -1,10 +1,11 @@
 #' Plot predictor importances as barplots
 #'
-#' For all of the available predictors in a single species STEM result set, this
-#' function makes a bar plot of those relative importances, from highest to
-#' lowest. Many function parameters allow for customized plots.
+#' For all of the available predictors in a single set of species eBird
+#' Status and Trends products, this function makes a bar plot of those relative
+#' importances, from highest to lowest. Many function parameters allow for
+#' customized plots.
 #'
-#' @param path character; Full path to single species STEM results.
+#' @param path character; Full path to single species eBird Status and Trends products.
 #' @param pis data.frame; From `load_pis()`.
 #' @param st_extent list; st_extent list for spatiotemporal filtering. Required,
 #' as results are less meaningful over large spatiotemporal extents.
@@ -25,7 +26,7 @@
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species STEM results"
+#' sp_path <- "path to species eBird Status and Trends products"
 #' pis <- load_pis(sp_path)
 #'
 #' ne_extent <- list(type = "rectangle",
@@ -177,9 +178,9 @@ plot_pis <- function(path,
 
 #' Plot partial dependency as line plot
 #'
-#' For all of the available predictors in a single species STEM result set, this
-#' function makes a line plot of a single partial dependency, with two options
-#' for smoothing.
+#' For all of the available predictors in a single species set of eBird Status
+#' and Trends products, this function makes a line plot of a single partial
+#' dependency, with two options for smoothing.
 #'
 #' @param pd_name character; Single predictor name from PDs (via `load_pds()`).
 #' Unique predictors can be listed by calling `pds <- load_pds(path)` and
@@ -194,16 +195,16 @@ plot_pis <- function(path,
 #' @param stixel_pds logical; Default is FALSE. Toggle to plot the individual
 #' stixel PD values as semi-transparent lines.
 #' @param k.cont.res int; Default is 25. Number of knots to use in GAM based on
-#' continuining resolution of the current STEM results.
+#' continuining resolution of the current eBird Status and Trends products.
 #' @param gbm.n.trees int; Default is 500. Number of trees to use in pointwise
 #' GAM.
-#' @param nnn.bs int; Default is 100. Daniel?
-#' @param equivalent.ensemble.ss int; Default is 10. Daniel?
+#' @param nnn.bs int; Default is 100.
+#' @param equivalent.ensemble.ss int; Default is 10.
 #' @param ci.alpha numeric; Default is 0.05. Alpha transparency of confidence
 #' intervals.
-#' @param mean.all.data logical; Default is FALSE. Daniel?
+#' @param mean.all.data logical; Default is FALSE.
 #' @param ylim vector pair; Opportunity to pre-define plot y-min and y-max as
-#' vector pair (e.g., c(-1,1)).
+#' vector pair (e.g., c(-1, 1)).
 #' @param print_plot logical; Default is TRUE. Set to FALSE to turn off plotting and
 #' only get return of pointwise pi values.
 
@@ -217,7 +218,7 @@ plot_pis <- function(path,
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species STEM results"
+#' sp_path <- "path to species eBird Status and Trends products"
 #' pds <- load_pds(sp_path)
 #'
 #' ne_extent <- list(type = "rectangle",

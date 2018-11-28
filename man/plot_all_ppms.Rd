@@ -7,7 +7,7 @@
 plot_all_ppms(path, st_extent)
 }
 \arguments{
-\item{path}{character; Full path to single species STEM results.}
+\item{path}{character; Full path to single species eBird Status and Trends products.}
 
 \item{st_extent}{list; st_extent list for spatiotemporal filtering.}
 }
@@ -22,7 +22,7 @@ Probability, and Abundance.
 \examples{
 \dontrun{
 
-sp_path <- "path to species STEM results"
+sp_path <- "path to species eBird Status and Trends products"
 
 ne_extent <- list(type = "rectangle",
                   lat.min = 40,

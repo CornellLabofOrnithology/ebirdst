@@ -8,20 +8,20 @@ load_config(path)
 }
 \arguments{
 \item{path}{character; Full path to the directory containing single species
-STEM results.}
+eBird Status and Trends products.}
 }
 \value{
 environment object containing all run parameters.
 }
 \description{
 Internal function used by load_summary(), load_pis(), and load_pds() to get
-configuration variables from STEM species run information
+configuration variables from eBird Status and Trends products
 (from *_config.RData).
 }
 \examples{
 \dontrun{
 
-sp_path <- "path to species STEM results"
+sp_path <- "path to species eBird Status and Trends products"
 
 e <- load_config(sp_path)
 }

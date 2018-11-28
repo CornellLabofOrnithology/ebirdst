@@ -2,13 +2,14 @@
 % Please edit documentation in R/ebirdst-mapping.R
 \name{calc_bins}
 \alias{calc_bins}
-\title{Calculates bins (breaks) based on standard deviations of log-transformed
-data for mapping}
+\title{Calculates bins (breaks) based on standard deviations of Box-Cox
+power-transformed data for mapping}
 \usage{
 calc_bins(x)
 }
 \arguments{
-\item{x}{Raster* object; usually from stem_stack() function.}
+\item{x}{RasterStack or RasterBrick; original eBird Status and
+Trends product raster GeoTiff with 52 bands, one for each week.}
 }
 \value{
 A vector containing the break points of bins.
@@ -19,14 +20,15 @@ in that patterns of concentration and dispersion in abundance change
 throughout the year, making it difficult to define color bins that suit all
 seasons and accurately reflect the detail of abundance predictions. To
 address this, we selected a method (described by Maciejewski et al. 2013)
-that log transforms the entire year of non-zero data, constructs bins with
-the log-transformed data using standard-deviations, and then untransforms
-the bins.
+that first selects an optimal power (the Box-Cox method) for normalizing
+the data, then power transforms the entire year of non-zero data, constructs
+bins with the power-transformed data using standard-deviations, and then
+un-transforms the bins.
 }
 \examples{
 \dontrun{
 
-sp_path <- "path to species STEM results"
+sp_path <- "path to species eBird Status and Trends products"
 raster_stack <- stack(sp_path)
 year_bins <- calc_bins(raster_stack)
 

@@ -7,19 +7,22 @@
 label_raster_stack(raster_data)
 }
 \arguments{
-\item{raster_data}{RasterStack or RasterBrick; original eBird Science Product
-raster GeoTiff with 52 bands, one for each week}
+\item{raster_data}{RasterStack or RasterBrick; original eBird Status and
+Trends product raster GeoTiff with 52 bands, one for each week.}
 }
 \value{
 A RasterStack or Rasterbrick with names assigned for the dates in
-the format of "XYYY.MM.DD" per raster package constraints.
+the format of "XYYYY.MM.DD" per raster package constraints. The Raster*
+objects do not allow the names to start with a number, nor are they allowed
+to contain "-", so it is not possible to store the date in an ISO compliant
+format.
 }
 \description{
 The raster package does not allow layer names to be saved with the bands of a
-multi-band GeoTiff. Accordingly, all eBird Science Product raster results
-cover the entire 52 week temporal extent of analysis. For convenience, this
-function labels the RasterStack once it has been loaded in R with the dates
-for each band.
+multi-band GeoTiff. Accordingly, all eBird Status and Trends products raster
+results cover the entire 52 week temporal extent of analysis. For
+convenience, this function labels the RasterStack once it has been loaded
+with the dates for each band.
 }
 \examples{
 \dontrun{

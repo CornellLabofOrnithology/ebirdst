@@ -7,7 +7,7 @@
 plot_binary_by_time(path, metric, n_time_periods = 52, st_extent = NA)
 }
 \arguments{
-\item{path}{character; Full path to single species STEM results.}
+\item{path}{character; Full path to single species eBird Status and Trends products.}
 
 \item{metric}{character; One of: "Kappa", "AUC", "Sensitivity",
 "Specificity".}
@@ -28,7 +28,7 @@ an \code{st_extent} to see performance within spatiotemporal extent.
 \examples{
 \dontrun{
 
-sp_path <- "path to species STEM results"
+sp_path <- "path to species eBird Status and Trends products"
 
 
 plot_binary_by_time(path = sp_path, metric = "Kappa", n_time_periods = 12)

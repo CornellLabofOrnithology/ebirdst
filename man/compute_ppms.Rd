@@ -7,7 +7,7 @@
 compute_ppms(path, st_extent = NA)
 }
 \arguments{
-\item{path}{character; Full path to single species STEM results.}
+\item{path}{character; Full path to single species eBird Status and Trends products.}
 
 \item{st_extent}{list; st_extent list for spatiotemporal filtering.}
 }
@@ -23,7 +23,7 @@ use \code{plot_all_ppms()} or \code{plot_binary_by_time()} to summarize the metr
 \examples{
 \dontrun{
 
-sp_path <- "path to species STEM results"
+sp_path <- "path to species eBird Status and Trends products"
 
 ne_extent <- list(type = "rectangle",
                   lat.min = 40,

@@ -5,7 +5,7 @@
 #' `st_extent`. Use this function directly to access the computed metrics, or
 #' use `plot_all_ppms()` or `plot_binary_by_time()` to summarize the metrics.
 #'
-#' @param path character; Full path to single species STEM results.
+#' @param path character; Full path to single species eBird Status and Trends products.
 #' @param st_extent list; st_extent list for spatiotemporal filtering.
 #'
 #' @return list of data.frames: binary_stats, occ_stats, count_stats
@@ -15,7 +15,7 @@
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species STEM results"
+#' sp_path <- "path to species eBird Status and Trends products"
 #'
 #' ne_extent <- list(type = "rectangle",
 #'                   lat.min = 40,
@@ -768,7 +768,7 @@ compute_ppms <- function(path, st_extent = NA) {
 #' without `st_extent` to see range-wide predictive performance, or provide
 #' an `st_extent` to see performance within spatiotemporal extent.
 #'
-#' @param path character; Full path to single species STEM results.
+#' @param path character; Full path to single species eBird Status and Trends products.
 #' @param metric character; One of: "Kappa", "AUC", "Sensitivity",
 #' "Specificity".
 #' @param n_time_periods int; Greater than 1 (e.g., 52 for weeks).
@@ -781,7 +781,7 @@ compute_ppms <- function(path, st_extent = NA) {
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species STEM results"
+#' sp_path <- "path to species eBird Status and Trends products"
 #'
 #'
 #' plot_binary_by_time(path = sp_path, metric = "Kappa", n_time_periods = 12)
@@ -889,7 +889,7 @@ plot_binary_by_time <- function(path,
 #' performance metrics within three sets: Binary Occurrence, Occurrence
 #' Probability, and Abundance.
 #'
-#' @param path character; Full path to single species STEM results.
+#' @param path character; Full path to single species eBird Status and Trends products.
 #' @param st_extent list; st_extent list for spatiotemporal filtering.
 #'
 #' @return Plot of metric box plots by category
@@ -899,7 +899,7 @@ plot_binary_by_time <- function(path,
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species STEM results"
+#' sp_path <- "path to species eBird Status and Trends products"
 #'
 #' ne_extent <- list(type = "rectangle",
 #'                   lat.min = 40,

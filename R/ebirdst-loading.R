@@ -66,16 +66,19 @@ get_sinu_ext <- function(st_extent) {
 #' Labels 52 week RasterStack with the dates for each band
 #'
 #' The raster package does not allow layer names to be saved with the bands of a
-#' multi-band GeoTiff. Accordingly, all eBird Science Product raster results
-#' cover the entire 52 week temporal extent of analysis. For convenience, this
-#' function labels the RasterStack once it has been loaded in R with the dates
-#' for each band.
+#' multi-band GeoTiff. Accordingly, all eBird Status and Trends products raster
+#' results cover the entire 52 week temporal extent of analysis. For
+#' convenience, this function labels the RasterStack once it has been loaded
+#' with the dates for each band.
 #'
-#' @param raster_data RasterStack or RasterBrick; original eBird Science Product
-#' raster GeoTiff with 52 bands, one for each week
+#' @param raster_data RasterStack or RasterBrick; original eBird Status and
+#' Trends product raster GeoTiff with 52 bands, one for each week.
 #'
 #' @return A RasterStack or Rasterbrick with names assigned for the dates in
-#' the format of "XYYY.MM.DD" per raster package constraints.
+#' the format of "XYYYY.MM.DD" per raster package constraints. The Raster*
+#' objects do not allow the names to start with a number, nor are they allowed
+#' to contain "-", so it is not possible to store the date in an ISO compliant
+#' format.
 #'
 #' @export
 #'
@@ -100,14 +103,16 @@ label_raster_stack <- function(raster_data) {
                 " layers as originally provided."))
   }
 
-  SRD_DATE_VEC <- seq(from = 0, to= 1, length = 52 + 1)
+  SRD_DATE_VEC <- seq(from = 0, to = 1, length = 52 + 1)
   SRD_DATE_VEC <- (SRD_DATE_VEC[1:52] + SRD_DATE_VEC[2:(52 + 1)]) / 2
   SRD_DATE_VEC <- round(SRD_DATE_VEC, digits = 4)
 
   year_seq <- 2015
   p_time <- strptime(x = paste(round(SRD_DATE_VEC * 366), year_seq), "%j %Y")
-  date_names <- paste(formatC(p_time$mon + 1, width = 2, format="d", flag="0"),
-                      formatC(p_time$mday, width = 2, format="d", flag="0"),
+  date_names <- paste(formatC(p_time$mon + 1, width = 2, format = "d",
+                              flag = "0"),
+                      formatC(p_time$mday, width = 2, format = "d",
+                              flag = "0"),
                       sep = "-")
 
   names(raster_data) <- paste(2016, date_names, sep = "-")
@@ -115,7 +120,7 @@ label_raster_stack <- function(raster_data) {
   return(raster_data)
 }
 
-#' Spatiotemporal subsetter for STEM result data objects
+#' Spatiotemporal subsetter for eBird Status and Trends products table
 #'
 #' Internal function that takes a data.frame or SpatialPointsDataFrame and
 #' a st_extent list and returns a subset of the data object. Currently
@@ -135,8 +140,8 @@ label_raster_stack <- function(raster_data) {
 #' @examples
 #' \dontrun{
 #'
-#' # define species STEM results location and load pis
-#' sp_path <- "path to species STEM results"
+#' # define species eBird Status and Trends product location and load pis
+#' sp_path <- "path to species product"
 #' pis <- load_pis(sp_path)
 #'
 #' # define st_extent list
@@ -290,7 +295,7 @@ data_st_subset <- function(data, st_extent) {
   return(subset_data)
 }
 
-#' Spatiotemporal subsetter for STEM result data objects
+#' Spatiotemporal subsetter for eBird Status and Trends products raster
 #'
 #' Internal function that takes a RasterStack or RasterBrick and a st_extent
 #' list and returns a spatiotemporal subset of the data object. Currently
@@ -481,11 +486,11 @@ raster_st_subset <- function(raster_data, st_extent) {
 #' Config file loader
 #'
 #' Internal function used by load_summary(), load_pis(), and load_pds() to get
-#' configuration variables from STEM species run information
+#' configuration variables from eBird Status and Trends products
 #' (from *_config.RData).
 #'
 #' @param path character; Full path to the directory containing single species
-#' STEM results.
+#' eBird Status and Trends products.
 #'
 #' @return environment object containing all run parameters.
 #'
@@ -494,7 +499,7 @@ raster_st_subset <- function(raster_data, st_extent) {
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species STEM results"
+#' sp_path <- "path to species eBird Status and Trends products"
 #'
 #' e <- load_config(sp_path)
 #' }
@@ -525,7 +530,7 @@ load_config <- function(path) {
 #' summary information (from summary.txt).
 #'
 #' @param path character; Full path to the directory containing single species
-#' STEM results.
+#' eBird Status and Trends products.
 #'
 #' @return data.frame containing stixel summary information about each stixel
 #' centroid.
@@ -535,7 +540,7 @@ load_config <- function(path) {
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species STEM results"
+#' sp_path <- "path to species eBird Status and Trends products"
 #'
 #' summaries <- load_summary(sp_path)
 #' }
@@ -597,13 +602,13 @@ load_summary <- function(path) {
   return(summary_nona)
 }
 
-#' Load predictor importances for single species STEM results
+#' Load predictor importances for single species eBird Status and Trends products
 #'
 #' Loads the predictor importance data (from pi.txt), joins with stixel summary
 #' data, sets the names from `load_config()`, and cleans up the data.frame.
 #'
 #' @param path character; Full path to the directory containing single species
-#' STEM results.
+#' eBird Status and Trends products.
 #'
 #' @return data.frame containing predictor importance values for each stixel,
 #' as well as stixel summary information.
@@ -615,7 +620,7 @@ load_summary <- function(path) {
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species STEM results"
+#' sp_path <- "path to species eBird Status and Trends products"
 #'
 #' pis <- load_pis(sp_path)
 #' }
@@ -650,7 +655,7 @@ load_pis <- function(path) {
   return(as.data.frame(pi_summary))
 }
 
-#' Load partial dependencies for single species STEM results
+#' Load partial dependencies for single species eBird Status and Trends products
 #'
 #' Loads the partial dependency data (from pd.txt), joins with stixel summary
 #' data, sets the names from `load_config()`, and cleans up the data.frame.
@@ -658,7 +663,7 @@ load_pis <- function(path) {
 #' pd.txt file (usually multiple GB).
 #'
 #' @param path character; Full path to the directory containing single species
-#' STEM results.
+#' eBird Status and Trends products.
 #'
 #' @return data.frame containing partial dependency values for each stixel,
 #' as well as stixel summary information.
@@ -670,7 +675,7 @@ load_pis <- function(path) {
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species STEM results"
+#' sp_path <- "path to species eBird Status and Trends products"
 #'
 #' pds <- load_pds(sp_path)
 #' }

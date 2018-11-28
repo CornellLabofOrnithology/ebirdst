@@ -2,7 +2,7 @@
 % Please edit documentation in R/ebirdst-loading.R
 \name{data_st_subset}
 \alias{data_st_subset}
-\title{Spatiotemporal subsetter for STEM result data objects}
+\title{Spatiotemporal subsetter for eBird Status and Trends products table}
 \usage{
 data_st_subset(data, st_extent)
 }
@@ -26,8 +26,8 @@ the \code{st_extent} list are currently able to wrap time around the year
 \examples{
 \dontrun{
 
-# define species STEM results location and load pis
-sp_path <- "path to species STEM results"
+# define species eBird Status and Trends product location and load pis
+sp_path <- "path to species product"
 pis <- load_pis(sp_path)
 
 # define st_extent list

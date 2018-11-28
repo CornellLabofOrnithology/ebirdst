@@ -2,13 +2,13 @@
 % Please edit documentation in R/ebirdst-loading.R
 \name{load_pis}
 \alias{load_pis}
-\title{Load predictor importances for single species STEM results}
+\title{Load predictor importances for single species eBird Status and Trends products}
 \usage{
 load_pis(path)
 }
 \arguments{
 \item{path}{character; Full path to the directory containing single species
-STEM results.}
+eBird Status and Trends products.}
 }
 \value{
 data.frame containing predictor importance values for each stixel,
@@ -21,7 +21,7 @@ data, sets the names from \code{load_config()}, and cleans up the data.frame.
 \examples{
 \dontrun{
 
-sp_path <- "path to species STEM results"
+sp_path <- "path to species eBird Status and Trends products"
 
 pis <- load_pis(sp_path)
 }

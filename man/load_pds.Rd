@@ -2,13 +2,13 @@
 % Please edit documentation in R/ebirdst-loading.R
 \name{load_pds}
 \alias{load_pds}
-\title{Load partial dependencies for single species STEM results}
+\title{Load partial dependencies for single species eBird Status and Trends products}
 \usage{
 load_pds(path)
 }
 \arguments{
 \item{path}{character; Full path to the directory containing single species
-STEM results.}
+eBird Status and Trends products.}
 }
 \value{
 data.frame containing partial dependency values for each stixel,
@@ -23,7 +23,7 @@ pd.txt file (usually multiple GB).
 \examples{
 \dontrun{
 
-sp_path <- "path to species STEM results"
+sp_path <- "path to species eBird Status and Trends products"
 
 pds <- load_pds(sp_path)
 }

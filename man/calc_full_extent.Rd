@@ -17,7 +17,7 @@ raster Extent object
 }
 \description{
 After loading a RasterStack of results, there are lots of NA values
-and plots of the individual raster layers are at the full extent of the
+and plots of individual raster layers will display at the full extent of the
 study extent. To show an ideal extent, this function trims away 0 and
 NA values and checks to make sure it returns a reasonable extent for
 plotting. The returned Extent object can then be used for plotting.
@@ -25,7 +25,7 @@ plotting. The returned Extent object can then be used for plotting.
 \examples{
 \dontrun{
 
-sp_path <- "path to species STEM results"
+sp_path <- "path to species eBird Status and Trends products"
 raster_stack <- stack(sp_path)
 plot_extent <- calc_full_extent(raster_stack, path)
 raster::plot(raster_stack[[1]], ext = plot_extent)

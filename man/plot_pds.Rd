@@ -29,22 +29,22 @@ individual stixel PD values. Ideal visualization of the PD values.}
 stixel PD values as semi-transparent lines.}
 
 \item{k.cont.res}{int; Default is 25. Number of knots to use in GAM based on
-continuining resolution of the current STEM results.}
+continuining resolution of the current eBird Status and Trends products.}
 
 \item{gbm.n.trees}{int; Default is 500. Number of trees to use in pointwise
 GAM.}
 
-\item{nnn.bs}{int; Default is 100. Daniel?}
+\item{nnn.bs}{int; Default is 100.}
 
-\item{equivalent.ensemble.ss}{int; Default is 10. Daniel?}
+\item{equivalent.ensemble.ss}{int; Default is 10.}
 
 \item{ci.alpha}{numeric; Default is 0.05. Alpha transparency of confidence
 intervals.}
 
-\item{mean.all.data}{logical; Default is FALSE. Daniel?}
+\item{mean.all.data}{logical; Default is FALSE.}
 
 \item{ylim}{vector pair; Opportunity to pre-define plot y-min and y-max as
-vector pair (e.g., c(-1,1)).}
+vector pair (e.g., c(-1, 1)).}
 
 \item{print_plot}{logical; Default is TRUE. Set to FALSE to turn off plotting and
 only get return of pointwise pi values.}
@@ -55,14 +55,14 @@ Plots barplot and returns a list containing the quantiles
 median (if pointwise_pi = TRUE).
 }
 \description{
-For all of the available predictors in a single species STEM result set, this
-function makes a line plot of a single partial dependency, with two options
-for smoothing.
+For all of the available predictors in a single species set of eBird Status
+and Trends products, this function makes a line plot of a single partial
+dependency, with two options for smoothing.
 }
 \examples{
 \dontrun{
 
-sp_path <- "path to species STEM results"
+sp_path <- "path to species eBird Status and Trends products"
 pds <- load_pds(sp_path)
 
 ne_extent <- list(type = "rectangle",

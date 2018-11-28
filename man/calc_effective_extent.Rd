@@ -13,8 +13,8 @@ calc_effective_extent(st_extent, pis = NA, pds = NA, path)
 
 \item{pds}{data.frame; from \code{load_pds()} Must supply either pis or pds.}
 
-\item{path}{character; Full path to directory containing the STEM results
-for a single species.}
+\item{path}{character; Full path to directory containing the eBird Status
+and Trends products for a single species.}
 }
 \value{
 RasterLayer and plots the RasterLayer with centroid locations and
@@ -35,7 +35,7 @@ selected stixels are contributing information, ranging from 0 to 1.
 \examples{
 \dontrun{
 
-sp_path <- "path to species STEM results"
+sp_path <- "path to species eBird Status and Trends products"
 pis <- load_pis(sp_path)
 
 ne_extent <- list(type = "rectangle",

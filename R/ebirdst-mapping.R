@@ -1,7 +1,7 @@
 #' Calculates spatial extent of non-zero data from Raster* object for plotting
 #'
 #' After loading a RasterStack of results, there are lots of NA values
-#' and plots of the individual raster layers are at the full extent of the
+#' and plots of individual raster layers will display at the full extent of the
 #' study extent. To show an ideal extent, this function trims away 0 and
 #' NA values and checks to make sure it returns a reasonable extent for
 #' plotting. The returned Extent object can then be used for plotting.
@@ -17,7 +17,7 @@
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species STEM results"
+#' sp_path <- "path to species eBird Status and Trends products"
 #' raster_stack <- stack(sp_path)
 #' plot_extent <- calc_full_extent(raster_stack, path)
 #' raster::plot(raster_stack[[1]], ext = plot_extent)
@@ -56,7 +56,8 @@ calc_full_extent <- function(x, path) {
 
   if(raster::projection(tr) != raster::projection(stack)) {
     this_template_raster <- raster::projectRaster(tr,
-                                                  crs = sp::proj4string(stack))
+                                                  crs = sp::proj4string(stack),
+                                                  method = 'ngb')
   } else {
     this_template_raster <- tr
   }
@@ -90,19 +91,21 @@ calc_full_extent <- function(x, path) {
   return(map_extent)
 }
 
-#' Calculates bins (breaks) based on standard deviations of log-transformed
-#' data for mapping
+#' Calculates bins (breaks) based on standard deviations of Box-Cox
+#' power-transformed data for mapping
 #'
 #' Mapping species abundance across the full-annual cycle presents a challenge,
 #' in that patterns of concentration and dispersion in abundance change
 #' throughout the year, making it difficult to define color bins that suit all
 #' seasons and accurately reflect the detail of abundance predictions. To
 #' address this, we selected a method (described by Maciejewski et al. 2013)
-#' that log transforms the entire year of non-zero data, constructs bins with
-#' the log-transformed data using standard-deviations, and then untransforms
-#' the bins.
+#' that first selects an optimal power (the Box-Cox method) for normalizing
+#' the data, then power transforms the entire year of non-zero data, constructs
+#' bins with the power-transformed data using standard-deviations, and then
+#' un-transforms the bins.
 #'
-#' @param x Raster* object; usually from stem_stack() function.
+#' @param x RasterStack or RasterBrick; original eBird Status and
+#' Trends product raster GeoTiff with 52 bands, one for each week.
 #'
 #' @return A vector containing the break points of bins.
 #'
@@ -113,7 +116,7 @@ calc_full_extent <- function(x, path) {
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species STEM results"
+#' sp_path <- "path to species eBird Status and Trends products"
 #' raster_stack <- stack(sp_path)
 #' year_bins <- calc_bins(raster_stack)
 #'
@@ -217,7 +220,7 @@ calc_bins <- function(x) {
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species STEM results"
+#' sp_path <- "path to species eBird Status and Trends products"
 #' pis <- load_pis(sp_path)
 #' pds <- load_pds(sp_path)
 #'
@@ -392,8 +395,8 @@ map_centroids <- function(pis,
 #' @param st_extent list; st_extent list containing spatiotemporal filter
 #' @param pis data.frame; from `load_pis()` Must supply either pis or pds.
 #' @param pds data.frame; from `load_pds()` Must supply either pis or pds.
-#' @param path character; Full path to directory containing the STEM results
-#' for a single species.
+#' @param path character; Full path to directory containing the eBird Status
+#' and Trends products for a single species.
 #'
 #' @return RasterLayer and plots the RasterLayer with centroid locations and
 #' st_extent boundaries.
@@ -404,7 +407,7 @@ map_centroids <- function(pis,
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species STEM results"
+#' sp_path <- "path to species eBird Status and Trends products"
 #' pis <- load_pis(sp_path)
 #'
 #' ne_extent <- list(type = "rectangle",
