@@ -2,7 +2,7 @@
 #'
 #' Internal function that converts the st_extent list used throughout this
 #' package from lat/lon corners to a raster Extent using the same
-#' Sinusoidal projection as the `template_raster` data object.
+#' Sinusoidal projection as the eBird Status and Trends products.
 #'
 #' @param st_extent list; st_extent list with lat/lon coordinates.
 #'
