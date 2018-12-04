@@ -1,0 +1,426 @@
+---
+title: "ebirdst: Introduction to loading, mapping, and plotting eBird Status and Trend products"
+author: "Tom Auer, Daniel Fink"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ebirdst: Introduction to loading, mapping, and plotting eBird Status and Trend products}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+<style type="text/css">
+.table {
+
+    width: 50%;
+
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, 
+                      message = FALSE, 
+                      out.width="\\textwidth", 
+                      fig.height=4, 
+                      fig.width=7, 
+                      fig.align="center")
+devtools::load_all()
+```
+
+# Outline
+
+1. Background
+2. Projections and Loading Rasters
+3. Mapping Occurrence and Abundance
+4. Extracting Trajectories with Uncertainty
+5. Conversion
+
+# 1. Background
+
+Many ecological and conservation problems require comprehensive, high-resolution information about the spatial and temporal distribution and abundance of species’ populations. This poses a challenge because observations of species are often sparsely and irregularly distributed, especially for widely distributed species. To address this challenge, species distribution models are used to estimate species’ distributions in unobserved locations and times. By associating local environmental characteristics with observed patterns of species occurrence and abundance statistical models provide a framework to harness available data and make estimates in unobserved areas. Additionally, these models can be used to control for known sources of biases that arise from the observation process.
+
+The relative abundance estimates described here were based on bird observation data from [eBird](www.ebird.org), a citizen-science program administered by Cornell Lab of Ornithology, and local land cover descriptions derived from NASA MODIS and other remote sensing data. Individual species’ distributions and abundance were modeled using a spatio-temporal ensemble of boosted regression using the Spatio-Temporal Exploratory Model (STEM) framework (see Fink et al. 2010, 2014 and Johnston et al. 2015).
+
+These models were then used to produce one daily abundance and occurrence estimate per week for all 52 weeks of the year. For each week, estimates were made across a regular grid of locations that cover terrestrial North America at a resolution of 2.8km x 2.8km. Variation in detectability associated with the search effort is controlled by standardizing the estimates to be the expected count of the species on a search conducted for one hour while traveling 1 km at the optimal time of day for detection of that species, on the given day at the given location by a skilled eBirder.
+
+Each relative abundance estimate was computed as an ensemble average of up to 100 randomized base models. Averaging across an ensemble of base model estimates, each trained on random subsample of the data, produces a smoothed bootstrap (Efron 2014) or a bagged estimator. For each abundance estimate we also computed upper and lower limits as the 10th and 90th percentiles across the ensemble. These limits are conservative estimates of the sampling variation of the smoothed bootstrap estimator, for the reasons discussed in Efron (2014), and because they are based on subsamples of the full data set.
+
+## Data access
+
+TODO: Update data access
+
+**DATA ACCESS HAS NOT BEEN PROVIDED TO DATE**
+
+## Data Structure and Types
+
+TODO: Add something about zeroes.
+
+**IMPORTANT. AFTER DOWNLOADING THE RESULTS AND UNZIPPING THEM, DO NOT CHANGE THE FILE STRUCTURE.** All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package. You can download the data to wherever you like, but you cannot change the structure within the folder.
+
+eBird Status and Trends product abundance and occurrence estimates are currently provided in the widely used GeoTiff raster format. These are easily opened with the `raster` package in R, as well as with a variety of GIS software tools. The results are structured in the following way, with the abundance and occurrence estimate GeoTiff files for being found under the \\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>\\results\\tifs\\ directory.
+  
+\\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>\\data\\ebird.abund_<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>_erd.test.data.csv
+\\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>\\data\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>_config.RData
+\\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>\\data\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>_srd_raster_template.tif
+\\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>\\results\\abund_preds\\unpeeled_folds\\pd.txt
+\\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>\\results\\abund_preds\\unpeeled_folds\\pi.txt 
+\\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>\\results\\abund_preds\\unpeeled_folds\\summary.txt 
+\\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>\\results\\abund_preds\\unpeeled_folds\\test.pred.ave.txt 
+\\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>\\results\\tifs\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>_hr_2016_abundance_umean.tif
+\\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>\\results\\tifs\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>_hr_2016_abundance_upper.tif
+\\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>\\results\\tifs\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>_hr_2016_abundance_lower.tif
+\\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>\\results\\tifs\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>_hr_2016_occurrence_umean.tif
+\\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>\\results\\tifs\\band_dates.csv
+    
+## Raster Layer Descriptions
+
+| Type | Measure | File Name |
+| ---------- | ---------- |  ---------- |
+| occurrence | trimmed mean | \*\_hr\_2016\_occurrence\_umean.tif  |
+| abundance  | trimmed mean | \*\_hr\_2016\_abundance\_umean.tif |
+| abundance  | 10th quantile | \*\_hr\_2016\_abundance\_lower.tif  |
+| abundance  | 90th quantile | \*\_hr\_2016\_abundance\_upper.tif  |
+    
+### occurrence_umean
+
+This layer represents the mean probability of occurrence, ranging from 0 to 1, for a 1-hour, 1-kilometre eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.
+
+### abundance_umean
+
+This layer represents the mean estimated relative abundance of the species, defined as the expected number of birds encountered on a 1-hour, 1-kilometre eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.
+
+### abundance_lower
+
+This layer represents the lower 10th quantile of the estimated relative abundance of the species, defined as the expected number of birds encountered on a 1-hour, 1-kilometre eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.
+
+### abundance_upper
+
+This layer represents the upper 90th quantile of the estimated relative abundance of the species, defined as the expected number of birds encountered on a 1-hour, 1-kilometre eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.
+
+# 2. Projection and Loading Rasters
+
+## Projection
+
+The GeoTiffs use the same Sinusoidal projection that the NASA MODIS data uses. As part of this package, we provide a template raster (\\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>\\data\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>_srd_raster_template.tif), that contains the spatial extent and resolution for the Western Hemisphere extent. Accessing this raster directly through the package is not necessary, but can be applied elsewhere (e.g., other GIS software).
+
+## Loading Rasters
+
+Once you have downloaded a set of eBird Status and Trends products, one of the first tasks is to load one of the abundance or occurrence estimates into R in a way that they can easily be used. Each estimate is stored in a multi-band GeoTiff file and are most appropriately loaded as a `RasterStack` object. These "cubes" come with areas of predicted and assumed zeroes, such that any cells that are NA represent areas outside of the area of estimation. All cubes have 52 weeks, even if some weeks are all NA (such as those species that winter entirely outside of North America). The following code example shows how to load an estimate raster and assign names.
+
+TODO: update data access.
+
+```{r load_raster_stack}
+# DOWNLOAD DATA
+# Currently, example data is available on a public s3 bucket. The following 
+# download_data() function copies the species results to a selected path and 
+# returns the full path of the results. Please note that the example_data is
+# for Yellow-bellied Sapsucker and has the same run code as the real data,
+# so if you download both, make sure you put the example_data somewhere else.
+species <- "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"
+sp_path <- download_data("~/tmp/", species = species, example_data = TRUE)
+print(sp_path)
+
+# load trimmed mean abundances and label dates
+abund_stack <- raster::stack(paste0(sp_path, "/results/tifs/", species,
+                               "_hr_2016_abundance_umean.tif"))
+abund_stack <- label_raster_stack(abund_stack)
+print(abund_stack)
+```
+
+# 3. Mapping Occurrence and Abundance
+
+One of the most common tasks with eBird Status and Trends products is to make maps of occurrence and abundance. It is fast and easy to make maps with limited code, but to get ideal maps takes extra preparation. This section describes some functions in the `ebirdst` package intended to assist with mapping.
+
+## Projections
+
+The sinusoidal projection that NASA provides MODIS data in, while functional because of its equal-area property, is not good for mapping because of the significant distortion of land masses across the globe. In general, there are few global equal-area projections, including, but not limited to, Lambert Azimuthal Equal Area, Goode Homolosine, Mollweide, and Equal Area Cylindrical. Of these, we have selected Mollweide, used in the remainder of this section, for its pleasing conformal properties across the globe, ease of projection configuration within R and its proj4string construction, and the ease of setting central meridians that best display the Western Hemisphere. It is worth noting that while projecting to a more visually appealing projection is ideal for mapping, it is not necessary for quantitative analysis of eBird Status and Trends products, for which purposes the results can be left in the original Sinusoidal projection.
+
+```{r project_stack}
+library(viridis)
+library(raster)
+
+# define mollweide projection
+mollweide <- CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
+
+# project single layer from stack to mollweide
+week38_moll <- projectRaster(abund_stack[[38]], crs = mollweide, method = 'ngb')
+
+# optionally, you can project an entire stack, but it takes much longer
+#abund_stack_moll <- projectRaster(abund_stack, crs = mollweide, method = 'ngb')
+
+# map single layer with full annual extent
+par(mar = c(0, 0, 0, 2))
+plot(week38_moll, xaxt = 'n', yaxt = 'n', bty = 'n', col = plasma(10),
+     maxpixels = ncell(week38_moll))
+```
+
+If working with a full set of data for a species, mapping the layer at the full spatial extent of the analysis area makes for a small map. The raster cube has zeroes for our prediction extent and NAs for the entire Western Hemisphere, unifying the weeks in a cube to the same extent. However, this also means that mapping defaults to the full spatial extent of NAs, the Western Hemisphere. To assist with this, project the `RasterStack` or `RasterLayer` to Mollweide, then calculate the full annual spatial extent for the species with the `calc_full_extent()` function, and then map, showing an extent that works for the entire full-annual cycle of the species.
+
+## Mapping Occurrence
+
+Most examples in this vignette focus primarily on relative abundance estimates, as they're the most novel and informative. However, we also provide estimates for the probability of occurrence. These are much simpler to map than abundance in terms of color scales and binning, as values range between 0 and 1 throughout the year.
+
+```{r map_occurrence}
+occ_stack <- raster::stack(paste0(sp_path, "/results/tifs/", species,
+                               "_hr_2016_occurrence_umean.tif"))
+occ_stack <- label_raster_stack(occ_stack)
+occ_week <- occ_stack[[26]]
+
+# create breaks every 0.05 from 0 to 1
+occ_bins <- seq(0, 1, by = 0.05)
+occ_week26 <- projectRaster(occ_week, crs = mollweide, method = 'ngb')
+
+par(mar = c(0, 0, 0, 2), cex = 0.9)
+plot(occ_week26, xaxt = 'n', yaxt = 'n', bty = 'n', breaks = occ_bins,
+     col = plasma(length(occ_bins) - 1), maxpixels = ncell(occ_week26),
+     legend.width = 2, legend.shrink = 0.97)
+```
+
+## Calculating Abundance Bins
+
+Mapping relative abundance estimates across the full-annual cycle presents a challenge, in that patterns of concentration and dispersal in abundance change throughout the year, making it difficult to define color bins that suit all seasons and accurately reflect the detail of abundance predictions. To address this, we selected a method (described by Maciejewski et al. 2013) that does a Box-Cox power transformation of the entire year of data, constructs bins with the transformed data using standard deviations, and then un-transforms the bins.
+
+To compare, we first scale the colors linearly, based on the maximum from the entire year. Since the max is quite high, times of the year with low concentration appear flat.
+
+```{r map_linear}
+year_max <- max(maxValue(abund_stack), na.rm = TRUE)
+
+week14_moll <- projectRaster(abund_stack[[14]], crs = mollweide, method = 'ngb')
+
+# set graphical params
+par(mfrow = c(1,2), mar = c(0, 0, 0, 0))
+
+# adding this extent to the background provides a better extent for the example
+plot(as(extent(trim(week38_moll, values = NA)), "SpatialPolygons"), 
+     col = 'white', border = 'white')
+# plot the abundance
+plot(week38_moll, xaxt = 'n', yaxt = 'n', bty = 'n', zlim = c(0, year_max),
+     col = plasma(20), maxpixels = ncell(week38_moll), legend = FALSE, add = TRUE)
+
+# do the same for week 14
+par(mar = c(0, 0, 0, 4))
+plot(as(extent(trim(week38_moll, values = NA)), "SpatialPolygons"), 
+     col = 'white', border = 'white')
+plot(week14_moll, xaxt = 'n', yaxt = 'n', bty = 'n', zlim = c(0, year_max),
+     col = plasma(20), maxpixels = ncell(week14_moll), legend.shrink = 0.97, add = TRUE)
+```
+
+We can compare this with maps made using the `calc_bins()` method.
+
+```{r map_bins}
+# calculate ideal color bins for abundance values
+year_bins <- calc_bins(abund_stack)
+
+# plot
+par(mfrow = c(1, 2), mar = c(0, 0, 0, 6))
+plot(as(extent(trim(week38_moll, values = NA)), "SpatialPolygons"), 
+     col = 'white', border = 'white')
+plot(week38_moll, xaxt = 'n', yaxt = 'n', bty = 'n', breaks = year_bins$bins,
+     col = viridis::plasma(length(year_bins$bins) - 1), 
+     maxpixels = ncell(week38_moll), legend = FALSE, add = TRUE)
+par(mar = c(0, 0, 0, 6))
+plot(as(extent(trim(week38_moll, values = NA)), "SpatialPolygons"), 
+     col = 'white', border = 'white')
+plot(week14_moll, xaxt = 'n', yaxt = 'n', bty = 'n', breaks = year_bins$bins,
+     col = viridis::plasma(length(year_bins$bins) - 1), 
+     maxpixels = ncell(week14_moll), legend = FALSE, add = TRUE)
+
+# create a thinner set of labels
+bin_labels <- format(round(year_bins$bins, 2), nsmall = 2)
+bin_labels[!(bin_labels %in% c(bin_labels[1],
+                               bin_labels[round((length(bin_labels) / 2)) + 1],
+                               bin_labels[length(bin_labels)]))] <- ""
+
+# plot legend
+plot(week38_moll ^ year_bins$power, 
+     col = viridis::plasma(length(year_bins$bins) - 1), legend.only = TRUE, 
+     breaks = year_bins$bins ^ year_bins$power, lab.breaks = bin_labels,
+     legend.shrink = 0.97, legend.width = 2,  axis.args = list(cex.axis = 0.9, 
+                                                               lwd.ticks = 0))
+```
+
+## Mapping Abundance
+
+As seen in the map above, the `calc_bins` method excludes zeroes. However, with color bins that accurately represent the data distribution, we can add in details about zeroes, tweak the legend, and add some reference data to make a complete map. Like the quick start guide, this will show you how to download example data and plot abundance values similar to how they are plotted for the [eBird Status and Trends Abundance animations](https://ebird.org/science/status-and-trends/woothr/abundance-map-weekly).
+
+```{r map_w_es, out.width = NULL}
+library(rnaturalearth)
+
+# to add context, let's pull in some reference data to add
+wh <- ne_countries(continent = c("North America", "South America"))
+wh_states <- ne_states(iso_a2 = unique(wh@data$iso_a2))
+wh_moll <- spTransform(wh, mollweide)
+wh_states_moll <- spTransform(wh_states, mollweide)
+
+week26_moll <- projectRaster(abund_stack[[26]], crs = mollweide, method = 'ngb')
+
+# set graphics params
+par(mfrow = c(1, 1), mar = c(0, 0, 0, 6))
+
+# use the extent object to set the spatial extent for the plot
+# use the extent object to set the spatial extent for the plot
+plot(as(extent(trim(week26_moll, values = NA)), "SpatialPolygons"), 
+     col = 'white', border = 'white')
+
+# add background spatial context
+plot(wh_states_moll, col = "#eeeeee", border = NA, add = TRUE)
+
+# plot zeroes as gray
+plot(week26_moll == 0, maxpixels = ncell(week26_moll),
+     ext = extent(trim(week26_moll, values = NA)), col = '#dddddd', 
+     xaxt = 'n', yaxt = 'n', legend = FALSE, add = TRUE)
+
+# define color bins
+these_cols <- rev(viridis::plasma(length(year_bins$bins) - 2, end = 0.9))
+grayInt <- colorRampPalette(c("#dddddd", these_cols[1]))
+qcol <- c(grayInt(4)[2], these_cols)
+
+# plot abundances
+plot(week26_moll, maxpixels = ncell(week26_moll),
+     ext = extent(trim(week26_moll, values = NA)), breaks = year_bins$bins,
+     col = qcol, xaxt = 'n', yaxt = 'n', legend = FALSE, add = TRUE)
+
+# for legend, create a smaller set of bin labels
+bin_labels <- format(round(year_bins$bins, 2), nsmall = 2)
+bin_labels[!(bin_labels %in% c(bin_labels[1],
+                               bin_labels[round((length(bin_labels) / 2)) + 1],
+                               bin_labels[length(bin_labels)]))] <- ""
+bin_labels <- c("0", bin_labels)
+
+# create colors that include gray for 0
+lcol <- c('#dddddd', qcol)
+
+# set legend such that color ramp appears linearly
+ltq <- seq(from = year_bins$bins[1], to = year_bins$bins[length(year_bins$bins)],
+           length.out = length(year_bins$bins))
+ltq <- c(0, ltq)
+
+# plot legend
+plot(week26_moll ^ year_bins$power, col = lcol, legend.only = TRUE,
+     breaks = ltq ^ year_bins$power, lab.breaks = bin_labels, legend.shrink = 0.97,
+     legend.width = 2, axis.args = list(cex.axis = 0.9, lwd.ticks = 0))
+
+# add state boundaries on top
+plot(wh_states_moll, add = TRUE, border = 'white', lwd = 1.5)
+```
+
+```{r set_figures, include = FALSE}
+knitr::opts_chunk$set(fig.width = 7, fig.height = 4)
+```
+
+## Mapping Abundance Confidence Intervals
+
+In addition to occurrence and abundance estimates, we also provide confidence intervals at an upper value of 90% and lower value of 10%. These can be used to calculate and map a confidence band width.
+
+```{r map_confidence_band}
+# load lower and upper stacks
+# load trimmed mean abundances and label dates
+lower_stack <- raster::stack(paste0(sp_path, "/results/tifs/", species,
+                               "_hr_2016_abundance_lower.tif"))
+upper_stack <- raster::stack(paste0(sp_path, "/results/tifs/", species,
+                               "_hr_2016_abundance_upper.tif"))
+
+# calculate band width
+conf_band <- upper_stack[[26]] - lower_stack[[26]]
+
+conf_week26 <- projectRaster(conf_band, crs = mollweide, method = 'ngb')
+
+par(mar = c(0, 0, 0, 2))
+plot(conf_week26, xaxt = 'n', yaxt = 'n', bty = 'n', col = magma(20),
+     maxpixel = ncell(conf_week26))
+```
+
+# 4. Extracting Trajectories with Uncertainty
+
+With `RasterStacks` for relative abundance estimates, as well as upper and lower confidence intervals, we can extract an abundance trajectory with uncertainty intervals and plot them across the year for a single location.
+
+```{r trajectories}
+# set a point
+coords <- cbind(-88.1, 46.7)
+pt <- SpatialPoints(coords, proj4string = CRS("+init=epsg:4326"))
+pt_prj <- spTransform(pt, CRS(proj4string(abund_stack)))
+
+# extract
+abund_traj <- unlist(extract(abund_stack, pt_prj, fun = mean, na.rm = TRUE))
+upper_traj <- unlist(extract(upper_stack, pt_prj, fun = mean, na.rm = TRUE))
+lower_traj <- unlist(extract(lower_stack, pt_prj, fun = mean, na.rm = TRUE))
+
+# Plot trajectories
+library(ggplot2)
+
+plot_frame <- data.frame(x = 1:length(abund_traj),
+                         y = c(unname(abund_traj)),
+                         upper = c(unname(upper_traj)),
+                         lower = c(unname(lower_traj)))
+
+g <- ggplot(plot_frame, aes(x, y)) +
+     geom_line(data = plot_frame) +
+     geom_ribbon(data = plot_frame, 
+                 aes(ymin = lower, ymax = upper), 
+                 alpha = 0.3) +
+     ylab("Expected Count (count/(km hr))") +
+     xlab("Week") +
+     theme_light()
+g
+```
+
+It is also possible to extract trajectories for regions, but it takes a little more data work.
+
+```{r trajectories_region}
+# set an extent based on polygon
+mi <- wh_states[!is.na(wh_states$name) & wh_states$name == "Michigan", ]
+
+# extract
+# because we're using a region, we get lots of values that we need to average together
+abund_traj <- extract(abund_stack, mi, fun = mean, na.rm = TRUE)
+abund_traj <- apply(abund_traj, 2, mean, na.rm = TRUE)
+
+upper_traj <- extract(upper_stack, mi, fun = mean, na.rm = TRUE)
+upper_traj <- apply(upper_traj, 2, mean, na.rm = TRUE)
+
+lower_traj <- extract(lower_stack, mi, fun = mean, na.rm = TRUE)
+lower_traj <- apply(lower_traj, 2, mean, na.rm = TRUE)
+
+# Plot trajectories
+library(ggplot2)
+
+plot_frame <- data.frame(x = 1:length(abund_traj),
+                         y = c(unname(abund_traj)),
+                         upper = c(unname(upper_traj)),
+                         lower = c(unname(lower_traj)))
+
+g <- ggplot(plot_frame, aes(x, y)) +
+     geom_line(data = plot_frame) +
+     geom_ribbon(data = plot_frame, 
+                 aes(ymin = lower, ymax =upper), 
+                 alpha = 0.3) +
+     ylab("Expected Count (count/(km hr))") +
+     xlab("Week") +
+     theme_light()
+g
+```
+
+# 5. Conversion
+
+The `raster` package has a lot of functionality and the `RasterLayer` format is useful for spatial analysis and mapping, but some users do not have GIS experience or want the data in a simpler format for their preferred method of analysis. There are multiple ways to get more basic representations of the data.
+
+```{r conversion}
+# To convert the data to a simpler geographic format and access tabularly	
+# reproject into geographic (decimal degrees) 
+abund_stack_ll <- projectRaster(abund_stack[[26]], crs = CRS("+init=epsg:4326"), 
+                                method = 'ngb')
+
+# Convert raster object into a matrix
+p <- rasterToPoints(abund_stack_ll)
+colnames(p) <- c("longitude", "latitude", "abundance_umean")
+head(p)
+```
+
+```{r conversion_write, eval=FALSE}
+# Write a CSV file of the matrix
+write.csv(p, file = "yebsap_week26.csv", row.names = FALSE)
+```
+
+## References
+
+Ross Maciejewski, Avin Pattah, Sungahn Ko, Ryan Hafen, William S. Cleveland, David S. Ebert. Automated Box-Cox Transformations for Improved Visual Encoding. IEEE Transactions on Visualization and Computer Graphics, 19(1): 130-140, 2013.
