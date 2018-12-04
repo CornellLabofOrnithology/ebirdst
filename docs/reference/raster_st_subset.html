@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Projects st_extent lat/lon list to sinusoidal raster Extent — get_sinu_ext • ebirdst</title>
+<title>Spatiotemporal subsetter for eBird Status and Trends products raster — raster_st_subset • ebirdst</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -80,48 +80,60 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Projects st_extent lat/lon list to sinusoidal raster Extent</h1>
+    <h1>Spatiotemporal subsetter for eBird Status and Trends products raster</h1>
     </div>
 
     
-    <p>Internal function that converts the st_extent list used throughout this
-package from lat/lon corners to a raster Extent using the same
-Sinusoidal projection as the eBird Status and Trends products.</p>
+    <p>Internal function that takes a RasterStack or RasterBrick and a st_extent
+list and returns a spatiotemporal subset of the data object. Currently
+designed to handle either a 'rectangle' as defined by a lat/lon bounding
+box or a 'polygon' as defined by a SpatialPolygon* object. The function
+will use temporal information if provided. The t.min and t.max objects in
+the <code>st_extent</code> list are currently able to wrap time around the year
+(e.g., t.min = 0.9 and t.max = 0.1 is acceptable). This function will also
+returned a date labeled RasterStack or RasterBrick, so there is no need
+to use the label_raster_stack() directly if subsetting.</p>
     
 
-    <pre class="usage"><span class='fu'>get_sinu_ext</span>(<span class='no'>st_extent</span>)</pre>
+    <pre class="usage"><span class='fu'>raster_st_subset</span>(<span class='no'>raster_data</span>, <span class='no'>st_extent</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>st_extent</th>
-      <td><p>list; st_extent list with lat/lon coordinates.</p></td>
+      <td><p>list; st_extent list object</p></td>
+    </tr>
+    <tr>
+      <th>data</th>
+      <td><p>RasterStack or RasterBrick; one of four GeoTiff files provided
+with results</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A raster Extent in Sinusoidal projection.</p>
+    <p>Subset of input data as same type, with layers labeled with dates
+from label_raster_stack().</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># define st_extent list</span>
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='no'>rs</span> <span class='kw'>&lt;-</span> <span class='fu'>stack</span>(<span class='st'>"/path to GeoTiff"</span>)
+<span class='no'>rs</span>
+
+<span class='co'># define st_extent list</span>
 <span class='no'>ne_extent</span> <span class='kw'>&lt;-</span> <span class='fu'>list</span>(<span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"rectangle"</span>,
                   <span class='kw'>lat.min</span> <span class='kw'>=</span> <span class='fl'>40</span>,
                   <span class='kw'>lat.max</span> <span class='kw'>=</span> <span class='fl'>47</span>,
                   <span class='kw'>lon.min</span> <span class='kw'>=</span> -<span class='fl'>80</span>,
                   <span class='kw'>lon.max</span> <span class='kw'>=</span> -<span class='fl'>70</span>,
-                  <span class='kw'>t.min</span> <span class='kw'>=</span> <span class='fl'>0.425</span>,
-                  <span class='kw'>t.max</span> <span class='kw'>=</span> <span class='fl'>0.475</span>)
+                  <span class='kw'>t.min</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
+                  <span class='kw'>t.max</span> <span class='kw'>=</span> <span class='fl'>0.6</span>)
 
-<span class='co'># convert</span>
-<span class='no'>sinu_e</span> <span class='kw'>&lt;-</span> <span class='fu'>get_sinu_ext</span>(<span class='no'>ne_extent</span>)
-<span class='no'>sinu_e</span></div><div class='output co'>#&gt; class       : Extent 
-#&gt; xmin        : -6836828 
-#&gt; xmax        : -5286748 
-#&gt; ymin        : 4426967 
-#&gt; ymax        : 5247767 </div></pre>
+<span class='co'># subset stack with extent</span>
+<span class='no'>rs_sub</span> <span class='kw'>&lt;-</span> <span class='fu'>raster_st_subset</span>(<span class='no'>rs</span>, <span class='kw'>st_extent</span> <span class='kw'>=</span> <span class='no'>ne_extent</span>)
+<span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

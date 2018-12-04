@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • stemhelper</title>
+<title>Function reference • ebirdst</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -47,7 +47,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">stemhelper</a>
+      <a class="navbar-brand" href="../index.html">ebirdst</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
@@ -82,7 +82,7 @@
     <div class="page-header">
       <h1>
         Reference
-        <small>version&nbsp;0.0.0.9000</small>
+        <small>version&nbsp;0.1</small>
       </h1>
     </div>
 
@@ -104,17 +104,10 @@
         <tr>
           <!--  -->
           <td>
-            <p><code><a href="cake_plot.html">cake_plot</a></code> </p>
-          </td>
-          <td><p>Cake plot the PIs and PDs in a combined fasion to see directionality with
-importance for habitat association and avoidance</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
             <p><code><a href="calc_bins.html">calc_bins</a></code> </p>
           </td>
-          <td><p>Calculates bins (breaks) based on standard deviations of log-transformed
-data for mapping</p></td>
+          <td><p>Calculates bins (breaks) based on standard deviations of Box-Cox
+power-transformed data for mapping</p></td>
         </tr><tr>
           <!--  -->
           <td>
@@ -136,15 +129,33 @@ data for mapping</p></td>
         </tr><tr>
           <!--  -->
           <td>
+            <p><code><a href="data_st_subset.html">data_st_subset</a></code> </p>
+          </td>
+          <td><p>Spatiotemporal subsetter for eBird Status and Trends products table</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="download_data.html">download_data</a></code> </p>
+          </td>
+          <td><p>Downloads data package for a single species or for the example data</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="label_raster_stack.html">label_raster_stack</a></code> </p>
+          </td>
+          <td><p>Labels 52 week RasterStack with the dates for each band</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
             <p><code><a href="load_pds.html">load_pds</a></code> </p>
           </td>
-          <td><p>Load partial dependencies for single species STEM results</p></td>
+          <td><p>Load partial dependencies for single species eBird Status and Trends products</p></td>
         </tr><tr>
           <!--  -->
           <td>
             <p><code><a href="load_pis.html">load_pis</a></code> </p>
           </td>
-          <td><p>Load predictor importances for single species STEM results</p></td>
+          <td><p>Load predictor importances for single species eBird Status and Trends products</p></td>
         </tr><tr>
           <!--  -->
           <td>
@@ -178,27 +189,9 @@ data for mapping</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="st_extent_subset.html">st_extent_subset</a></code> </p>
+            <p><code><a href="raster_st_subset.html">raster_st_subset</a></code> </p>
           </td>
-          <td><p>Spatiotemporal subsetter for STEM result data objects</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="stack_stem.html">stack_stem</a></code> </p>
-          </td>
-          <td><p>Load, extend, and stack all weeks of STEM rasters for a given result type</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="template_raster.html">template_raster</a></code> </p>
-          </td>
-          <td><p>Template raster for extending the extents of STEM raster layers</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="zero_es_stack.html">zero_es_stack</a></code> </p>
-          </td>
-          <td><p>RasterStack of zero values based on checklist-level ensemble support</p></td>
+          <td><p>Spatiotemporal subsetter for eBird Status and Trends products raster</p></td>
         </tr>
       </tbody>
       </table>

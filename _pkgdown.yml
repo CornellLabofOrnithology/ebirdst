@@ -3,14 +3,14 @@ navbar:
   type: default
   left:
   - text: Intro Vignette
-    href: articles/stemhelper-intro-mapping.html
+    href: articles/ebirdst-intro-mapping.html
   - text: Advanced Vignette
-    href: articles/stemhelper-pipd.html
+    href: articles/ebirdst-pipd.html
   - text: Function Reference
     href: reference/index.html
   right:
   - icon: fa-github fa-lg
-    href: https://github.com/CornellLabofOrnithology/stemhelper
+    href: https://github.com/CornellLabofOrnithology/ebirdst
 
 authors:
   Tom Auer:

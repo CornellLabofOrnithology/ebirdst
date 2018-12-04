@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STEM Loading, Mapping, Plotting and Analysis • stemhelper</title>
+<title>Tools to Load, Map, Plot, and Analyze eBird Status and Trends Data Products • ebirdst</title>
 <!-- jquery --><script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 <!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
@@ -24,7 +24,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">stemhelper</a>
+      <a class="navbar-brand" href="index.html">ebirdst</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
@@ -62,129 +62,119 @@
     
 <div class="contents">
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-<div id="stemhelper-functions-for-stem-loading-mapping-plotting-and-analysis" class="section level1">
+<div id="ebirdst-tools-to-load-map-plot-and-analyze-ebird-status-and-trends-data-products" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#stemhelper-functions-for-stem-loading-mapping-plotting-and-analysis" class="anchor"></a>stemhelper: functions for STEM loading, mapping, plotting, and analysis</h1></div>
+<a href="#ebirdst-tools-to-load-map-plot-and-analyze-ebird-status-and-trends-data-products" class="anchor"></a>ebirdst: Tools to Load, Map, Plot, and Analyze eBird Status and Trends Data Products</h1></div>
 <!-- [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0) -->
 <p><strong>THIS PACKAGE IS UNDER ACTIVE DEVELOPMENT. FUNCTIONALITY MAY CHANGE AT ANY TIME.</strong></p>
-<p>The goal of stemhelper is to provide functionality for loading, mapping, plotting, and analyzing STEM results.</p>
+<p>The goal of this package is to provide tools for loading, mapping, plotting, and analyzing eBird Status and Trends data products. If you’re looking for the previous version (known as stemhelper), which is no longer being maintained, please access the <code>stemhelper_archive</code> branch.</p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<p>You can install stemhelper from GitHub with:</p>
+<p>You can install ebirdst from GitHub with:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install the development version from GitHub</span>
 <span class="co"># install.packages("devtools")</span>
-devtools::<span class="kw">install_github</span>(<span class="st">"CornellLabofOrnithology/stemhelper"</span>)</code></pre></div>
+devtools::<span class="kw">install_github</span>(<span class="st">"CornellLabofOrnithology/ebirdst"</span>)</code></pre></div>
 </div>
 <div id="vignette" class="section level2">
 <h2 class="hasAnchor">
 <a href="#vignette" class="anchor"></a>Vignette</h2>
-<p>For a full introduction and advanced usage, please see the package <a href="https://cornelllabofornithology.github.io/stemhelper">website</a>. An <a href="https://cornelllabofornithology.github.io/stemhelper/articles/stem-intro-mapping.html">introductory vignette</a> is available, detailing the structure of the results and how to begin loading and mapping the results. Further, an <a href="https://cornelllabofornithology.github.io/stemhelper/articles/stem-pipd.html">advanced vignette</a> details how to access additional information from the model results about predictor importance and directionality, as well as predictive performance metrics.</p>
+<p>TODO: update website, then updated this section.</p>
+<p>For a full introduction and advanced usage, please see the package <a href="https://cornelllabofornithology.github.io/ebirdst">website</a>. An <a href="https://cornelllabofornithology.github.io/ebirdst/articles/stem-intro-mapping.html">introductory vignette</a> is available, detailing the structure of the results and how to begin loading and mapping the results. Further, an <a href="https://cornelllabofornithology.github.io/ebirdst/articles/stem-pipd.html">advanced vignette</a> details how to access additional information from the model results about predictor importance and directionality, as well as predictive performance metrics.</p>
 </div>
 <div id="quick-start" class="section level2">
 <h2 class="hasAnchor">
 <a href="#quick-start" class="anchor"></a>Quick Start</h2>
-<p>TODO: Add details on how to acquire results.</p>
-<p><strong>IMPORTANT. AFTER DOWNLOADING THE RESULTS AND UNZIPPING THEM, DO NOT CHANGE THE FILE STRUCTURE.</strong> All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package. See the SETUP PATHS part of the example code below.</p>
-<p>One of the most common first tasks is to load a RasterStack of relative abundance estimates and make a map.</p>
+<p>This quick start guide will show you how to download example data and plot abundance values similar to how they are plotted for the <a href="https://ebird.org/science/status-and-trends/woothr/abundance-map-weekly">eBird Status and Trends Abundance animations</a>. <strong>IMPORTANT. AFTER DOWNLOADING THE RESULTS, DO NOT CHANGE THE FILE STRUCTURE.</strong> All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(viridis)
 <span class="kw">library</span>(raster)
 <span class="kw">library</span>(rnaturalearth)
 
-<span class="co"># SETUP PATHS</span>
-<span class="co"># Once you have downloaded and unzipped the results, place the resulting folder,</span>
-<span class="co"># with the unique species ID name (e.g., woothr-ERD2016-PROD-20170505-3f880822)</span>
-<span class="co"># wherever you want to keep it. Then provide the root_path variable as that</span>
-<span class="co"># location (without the unique species ID name) and provide the unique species </span>
-<span class="co"># ID name as the species variable below. Use the paste() function to combine</span>
+<span class="co"># DOWNLOAD DATA</span>
+<span class="co"># Currently, example data is available on a public s3 bucket. The following </span>
+<span class="co"># download_data() function copies the species results to a selected path and </span>
+<span class="co"># returns the full path of the results. Please note that the example_data is</span>
+<span class="co"># for Yellow-bellied Sapsucker and has the same run code as the real data,</span>
+<span class="co"># so if you download both, make sure you put the example_data somewhere else.</span>
+species &lt;-<span class="st"> "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"</span>
+sp_path &lt;-<span class="st"> </span><span class="kw"><a href="reference/download_data.html">download_data</a></span>(<span class="st">"~/tmp/"</span>, <span class="dt">species =</span> species, <span class="dt">example_data =</span> <span class="ot">TRUE</span>)
+<span class="kw">print</span>(sp_path)
+<span class="co">#&gt; [1] "~/tmp//yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"</span>
 
-<span class="co"># This example downloads example data directly</span>
-species &lt;-<span class="st"> "amerob-ERD2016-EXAMPLE_DATA-20171122-5a9e702e"</span>
-species_url &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="st">"http://ebirddata.ornith.cornell.edu/downloads/hidden/"</span>, 
-                     species, <span class="st">".zip"</span>, <span class="dt">sep =</span> <span class="st">""</span>)
+<span class="co"># load estimated relative abundance and label with dates</span>
+abunds &lt;-<span class="st"> </span>raster::<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/stack">stack</a></span>(<span class="kw">paste0</span>(sp_path, <span class="st">"/results/tifs/"</span>, species, 
+                              <span class="st">"_hr_2016_abundance_umean.tif"</span>))
+abunds &lt;-<span class="st"> </span><span class="kw"><a href="reference/label_raster_stack.html">label_raster_stack</a></span>(abunds)
 
-temp &lt;-<span class="st"> </span><span class="kw">tempfile</span>()
-temp_dir &lt;-<span class="st"> </span><span class="kw">tempdir</span>()
-<span class="kw">download.file</span>(species_url, temp)
-<span class="kw">unzip</span>(temp, <span class="dt">exdir =</span> temp_dir)
-<span class="kw">unlink</span>(temp)
+<span class="co"># select a week in the summer</span>
+abund &lt;-<span class="st"> </span>abunds[[<span class="dv">26</span>]]
+<span class="kw">rm</span>(abunds)
 
-sp_path &lt;-<span class="st"> </span><span class="kw">paste</span>(temp_dir, <span class="st">"/"</span>, species, <span class="dt">sep =</span> <span class="st">""</span>)
-
-<span class="co"># load a stack of rasters with the helper function stack_stem()</span>
-abund &lt;-<span class="st"> </span><span class="kw"><a href="reference/stack_stem.html">stack_stem</a></span>(sp_path, <span class="dt">variable =</span> <span class="st">"abundance_umean"</span>, <span class="dt">week =</span> <span class="dv">26</span>)
+<span class="co"># get reference data from the rnaturalearth package</span>
+<span class="co"># the example data currently shows only the US state of Michigan</span>
+wh_states &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/rnaturalearth/topics/ne_states">ne_states</a></span>(<span class="dt">country =</span> <span class="kw">c</span>(<span class="st">"United States of America"</span>, <span class="st">"Canada"</span>))
+wh_sub &lt;-<span class="st"> </span>wh_states[!<span class="kw">is.na</span>(wh_states$name) &amp;<span class="st"> </span>wh_states$name ==<span class="st"> "Michigan"</span>, ]
 
 <span class="co"># project to Mollweide for mapping and extent calc</span>
 mollweide &lt;-<span class="st"> </span><span class="kw">CRS</span>(<span class="st">"+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"</span>)
-abund_moll &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/projectRaster">projectRaster</a></span>(abund, <span class="dt">crs =</span> mollweide)
 
-<span class="co"># calculate extent</span>
-sp_ext &lt;-<span class="st"> </span><span class="kw"><a href="reference/calc_full_extent.html">calc_full_extent</a></span>(abund_moll)
+<span class="co"># the nearest neighbor method preserves cell values across projections</span>
+abund_moll &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/projectRaster">projectRaster</a></span>(abund, <span class="dt">crs =</span> mollweide, <span class="dt">method =</span> <span class="st">'ngb'</span>)
 
-xlimits &lt;-<span class="st"> </span><span class="kw">c</span>(sp_ext[<span class="dv">1</span>], sp_ext[<span class="dv">2</span>])
-ylimits &lt;-<span class="st"> </span><span class="kw">c</span>(sp_ext[<span class="dv">3</span>], sp_ext[<span class="dv">4</span>])
-
-xrange &lt;-<span class="st"> </span>xlimits[<span class="dv">2</span>] -<span class="st"> </span>xlimits[<span class="dv">1</span>]
-yrange &lt;-<span class="st"> </span>ylimits[<span class="dv">2</span>] -<span class="st"> </span>ylimits[<span class="dv">1</span>]
-
-<span class="co"># these are RMarkdown specific here, but could be passed to png()</span>
-w_cm &lt;-<span class="st"> </span><span class="fl">8.5</span>
-h_cm &lt;-<span class="st"> </span>w_cm*(yrange/xrange)
-knitr::opts_chunk$<span class="kw">set</span>(<span class="dt">fig.width =</span> w_cm, <span class="dt">fig.height =</span> h_cm)
+<span class="co"># project the reference data as well</span>
+wh_states_moll &lt;-<span class="st"> </span><span class="kw">spTransform</span>(wh_states, mollweide)
 
 <span class="co"># calculate ideal color bins for abundance values for this week</span>
 week_bins &lt;-<span class="st"> </span><span class="kw"><a href="reference/calc_bins.html">calc_bins</a></span>(abund_moll)
-
-<span class="co"># to add context, pull in some reference data from the rnaturalearth package</span>
-wh &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/rnaturalearth/topics/ne_countries">ne_countries</a></span>(<span class="dt">continent =</span> <span class="kw">c</span>(<span class="st">"North America"</span>, <span class="st">"South America"</span>))
-wh_states &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/rnaturalearth/topics/ne_states">ne_states</a></span>(<span class="dt">iso_a2 =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/unique">unique</a></span>(wh@data$iso_a2))
-wh_moll &lt;-<span class="st"> </span><span class="kw">spTransform</span>(wh, mollweide)
-wh_states_moll &lt;-<span class="st"> </span><span class="kw">spTransform</span>(wh_states, mollweide)
 
 <span class="co"># start plotting</span>
 <span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>), <span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">6</span>))
 
 <span class="co"># use the extent object to set the spatial extent for the plot</span>
-<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(sp_ext, <span class="dt">col =</span> <span class="st">'white'</span>)
+<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(<span class="kw">as</span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/extent">extent</a></span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/trim">trim</a></span>(abund_moll, <span class="dt">values =</span> <span class="ot">NA</span>)), <span class="st">"SpatialPolygons"</span>), 
+     <span class="dt">col =</span> <span class="st">'white'</span>, <span class="dt">border =</span> <span class="st">'white'</span>)
 
-<span class="co"># add background spatial context</span>
-<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(wh_states_moll, <span class="dt">col =</span> <span class="st">"grey70"</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
+<span class="co"># add background reference data</span>
+<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(wh_states_moll, <span class="dt">col =</span> <span class="st">"#eeeeee"</span>, <span class="dt">border =</span> <span class="ot">NA</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
 
-<span class="co"># plot the raster</span>
-<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(abund_moll,
-     <span class="dt">maxpixels =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(abund_moll),
-     <span class="dt">ext =</span> sp_ext,
-     <span class="dt">breaks =</span> week_bins,
-     <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="kw">length</span>(week_bins<span class="dv">-1</span>)),
-     <span class="dt">xaxt =</span> <span class="st">'n'</span>,
-     <span class="dt">yaxt =</span> <span class="st">'n'</span>,
-     <span class="dt">legend =</span> <span class="ot">FALSE</span>,
-     <span class="dt">add =</span> <span class="ot">TRUE</span>)
+<span class="co"># plot zeroes as gray</span>
+<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(abund_moll ==<span class="st"> </span><span class="dv">0</span>, <span class="dt">maxpixels =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(abund_moll),
+     <span class="dt">ext =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/extent">extent</a></span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/trim">trim</a></span>(abund_moll, <span class="dt">values =</span> <span class="ot">NA</span>)), <span class="dt">col =</span> <span class="st">'#dddddd'</span>, 
+     <span class="dt">xaxt =</span> <span class="st">'n'</span>, <span class="dt">yaxt =</span> <span class="st">'n'</span>, <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
 
-<span class="co"># for legend plotting create a smaller set of bin labels and do it separately</span>
-bin_labels &lt;-<span class="st"> </span><span class="kw">format</span>(<span class="kw">round</span>(week_bins, <span class="dv">3</span>), <span class="dt">nsmall =</span> <span class="dv">2</span>)
+<span class="co"># define color bins</span>
+these_cols &lt;-<span class="st"> </span><span class="kw">rev</span>(viridis::<span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">plasma</a></span>(<span class="kw">length</span>(week_bins$bins) -<span class="st"> </span><span class="dv">2</span>, <span class="dt">end =</span> <span class="fl">0.9</span>))
+grayInt &lt;-<span class="st"> </span><span class="kw">colorRampPalette</span>(<span class="kw">c</span>(<span class="st">"#dddddd"</span>, these_cols[<span class="dv">1</span>]))
+qcol &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">grayInt</span>(<span class="dv">4</span>)[<span class="dv">2</span>], these_cols)
+
+<span class="co"># plot abundances</span>
+<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(abund_moll, <span class="dt">maxpixels =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(abund_moll),
+     <span class="dt">ext =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/extent">extent</a></span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/trim">trim</a></span>(abund_moll, <span class="dt">values =</span> <span class="ot">NA</span>)), <span class="dt">breaks =</span> week_bins$bins,
+     <span class="dt">col =</span> qcol, <span class="dt">xaxt =</span> <span class="st">'n'</span>, <span class="dt">yaxt =</span> <span class="st">'n'</span>, <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
+
+<span class="co"># for legend, create a smaller set of bin labels</span>
+bin_labels &lt;-<span class="st"> </span><span class="kw">format</span>(<span class="kw">round</span>(week_bins$bins, <span class="dv">2</span>), <span class="dt">nsmall =</span> <span class="dv">2</span>)
 bin_labels[!(bin_labels %in%<span class="st"> </span><span class="kw">c</span>(bin_labels[<span class="dv">1</span>],
-                    bin_labels[<span class="kw">round</span>((<span class="kw">length</span>(bin_labels) /<span class="st"> </span><span class="dv">4</span>)) +<span class="st"> </span><span class="dv">1</span>], 
-                    bin_labels[<span class="kw">round</span>((<span class="kw">length</span>(bin_labels) /<span class="st"> </span><span class="dv">2</span>)) +<span class="st"> </span><span class="dv">1</span>],
-                    bin_labels[<span class="kw">length</span>(bin_labels) -<span class="st"> </span>
-<span class="st">                               </span><span class="kw">round</span>((<span class="kw">length</span>(bin_labels) /<span class="st"> </span><span class="dv">4</span>)) +<span class="st"> </span><span class="dv">1</span>],
-                    bin_labels[<span class="kw">length</span>(bin_labels)]))] &lt;-<span class="st"> ""</span>
+                               bin_labels[<span class="kw">round</span>((<span class="kw">length</span>(bin_labels) /<span class="st"> </span><span class="dv">2</span>)) +<span class="st"> </span><span class="dv">1</span>],
+                               bin_labels[<span class="kw">length</span>(bin_labels)]))] &lt;-<span class="st"> ""</span>
+bin_labels &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"0"</span>, bin_labels)
 
-<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(<span class="kw">log</span>(abund_moll),
-     <span class="dt">col =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/viridis/topics/reexports">viridis</a></span>(<span class="kw">length</span>(week_bins) -<span class="st"> </span><span class="dv">1</span>),
-     <span class="dt">legend.only =</span> <span class="ot">TRUE</span>,
-     <span class="dt">breaks =</span> <span class="kw">c</span>(<span class="kw">log</span>(<span class="fl">0.0001</span>), <span class="kw">log</span>(week_bins[week_bins !=<span class="st"> </span><span class="dv">0</span>])),
-     <span class="dt">lab.breaks =</span> bin_labels,
-     <span class="dt">legend.shrink =</span> <span class="fl">0.97</span>,
-     <span class="dt">legend.width =</span> <span class="dv">2</span>,
-     <span class="dt">axis.args =</span> <span class="kw">list</span>(<span class="dt">cex.axis =</span> <span class="fl">0.9</span>))
+<span class="co"># create colors that include gray for 0</span>
+lcol &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">'#dddddd'</span>, qcol)
+
+<span class="co"># set legend such that color ramp appears linearly</span>
+ltq &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dt">from =</span> week_bins$bins[<span class="dv">1</span>], <span class="dt">to =</span> week_bins$bins[<span class="kw">length</span>(week_bins$bins)],
+           <span class="dt">length.out =</span> <span class="kw">length</span>(week_bins$bins))
+ltq &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, ltq)
+
+<span class="co"># plot legend</span>
+<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(abund_moll ^<span class="st"> </span>week_bins$power, <span class="dt">col =</span> lcol, <span class="dt">legend.only =</span> <span class="ot">TRUE</span>,
+     <span class="dt">breaks =</span> ltq ^<span class="st"> </span>week_bins$power, <span class="dt">lab.breaks =</span> bin_labels, <span class="dt">legend.shrink =</span> <span class="fl">0.97</span>,
+     <span class="dt">legend.width =</span> <span class="dv">2</span>, <span class="dt">axis.args =</span> <span class="kw">list</span>(<span class="dt">cex.axis =</span> <span class="fl">0.9</span>, <span class="dt">lwd.ticks =</span> <span class="dv">0</span>))
 
 <span class="co"># add state boundaries on top</span>
-<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(wh_states_moll, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">border =</span> <span class="st">'black'</span>, <span class="dt">lwd =</span> <span class="dv">1</span>)</code></pre></div>
+<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(wh_states_moll, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">border =</span> <span class="st">'white'</span>, <span class="dt">lwd =</span> <span class="fl">1.5</span>)</code></pre></div>
 <p><img src="README-quick_start-1.png" width="672" style="display: block; margin: auto;"></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
-<span class="co"># clean up</span>
-<span class="kw">unlink</span>(temp_dir)</code></pre></div>
 </div>
 </div>
 </div>
@@ -194,16 +184,16 @@ bin_labels[!(bin_labels %in%<span class="st"> </span><span class="kw">c</span>(b
     <h2 class="hasAnchor">
 <a href="#sidebar" class="anchor"></a>Links</h2>
 <ul class="list-unstyled">
-<li>Browse source code at <br><a href="https://github.com/CornellLabofOrnithology/stemhelper">https://​github.com/​CornellLabofOrnithology/​stemhelper</a>
+<li>Browse source code at <br><a href="https://github.com/CornellLabofOrnithology/ebirdst">https://​github.com/​CornellLabofOrnithology/​ebirdst</a>
 </li>
-<li>Report a bug at <br><a href="https://github.com/CornellLabofOrnithology/stemhelper/issues">https://​github.com/​CornellLabofOrnithology/​stemhelper/​issues</a>
+<li>Report a bug at <br><a href="https://github.com/CornellLabofOrnithology/ebirdst/issues">https://​github.com/​CornellLabofOrnithology/​ebirdst/​issues</a>
 </li>
 </ul>
 <h2>License</h2>
 <p><a href="https://www.r-project.org/Licenses/GPL-3">GPL-3</a> + file <a href="LICENSE.html">LICENSE</a></p>
 <h2>Citation</h2>
 <ul class="list-unstyled">
-<li><a href="authors.html">Citing stemhelper</a></li>
+<li><a href="authors.html">Citing ebirdst</a></li>
 </ul>
 <h2>Developers</h2>
 <ul class="list-unstyled">

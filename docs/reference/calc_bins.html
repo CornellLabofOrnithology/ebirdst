@@ -6,8 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Calculates bins (breaks) based on standard deviations of log-transformed
-data for mapping — calc_bins • stemhelper</title>
+<title>Calculates bins (breaks) based on standard deviations of Box-Cox
+power-transformed data for mapping — calc_bins • ebirdst</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -48,7 +48,7 @@ data for mapping — calc_bins • stemhelper</title>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">stemhelper</a>
+      <a class="navbar-brand" href="../index.html">ebirdst</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
@@ -81,8 +81,8 @@ data for mapping — calc_bins • stemhelper</title>
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Calculates bins (breaks) based on standard deviations of log-transformed
-data for mapping</h1>
+    <h1>Calculates bins (breaks) based on standard deviations of Box-Cox
+power-transformed data for mapping</h1>
     </div>
 
     
@@ -91,9 +91,10 @@ in that patterns of concentration and dispersion in abundance change
 throughout the year, making it difficult to define color bins that suit all
 seasons and accurately reflect the detail of abundance predictions. To
 address this, we selected a method (described by Maciejewski et al. 2013)
-that log transforms the entire year of non-zero data, constructs bins with
-the log-transformed data using standard-deviations, and then untransforms
-the bins.</p>
+that first selects an optimal power (the Box-Cox method) for normalizing
+the data, then power transforms the entire year of non-zero data, constructs
+bins with the power-transformed data using standard-deviations, and then
+un-transforms the bins.</p>
     
 
     <pre class="usage"><span class='fu'>calc_bins</span>(<span class='no'>x</span>)</pre>
@@ -103,7 +104,8 @@ the bins.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>Raster* object; usually from stem_stack() function.</p></td>
+      <td><p>RasterStack or RasterBrick; original eBird Status and
+Trends product raster GeoTiff with 52 bands, one for each week.</p></td>
     </tr>
     </table>
     
@@ -118,8 +120,8 @@ the bins.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='st'>"path to species STEM results"</span>
-<span class='no'>raster_stack</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='stack_stem.html'>stack_stem</a></span>(<span class='no'>sp_path</span>, <span class='kw'>variable</span> <span class='kw'>=</span> <span class='st'>"abundance_umean"</span>)
+<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='st'>"path to species eBird Status and Trends products"</span>
+<span class='no'>raster_stack</span> <span class='kw'>&lt;-</span> <span class='fu'>stack</span>(<span class='no'>sp_path</span>)
 <span class='no'>year_bins</span> <span class='kw'>&lt;-</span> <span class='fu'>calc_bins</span>(<span class='no'>raster_stack</span>)
 
 <span class='kw pkg'>raster</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/raster/topics/plot'>plot</a></span>(<span class='no'>raster_stack</span><span class='kw'>[[</span><span class='fl'>1</span>]], <span class='kw'>xaxt</span> <span class='kw'>=</span> <span class='st'>'n'</span>, <span class='kw'>yaxt</span> <span class='kw'>=</span> <span class='st'>'n'</span>, <span class='kw'>breaks</span> <span class='kw'>=</span> <span class='no'>year_bins</span>)
