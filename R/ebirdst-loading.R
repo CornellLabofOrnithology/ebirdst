@@ -1,3 +1,54 @@
+#' Downloads data package for a single species or for the example data
+#'
+#' This function will download the entire data package for a single species to a
+#' specified path.
+#'
+#' @param path character; directory for data to be downloaded to
+#' @param species character; either a valid six letter code or "example_data"
+#'
+#' @return None.
+#'
+#' @export
+#'
+#' @examples
+#' #' \dontrun{
+#' path <- "~/tmp"
+#' species <- "example_data"
+#'
+#' download_data(path, species)
+#' }
+download_data <- function(path, species) {
+  # toggle between example_data and actual species
+
+  if(species == "example_data") {
+    bucket <- "s3://clo-is-da-example-data/"
+    species <- "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"
+  } else {
+    # TODO: add path to AWS data
+    # TODO: once this works, add check
+    bucket <- "s3://clo-is-da-example-data/"
+  }
+
+  # list what's in the bucket
+  sp_bucket <- aws.s3::get_bucket(bucket = paste0(bucket, species))
+
+  # download things that have size greater than 0
+  lapply(sp_bucket, function(x) {
+    if(x$Size > 0) {
+      split_key <- strsplit(x$Key, "/")
+
+      new_dir <- paste0(path,
+                        paste(split_key[[1]][1:length(split_key[[1]]) - 1],
+                              collapse = "/"))
+
+      dir.create(new_dir, recursive = TRUE, showWarnings = FALSE)
+
+      aws.s3::save_object(object = x, file = paste0(path, x$Key),
+                          overwrite = TRUE)
+    }
+  })
+}
+
 #' Projects st_extent lat/lon list to sinusoidal raster Extent
 #'
 #' Internal function that converts the st_extent list used throughout this
