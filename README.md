@@ -6,7 +6,7 @@ ebirdst: Tools to Load, Map, Plot, and Analyze eBird Status and Trends Data Prod
 <!-- [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0) -->
 **THIS PACKAGE IS UNDER ACTIVE DEVELOPMENT. FUNCTIONALITY MAY CHANGE AT ANY TIME.**
 
-The goal of this package is to providet tools for loading, mapping, plotting, and analyzing eBird Status and Trends data products. If you're looking for the previous version (known as stemhelper), which is no longer being maintained, please access the stemhelper\_archive branch.
+The goal of this package is to provide tools for loading, mapping, plotting, and analyzing eBird Status and Trends data products. If you're looking for the previous version (known as stemhelper), which is no longer being maintained, please access the `stemhelper_archive` branch.
 
 Installation
 ------------
@@ -29,11 +29,7 @@ For a full introduction and advanced usage, please see the package [website](htt
 Quick Start
 -----------
 
-This quick start guide will show you how to plot abundance values similar to how they are plotted for the [eBird Status and Trends Abundance animations](https://ebird.org/science/status-and-trends/woothr/abundance-map-weekly). First, you need to access and download the data.
-
-TODO: Add details on how to acquire results.
-
-**IMPORTANT. AFTER DOWNLOADING THE RESULTS AND UNZIPPING THEM, DO NOT CHANGE THE FILE STRUCTURE.** All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package. See the SETUP PATHS part of the example code below.
+This quick start guide will show you how to download example dat and plot abundance values similar to how they are plotted for the [eBird Status and Trends Abundance animations](https://ebird.org/science/status-and-trends/woothr/abundance-map-weekly). **IMPORTANT. AFTER DOWNLOADING THE RESULTS, DO NOT CHANGE THE FILE STRUCTURE.** All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package.
 
 ``` r
 library(viridis)
@@ -62,9 +58,8 @@ rm(abunds)
 
 # get reference data from the rnaturalearth package
 # the example data currently shows only the US state of Michigan
-wh <- ne_countries(continent = c("North America"))
-wh_states <- ne_states(country = "United States of America")
-wh_sub <- wh_states[wh_states$name == "Michigan", ]
+wh_states <- ne_states(country = c("United States of America", "Canada"))
+wh_sub <- wh_states[!is.na(wh_states$name) & wh_states$name == "Michigan", ]
 
 # project to Mollweide for mapping and extent calc
 mollweide <- CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
@@ -73,7 +68,6 @@ mollweide <- CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
 abund_moll <- projectRaster(abund, crs = mollweide, method = 'ngb')
 
 # project the reference data as well
-wh_moll <- spTransform(wh, mollweide)
 wh_states_moll <- spTransform(wh_states, mollweide)
 
 # calculate ideal color bins for abundance values for this week
@@ -83,7 +77,8 @@ week_bins <- calc_bins(abund_moll)
 par(mfrow = c(1, 1), mar = c(0, 0, 0, 6))
 
 # use the extent object to set the spatial extent for the plot
-plot(extent(trim(abund_moll, values = NA)), col = 'white')
+plot(as(extent(trim(abund_moll, values = NA)), "SpatialPolygons"), 
+     col = 'white', border = 'white')
 
 # add background reference data
 plot(wh_states_moll, col = "#eeeeee", border = NA, add = TRUE)
@@ -120,7 +115,7 @@ ltq <- c(0, ltq)
 
 # plot legend
 plot(abund_moll ^ week_bins$power, col = lcol, legend.only = TRUE,
-     breaks = ltq, lab.breaks = bin_labels, legend.shrink = 0.97,
+     breaks = ltq ^ week_bins$power, lab.breaks = bin_labels, legend.shrink = 0.97,
      legend.width = 2, axis.args = list(cex.axis = 0.9, lwd.ticks = 0))
 
 # add state boundaries on top
@@ -128,9 +123,3 @@ plot(wh_states_moll, add = TRUE, border = 'white', lwd = 1.5)
 ```
 
 <img src="README-quick_start-1.png" style="display: block; margin: auto;" />
-
-``` r
-
-# clean up
-#unlink(temp_dir)
-```
