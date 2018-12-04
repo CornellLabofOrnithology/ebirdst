@@ -40,52 +40,31 @@ library(viridis)
 library(raster)
 library(rnaturalearth)
 
-# SETUP PATHS
-# Once you have downloaded and unzipped the results, place the resulting folder,
-# with the unique species ID name (e.g., woothr-ERD2016-PROD-20170505-3f880822)
-# wherever you want to keep it. Then provide the root_path variable as that
-# location (without the unique species ID name) and provide the unique species 
-# ID name as the species variable below. Use the paste() function to combine
+# DOWNLOAD DATA
+# Currently, example data is available on a public s3 bucket. The following 
+# download_data() function copies the species results to a selected path and 
+# returns the full path of the results. Please note that the example_data is
+# for Yellow-bellied Sapsucker and has the same run code as the real data,
+# so if you download both, make sure you put the example_data somewhere else.
+species <- "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"
+sp_path <- download_data("~/tmp/", species = species, example_data = TRUE)
+print(sp_path)
+#> [1] "~/tmp//yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"
 
-# This example downloads example data directly
-#species <- "amerob-ERD2016-EXAMPLE_DATA-20171122-5a9e702e"
-#species_url <- paste("http://ebirddata.ornith.cornell.edu/downloads/hidden/", 
-#                     species, ".zip", sep = "")
-
-#temp <- tempfile()
-#temp_dir <- tempdir()
-#download.file(species_url, temp)
-#unzip(temp, exdir = temp_dir)
-#unlink(temp)
-
-#sp_path <- paste(temp_dir, "/", species, sep = "")
-
-# Temp version before I put these on the web
-# Loading data
-root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
-sp_path <- paste(root_path, species, sep = "")
-
-# load Trimmed Mean Abundances and label
-abunds <- raster::stack(paste0(sp_path, "/results/tifs/", species,
-                               "_hr_2016_abundance_umean.tif"))
+# load estimated relative abundance and label with dates
+abunds <- raster::stack(paste0(sp_path, "/results/tifs/", species, 
+                              "_hr_2016_abundance_umean.tif"))
 abunds <- label_raster_stack(abunds)
 
-# to subset the data and add map context, get reference data from the rnaturalearth package
-wh <- ne_countries(continent = c("North America"))
-wh_states <- ne_states(iso_a2 = unique(wh@data$iso_a2))
-
-# region for subsetting
-wh_sub <- wh_states[wh_states$name %in% c("Minnesota", "Wisconsin", "Illinois", 
-                                          "Iowa", "Indiana", "Ohio", "Michigan"), ]
-
-# subset to a portion of the range
-ne_extent <- list(type = "polygon",
-                  polygon = wh_sub,
-                  t.min = 0.48,
-                  t.max = 0.50)
-abund <- raster_st_subset(abunds, ne_extent)
+# select a week in the summer
+abund <- abunds[[26]]
 rm(abunds)
+
+# get reference data from the rnaturalearth package
+# the example data currently shows only the US state of Michigan
+wh <- ne_countries(continent = c("North America"))
+wh_states <- ne_states(country = "United States of America")
+wh_sub <- wh_states[wh_states$name == "Michigan", ]
 
 # project to Mollweide for mapping and extent calc
 mollweide <- CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
