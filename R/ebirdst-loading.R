@@ -6,7 +6,7 @@
 #' @param path character; directory for data to be downloaded to
 #' @param species character; either a valid six letter code or "example_data"
 #'
-#' @return None.
+#' @return Full path to results.
 #'
 #' @export
 #'
@@ -17,12 +17,15 @@
 #'
 #' download_data(path, species)
 #' }
-download_data <- function(path, species) {
+download_data <- function(path, species, example_data = FALSE) {
   # toggle between example_data and actual species
 
-  if(species == "example_data") {
+  if(example_data) {
+    if(species != "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83") {
+      stop("Example data only available for 'yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83'.")
+    }
+
     bucket <- "s3://clo-is-da-example-data/"
-    species <- "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"
   } else {
     # TODO: add path to AWS data
     # TODO: once this works, add check
@@ -37,9 +40,9 @@ download_data <- function(path, species) {
     if(x$Size > 0) {
       split_key <- strsplit(x$Key, "/")
 
-      new_dir <- paste0(path,
-                        paste(split_key[[1]][1:length(split_key[[1]]) - 1],
-                              collapse = "/"))
+      new_dir <- paste(path, paste(split_key[[1]][1:length(split_key[[1]]) - 1],
+                                   collapse = "/"),
+                       sep = "/")
 
       dir.create(new_dir, recursive = TRUE, showWarnings = FALSE)
 
@@ -47,6 +50,8 @@ download_data <- function(path, species) {
                           overwrite = TRUE)
     }
   })
+
+  return(paste(path, species, sep = "/"))
 }
 
 #' Projects st_extent lat/lon list to sinusoidal raster Extent
