@@ -41,51 +41,27 @@ calc_full_extent <- function(x, path) {
   map_extent <- raster::extent(stack)
 
   # sometimes extent calculations get weird and you'll get a very broad
-  # extent that goes further than you want
-  # this section is intended to correct that by setting the mins and maxes
-  # to that of the template_raster
-  # however, if the stack comes in a different projection, we need to correct
-  # for that
-
-  # if stack projection is different from template_raster,
-  # project template_raster
-  # load template raster
-  e <- load_config(path)
-  tr <- raster::raster(paste(path, "/data/", e$RUN_NAME,
-                             "_srd_raster_template.tif", sep = ""))
-
-  if(raster::projection(tr) != raster::projection(stack)) {
-    this_template_raster <- raster::projectRaster(tr,
-                                                  crs = sp::proj4string(stack),
-                                                  method = 'ngb')
-  } else {
-    this_template_raster <- tr
-  }
-  rm(tr, stack)
-
-  # create object of this template_raster for comparison to extent extracted
-  # from the stack above
-  template_raster_extent <- raster::extent(this_template_raster)
-  rm(this_template_raster)
+  # extent that goes further than you want, so check against the input
+  input_raster_extent <- extent(x)
 
   # xmin too low
-  if(map_extent[1] < template_raster_extent[1]) {
-    map_extent[1] <- template_raster_extent[1]
+  if(map_extent[1] < input_raster_extent[1]) {
+    map_extent[1] <- input_raster_extent[1]
   }
 
   # xmax too high
-  if(map_extent[2] > template_raster_extent[2]) {
-    map_extent[2] <- template_raster_extent[2]
+  if(map_extent[2] > input_raster_extent[2]) {
+    map_extent[2] <- input_raster_extent[2]
   }
 
   # ymin too low
-  if(map_extent[3] < template_raster_extent[3]) {
-    map_extent[3] <- template_raster_extent[3]
+  if(map_extent[3] < input_raster_extent[3]) {
+    map_extent[3] <- input_raster_extent[3]
   }
 
   # ymax too high
-  if(map_extent[4] > template_raster_extent[4]) {
-    map_extent[4] <- template_raster_extent[4]
+  if(map_extent[4] > input_raster_extent[4]) {
+    map_extent[4] <- input_raster_extent[4]
   }
 
   return(map_extent)
