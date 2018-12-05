@@ -176,6 +176,44 @@ label_raster_stack <- function(raster_data) {
   return(raster_data)
 }
 
+#' Parses the names attached to a Raster* from label_raster_stack()
+#'
+#' The label_raster_stack() function labels the dates of the estimate rasters
+#' in the format of "XYYYY.MM.DD", because of constraints in the `raster`
+#' packge. This function converts that character vector into an ISO compliant
+#' Date vector.
+#'
+#' @param raster RasterLayer, RasterStack, or RasterBrick; full or subser of
+#' original eBird Status and Trends product raster GeoTiff.
+#'
+#' @return Date vector.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' rs <- stack("/path to GeoTiff/")
+#' rs_labeled <- label_raster_stack(raster_data)
+#' rs_dates <- parse_raster_dates(rs_labeled)
+#' }
+parse_raster_dates <- function(raster) {
+  # check raster_data is either RasterLayer or RasterStack or RasterBrick
+  if(!(class(raster) %in% c("RasterLayer", "RasterStack", "RasterBrick"))) {
+    stop("raster must be one of RasterLayer, RasterStack, or RasterBrick")
+  }
+
+  # check for names
+  if(all(is.na(names(raster))) == TRUE |
+     all(is.null(names(raster))) == TRUE |
+     length(names(raster)) == 0) {
+    stop("No names on Raster* object. Please call label_raster_stack() first.")
+  }
+
+  names <- as.Date(gsub("\\.", "-", gsub("X", "", names(raster))), "%Y-%m-%d")
+
+  return(names)
+}
+
 #' Spatiotemporal subsetter for eBird Status and Trends products table
 #'
 #' Internal function that takes a data.frame or SpatialPointsDataFrame and

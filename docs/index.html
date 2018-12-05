@@ -106,6 +106,22 @@ abunds &lt;-<span class="st"> </span>raster::<span class="kw"><a href="http://ww
                               <span class="st">"_hr_2016_abundance_umean.tif"</span>))
 abunds &lt;-<span class="st"> </span><span class="kw"><a href="reference/label_raster_stack.html">label_raster_stack</a></span>(abunds)
 
+<span class="co"># Note: if you want to work with a proper Date vector for the raster </span>
+<span class="co"># dates, use parse_raster_dates()</span>
+date_vector &lt;-<span class="st"> </span><span class="kw"><a href="reference/parse_raster_dates.html">parse_raster_dates</a></span>(abunds)
+<span class="kw">print</span>(date_vector)
+<span class="co">#&gt;  [1] "2016-01-04" "2016-01-11" "2016-01-18" "2016-01-25" "2016-02-01"</span>
+<span class="co">#&gt;  [6] "2016-02-08" "2016-02-15" "2016-02-22" "2016-03-01" "2016-03-08"</span>
+<span class="co">#&gt; [11] "2016-03-15" "2016-03-22" "2016-03-29" "2016-04-05" "2016-04-12"</span>
+<span class="co">#&gt; [16] "2016-04-19" "2016-04-26" "2016-05-03" "2016-05-10" "2016-05-17"</span>
+<span class="co">#&gt; [21] "2016-05-24" "2016-05-31" "2016-06-07" "2016-06-14" "2016-06-21"</span>
+<span class="co">#&gt; [26] "2016-06-28" "2016-07-06" "2016-07-13" "2016-07-20" "2016-07-27"</span>
+<span class="co">#&gt; [31] "2016-08-03" "2016-08-10" "2016-08-17" "2016-08-24" "2016-08-31"</span>
+<span class="co">#&gt; [36] "2016-09-07" "2016-09-14" "2016-09-21" "2016-09-28" "2016-10-05"</span>
+<span class="co">#&gt; [41] "2016-10-12" "2016-10-19" "2016-10-26" "2016-11-02" "2016-11-09"</span>
+<span class="co">#&gt; [46] "2016-11-16" "2016-11-23" "2016-11-30" "2016-12-07" "2016-12-14"</span>
+<span class="co">#&gt; [51] "2016-12-21" "2016-12-28"</span>
+
 <span class="co"># select a week in the summer</span>
 abund &lt;-<span class="st"> </span>abunds[[<span class="dv">26</span>]]
 <span class="kw">rm</span>(abunds)

@@ -64,6 +64,11 @@ abunds <- raster::stack(paste0(sp_path, "/results/tifs/", species,
                               "_hr_2016_abundance_umean.tif"))
 abunds <- label_raster_stack(abunds)
 
+# Note: if you want to work with a proper Date vector for the raster 
+# dates, use parse_raster_dates()
+date_vector <- parse_raster_dates(abunds)
+print(date_vector)
+
 # select a week in the summer
 abund <- abunds[[26]]
 rm(abunds)

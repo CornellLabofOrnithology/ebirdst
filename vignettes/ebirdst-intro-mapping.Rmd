@@ -125,6 +125,11 @@ abund_stack <- raster::stack(paste0(sp_path, "/results/tifs/", species,
                                "_hr_2016_abundance_umean.tif"))
 abund_stack <- label_raster_stack(abund_stack)
 print(abund_stack)
+
+# Note: if you want to work with a proper Date vector for the raster 
+# dates, use parse_raster_dates()
+date_vector <- parse_raster_dates(abund_stack)
+print(date_vector)
 ```
 
 # 3. Mapping Occurrence and Abundance
