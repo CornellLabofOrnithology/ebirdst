@@ -2,19 +2,15 @@ context("Loading functions")
 context("raster_st_subset")
 
 test_that("ebirdst raster_st_subset", {
-  root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
-  sp_path <- paste(root_path, species, sep = "")
-
   abunds <- raster::stack(paste0(sp_path, "/results/tifs/", species,
                                  "_hr_2016_abundance_umean.tif"))
   expect_is(abunds, "RasterStack")
 
   ne_extent <- list(type = "rectangle",
-                    lat.min = 40,
+                    lat.min = 42,
                     lat.max = 47,
-                    lon.min = -80,
-                    lon.max = -70,
+                    lon.min = -88,
+                    lon.max = -82,
                     t.min = 0.5,
                     t.max = 0.6)
 
@@ -31,10 +27,10 @@ test_that("ebirdst raster_st_subset", {
   ### variations
   # without temporal info
   ne_extent <- list(type = "rectangle",
-                    lat.min = 40,
+                    lat.min = 42,
                     lat.max = 47,
-                    lon.min = -80,
-                    lon.max = -70)
+                    lon.min = -88,
+                    lon.max = -82)
   expect_warning(raster_st_subset(abunds, ne_extent))
 
   abund_sub <- raster_st_subset(abunds, ne_extent)
@@ -45,7 +41,7 @@ test_that("ebirdst raster_st_subset", {
 
   # extent with shapefile
   library(sp)
-  e_extent <- raster::extent(-80, -70, 40, 47)
+  e_extent <- raster::extent(-88, -82, 40, 47)
   e_polys <- methods::as(e_extent, "SpatialPolygons")
   raster::crs(e_polys) <- sp::CRS("+init=epsg:4326")
 
@@ -93,13 +89,9 @@ test_that("ebirdst raster_st_subset", {
                "st_extent argument must be a list")
 })
 
-context("label_raster_stack")
+context("label_raster_stack and parse_raster_dates")
 
 test_that("ebirdst label_raster_stack", {
-  root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
-  sp_path <- paste(root_path, species, sep = "")
-
   abunds <- raster::stack(paste0(sp_path, "/results/tifs/", species,
                                  "_hr_2016_abundance_umean.tif"))
 
@@ -112,34 +104,34 @@ test_that("ebirdst label_raster_stack", {
                "The raster_data object must be full stack or brick of 52")
   expect_error(label_raster_stack(abunds[[1]]),
                "The raster_data object must be either RasterStack or RasterBrick.")
+
+  # expected
+  date_vector <- parse_raster_dates(abunds_labeled)
+  expect_equal(class(date_vector), "Date")
+
+  # error
+  expect_error(parse_raster_dates(abunds),
+               "raster names not in correct format. Please call label_raster_stack first.")
 })
 
 context("load_pis")
 
 test_that("ebirdst load_pis", {
-  root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
-  sp_path <- paste(root_path, species, sep = "")
-
   expect_is(load_pis(sp_path), "data.frame")
   expect_gt(nrow(load_pis(sp_path)), 0)
 
   # broken path
-  sp_path <- '~/some/messed/up/path/that/does/not/exist'
-  expect_error(load_pis(sp_path), "RData file does not exist")
+  expect_error(load_pis('~/some/messed/up/path/that/does/not/exist'),
+               "RData file does not exist")
 })
 
 context("load_pds")
 
 test_that("stemhelpe load_pds", {
-  root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
-  sp_path <- paste(root_path, species, sep = "")
-
   expect_is(load_pds(sp_path), "data.frame")
   expect_gt(nrow(load_pds(sp_path)), 0)
 
   # broken path
-  sp_path <- '~/some/messed/up/path/that/does/not/exist'
-  expect_error(load_pds(sp_path), "RData file does not exist")
+  expect_error(load_pds('~/some/messed/up/path/that/does/not/exist'),
+               "RData file does not exist")
 })

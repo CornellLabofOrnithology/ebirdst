@@ -4,15 +4,11 @@ context("calc_full_extent")
 test_that("ebirdst calc_full_extent", {
   library(sp)
 
-  root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
-  sp_path <- paste(root_path, species, sep = "")
-
   ne_extent <- list(type = "rectangle",
-                    lat.min = 40,
+                    lat.min = 42,
                     lat.max = 47,
-                    lon.min = -80,
-                    lon.max = -70,
+                    lon.min = -88,
+                    lon.max = -82,
                     t.min = 0.425,
                     t.max = 0.475)
 
@@ -27,8 +23,9 @@ test_that("ebirdst calc_full_extent", {
   expect_is(calc_full_extent(abund[[2]], sp_path), "Extent")
 
   # projected
+  mollweide <- CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
   abund_prj <- suppressWarnings(raster::projectRaster(abund[[2]],
-                                                      crs = "+init=epsg:4326"))
+                                                      crs = mollweide))
   expect_is(calc_full_extent(abund_prj, sp_path), "Extent")
 
   # not a raster object
@@ -42,15 +39,11 @@ context("calc_bins")
 test_that("ebirdst calc_bins", {
   library(sp)
 
-  root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
-  sp_path <- paste(root_path, species, sep = "")
-
   ne_extent <- list(type = "rectangle",
-                    lat.min = 40,
+                    lat.min = 42,
                     lat.max = 47,
-                    lon.min = -80,
-                    lon.max = -70,
+                    lon.min = -88,
+                    lon.max = -82,
                     t.min = 0.425,
                     t.max = 0.475)
 
@@ -58,10 +51,10 @@ test_that("ebirdst calc_bins", {
                                 "_hr_2016_abundance_umean.tif"))
   abund <- raster_st_subset(abund, ne_extent)
 
-  # expected RasterStack
+  # expect a list greater than 1 for RasterStack
   expect_gt(length(calc_bins(abund)), 1)
 
-  # RasterLayer
+  # expect a list greater than 1 for RasterLayer
   expect_gt(length(calc_bins(abund[[2]])), 1)
 
   # projected
@@ -83,10 +76,6 @@ test_that("ebirdst calc_bins", {
 context("map_centroids")
 
 test_that("ebirdst map_centroids", {
-  root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
-  sp_path <- paste(root_path, species, sep = "")
-
   pis <- load_pis(sp_path)
   pds <- load_pds(sp_path)
 
@@ -95,10 +84,10 @@ test_that("ebirdst map_centroids", {
 
   # expected with st_extent
   ne_extent <- list(type = "rectangle",
-                    lat.min = 40,
+                    lat.min = 42,
                     lat.max = 47,
-                    lon.min = -80,
-                    lon.max = -70,
+                    lon.min = -88,
+                    lon.max = -82,
                     t.min = 0.425,
                     t.max = 0.475)
   expect_error(map_centroids(pis = pis, pds = pds, st_extent = ne_extent), NA)
@@ -137,18 +126,14 @@ test_that("ebirdst map_centroids", {
 context("calc_effective_extent")
 
 test_that("ebirdst calc_effective_extent", {
-  root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
-  sp_path <- paste(root_path, species, sep = "")
-
   pis <- load_pis(sp_path)
   pds <- load_pds(sp_path)
 
   ne_extent <- list(type = "rectangle",
-                    lat.min = 41,
-                    lat.max = 43,
-                    lon.min = -78,
-                    lon.max = -76,
+                    lat.min = 42,
+                    lat.max = 46,
+                    lon.min = -86,
+                    lon.max = -82,
                     t.min = 0.425,
                     t.max = 0.475)
 
@@ -169,10 +154,10 @@ test_that("ebirdst calc_effective_extent", {
 
   # no temporal info
   ne_extent <- list(type = "rectangle",
-                    lat.min = 41,
-                    lat.max = 42,
-                    lon.min = -78,
-                    lon.max = -77)
+                    lat.min = 42,
+                    lat.max = 47,
+                    lon.min = -86,
+                    lon.max = -83)
   expect_warning(calc_effective_extent(st_extent = ne_extent, pis = pis,
                                        path = sp_path),
                  "Without temporal limits")

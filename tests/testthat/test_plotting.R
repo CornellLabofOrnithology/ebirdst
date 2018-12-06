@@ -3,18 +3,14 @@ context("plot_pis")
 
 # plot_pis
 test_that("ebirdst plot_pis", {
-  root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
-  sp_path <- paste(root_path, species, sep = "")
-
   pis <- load_pis(sp_path)
 
   # expected with st_extent
   ne_extent <- list(type = "rectangle",
-                    lat.min = 40,
+                    lat.min = 42,
                     lat.max = 47,
-                    lon.min = -80,
-                    lon.max = -70,
+                    lon.min = -88,
+                    lon.max = -82,
                     t.min = 0.425,
                     t.max = 0.475)
   expect_error(plot_pis(path = sp_path,
@@ -78,20 +74,17 @@ test_that("ebirdst plot_pis", {
                "num_top_preds must be greater than 1")
 
   # broken path
-  sp_path <- '~/some/messed/up/path/that/does/not/exist'
-  expect_error(plot_pis(path = sp_path,
+  expect_error(plot_pis(path = '~/some/messed/up/path/that/does/not/exist',
                         pis = pis,
                         st_extent = ne_extent),
                "RData file does not exist")
 
-  sp_path <- paste(root_path, species, sep = "")
-
   # missing temporal info
   ne_extent <- list(type = "rectangle",
-                    lat.min = 40,
-                    lat.max = 47,
-                    lon.min = -80,
-                    lon.max = -70)
+                    lat.min = 42,
+                    lat.max = 45,
+                    lon.min = -88,
+                    lon.max = -82)
   expect_error(plot_pis(path = sp_path,
                      pis = pis,
                      st_extent = ne_extent),
@@ -140,18 +133,14 @@ context("plot_pds")
 
 # plot_pds
 test_that("ebirdst plot_pds", {
-  root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-  species <- "woothr-ERD2016-SP_TEST-20180724-7ff34421"
-  sp_path <- paste(root_path, species, sep = "")
-
   pds <- load_pds(sp_path)
 
   # expected with st_extent
   ne_extent <- list(type = "rectangle",
-                    lat.min = 40,
-                    lat.max = 47,
-                    lon.min = -80,
-                    lon.max = -70,
+                    lat.min = 42,
+                    lat.max = 45,
+                    lon.min = -88,
+                    lon.max = -82,
                     t.min = 0.425,
                     t.max = 0.475)
   expect_error(plot_pds(pd_name = "EFFORT_HRS",
