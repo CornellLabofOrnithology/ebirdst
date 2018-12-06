@@ -206,11 +206,11 @@ parse_raster_dates <- function(raster) {
   if(all(is.na(names(raster))) == TRUE |
      all(is.null(names(raster))) == TRUE |
      length(names(raster)) == 0) {
-    stop("No names on Raster* object. Please call label_raster_stack() first.")
+    stop("No names on Raster object. Please call label_raster_stack() first.")
   }
 
   if(length(grep("X2016.", names(raster)[1])) == 0) {
-    stop("Raster* names not in correct format. Please call label_raster_stack first.")
+    stop("raster names not in correct format. Please call label_raster_stack first.")
   }
 
   names <- as.Date(gsub("\\.", "-", gsub("X", "", names(raster))), "%Y-%m-%d")
