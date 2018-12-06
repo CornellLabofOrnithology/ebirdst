@@ -160,6 +160,10 @@ calc_bins <- function(x) {
     log_sd <- append(log_sd, minl, after = 0)
   }
 
+  if(log_sd[1] < 0) {
+    log_sd[1] <- 0.01 ^ this_power
+  }
+
   if(log_sd[1] ^ (1 / this_power) < 0.01) {
     log_sd[1] <- 0.01 ^ this_power
   }
