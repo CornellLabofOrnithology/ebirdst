@@ -1,0 +1,91 @@
+---
+title: "Generating Seasonal Abundance and Range Maps and Stats"
+author: "Tom Auer, Daniel Fink"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Generating Seasonal Abundance and Range Maps and Stats}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, 
+                      message = FALSE, 
+                      out.width = "\\textwidth", 
+                      fig.height = 5, 
+                      fig.width = 7, 
+                      fig.align = "center")
+devtools::load_all()
+```
+
+# Outline
+
+1. Introduction
+2. Season Definition
+3. Abundance Maps
+4. Range Maps
+5. Days of Occupation Statistic
+
+# 1. Introduction
+
+This vignette describes how to recreate the seasonal map products found on the [eBird Status and Trends pages](https://ebird.org/science/status-and-trends). First, the vignette will cover the background and details for acquiring the seasonal definitions used on those pages and then proceed with examples of averaging data seasonally, making abundance maps, aggregating and smoothing data for range maps, and, finally, provide an example of calculating the "Days of occupation" statistic.
+
+# 2. Season Defintion
+
+Generally, the seasons defined for eBird Status and Trends products are done through expert review. For information on the details of defining seasons, please see the [seasons section of the FAQ](https://ebird.org/science/status-and-trends/faq#seasons). While it is certainly possible to define your own seasons when making seasonal abundance and range maps, if you want to recreate the products with the same seasons as the website, you'll need to login to ebird.org and download the "Regional range and abundance as tabular data" (the "Download all stats (csv)" button) from the eBird Status and Trends [download page](https://ebird.org/science/status-and-trends/download-data). The rest of this vignette will use the seasons defined in that csv file.
+
+```{r load_stats}
+# For this vignette, the csv file has been downloaded, unzipped, and placed
+# in the /tmp directory of the root path
+all_stats <- read.csv("~/tmp/all-stats-regional-2018.csv/regionSummaries-2018.csv")
+
+# This file contains information for all 107 species, so the first step
+# is to subset to Yellow-bellied Sapsucker for the example_data.
+yebsap <- all_stats[all_stats$species_code == "yebsap", ]
+
+# The file replicates season names, start and end dates across the 
+# different regions for which statistics are calculated, so we can
+# get just one unique set of seasons by subsetting this data.frame
+# further to just Michigan
+yebsap_mi <- yebsap[yebsap$region_name == "Michigan", ]
+print(yebsap_mi[, c("season_name", "start_dt", "end_dt")])
+
+# cleanup unneeded data
+rm(all_stats, yebsap)
+```
+
+# 3. Abundance Maps
+
+This section will give an example of how to average the weekly abundance data
+together and generate both individual and combined seasonal maps, in the style of the eBird Status and Trends Abundance [maps](https://ebird.org/science/status-and-trends/yebsap/abundance-map), using the example_data available, which has been subset to the state of Michigan.
+
+```{r abundance_maps}
+# DOWNLOAD DATA
+# Currently, example data is available on a public s3 bucket. The following 
+# download_data() function copies the species results to a selected path and 
+# returns the full path of the results. Please note that the example_data is
+# for Yellow-bellied Sapsucker and has the same run code as the real data,
+# so if you download both, make sure you put the example_data somewhere else.
+species <- "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"
+sp_path <- download_data("~/tmp/", species = species, example_data = TRUE)
+
+# load trimmed mean abundances and label dates
+abund_stack <- raster::stack(paste0(sp_path, "/results/tifs/", species,
+                               "_hr_2016_abundance_umean.tif"))
+abund_stack <- label_raster_stack(abund_stack)
+
+# getting the data vector will make interacting with the seasonal definitions easier
+date_vector <- parse_raster_dates(abund_stack)
+
+# average by season
+```
+
+# 4. Range Maps
+
+
+
+
+
+
+# 5. Day Use Statistic
