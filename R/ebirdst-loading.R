@@ -1,57 +1,78 @@
-#' Downloads data package for a single species or for the example data
+#' Download eBird Status and Trends Data
 #'
-#' This function will download the entire data package for a single species to a
-#' specified path.
+#' Download an eBird Status and Trends data package for a single species, or for
+#' an example species, to a specified path. The example data consist of the
+#' results for Yellow-bellied Sapsucker subset to Michigan and are much smaller
+#' than the full dataset making these data quicker to download and process.
 #'
-#' @param path character; directory for data to be downloaded to
-#' @param species character; either a valid six letter code or "example_data"
+#' @param species character; a single six-letter species code (e.g. rufhum).
+#'   The full list of valid codes is can be viewed in the [runs_w_names] data
+#'   frame included in this package. To download the example dataset, use
+#'   "example_data".
+#' @param path character; directory to download the data to. All downloaded
+#'   files will be placed in a sub-directory of this directory named according
+#'   to the unique run ID associated with this species.
 #'
-#' @return Full path to results.
-#'
+#' @return Vector of paths to the downloaded files.
 #' @export
-#'
 #' @examples
-#' #' \dontrun{
-#' path <- "~/tmp"
-#' species <- "example_data"
-#'
-#' download_data(path, species)
+#' \dontrun{
+#'   dl_dir <- tempdir()
+#'   download_data("example_data", path = dl_dir)
 #' }
-download_data <- function(path, species, example_data = FALSE) {
-  # toggle between example_data and actual species
+download_data <- function(species, path) {
+  stopifnot(is.character(species), length(species) == 1)
+  stopifnot(is.character(path), length(path) == 1, dir.exists(path))
+  species <- tolower(species)
 
-  if(example_data) {
-    if(species != "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83") {
-      stop("Example data only available for 'yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83'.")
-    }
-
-    bucket <- "s3://clo-is-da-example-data/"
+  # example data or a real run
+  if (species == "example_data") {
+    bucket_url <- "https://clo-is-da-example-data.s3.amazonaws.com/"
+    run <- "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"
   } else {
-    # TODO: add path to AWS data
-    # TODO: once this works, add check
-    bucket <- "s3://clo-is-da-example-data/"
+    row_id <- which(ebirdst::runs_w_names$SPECIES_CODE == species)
+    if (length(row_id) != 1) {
+      stop(sprintf("species = %s does not uniquely identify a species."))
+    }
+    # presumably this url will change
+    bucket_url <- "https://clo-is-da-example-data.s3.amazonaws.com/"
+    run <- ebirdst::runs_w_names$RUN_NAME[row_id]
   }
 
-  # list what's in the bucket
-  sp_bucket <- aws.s3::get_bucket(bucket = paste0(bucket, species))
+  # get bucket contents
+  s3_contents <- xml2::xml_ns_strip(xml2::read_xml(bucket_url))
+  s3_contents <- xml2::xml_find_all(s3_contents, ".//Contents")
+  if (length(s3_contents) == 0) {
+    stop(sprintf("Files not found on AWS S3 for species = %s", species))
+  }
+  # store filename and size
+  s3_files <- data.frame(
+    file = xml2::xml_text(xml2::xml_find_all(s3_contents, ".//Key")),
+    size = xml2::xml_text(xml2::xml_find_all(s3_contents, ".//Size")),
+    stringsAsFactors = FALSE)
+  s3_files$size <- as.numeric(s3_files$size)
+  # filter to desired run/species
+  s3_files[as.numeric(s3_files$size) > 0 & grepl(run, s3_files$file), ]
+  if (nrow(s3_files) == 0) {
+    stop(sprintf("Files not found on AWS S3 for species = %s", species))
+  }
 
-  # download things that have size greater than 0
-  lapply(sp_bucket, function(x) {
-    if(x$Size > 0) {
-      split_key <- strsplit(x$Key, "/")
+  # prepare downlaod paths
+  s3_files$s3_path <- paste0(bucket_url, s3_files$file)
+  s3_files$local_path <- file.path(path, s3_files$file)
+  # create necessary directories
+  dirs <- unique(dirname(s3_files$local_path))
+  for (d in dirs) {
+    dir.create(d, showWarnings = FALSE, recursive = TRUE)
+  }
+  # download
+  dl_response <- download.file(s3_files$s3_path, s3_files$local_path,
+                               quiet = TRUE)
+  if (dl_response != 0) {
+    stop("Error downloading files from AWS S3")
+  }
 
-      new_dir <- paste(path, paste(split_key[[1]][1:length(split_key[[1]]) - 1],
-                                   collapse = "/"),
-                       sep = "/")
-
-      dir.create(new_dir, recursive = TRUE, showWarnings = FALSE)
-
-      aws.s3::save_object(object = x, file = paste0(path, x$Key),
-                          overwrite = TRUE)
-    }
-  })
-
-  return(paste(path, species, sep = "/"))
+  return(invisible(normalizePath(s3_files$local_path)))
 }
 
 #' Projects st_extent lat/lon list to sinusoidal raster Extent
