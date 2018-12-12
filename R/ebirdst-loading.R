@@ -13,7 +13,7 @@
 #'   files will be placed in a sub-directory of this directory named according
 #'   to the unique run ID associated with this species.
 #'
-#' @return Vector of paths to the downloaded files.
+#' @return Path to the run-specific root of the downloaded files.
 #' @export
 #' @examples
 #' \dontrun{
@@ -72,7 +72,7 @@ download_data <- function(species, path) {
     stop("Error downloading files from AWS S3")
   }
 
-  return(invisible(normalizePath(s3_files$local_path)))
+  return(invisible(normalizePath(paste0(path, "/", run))))
 }
 
 #' Projects st_extent lat/lon list to sinusoidal raster Extent
