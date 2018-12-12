@@ -60,7 +60,7 @@
       <h1>Advanced Vignette: Using Predictor Importance and Partial Dependence Information</h1>
                         <h4 class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2018-12-05</h4>
+            <h4 class="date">2018-12-12</h4>
           </div>
 
     
@@ -103,9 +103,9 @@
 <span class="co"># for Yellow-bellied Sapsucker and has the same run code as the real data,</span>
 <span class="co"># so if you download both, make sure you put the example_data somewhere else.</span>
 species &lt;-<span class="st"> "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"</span>
-sp_path &lt;-<span class="st"> </span><span class="kw"><a href="../reference/download_data.html">download_data</a></span>(<span class="st">"~/tmp/"</span>, <span class="dt">species =</span> species, <span class="dt">example_data =</span> <span class="ot">TRUE</span>)
+sp_path &lt;-<span class="st"> </span><span class="kw"><a href="../reference/download_data.html">download_data</a></span>(<span class="dt">species =</span> <span class="st">"example_data"</span>, <span class="dt">path =</span> <span class="st">"~/tmp/"</span>)
 <span class="kw">print</span>(sp_path)</code></pre></div>
-<pre><code>## [1] "~/tmp//yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"</code></pre>
+<pre><code>## [1] "/Users/mta45/tmp/yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pis &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_pis.html">load_pis</a></span>(sp_path)
 pds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_pds.html">load_pds</a></span>(sp_path)</code></pre></div>
 </div>
@@ -216,7 +216,7 @@ pi_extent &lt;-<span class="st"> </span><span class="kw"><a href="../reference/c
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="http://twitter.com/tom_auer">Tom Auer</a>, Daniel Fink.</p>
+  <p>Developed by <a href="http://twitter.com/tom_auer">Tom Auer</a>, Daniel Fink, <a href="http://strimas.com">Matthew Strimas-Mackey</a>.</p>
 </div>
 
 <div class="pkgdown">

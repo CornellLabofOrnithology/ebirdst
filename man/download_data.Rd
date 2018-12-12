@@ -17,7 +17,7 @@ files will be placed in a sub-directory of this directory named according
 to the unique run ID associated with this species.}
 }
 \value{
-Vector of paths to the downloaded files.
+Path to the run-specific root of the downloaded files.
 }
 \description{
 Download an eBird Status and Trends data package for a single species, or for

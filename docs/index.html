@@ -91,19 +91,19 @@ devtools::<span class="kw">install_github</span>(<span class="st">"CornellLabofO
 <span class="kw">library</span>(rnaturalearth)
 
 <span class="co"># DOWNLOAD DATA</span>
-<span class="co"># Currently, example data is available on a public s3 bucket. The following </span>
+<span class="co"># Currently, example data is available on a public AWS s3 bucket. The following </span>
 <span class="co"># download_data() function copies the species results to a selected path and </span>
 <span class="co"># returns the full path of the results. Please note that the example_data is</span>
 <span class="co"># for Yellow-bellied Sapsucker and has the same run code as the real data,</span>
 <span class="co"># so if you download both, make sure you put the example_data somewhere else.</span>
-species &lt;-<span class="st"> "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"</span>
-sp_path &lt;-<span class="st"> </span><span class="kw"><a href="reference/download_data.html">download_data</a></span>(<span class="st">"~/tmp/"</span>, <span class="dt">species =</span> species, <span class="dt">example_data =</span> <span class="ot">TRUE</span>)
+sp_path &lt;-<span class="st"> </span><span class="kw"><a href="reference/download_data.html">download_data</a></span>(<span class="dt">species =</span> <span class="st">"example_data"</span>, <span class="dt">path =</span> <span class="st">"~/tmp/"</span>)
 <span class="kw">print</span>(sp_path)
-<span class="co">#&gt; [1] "~/tmp//yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"</span>
+<span class="co">#&gt; [1] "/Users/mta45/tmp/yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"</span>
 
 <span class="co"># load estimated relative abundance and label with dates</span>
-abunds &lt;-<span class="st"> </span>raster::<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/stack">stack</a></span>(<span class="kw">paste0</span>(sp_path, <span class="st">"/results/tifs/"</span>, species, 
-                              <span class="st">"_hr_2016_abundance_umean.tif"</span>))
+abunds &lt;-<span class="st"> </span>raster::<span class="kw"><a href="http://www.rdocumentation.org/packages/raster/topics/stack">stack</a></span>(<span class="kw">list.files</span>(<span class="dt">path =</span> <span class="kw">paste0</span>(sp_path, <span class="st">"/results/tifs/"</span>),
+                                   <span class="dt">pattern =</span> <span class="st">"*_hr_2016_abundance_umean.tif"</span>,
+                                   <span class="dt">full.names =</span> <span class="ot">TRUE</span>))
 abunds &lt;-<span class="st"> </span><span class="kw"><a href="reference/label_raster_stack.html">label_raster_stack</a></span>(abunds)
 
 <span class="co"># Note: if you want to work with a proper Date vector for the raster </span>
@@ -216,6 +216,8 @@ ltq &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</
 <li>
 <a href="http://twitter.com/tom_auer">Tom Auer</a> <br><small class="roles"> Author, maintainer </small> </li>
 <li>Daniel Fink <br><small class="roles"> Author </small> </li>
+<li>
+<a href="http://strimas.com">Matthew Strimas-Mackey</a> <br><small class="roles"> Author </small> </li>
 <li><a href="authors.html">All authors...</a></li>
 </ul>
 </div>
@@ -224,7 +226,7 @@ ltq &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="http://twitter.com/tom_auer">Tom Auer</a>, Daniel Fink.</p>
+  <p>Developed by <a href="http://twitter.com/tom_auer">Tom Auer</a>, Daniel Fink, <a href="http://strimas.com">Matthew Strimas-Mackey</a>.</p>
 </div>
 
 <div class="pkgdown">

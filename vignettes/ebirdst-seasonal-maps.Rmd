@@ -67,16 +67,16 @@ together and generate both individual and combined seasonal maps, in the style o
 # returns the full path of the results. Please note that the example_data is
 # for Yellow-bellied Sapsucker and has the same run code as the real data,
 # so if you download both, make sure you put the example_data somewhere else.
-species <- "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"
-sp_path <- download_data("~/tmp/", species = species, example_data = TRUE)
+sp_path <- download_data(species = "example_data", path = "~/tmp/")
 
 # load trimmed mean abundances and label dates
-abund_stack <- raster::stack(paste0(sp_path, "/results/tifs/", species,
-                               "_hr_2016_abundance_umean.tif"))
-abund_stack <- label_raster_stack(abund_stack)
+abunds <- raster::stack(list.files(path = paste0(sp_path, "/results/tifs/"),
+                                   pattern = "*_hr_2016_abundance_umean.tif",
+                                   full.names = TRUE))
+abunds <- label_raster_stack(abunds)
 
 # getting the data vector will make interacting with the seasonal definitions easier
-date_vector <- parse_raster_dates(abund_stack)
+date_vector <- parse_raster_dates(abunds)
 
 # average by season
 ```

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Downloads data package for a single species or for the example data — download_data • ebirdst</title>
+<title>Download eBird Status and Trends Data — download_data • ebirdst</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -80,45 +80,46 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Downloads data package for a single species or for the example data</h1>
+    <h1>Download eBird Status and Trends Data</h1>
     </div>
 
     
-    <p>This function will download the entire data package for a single species to a
-specified path.</p>
+    <p>Download an eBird Status and Trends data package for a single species, or for
+an example species, to a specified path. The example data consist of the
+results for Yellow-bellied Sapsucker subset to Michigan and are much smaller
+than the full dataset making these data quicker to download and process.</p>
     
 
-    <pre class="usage"><span class='fu'>download_data</span>(<span class='no'>path</span>, <span class='no'>species</span>, <span class='kw'>example_data</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>download_data</span>(<span class='no'>species</span>, <span class='no'>path</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>path</th>
-      <td><p>character; directory for data to be downloaded to</p></td>
+      <th>species</th>
+      <td><p>character; a single six-letter species code (e.g. rufhum).
+The full list of valid codes is can be viewed in the <a href='runs_w_names.html'>runs_w_names</a> data
+frame included in this package. To download the example dataset, use
+"example_data".</p></td>
     </tr>
     <tr>
-      <th>species</th>
-      <td><p>character; either a valid six letter code or "example_data"</p></td>
+      <th>path</th>
+      <td><p>character; directory to download the data to. All downloaded
+files will be placed in a sub-directory of this directory named according
+to the unique run ID associated with this species.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Full path to results.</p>
+    <p>Path to the run-specific root of the downloaded files.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>#' \dontrun{
-path <- "~/tmp"
-species <- "example_data"
-
-download_data(path, species)
-}
-</div><div class='output co'>#&gt; <span class='error'>Error: &lt;text&gt;:6:1: unexpected '}'</span>
-#&gt; <span class='error'>5: download_data(path, species)</span>
-#&gt; <span class='error'>6: }</span>
-#&gt; <span class='error'>   ^</span></div></pre>
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+  <span class='no'>dl_dir</span> <span class='kw'>&lt;-</span> <span class='fu'>tempdir</span>()
+  <span class='fu'>download_data</span>(<span class='st'>"example_data"</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>dl_dir</span>)
+<span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -135,7 +136,7 @@ download_data(path, species)
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='http://twitter.com/tom_auer'>Tom Auer</a>, Daniel Fink.</p>
+  <p>Developed by <a href='http://twitter.com/tom_auer'>Tom Auer</a>, Daniel Fink, <a href='http://strimas.com'>Matthew Strimas-Mackey</a>.</p>
 </div>
 
 <div class="pkgdown">
