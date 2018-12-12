@@ -37,19 +37,19 @@ library(raster)
 library(rnaturalearth)
 
 # DOWNLOAD DATA
-# Currently, example data is available on a public s3 bucket. The following 
+# Currently, example data is available on a public AWS s3 bucket. The following 
 # download_data() function copies the species results to a selected path and 
 # returns the full path of the results. Please note that the example_data is
 # for Yellow-bellied Sapsucker and has the same run code as the real data,
 # so if you download both, make sure you put the example_data somewhere else.
-species <- "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"
-sp_path <- download_data("~/tmp/", species = species, example_data = TRUE)
+sp_path <- download_data(species = "example_data", path = "~/tmp/")
 print(sp_path)
-#> [1] "~/tmp//yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"
+#> [1] "/Users/mta45/tmp/yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"
 
 # load estimated relative abundance and label with dates
-abunds <- raster::stack(paste0(sp_path, "/results/tifs/", species, 
-                              "_hr_2016_abundance_umean.tif"))
+abunds <- raster::stack(list.files(path = paste0(sp_path, "/results/tifs/"),
+                                   pattern = "*_hr_2016_abundance_umean.tif",
+                                   full.names = TRUE))
 abunds <- label_raster_stack(abunds)
 
 # Note: if you want to work with a proper Date vector for the raster 
