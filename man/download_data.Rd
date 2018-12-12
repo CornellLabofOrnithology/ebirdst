@@ -2,27 +2,32 @@
 % Please edit documentation in R/ebirdst-loading.R
 \name{download_data}
 \alias{download_data}
-\title{Downloads data package for a single species or for the example data}
+\title{Download eBird Status and Trends Data}
 \usage{
-download_data(path, species, example_data = FALSE)
+download_data(species, path)
 }
 \arguments{
-\item{path}{character; directory for data to be downloaded to}
+\item{species}{character; a single six-letter species code (e.g. rufhum).
+The full list of valid codes is can be viewed in the \link{runs_w_names} data
+frame included in this package. To download the example dataset, use
+"example_data".}
 
-\item{species}{character; either a valid six letter code or "example_data"}
+\item{path}{character; directory to download the data to. All downloaded
+files will be placed in a sub-directory of this directory named according
+to the unique run ID associated with this species.}
 }
 \value{
-Full path to results.
+Vector of paths to the downloaded files.
 }
 \description{
-This function will download the entire data package for a single species to a
-specified path.
+Download an eBird Status and Trends data package for a single species, or for
+an example species, to a specified path. The example data consist of the
+results for Yellow-bellied Sapsucker subset to Michigan and are much smaller
+than the full dataset making these data quicker to download and process.
 }
 \examples{
-#' \dontrun{
-path <- "~/tmp"
-species <- "example_data"
-
-download_data(path, species)
+\dontrun{
+  dl_dir <- tempdir()
+  download_data("example_data", path = dl_dir)
 }
 }
