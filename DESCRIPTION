@@ -34,5 +34,4 @@ Imports: raster,
     methods,
     gridExtra,
     rgdal,
-    car,
-    aws.s3
+    car
