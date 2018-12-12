@@ -50,13 +50,13 @@ library(raster)
 library(rnaturalearth)
 
 # DOWNLOAD DATA
-# Currently, example data is available on a public s3 bucket. The following 
+# Currently, example data is available on a public AWS s3 bucket. The following 
 # download_data() function copies the species results to a selected path and 
 # returns the full path of the results. Please note that the example_data is
 # for Yellow-bellied Sapsucker and has the same run code as the real data,
 # so if you download both, make sure you put the example_data somewhere else.
 species <- "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"
-sp_path <- download_data("~/tmp/", species = species, example_data = TRUE)
+sp_path <- download_data(species = "example_data", path = "~/tmp/")
 print(sp_path)
 
 # load estimated relative abundance and label with dates

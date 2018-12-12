@@ -58,7 +58,7 @@ The first step when working with stixel centroid data is to load the Predictor I
 # for Yellow-bellied Sapsucker and has the same run code as the real data,
 # so if you download both, make sure you put the example_data somewhere else.
 species <- "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"
-sp_path <- download_data("~/tmp/", species = species, example_data = TRUE)
+sp_path <- download_data(species = "example_data", path = "~/tmp/")
 print(sp_path)
 
 pis <- load_pis(sp_path)
