@@ -66,10 +66,13 @@ download_data <- function(species, path) {
     dir.create(d, showWarnings = FALSE, recursive = TRUE)
   }
   # download
-  dl_response <- download.file(s3_files$s3_path, s3_files$local_path,
-                               quiet = TRUE)
-  if (dl_response != 0) {
-    stop("Error downloading files from AWS S3")
+  for(f in 1:nrow(s3_files)) {
+    dl_response <- download.file(s3_files[f, ]$s3_path,
+                                 s3_files[f, ]$local_path,
+                                 quiet = TRUE)
+    if (dl_response != 0) {
+      stop("Error downloading files from AWS S3")
+    }
   }
 
   return(invisible(normalizePath(paste0(path, "/", run))))
