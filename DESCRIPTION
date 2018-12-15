@@ -11,10 +11,6 @@ License: GPL-3 + file LICENSE
 URL: https://github.com/CornellLabofOrnithology/ebirdst
 BugReports: https://github.com/CornellLabofOrnithology/ebirdst/issues
 Depends: R (>= 3.3.0)
-Suggests: 
-    knitr,
-    rmarkdown,
-    testthat
 Imports: 
     raster,
     tools,
@@ -34,6 +30,10 @@ Imports:
     gridExtra,
     rgdal,
     car
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat
 VignetteBuilder: knitr
 Encoding: UTF-8
 LazyData: true
