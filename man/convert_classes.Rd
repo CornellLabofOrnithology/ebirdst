@@ -7,13 +7,12 @@
 convert_classes(cov_names, by_cover_class = FALSE, pretty = FALSE)
 }
 \arguments{
-\item{cov_names}{vector; Cover class names to convert.}
+\item{cov_names}{character; vector of cover class names to convert.}
 
-\item{by_cover_class}{logical; Default is FALSE. If TRUE, replaces fragstat
-cover class name with a name for the cover class as whole.}
+\item{by_cover_class}{logical; whether to replace FRAGSTATS cover class name
+with a name for the cover class as whole.}
 
-\item{pretty}{logical; Default is FALSE. If TRUE, Converts from capital case
-to title case.}
+\item{pretty}{logical; whether to convert from capital case to title case.}
 }
 \value{
 A vector of converted names.
@@ -24,7 +23,6 @@ readable land cover names.
 }
 \examples{
 cns <- c("UMD_FS_C1_1500_PLAND", "MODISWATER_FS_C7_1500_LPI")
-
-converted <- convert_classes(cov_names = cns, pretty = TRUE)
+converted <- ebirdst:::convert_classes(cov_names = cns, pretty = TRUE)
 }
 \keyword{internal}

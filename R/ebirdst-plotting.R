@@ -5,19 +5,20 @@
 #' importances, from highest to lowest. Many function parameters allow for
 #' customized plots.
 #'
-#' @param path character; Full path to single species eBird Status and Trends products.
-#' @param pis data.frame; From `load_pis()`.
-#' @param st_extent list; st_extent list for spatiotemporal filtering. Required,
-#' as results are less meaningful over large spatiotemporal extents.
-#' @param by_cover_class logical; Default is FALSE. If TRUE, aggregate Fragstats
-#' for the land cover classes into single values for the land cover classes.
-#' @param num_top_preds int; Integer showing how many predictors to show.
-#' @param return_top logical; Default is FALSE. If TRUE, returns a vecotr of the
-#' top predictors, based on the `num_top_preds` param.
-#' @param pretty_names logical; Default is TRUE. Set to convert cryptic land
-#' cover codes to readable land cover class names.
-#' @param print_plot logical; Default is TRUE. Toggle to print plot, to allow
-#' only the return the top predictors, if desired.
+#' @param path character; full path to single species eBird Status and Trends
+#'   products.
+#' @param pis data.frame; predictory importance data rom [load_pis()].
+#' @param st_extent list; `st_extent` list for spatiotemporal filtering.
+#'   Required, as results are less meaningful over large spatiotemporal extents.
+#' @param by_cover_class logical; whether to aggregate FRAGSTATS metrics for the
+#'   land cover classes into single values for the land cover classes.
+#' @param num_top_preds integer; how many predictors to show.
+#' @param return_top logical; wether to returns a vector of the top predictors,
+#'   based on the `num_top_preds` param.
+#' @param pretty_names logical; whether to convert cryptic land cover codes to
+#'   readable land cover class names.
+#' @param print_plot logical; whether to print plot, to allow only the return
+#'   the top predictors, if desired.
 #'
 #' @return Plots barplot and/or returns a vector of top predictors.
 #'
@@ -26,9 +27,12 @@
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species eBird Status and Trends products"
+#' # download and load example data
+#' dl_path <- tempdir()
+#' sp_path <- download_data("example_data", path = dl_path)
 #' pis <- load_pis(sp_path)
 #'
+#' # define a spatioremporal extent
 #' ne_extent <- list(type = "rectangle",
 #'                   lat.min = 40,
 #'                   lat.max = 47,
@@ -38,6 +42,7 @@
 #'                   t.max = 0.475)
 #'
 #' plot_pis(path = sp_path, pis = pis, st_extent = ne_extent)
+#'
 #' }
 plot_pis <- function(path,
                      pis,
@@ -47,6 +52,7 @@ plot_pis <- function(path,
                      return_top = FALSE,
                      pretty_names = TRUE,
                      print_plot = TRUE) {
+  stopifnot(dir.exists(path))
   e <- load_config(path)
 
   if(num_top_preds < 2) {
@@ -218,9 +224,12 @@ plot_pis <- function(path,
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species eBird Status and Trends products"
+#' # download and load example data
+#' dl_path <- tempdir()
+#' sp_path <- download_data("example_data", path = dl_path)
 #' pds <- load_pds(sp_path)
 #'
+#' # define a spatioremporal extent
 #' ne_extent <- list(type = "rectangle",
 #'                   lat.min = 40,
 #'                   lat.max = 47,
@@ -230,6 +239,7 @@ plot_pis <- function(path,
 #'                   t.max = 0.475)
 #'
 #' plot_pds(pd_name = "TIME", pds = pds, st_extent = ne_extent)
+#'
 #' }
 plot_pds <- function(pd_name,
                      pds,
@@ -360,7 +370,7 @@ plot_pds <- function(pd_name,
     ttt <- data.frame(x = utils::stack(pd.x)[,1],
                       y = utils::stack(pd.y)[,1])
 
-    ttt <- na.omit(ttt)
+    ttt <- stats::na.omit(ttt)
 
     d.ul <- gbm::gbm(y ~ x,
                      data = ttt,
@@ -570,8 +580,6 @@ plot_pds <- function(pd_name,
 
 
   return(return_list)
-
-
 }
 
 #' Converts cryptic cover class names to readable land cover names
@@ -579,11 +587,10 @@ plot_pds <- function(pd_name,
 #' Internal function that converts the cryptic predictor class names to
 #' readable land cover names.
 #'
-#' @param cov_names vector; Cover class names to convert.
-#' @param by_cover_class logical; Default is FALSE. If TRUE, replaces fragstat
-#' cover class name with a name for the cover class as whole.
-#' @param pretty logical; Default is FALSE. If TRUE, Converts from capital case
-#' to title case.
+#' @param cov_names character; vector of cover class names to convert.
+#' @param by_cover_class logical; whether to replace FRAGSTATS cover class name
+#'   with a name for the cover class as whole.
+#' @param pretty logical; whether to convert from capital case to title case.
 #'
 #' @return A vector of converted names.
 #'
@@ -591,8 +598,7 @@ plot_pds <- function(pd_name,
 #'
 #' @examples
 #' cns <- c("UMD_FS_C1_1500_PLAND", "MODISWATER_FS_C7_1500_LPI")
-#'
-#' converted <- convert_classes(cov_names = cns, pretty = TRUE)
+#' converted <- ebirdst:::convert_classes(cov_names = cns, pretty = TRUE)
 convert_classes <- function(cov_names,
                             by_cover_class = FALSE,
                             pretty = FALSE) {

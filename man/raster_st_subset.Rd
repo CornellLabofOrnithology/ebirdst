@@ -4,13 +4,13 @@
 \alias{raster_st_subset}
 \title{Spatiotemporal subsetter for eBird Status and Trends products raster}
 \usage{
-raster_st_subset(raster_data, st_extent)
+raster_st_subset(x, st_extent)
 }
 \arguments{
-\item{st_extent}{list; st_extent list object}
+\item{x}{RasterStack or RasterBrick; one of four GeoTiff files provided
+with results.}
 
-\item{data}{RasterStack or RasterBrick; one of four GeoTiff files provided
-with results}
+\item{st_extent}{list; st_extent list object.}
 }
 \value{
 Subset of input data as same type, with layers labeled with dates
@@ -24,14 +24,19 @@ box or a 'polygon' as defined by a SpatialPolygon* object. The function
 will use temporal information if provided. The t.min and t.max objects in
 the \code{st_extent} list are currently able to wrap time around the year
 (e.g., t.min = 0.9 and t.max = 0.1 is acceptable). This function will also
-returned a date labeled RasterStack or RasterBrick, so there is no need
-to use the label_raster_stack() directly if subsetting.
+returned a date labeled \code{RasterStack} or \code{RasterBrick}, so there is no need
+to use the \code{\link[=label_raster_stack]{label_raster_stack()}} directly if subsetting.
 }
 \examples{
 \dontrun{
 
-rs <- stack("/path to GeoTiff")
-rs
+# download and load example abundance data
+dl_path <- tempdir()
+sp_path <- download_data("example_data", path = dl_path)
+abd_path <- list.files(file.path(sp_path, "results", "tifs"),
+                       pattern = "hr_2016_abundance_umean",
+                       full.names = TRUE)
+abd <- raster::stack(abd_path)
 
 # define st_extent list
 ne_extent <- list(type = "rectangle",
@@ -43,6 +48,7 @@ ne_extent <- list(type = "rectangle",
                   t.max = 0.6)
 
 # subset stack with extent
-rs_sub <- raster_st_subset(rs, st_extent = ne_extent)
+raster_st_subset(abd, st_extent = ne_extent)
+
 }
 }

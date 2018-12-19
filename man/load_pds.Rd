@@ -11,20 +11,24 @@ load_pds(path)
 eBird Status and Trends products.}
 }
 \value{
-data.frame containing partial dependency values for each stixel,
-as well as stixel summary information.
+data.frame containing partial dependency values for each stixel, as
+well as stixel summary information.
 }
 \description{
 Loads the partial dependency data (from pd.txt), joins with stixel summary
-data, sets the names from \code{load_config()}, and cleans up the data.frame.
+data, sets the names from \code{\link[=load_config]{load_config()}}, and cleans up the data.frame.
 This is one of the slower functions in the package, due to the size of the
 pd.txt file (usually multiple GB).
 }
 \examples{
 \dontrun{
 
-sp_path <- "path to species eBird Status and Trends products"
+# download example data
+dl_path <- tempdir()
+sp_path <- download_data("example_data", path = dl_path)
 
+# load partial dependence
 pds <- load_pds(sp_path)
+
 }
 }

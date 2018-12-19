@@ -7,8 +7,6 @@
 #' plotting. The returned Extent object can then be used for plotting.
 #'
 #' @param x Raster* object; either full RasterStack or subset.
-#' @param path character; Full path to directory containing the results
-#' for a single species.
 #'
 #' @return raster Extent object
 #'
@@ -17,16 +15,23 @@
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species eBird Status and Trends products"
-#' raster_stack <- stack(sp_path)
-#' plot_extent <- calc_full_extent(raster_stack, path)
-#' raster::plot(raster_stack[[1]], ext = plot_extent)
+#' # download and load example abundance data
+#' dl_path <- tempdir()
+#' sp_path <- download_data("example_data", path = dl_path)
+#' abd_path <- list.files(file.path(sp_path, "results", "tifs"),
+#'                        pattern = "hr_2016_abundance_umean",
+#'                        full.names = TRUE)
+#' abd <- raster::stack(abd_path)
+#'
+#' # calculate full extent
+#' plot_extent <- calc_full_extent(abd)
+#'
+#' # plot
+#' raster::plot(abd[[1]], axes = FALSE, ext = plot_extent)
+#'
 #' }
-calc_full_extent <- function(x, path) {
-
-  if(!(class(x) %in% c("RasterLayer", "RasterStack", "RasterBrick"))) {
-    stop("Input must be a Raster* object.")
-  }
+calc_full_extent <- function(x) {
+  stopifnot(inherits(x, "Raster"))
 
   # aggregate stack for speed, otherwise everything else takes too long
   stack <- raster::aggregate(x, fact = 3)
@@ -42,7 +47,7 @@ calc_full_extent <- function(x, path) {
 
   # sometimes extent calculations get weird and you'll get a very broad
   # extent that goes further than you want, so check against the input
-  input_raster_extent <- extent(x)
+  input_raster_extent <- raster::extent(x)
 
   # xmin too low
   if(map_extent[1] < input_raster_extent[1]) {
@@ -67,6 +72,7 @@ calc_full_extent <- function(x, path) {
   return(map_extent)
 }
 
+
 #' Calculates bins (breaks) based on standard deviations of Box-Cox
 #' power-transformed data for mapping
 #'
@@ -80,29 +86,40 @@ calc_full_extent <- function(x, path) {
 #' bins with the power-transformed data using standard-deviations, and then
 #' un-transforms the bins.
 #'
-#' @param x RasterStack or RasterBrick; original eBird Status and
-#' Trends product raster GeoTiff with 52 bands, one for each week.
+#' @param x RasterStack or RasterBrick; original eBird Status and Trends product
+#'   raster GeoTiff with 52 bands, one for each week.
 #'
-#' @return A vector containing the break points of bins.
+#' @return A list with two elements: `bins` is a vector containing the break
+#'   points of the bins and `power` is the optimal power used to transform data
+#'   when calculating bins.
 #'
 #' @export
 #'
-#' @references Ross Maciejewski, Avin Pattah, Sungahn Ko, Ryan Hafen, William S. Cleveland, David S. Ebert.  Automated Box-Cox Transformations for Improved Visual Encoding. IEEE Transactions on Visualization and Computer Graphics, 19(1): 130-140, 2013.
+#' @references Ross Maciejewski, Avin Pattah, Sungahn Ko, Ryan Hafen, William S.
+#' Cleveland, David S. Ebert.  Automated Box-Cox Transformations for Improved
+#' Visual Encoding. IEEE Transactions on Visualization and Computer Graphics,
+#' 19(1): 130-140, 2013.
 #'
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species eBird Status and Trends products"
-#' raster_stack <- stack(sp_path)
-#' year_bins <- calc_bins(raster_stack)
+#' # download and load example abundance data
+#' dl_path <- tempdir()
+#' sp_path <- download_data("example_data", path = dl_path)
+#' abd_path <- list.files(file.path(sp_path, "results", "tifs"),
+#'                        pattern = "hr_2016_abundance_umean",
+#'                        full.names = TRUE)
+#' abd <- raster::stack(abd_path)
 #'
-#' raster::plot(raster_stack[[1]], xaxt = 'n', yaxt = 'n', breaks = year_bins)
+#' # calculate bins
+#' year_bins <- calc_bins(abd)
+#'
+#' # plot
+#' raster::plot(abd[[30]], axes = FALSE, breaks = year_bins$bins)
+#'
 #' }
 calc_bins <- function(x) {
-
-  if(!(class(x) %in% c("RasterLayer", "RasterStack", "RasterBrick"))) {
-    stop("Input must be a Raster* object.")
-  }
+  stopifnot(inherits(x, "Raster"))
 
   if(all(is.na(raster::maxValue(x))) & all(is.na(raster::minValue(x)))) {
     stop("Input Raster* object must have non-NA values.")
@@ -112,7 +129,7 @@ calc_bins <- function(x) {
   zrv <- raster::getValues(x)
   vals_for_pt <- zrv[!is.na(zrv) & zrv > 0]
 
-  # BoxCox transform
+  # box-cox transform
   pt <- car::powerTransform(vals_for_pt)
   this_power <- pt$lambda
 
@@ -140,22 +157,22 @@ calc_bins <- function(x) {
 
   # lots of checks for values outside of the upper and lower bounds
 
-  # remove +3 SD break if it is greater than max
+  # remove +3 sd break if it is greater than max
   if(maxl < mdl + (3.00 * sdl)) {
     log_sd <- log_sd[1:length(log_sd) - 1]
   }
 
-  # add max if the max is greater than +3 SD break
+  # add max if the max is greater than +3 sd break
   if(maxl > mdl + (3.00 * sdl) | maxl > log_sd[length(log_sd)]) {
     log_sd <- append(log_sd, maxl)
   }
 
-  # remove the -3 SD break if it is less than the min
+  # remove the -3 sd break if it is less than the min
   if(minl > mdl - (3.00 * sdl)) {
     log_sd <- log_sd[2:length(log_sd)]
   }
 
-  # add min if the min is less than -3 SD break
+  # add min if the min is less than -3 sd break
   if(minl < mdl - (3.00 * sdl) | minl < log_sd[1]) {
     log_sd <- append(log_sd, minl, after = 0)
   }
@@ -180,18 +197,19 @@ calc_bins <- function(x) {
   return(list(bins = bins, power = this_power))
 }
 
+
 #' Map PI and PD centroid locations
 #'
 #' Creates a map showing the stixel centroid locations for PIs and/or PDs, with
 #' an optional spatiotemporal subset using an `st_extent` list.
 #'
-#' @param pis data.frame; from `load_pis()`
-#' @param pds data.frame; from `load_pds()`
+#' @param pis data.frame; predictor importance data from [load_pis()].
+#' @param pds data.frame; partial depenence data from [load_pds()].
 #' @param st_extent list; Optional spatiotemporal filter using `st_extent` list.
 #' @param plot_pis logical; Default is TRUE. Set to FALSE to hide the plotting
-#' of PI stixel centroid locations.
+#'   of PI stixel centroid locations.
 #' @param plot_pds logical; Default is TRUE. Set to FALSE to hide the plotting
-#' of PD stixel centroid locations.
+#'   of PD stixel centroid locations.
 #'
 #' @return Plot showing locations of PIs and/or PDs.
 #'
@@ -200,10 +218,13 @@ calc_bins <- function(x) {
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species eBird Status and Trends products"
+#' # download and load example data
+#' dl_path <- tempdir()
+#' sp_path <- download_data("example_data", path = dl_path)
 #' pis <- load_pis(sp_path)
 #' pds <- load_pds(sp_path)
 #'
+#' # define a spatiotemporal extent to plot
 #' ne_extent <- list(type = "rectangle",
 #'                   lat.min = 40,
 #'                   lat.max = 47,
@@ -213,6 +234,7 @@ calc_bins <- function(x) {
 #'                   t.max = 0.475)
 #'
 #' map_centroids(pis = pis, pds = pds, st_extent = ne_extent)
+#'
 #' }
 map_centroids <- function(pis,
                           pds,
@@ -235,7 +257,7 @@ map_centroids <- function(pis,
   mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
 
   # initialize graphical parameters
-  graphics::par(mfrow = c(1, 1), mar=c(0,0,0,0), bg = "black")
+  graphics::par(mfrow = c(1, 1), mar = c(0, 0, 0, 0), bg = "black")
 
   # Plotting PDs
   if(plot_pds == TRUE) {
@@ -334,19 +356,19 @@ map_centroids <- function(pis,
     xwidth <- usr[2] - usr[1]
     yheight <- usr[4] - usr[3]
 
-    text(x = usr[1] + xwidth/8,
-         y = usr[3] + yheight/12,
-         paste("Available PIs: ", nrow(tpis_prj), sep = ""),
-         cex = 1,
-         col = "#d95f02")
+    graphics::text(x = usr[1] + xwidth/8,
+                   y = usr[3] + yheight/12,
+                   paste("Available PIs: ", nrow(tpis_prj), sep = ""),
+                   cex = 1,
+                   col = "#d95f02")
     rm(tpis_prj)
 
     if(!all(is.na(st_extent))) {
-      text(x = usr[1] + xwidth/8,
-           y = usr[3] + yheight/17,
-           paste("Selected PIs: ", nrow(tpis_region), sep = ""),
-           cex = 1,
-           col = "#fdcdac")
+      graphics::text(x = usr[1] + xwidth/8,
+                     y = usr[3] + yheight/17,
+                     paste("Selected PIs: ", nrow(tpis_region), sep = ""),
+                     cex = 1,
+                     col = "#fdcdac")
       rm(tpis_region)
     }
   }
@@ -358,6 +380,7 @@ map_centroids <- function(pis,
   suppressWarnings(raster::plot(ned_wh_st_moll, ext = wh_extent, lwd = 0.25,
                                 border = 'black', add = TRUE))
 }
+
 
 #' Calculate and map effective extent of selected centroids
 #'
@@ -373,13 +396,15 @@ map_centroids <- function(pis,
 #' selected stixels are contributing information, ranging from 0 to 1.
 #'
 #' @param st_extent list; st_extent list containing spatiotemporal filter
-#' @param pis data.frame; from `load_pis()` Must supply either pis or pds.
-#' @param pds data.frame; from `load_pds()` Must supply either pis or pds.
-#' @param path character; Full path to directory containing the eBird Status
-#' and Trends products for a single species.
+#' @param pis data.frame; predictor importance data from [load_pis()]. Must
+#'   supply either pis or pds.
+#' @param pds data.frame; partial dependence data from [load_pds()]. Must supply
+#'   either pis or pds.
+#' @param path character; full path to directory containing the eBird Status and
+#'   Trends products for a single species.
 #'
 #' @return RasterLayer and plots the RasterLayer with centroid locations and
-#' st_extent boundaries.
+#'   st_extent boundaries.
 #'
 #' @import sp
 #' @export
@@ -387,9 +412,12 @@ map_centroids <- function(pis,
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species eBird Status and Trends products"
+#' # download and load example data
+#' dl_path <- tempdir()
+#' sp_path <- download_data("example_data", path = dl_path)
 #' pis <- load_pis(sp_path)
 #'
+#' # define a spatioremporal extent
 #' ne_extent <- list(type = "rectangle",
 #'                   lat.min = 40,
 #'                   lat.max = 47,
@@ -398,12 +426,10 @@ map_centroids <- function(pis,
 #'                   t.min = 0.425,
 #'                   t.max = 0.475)
 #'
-#' eff_lay <- calc_effective_extent(st_extent = ne_extent, pis = pis)
+#' eff_lay <- calc_effective_extent(st_extent = ne_extent, pis = pis,
+#'                                  path = sp_path)
 #' }
-calc_effective_extent <- function(st_extent,
-                                  pis = NA,
-                                  pds = NA,
-                                  path) {
+calc_effective_extent <- function(st_extent, pis = NA, pds = NA, path) {
 
   if(is.null(nrow(pis)) & is.null(nrow(pds))) {
     stop("Both PIs and PDs are NA. Nothing to calculate.")
@@ -422,9 +448,9 @@ calc_effective_extent <- function(st_extent,
   }
 
   if(is.null(st_extent$t.min) | is.null(st_extent$t.max)) {
-    warning(paste("Without temporal limits (t.min, t.max) in st_extent, ",
-                  "function will take considerably longer to run and is ",
-                  "less informative.", sep = ""))
+    warning(paste0("Without temporal limits (t.min, t.max) in st_extent, ",
+                   "function will take considerably longer to run and is ",
+                   "less informative."))
   }
 
   # projection info
@@ -432,9 +458,10 @@ calc_effective_extent <- function(st_extent,
   mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
 
   # load template raster
-  e <- load_config(path)
-  template_raster <- raster::raster(paste(path, "/data/", e$RUN_NAME,
-                                          "_srd_raster_template.tif", sep = ""))
+  f_tmplt <- list.files(file.path(path, "data"),
+                        pattern = "srd_raster_template.tif",
+                        full.names = TRUE)
+  template_raster <- raster::raster(f_tmplt)
 
   # set object based on whether using PIs or PDs
   if(!is.null(nrow(pis))) {
@@ -457,10 +484,10 @@ calc_effective_extent <- function(st_extent,
 
   # build stixels as polygons
   # create corners
-  xPlus <- tpis_sub$lon + (tpis_sub$stixel_width/2)
-  yPlus <- tpis_sub$lat + (tpis_sub$stixel_height/2)
-  xMinus <- tpis_sub$lon - (tpis_sub$stixel_width/2)
-  yMinus <- tpis_sub$lat - (tpis_sub$stixel_height/2)
+  xPlus <- tpis_sub$lon + (tpis_sub$stixel_width / 2)
+  yPlus <- tpis_sub$lat + (tpis_sub$stixel_height / 2)
+  xMinus <- tpis_sub$lon - (tpis_sub$stixel_width / 2)
+  yMinus <- tpis_sub$lat - (tpis_sub$stixel_height / 2)
 
   ID <- row.names(tpis_sub)
 
@@ -507,7 +534,7 @@ calc_effective_extent <- function(st_extent,
                              st_extent$lon.max,
                              st_extent$lat.min,
                              st_extent$lat.max)
-    st_extp <- as(st_ext, "SpatialPolygons")
+    st_extp <- methods::as(st_ext, "SpatialPolygons")
     raster::projection(st_extp) <- sp::CRS(ll)
     st_extp_prj <- sp::spTransform(st_extp, sp::CRS(mollweide))
     rm(st_ext, st_extp)
@@ -522,19 +549,73 @@ calc_effective_extent <- function(st_extent,
   tpis_per_prj[tpis_per_prj >= 1] <- 1
 
   raster::plot(tpis_per_prj,
-               xaxt = 'n',
-               yaxt = 'n',
-               bty = 'n',
+               xaxt = "n",
+               yaxt = "n",
+               bty = "n",
                breaks = c(0, seq(0.5, 1, by = 0.05)),
                ext = raster::extent(tdspolydf_moll),
-               col = viridis::viridis(11),
+               col = viridisLite::viridis(11),
                maxpixels = raster::ncell(tpis_per_prj),
                legend = TRUE)
 
-  sp::plot(ned_wh_co_moll, add = TRUE, border = 'gray')
-  sp::plot(ned_wh_st_moll, add = TRUE, border = 'gray')
-  sp::plot(st_extp_prj, add = TRUE, border = 'red')
+  sp::plot(ned_wh_co_moll, add = TRUE, border = "gray")
+  sp::plot(ned_wh_st_moll, add = TRUE, border = "gray")
+  sp::plot(st_extp_prj, add = TRUE, border = "red")
   sp::plot(tpis_sub_moll, add = TRUE, pch = 16, cex = 1 * graphics::par()$cex)
 
   return(tpis_per)
+}
+
+
+#' eBird Status and Trends color palettes for abundance data
+#'
+#' Generate the color palettes used in the eBird Status and Trends relative
+#' abundance maps.
+#'
+#' @param n integer; the number of colors (≥ 1) to be in the palette.
+#' @param season character; the season to generate colors for or "weekly" to
+#'   get the color palette used in the weekly abundance animations.
+#'
+#' @return A character vector of color hex codes.
+#' @export
+#'
+#' @examples
+#' # breeding season color palette
+#' abundance_palette(10, season = "breeding")
+abundance_palette <- function(n, season = c("weekly",
+                                            "breeding", "nonbreeding",
+                                            "migration",
+                                            "prebreeding_migration",
+                                            "postbreeding_migration",
+                                            "year_round")) {
+  stopifnot(is.numeric(n), length(n) == 1, n >= 1)
+  season <- match.arg(season)
+
+  # set base color by season
+  col_zero <- "#dddddd"
+  if (season == "weekly") {
+    plsm <- rev(viridisLite::plasma(n - 1, end = 0.9))
+    gry <- grDevices::colorRampPalette(c(col_zero, plsm[1]))
+    return(c(gry(4)[2], plsm))
+  } else if (season == "breeding") {
+    base_col <- "#cc503e"
+  } else if (season == "nonbreeding") {
+    base_col <- "#1d6996"
+  } else if (season %in% c("migration", "postbreeding_migration")) {
+    base_col <- "#edad08"
+  } else if (season == "prebreeding_migration") {
+    base_col <- "#73af48"
+  } else if (season == "year_round") {
+    base_col <- "#6f4070"
+  } else {
+    stop("Invalid season.")
+  }
+
+  # seasonal palettes
+  gry <- grDevices::colorRampPalette(c(col_zero, base_col))
+  mid <- grDevices::colorRampPalette(c(gry(5)[2], base_col))
+  black <- grDevices::colorRampPalette(c(base_col, "#000000"))
+  pal <- grDevices::colorRampPalette(c(gry(5)[2], mid(9)[5], base_col,
+                                       black(5)[2]))
+  return(pal(n))
 }

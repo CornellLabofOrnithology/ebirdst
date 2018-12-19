@@ -21,9 +21,14 @@ configuration variables from eBird Status and Trends products
 \examples{
 \dontrun{
 
-sp_path <- "path to species eBird Status and Trends products"
+# download example data
+dl_path <- tempdir()
+sp_path <- download_data("example_data", path = dl_path)
 
-e <- load_config(sp_path)
+# load configuration file
+e <- ebirdst:::load_config(sp_path)
+e
+
 }
 }
 \keyword{internal}

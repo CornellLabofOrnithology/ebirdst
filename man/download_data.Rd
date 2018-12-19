@@ -27,7 +27,9 @@ than the full dataset making these data quicker to download and process.
 }
 \examples{
 \dontrun{
-  dl_dir <- tempdir()
-  download_data("example_data", path = dl_dir)
+
+dl_path <- tempdir()
+download_data("example_data", path = dl_path)
+
 }
 }

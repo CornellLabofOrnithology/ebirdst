@@ -22,8 +22,11 @@ Probability, and Abundance.
 \examples{
 \dontrun{
 
-sp_path <- "path to species eBird Status and Trends products"
+# download example data
+dl_path <- tempdir()
+sp_path <- download_data("example_data", path = dl_path)
 
+# define a spatioremporal extent
 ne_extent <- list(type = "rectangle",
                   lat.min = 40,
                   lat.max = 47,

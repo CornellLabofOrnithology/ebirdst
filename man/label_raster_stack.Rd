@@ -4,33 +4,40 @@
 \alias{label_raster_stack}
 \title{Labels 52 week RasterStack with the dates for each band}
 \usage{
-label_raster_stack(raster_data)
+label_raster_stack(x)
 }
 \arguments{
-\item{raster_data}{RasterStack or RasterBrick; original eBird Status and
-Trends product raster GeoTiff with 52 bands, one for each week.}
+\item{x}{\code{RasterStack} or \code{RasterBrick}; original eBird Status and Trends
+product raster GeoTiff with 52 bands, one for each week.}
 }
 \value{
-A RasterStack or Rasterbrick with names assigned for the dates in
+A \code{RasterStack} or \code{RasterBrick} with names assigned for the dates in
 the format of "XYYYY.MM.DD" per raster package constraints. The Raster*
 objects do not allow the names to start with a number, nor are they allowed
 to contain "-", so it is not possible to store the date in an ISO compliant
 format.
 }
 \description{
-The raster package does not allow layer names to be saved with the bands of a
-multi-band GeoTiff. Accordingly, all eBird Status and Trends products raster
-results cover the entire 52 week temporal extent of analysis. For
+The \code{raster} package does not allow layer names to be saved with the bands of
+a multi-band GeoTiff. Accordingly, all eBird Status and Trends products
+raster results cover the entire 52 week temporal extent of analysis. For
 convenience, this function labels the RasterStack once it has been loaded
 with the dates for each band.
 }
 \examples{
 \dontrun{
 
-rs <- stack("/path to GeoTiff/")
-rs
+# download and load example abundance data
+dl_path <- tempdir()
+sp_path <- download_data("example_data", path = dl_path)
+abd_path <- list.files(file.path(sp_path, "results", "tifs"),
+                       pattern = "hr_2016_abundance_umean",
+                       full.names = TRUE)
+abd <- raster::stack(abd_path)
 
-rs_labeled <- label_raster_stack(raster_data)
-rs_labeled
+# label
+abd <- label_raster_stack(abd)
+names(abd)
+
 }
 }

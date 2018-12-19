@@ -11,18 +11,21 @@ load_pis(path)
 eBird Status and Trends products.}
 }
 \value{
-data.frame containing predictor importance values for each stixel,
-as well as stixel summary information.
+data.frame containing predictor importance values for each stixel, as
+well as stixel summary information.
 }
 \description{
 Loads the predictor importance data (from pi.txt), joins with stixel summary
-data, sets the names from \code{load_config()}, and cleans up the data.frame.
+data, sets the names from \code{\link[=load_config]{load_config()}}, and cleans up the data.frame.
 }
 \examples{
 \dontrun{
 
-sp_path <- "path to species eBird Status and Trends products"
+# download example data
+dl_path <- tempdir()
+sp_path <- download_data("example_data", path = dl_path)
 
+# load predictor importance
 pis <- load_pis(sp_path)
 }
 }

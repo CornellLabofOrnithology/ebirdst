@@ -2,90 +2,240 @@
 title: "Generating Seasonal Abundance and Range Maps and Stats"
 author: "Tom Auer, Daniel Fink"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    number_sections: true
 vignette: >
   %\VignetteIndexEntry{Generating Seasonal Abundance and Range Maps and Stats}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning = FALSE, 
-                      message = FALSE, 
+                      message = FALSE,
+                      collapse = TRUE,
+                      comment = "#>",
                       out.width = "\\textwidth", 
                       fig.height = 5, 
                       fig.width = 7, 
                       fig.align = "center")
-devtools::load_all()
 ```
 
-# Outline
 
-1. Introduction
-2. Season Definition
-3. Abundance Maps
-4. Range Maps
-5. Days of Occupation Statistic
+# Introduction
 
-# 1. Introduction
+This vignette describes how to recreate the seasonal map products found on the [eBird Status and Trends pages](https://ebird.org/science/status-and-trends). First, the vignette will cover how to average the abundance data seasonally, then it will proceed with examples of making abundance maps, aggregating and smoothing data for range maps, and, finally, provide an example of calculating the "days of occupation" statistic. Throughout this vignette we will use the simplified examlpe dataset available through the `download_data()` function, which consists of the Yellow-bellied Sapsucker data spatially subset to the state of Michigan. However, these methods can be applied to the full datasets for any of the eBird Status and Trends species.
 
-This vignette describes how to recreate the seasonal map products found on the [eBird Status and Trends pages](https://ebird.org/science/status-and-trends). First, the vignette will cover the background and details for acquiring the seasonal definitions used on those pages and then proceed with examples of averaging data seasonally, making abundance maps, aggregating and smoothing data for range maps, and, finally, provide an example of calculating the "Days of occupation" statistic.
+Let's begin by loading all the packages we'll need for this vignette.
 
-# 2. Season Defintion
-
-Generally, the seasons defined for eBird Status and Trends products are done through expert review. For information on the details of defining seasons, please see the [seasons section of the FAQ](https://ebird.org/science/status-and-trends/faq#seasons). While it is certainly possible to define your own seasons when making seasonal abundance and range maps, if you want to recreate the products with the same seasons as the website, you'll need to login to ebird.org and download the "Regional range and abundance as tabular data" (the "Download all stats (csv)" button) from the eBird Status and Trends [download page](https://ebird.org/science/status-and-trends/download-data). The rest of this vignette will use the seasons defined in that csv file.
-
-```{r load_stats}
-# For this vignette, the csv file has been downloaded, unzipped, and placed
-# in the /tmp directory of the root path
-all_stats <- read.csv("~/tmp/all-stats-regional-2018.csv/regionSummaries-2018.csv")
-
-# This file contains information for all 107 species, so the first step
-# is to subset to Yellow-bellied Sapsucker for the example_data.
-yebsap <- all_stats[all_stats$species_code == "yebsap", ]
-
-# The file replicates season names, start and end dates across the 
-# different regions for which statistics are calculated, so we can
-# get just one unique set of seasons by subsetting this data.frame
-# further to just Michigan
-yebsap_mi <- yebsap[yebsap$region_name == "Michigan", ]
-print(yebsap_mi[, c("season_name", "start_dt", "end_dt")])
-
-# cleanup unneeded data
-rm(all_stats, yebsap)
+```{r libraries}
+library(ebirdst)
+library(raster)
+library(sf)
+library(rnaturalearth)
+library(dplyr)
+library(tidyr)
+# resolve namespace conflicts
+select <- dplyr::select
 ```
 
-# 3. Abundance Maps
+# Data Download
 
-This section will give an example of how to average the weekly abundance data
-together and generate both individual and combined seasonal maps, in the style of the eBird Status and Trends Abundance [maps](https://ebird.org/science/status-and-trends/yebsap/abundance-map), using the example_data available, which has been subset to the state of Michigan.
+Before we do anything else, we'll need to download and load the example abundance data for Yellow-bellied Sapsucker.
 
-```{r abundance_maps}
-# DOWNLOAD DATA
-# Currently, example data is available on a public s3 bucket. The following 
-# download_data() function copies the species results to a selected path and 
-# returns the full path of the results. Please note that the example_data is
-# for Yellow-bellied Sapsucker and has the same run code as the real data,
-# so if you download both, make sure you put the example_data somewhere else.
-sp_path <- download_data(species = "example_data", path = "~/tmp/")
-
-# load trimmed mean abundances and label dates
-abunds <- raster::stack(list.files(path = paste0(sp_path, "/results/tifs/"),
-                                   pattern = "*_hr_2016_abundance_umean.tif",
-                                   full.names = TRUE))
-abunds <- label_raster_stack(abunds)
-
-# getting the data vector will make interacting with the seasonal definitions easier
-date_vector <- parse_raster_dates(abunds)
-
-# average by season
+```{r st-download}
+# download to a temp directory for the vigette
+# in practice, change to permanent directory the status and trends downloads
+st_path <- tempdir()
+sp_path <- download_data(species = "example_data", path = st_path)
+# load the abundance data
+abd <- file.path(sp_path, "results", "tifs") %>% 
+  list.files(pattern = "hr_2016_abundance_umean", full.names = TRUE) %>% 
+  stack() %>% 
+  # label the raster layers with their corresponding dates
+  label_raster_stack()
 ```
 
-# 4. Range Maps
+The abundance data now consist of a `RasterStack` object with 52 layers, each corresponding to the relative abundance for a single week.
+
+We'll also need some addiontal spatial data (state and country borders, lakes, etc.) to provide context for the maps we'll make. [Natural Earth](https://www.naturalearthdata.com/) is the best source for free map data and there's an associated R package (`rnaturalearth`) for accessing the data. For all the maps in this vigentte, we'll use the Mollweide projection](https://en.wikipedia.org/wiki/Mollweide_projection), an excellent option for continental scale maps. 
+
+```{r ne-data}
+mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
+ne_scale <- 50
+
+# land polygon
+ne_land <- ne_countries(scale = ne_scale, returnclass = "sf") %>%
+  filter(continent %in% c("North America", "South America")) %>%
+  st_set_precision(1e6) %>%
+  st_union() %>% 
+  st_geometry()
+# function to subset other features to those  within this land area
+wh_subset <- function(x) {
+  in_wh <- as.logical(st_intersects(x, ne_land, sparse = FALSE))
+  st_transform(x[in_wh], crs = mollweide)
+}
+# country lines
+# 
+ne_country_lines <- ne_download(scale = ne_scale, category = "cultural",
+                                type = "admin_0_boundary_lines_land",
+                                returnclass = "sf") %>% 
+  st_geometry() %>% 
+  wh_subset()
+# state lines
+ne_state_lines <- ne_download(scale = ne_scale, category = "cultural",
+                              type = "admin_1_states_provinces_lines",
+                              returnclass = "sf") %>% 
+  st_geometry() %>% 
+  wh_subset()
+# rivers
+ne_rivers <- ne_download(scale = ne_scale, category = "physical",
+                         type = "rivers_lake_centerlines",
+                         returnclass = "sf") %>% 
+  st_geometry() %>% 
+  wh_subset()
+# lakes
+ne_lakes <- ne_download(scale = ne_scale, category = "physical",
+                        type = "lakes",
+                        returnclass = "sf") %>% 
+  st_geometry() %>% 
+  wh_subset()
+```
+
+# Season Defintion
+
+Generally, the seasons for eBird Status and Trends products are defined on a species-specific basis through expert review. For information on the details of defining seasons, please see the [seasons section of the FAQ](https://ebird.org/science/status-and-trends/faq#seasons). While it is certainly possible to define your own seasons when making seasonal abundance and range maps, if you want to recreate the products with the same seasons as the website, you'll need to use the definitions included in the `runs_w_names` data frame included in this package.
+
+Let's start by getting the seasonal definitions for Yellow-bellied Sapsucker and transforming the data into a more usable format. For some species, expert review may have indicated that the models are poor in certain seasons. These problematic seasons are identified by missing dates in `runs_w_names` for the season in question. Although all seasons passed review for Yellow-bellied Sapsucker, for generality I'll add an additional column (`passed`) indicating whether a seasonal model passed review.
+
+```{r season-defs}
+# subset to the yellow-bellied sapsucker season definitions
+yebsap_dates <- filter(runs_w_names, SPECIES_CODE == "yebsap") %>% 
+  # just keep the seasonal definition columns
+  select(setdiff(matches("(START)|(END)"), matches("YEAR_ROUND"))) %>% 
+  # transpose
+  gather("label", "date") %>% 
+  mutate(label = tolower(label)) %>% 
+  # spread data so start and end dates are in separate columns
+  separate(label, c("season", "start_end"), "_(?=s|e)") %>% 
+  spread(start_end, date) %>% 
+  select(season, start_dt, end_dt)
+# did the season pass review
+yebsap_dates <- mutate(yebsap_dates, pass = !(is.na(start_dt) | is.na(end_dt)))
+yebsap_dates
+```
+
+Next, we'll assign each of the weekly abundance layers to a season.
+
+```{r season-assignment}
+# dates for each abundance layer
+weeks <- parse_raster_dates(abd)
+# assign to seasons
+weeks_season <- rep(NA_character_, length(weeks))
+for (i in seq_len(nrow(yebsap_dates))) {
+  s <- yebsap_dates[i, ]
+  # skip seasona assignment if season failed
+  if (!s$pass) {
+    next()
+  }
+  # handle seasons cross jan 1 separately
+  if (s$start_dt <= s$end_dt) {
+    in_season <- weeks >= s$start_dt & weeks <= s$end_dt
+  } else {
+    in_season <- weeks >= s$start_dt | weeks <= s$end_dt
+  }
+  weeks_season[in_season] <- s$season
+}
+```
+
+Finally, let's calculate seasonal averages of relative abundance.
+
+```{r seasonal-average}
+# drop weeks not assigned to season
+weeks_season[10:12] <- NA
+week_pass <- !is.na(weeks_season)
+abd <- abd[[which(week_pass)]]
+weeks_season <- weeks_season[week_pass]
+# average over weeks in season
+abd_season <- stackApply(abd, indices = weeks_season, fun = mean, na.rm = TRUE)
+names(abd_season) <- gsub("^index_", "", names(abd_season))
+abd_season
+```
+
+# Abundance Maps
+
+Before we create maps of seasonal relative abundance we need to account for two addition considerations that the online maps make: whether to split pre- and post-breeding migration and whether to explicitly show the year-round distribution as a separate color. For species that use different paths for their two migrations (less than 40% overlap) we show pre-breeding migration (green) and post-breeding migration (yellow) separately.
+
+```{r split-seasons}
+migration_threshold <- 0.4
+mig_seasons <- c("prebreeding_migration", "postbreeding_migration")
+if (all(mig_seasons %in% names(abd_season))) {
+  # identify areas with abundance in only one season
+  abd_nz <- abd_season[[mig_seasons]] > 0
+  just_pre <- mask(abd_nz[["prebreeding_migration"]],
+                   abd_nz[["postbreeding_migration"]], 
+                   maskvalue = 1)
+  just_post <- mask(abd_nz[["postbreeding_migration"]],
+                   abd_nz[["prebreeding_migration"]], 
+                   maskvalue = 1)
+  # count the number of cells with abundance in only one season
+  n_just <- cellStats(stack(just_pre, just_post), sum)
+  n_all <- cellStats(abd_nz, sum)
+  # is the proportion of one season cells above the 40% threshold
+  split_migration <- max(n_just / n_all, na.rm = TRUE) >= migration_threshold
+} else {
+  split_migration <- FALSE
+}
+n_just / n_all
+split_migration
+```
+
+In this case, there is essentially complete overlap between pre- and post-breeding migration, so we won't split them into separate colors on the map. Next, if at least 1% of the range is occupied in all four seasons, in these regions we'll display the average annual abundance as a separate color.
+
+```{r show-yr}
+threshold_yearround <- 0.01
+# decide whether to show year-round layer
+if (nlayers(abd_season) == 4) {
+  # annual abundance
+  abd_yr <- calc(abd, fun = mean, na.rm = TRUE)
+  # mask out cells that aren't occupied year-round
+  year_round <- calc(abd_season > 0, fun = sum, na.rm = TRUE) == 4
+  abd_yr_mask <- mask(abd_yr, year_round, maskvalue = 0)
+  # determine proportion of celss that are occupied year round
+  n_yr <- cellStats(abd_yr_mask > 0, sum)
+  n_an <- cellStats(abd_yr > 0, sum)
+  # only show year round abundance if it's above 1% of range threshold
+  show_yearround <- ((n_yr / n_an) >= threshold_yearround)
+} else {
+  show_yearround <- FALSE
+}
+show_yearround
+```
+
+Mapping relative abundance across the full-annual cycle requires a specilized set of color bins in order to ensure the full range of abundance values is effectively displayed. The function `calc_bins()` calculates the optimal break points of bins for status and trends abundance data.
+```{r breaks}
+bin_breaks <- calc_bins(abd)
+```
+
+Now that everything is in place, we can actually make the seasonal relative abundance map!
+
+```{r abd-map}
+# project the abundance data to mollweide
+# use nearest neighbour resampling to preserve true zeros
+abd_season_proj <- projectRaster(abd_season, crs = mollweide, method = "ngb")
+# determine spatial extent for plotting
+ext <- calc_full_extent(abd_season_proj)
+```
+
+# Range Maps
+
+# Regional Statistics
 
 
+```{r}
+unlink(sp_path, recursive = TRUE)
+```
 
-
-
-
-# 5. Day Use Statistic

@@ -15,8 +15,11 @@
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species eBird Status and Trends products"
+#' # download example data
+#' dl_path <- tempdir()
+#' sp_path <- download_data("example_data", path = dl_path)
 #'
+#' # define a spatioremporal extent
 #' ne_extent <- list(type = "rectangle",
 #'                   lat.min = 40,
 #'                   lat.max = 47,
@@ -26,6 +29,7 @@
 #'                   t.max = 0.475)
 #'
 #' ppms <- compute_ppms(path = sp_path, st_extent = ne_extent)
+#'
 #' }
 compute_ppms <- function(path, st_extent = NA) {
 
@@ -89,9 +93,9 @@ compute_ppms <- function(path, st_extent = NA) {
       t.ll <- min(ttt)
       # If Jittered, domain is bigger & number of grid cells increases
       if (jitter.cells){
-        x.ll <- x.ll - runif(1)*xxx.width
-        y.ll <- y.ll - runif(1)*yyy.width
-        t.ll <- t.ll - runif(1)*ttt.width
+        x.ll <- x.ll - stats::runif(1)*xxx.width
+        y.ll <- y.ll - stats::runif(1)*yyy.width
+        t.ll <- t.ll - stats::runif(1)*ttt.width
       }
       nx <- 1 + (max(xxx) - x.ll ) %/% xxx.width
       ny <- 1 + (max(yyy) - y.ll ) %/% yyy.width
@@ -140,7 +144,7 @@ compute_ppms <- function(path, st_extent = NA) {
       # So, I am going to handle this situation "by hand"
       result <- rep(NA, size)
       # Flip coin to determine if cell is sampled
-      if (runif(1) < prob){
+      if (stats::runif(1) < prob){
         if (length(x)==1 & replace==F) {
           #cat("sf: length(x)==1 & replace==F",x,"\n")
           result <- rep(NA, size)
@@ -424,14 +428,14 @@ compute_ppms <- function(path, st_extent = NA) {
           ttt.data <- NULL
           if ( sum(duplicated(sgc.pos.nindex)) > 0 ){
             # Calculate Variances for Predictor columns
-            pred.sd <- apply(predictor.data, 2, sd, na.rm=T)
+            pred.sd <- apply(predictor.data, 2, stats::sd, na.rm=T)
             pred.sd[ !names(pred.sd) %in% jitter.predictors] <- 0
             # Extract Duplicated Records
             ttt.data <- predictor.data[
               sgc.pos.nindex[duplicated(sgc.pos.nindex)],  ]
             # Matrix of random values
             ttt.rand.matrix <- matrix(
-              runif( nrow(ttt.data)*ncol(ttt.data), min=-1, max=1 ),
+              stats::runif( nrow(ttt.data)*ncol(ttt.data), min=-1, max=1 ),
               nrow(ttt.data),
               ncol(ttt.data))
             # Scale random values & Add to original values
@@ -561,14 +565,14 @@ compute_ppms <- function(path, st_extent = NA) {
 
   # FDR
   binom_test_p <- function(x) {
-    binom.test(round(as.numeric(x["pat"]) * as.numeric(x["pi.es"]), 0),
+    stats::binom.test(round(as.numeric(x["pat"]) * as.numeric(x["pi.es"]), 0),
                as.numeric(x["pi.es"]),
                (1 / 7),
                alternative = "greater")$p.value
   }
 
   p_values <- apply(st_data, 1, binom_test_p)
-  p_adj <- p.adjust(p_values, "fdr")
+  p_adj <- stats::p.adjust(p_values, "fdr")
 
   # Add Binary Prediction
   st_data$binary <- as.numeric(p_adj < 0.001)
@@ -781,8 +785,9 @@ compute_ppms <- function(path, st_extent = NA) {
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species eBird Status and Trends products"
-#'
+#' # download example data
+#' dl_path <- tempdir()
+#' sp_path <- download_data("example_data", path = dl_path)
 #'
 #' plot_binary_by_time(path = sp_path, metric = "Kappa", n_time_periods = 12)
 #' }
@@ -899,8 +904,11 @@ plot_binary_by_time <- function(path,
 #' @examples
 #' \dontrun{
 #'
-#' sp_path <- "path to species eBird Status and Trends products"
+#' # download example data
+#' dl_path <- tempdir()
+#' sp_path <- download_data("example_data", path = dl_path)
 #'
+#' # define a spatioremporal extent
 #' ne_extent <- list(type = "rectangle",
 #'                   lat.min = 40,
 #'                   lat.max = 47,
