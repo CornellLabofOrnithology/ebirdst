@@ -1,6 +1,6 @@
 ---
 title: "Generating Seasonal Abundance and Range Maps and Stats"
-author: "Tom Auer, Daniel Fink"
+author: "Matt Strimas-Mackey, Tom Auer, Daniel Fink"
 date: "`r Sys.Date()`"
 output: 
   rmarkdown::html_vignette:
@@ -24,20 +24,31 @@ knitr::opts_chunk$set(warning = FALSE,
                       fig.align = "center")
 ```
 
+# Outline
+
+1. [Introduction](#introduction)
+2. [Data Download](#data-download)
+3. [Seasonal Abundance](#seasonal-abundance)
+4. [Abundance Maps](#abundance-maps)
+5. [Range Maps](#range-maps)
+6. [Regional Statistics](#regional-statistics)
 
 # Introduction
 
-This vignette describes how to recreate the seasonal map products found on the [eBird Status and Trends pages](https://ebird.org/science/status-and-trends). First, the vignette will cover how to average the abundance data seasonally, then it will proceed with examples of making abundance maps, aggregating and smoothing data for range maps, and, finally, provide an example of calculating the "days of occupation" statistic. Throughout this vignette we will use the simplified examlpe dataset available through the `download_data()` function, which consists of the Yellow-bellied Sapsucker data spatially subset to the state of Michigan. However, these methods can be applied to the full datasets for any of the eBird Status and Trends species.
+This vignette describes how to recreate the seasonal map products found on the [eBird Status and Trends pages](https://ebird.org/science/status-and-trends). First, the vignette will cover how to average the abundance data seasonally, then it will proceed with examples of making abundance maps, aggregating and smoothing data for range maps, and, finally, provide examples of calculating regional summary statistic. Throughout this vignette we will use the simplified example dataset available through the `download_data()` function, which consists of the Yellow-bellied Sapsucker data spatially subset to the state of Michigan. However, these methods can be applied to the full datasets for any of the eBird Status and Trends species.
 
 Let's begin by loading all the packages we'll need for this vignette.
 
 ```{r libraries}
 library(ebirdst)
 library(raster)
+library(velox)
 library(sf)
+library(smoothr)
 library(rnaturalearth)
 library(dplyr)
 library(tidyr)
+library(ggplot2)
 # resolve namespace conflicts
 select <- dplyr::select
 ```
@@ -49,21 +60,19 @@ Before we do anything else, we'll need to download and load the example abundanc
 ```{r st-download}
 # download to a temp directory for the vigette
 # in practice, change to permanent directory the status and trends downloads
-st_path <- tempdir()
-sp_path <- download_data(species = "example_data", path = st_path)
+dl_path <- tempdir()
+sp_path <- download_data(species = "example_data", path = dl_path)
 # load the abundance data
-abd <- file.path(sp_path, "results", "tifs") %>% 
-  list.files(pattern = "hr_2016_abundance_umean", full.names = TRUE) %>% 
-  stack() %>% 
+abd <- load_raster("abundance_umean", path = sp_path) %>% 
   # label the raster layers with their corresponding dates
   label_raster_stack()
 ```
 
 The abundance data now consist of a `RasterStack` object with 52 layers, each corresponding to the relative abundance for a single week.
 
-We'll also need some addiontal spatial data (state and country borders, lakes, etc.) to provide context for the maps we'll make. [Natural Earth](https://www.naturalearthdata.com/) is the best source for free map data and there's an associated R package (`rnaturalearth`) for accessing the data. For all the maps in this vigentte, we'll use the Mollweide projection](https://en.wikipedia.org/wiki/Mollweide_projection), an excellent option for continental scale maps. 
+We'll also need some additional spatial data (state and country borders, lakes, etc.) to provide context for the maps we'll make. [Natural Earth](https://www.naturalearthdata.com/) is the best source for free map data and there's an associated R package (`rnaturalearth`) for accessing the data. For all the maps in this vignette, we'll use the [Mollweide projection](https://en.wikipedia.org/wiki/Mollweide_projection), an excellent option for continental scale maps. 
 
-```{r ne-data}
+```{r ne-data, results="hide"}
 mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
 ne_scale <- 50
 
@@ -79,7 +88,6 @@ wh_subset <- function(x) {
   st_transform(x[in_wh], crs = mollweide)
 }
 # country lines
-# 
 ne_country_lines <- ne_download(scale = ne_scale, category = "cultural",
                                 type = "admin_0_boundary_lines_land",
                                 returnclass = "sf") %>% 
@@ -103,9 +111,10 @@ ne_lakes <- ne_download(scale = ne_scale, category = "physical",
                         returnclass = "sf") %>% 
   st_geometry() %>% 
   wh_subset()
+ne_land <- st_transform(ne_land, crs = mollweide)
 ```
 
-# Season Defintion
+# Seasonal Abundance
 
 Generally, the seasons for eBird Status and Trends products are defined on a species-specific basis through expert review. For information on the details of defining seasons, please see the [seasons section of the FAQ](https://ebird.org/science/status-and-trends/faq#seasons). While it is certainly possible to define your own seasons when making seasonal abundance and range maps, if you want to recreate the products with the same seasons as the website, you'll need to use the definitions included in the `runs_w_names` data frame included in this package.
 
@@ -128,7 +137,7 @@ yebsap_dates <- mutate(yebsap_dates, pass = !(is.na(start_dt) | is.na(end_dt)))
 yebsap_dates
 ```
 
-Next, we'll assign each of the weekly abundance layers to a season.
+Now, we'll use these season definitions to assign each of the weekly abundance layers to a season.
 
 ```{r season-assignment}
 # dates for each abundance layer
@@ -151,13 +160,13 @@ for (i in seq_len(nrow(yebsap_dates))) {
 }
 ```
 
-Finally, let's calculate seasonal averages of relative abundance.
+Finally, let's average all the weeks within each season to produce seasonal relative abundance rasters.
 
 ```{r seasonal-average}
 # drop weeks not assigned to season
-weeks_season[10:12] <- NA
 week_pass <- !is.na(weeks_season)
 abd <- abd[[which(week_pass)]]
+weeks <- weeks[week_pass]
 weeks_season <- weeks_season[week_pass]
 # average over weeks in season
 abd_season <- stackApply(abd, indices = weeks_season, fun = mean, na.rm = TRUE)
@@ -193,7 +202,7 @@ n_just / n_all
 split_migration
 ```
 
-In this case, there is essentially complete overlap between pre- and post-breeding migration, so we won't split them into separate colors on the map. Next, if at least 1% of the range is occupied in all four seasons, in these regions we'll display the average annual abundance as a separate color.
+In this case, there is essentially complete overlap between pre- and post-breeding migration, so we won't split them into separate colors on the map. Next, we'll calculate the average annual abundance, which we'll display as a separate color  if at least 1% of the range is occupied in all four seasons.
 
 ```{r show-yr}
 threshold_yearround <- 0.01
@@ -215,12 +224,13 @@ if (nlayers(abd_season) == 4) {
 show_yearround
 ```
 
-Mapping relative abundance across the full-annual cycle requires a specilized set of color bins in order to ensure the full range of abundance values is effectively displayed. The function `calc_bins()` calculates the optimal break points of bins for status and trends abundance data.
+Mapping relative abundance across the full-annual cycle requires a specialized set of color bins in order to ensure the full range of abundance values is effectively displayed. The function `calc_bins()` calculates the optimal break points of bins for Status and Trends abundance data.
+
 ```{r breaks}
 bin_breaks <- calc_bins(abd)
 ```
 
-Now that everything is in place, we can actually make the seasonal relative abundance map!
+Now that everything is in place, we can actually make the seasonal relative abundance map! Note that the Status and Trends maps distinguish between regions of zero abundance and [regions with no prediction](https://ebird.org/science/status-and-trends/faq#no-prediction), which are displayed in different shades of gray, and regions with non-zero abundance, shown in color. To account for this, we'll need to generate a raster layer delineating the region within which predictions were made. 
 
 ```{r abd-map}
 # project the abundance data to mollweide
@@ -228,14 +238,310 @@ Now that everything is in place, we can actually make the seasonal relative abun
 abd_season_proj <- projectRaster(abd_season, crs = mollweide, method = "ngb")
 # determine spatial extent for plotting
 ext <- calc_full_extent(abd_season_proj)
+# set the plotting order of the seasons
+season_order <- c("postbreeding_migration", "prebreeding_migration", 
+                  "nonbreeding", "breeding")
+
+# prediction region, cells with predicted value in at least one week
+pred_region <- calc(abd_season_proj, mean, na.rm = TRUE)
+# mask to land area
+ne_land_buffer <- st_buffer(ne_land, dist = max(res(pred_region)) / 2)
+pred_region <- mask(pred_region, as_Spatial(ne_land_buffer))
+
+# remove zeros from abundnace layers
+abd_no_zero <- subs(abd_season_proj, data.frame(from = 0, to = NA), 
+                    subsWithNA = FALSE)
+
+# set up plot area
+par(mar = c(0 , 0, 0, 0))
+plot(ne_land, col = "#eeeeee", border = NA, 
+     xlim = c(ext@xmin, ext@xmax),
+     ylim = c(ext@ymin, ext@ymax))
+# prediction region and explicit zeros
+plot(pred_region, col = "#dddddd", maxpixels = raster::ncell(pred_region),
+     legend = FALSE, add = TRUE)
+# lakes
+plot(ne_lakes, col = "#ffffff", border =  "#444444", lwd = 0.5, add = TRUE)
+# land border
+plot(ne_land, col = NA, border = "#444444", lwd = 0.5, add = TRUE)
+# seasonal layer
+for (s in intersect(season_order, names(abd_no_zero))) {
+  # handle splitting of migration seasons into different colors
+  if (!split_migration && s %in% c("prebreeding_migration", 
+                                   "postbreeding_migration")) {
+    pal_season <- "migration"
+    
+  } else {
+    pal_season <- s
+  }
+  pal <- abundance_palette(length(bin_breaks$bins) - 1, pal_season)
+  plot(abd_no_zero[[s]], col = pal, breaks = bin_breaks$bins,
+       maxpixels = ncell(abd_no_zero[[s]]),
+       legend = FALSE, add = TRUE)
+}
+# year round
+if (show_yearround) {
+  year_round_proj <- projectRaster(year_round, crs = mollweide, method = "ngb")
+  plot(year_round_proj, 
+       col = abundance_palette(length(bin_breaks$bins) - 1, "year_round"), 
+       breaks = bin_breaks$bins,
+       maxpixels = ncell(year_round_proj),
+       legend = FALSE, add = TRUE)
+}
+# linework
+plot(ne_rivers, col = "#ffffff", lwd = 0.75, add = TRUE)
+plot(ne_state_lines, col = "#ffffff", lwd = 1.5, add = TRUE)
+plot(ne_country_lines, col = "#ffffff", lwd = 2, add = TRUE)
 ```
 
 # Range Maps
 
+The eBird Status and Trends range maps delineate the boundary of regions with non-zero relative abundance for a given species. We'll start by aggregating the raster layers to a coarser resolution to speed up processing, then convert the boundaries of non-zero abundance regions to polygons. We'll also convert the prediction areas to polygons so we can distinguish where the species is predicted to not occur from where it was not modeled.
+
+```{r raster-to-polygon}
+# aggregate
+abd_season_agg <- aggregate(abd_season_proj, fact = 3)
+# raster to polygon, one season at a time
+range <- list()
+pred_area <- list()
+for (s in names(abd_season_agg)) {
+  # range
+  range[[s]] <- rasterToPolygons(abd_season_agg[[s]], 
+                                 fun = function(y) {y > 0}, 
+                                 digits = 6) %>% 
+    st_as_sfc() %>% 
+    # combine polygon pieces into a single multipolygon
+    st_set_precision(1e6) %>% 
+    st_union() %>% 
+    st_sf() %>% 
+    # tag layers with season
+    mutate(season = s, layer = "range")
+  # prediction area
+  pred_area[[s]] <- rasterToPolygons(abd_season_agg[[s]], 
+                                     fun = function(y) {!is.na(y)}, 
+                                     digits = 6) %>% 
+    st_as_sfc() %>% 
+    # combine polygon pieces into a single multipolygon
+    st_set_precision(1e6) %>% 
+    st_union() %>% 
+    st_sf() %>% 
+    # tag layers with season
+    mutate(season = s, layer = "prediction_area")
+}
+# combine the sf objects for all seasons
+range <- rbind(do.call(rbind, range), do.call(rbind, pred_area))
+row.names(range) <- NULL
+print(range)
+```
+
+Converting from raster to polygons frequently yields tiny fragments of polygons and jagged polygon edges, which result in maps that aren't very aesthetically pleasing. To address this, we'll apply some algorithms from the `smoothr` package to clean up the polygons.
+
+```{r smoothr}
+# clean and smooth
+cell_area <- (1.5 * prod(res(abd_season_agg)))
+range_smooth <- range %>% 
+  # drop fragment polygons smaller than 1.5 times the aggregated cell size
+  drop_crumbs(threshold = cell_area) %>% 
+  # drop holes in polygons smaller than 1.5 times the aggregated cell size
+  fill_holes(threshold = cell_area) %>% 
+  # smooth the polygon edges
+  smooth(method = "ksmooth", smoothness = 2)
+# clip zeros to land border, range to buffered land to handle coastal species
+range_split <- split(range_smooth, range_smooth$layer)
+range_smooth <- rbind(
+  st_intersection(range_split$range, ne_land_buffer),
+  st_intersection(range_split$prediction_area, ne_land))
+```
+
+Finally, we can produce a seasonal range map in a similar fashion to the abundance map above.
+
+```{r range-map}
+# range map color palette
+range_palette <- c(nonbreeding = "#1d6996",
+                   prebreeding_migration = "#73af48",
+                   breeding = "#cc503e",
+                   postbreeding_migration = "#edad08",
+                   migration = "#edad08",
+                   year_round = "#6f4070")
+
+# set up plot area
+par(mar = c(0 , 0, 0, 0))
+plot(ne_land, col = "#eeeeee", border = NA, 
+     xlim = c(ext@xmin, ext@xmax),
+     ylim = c(ext@ymin, ext@ymax))
+# prediction region and explicit zeros
+annual_pred_area <- filter(range_smooth, layer == "prediction_area") %>% 
+  st_union()
+plot(annual_pred_area, col = "#dddddd", border = NA, add = TRUE)
+# lakes
+plot(ne_lakes, col = "#ffffff", border =  "#444444", lwd = 0.5, add = TRUE)
+# land border
+plot(ne_land, col = NA, border = "#444444", lwd = 0.5, add = TRUE)
+# seasonal layer
+for (s in intersect(season_order, unique(range_smooth$season))) {
+  # handle splitting of migration seasons into different colors
+  if (!split_migration && s %in% c("prebreeding_migration", 
+                                   "postbreeding_migration")) {
+    col_season <- "migration"
+  } else {
+    col_season <- s
+  }
+  rng_season <- filter(range_smooth, season == s, layer == "range") %>% 
+    st_geometry()
+  plot(rng_season, col = range_palette[col_season], border = NA, add = TRUE)
+}
+# year round
+if (show_yearround) {
+  # find common area between all seasons
+  range_combined <- filter(range_smooth, layer == "range")
+  range_yearround <- range_combined[1, ]
+  range_combined <- sf::st_geometry(range_combined)
+  for (i in 2:length(range_combined)) {
+    range_yearround <- sf::st_intersection(range_yearround, range_combined[i])
+  }
+  plot(st_geometry(range_yearround), 
+       col = range_palette["year_round"], border = NA, 
+       add = TRUE)
+}
+# linework
+plot(ne_rivers, col = "#ffffff", lwd = 0.75, add = TRUE)
+plot(ne_state_lines, col = "#ffffff", lwd = 1.5, add = TRUE)
+plot(ne_country_lines, col = "#ffffff", lwd = 2, add = TRUE)
+```
+
 # Regional Statistics
 
+In addition to maps and visualizations, the eBird Status and Trends website provides a set of statistics summarizing the spatial data over regions. In the US and Canada, statistics are provided for each state and province, and throughout North America they are provided for [Bird Conservation Regions (BCRs)](http://nabci-us.org/resources/bird-conservation-regions-map/). The five regional statistics are:
 
-```{r}
+1. **Mean relative abundance:** the average estimated relative abundance within the given region for a given season.
+2. **Percentage of seasonal North American population:** the sum of the estimated relative abundance within the selected region divided by the sum of the estimated relative abundance across North America.
+3. **Percentage of region occupied:** the percentage of the selected region within the range boundary of a species for a given season.
+4. **Percentage of North American range in region:** the fraction of a species' total North American range that falls within the selected region.
+5. **Days of occupation in region:** the number of days that a species occupies the selected region, with occupation being defined as spatially covering the selected region by at least 5% based on estimated relative abundances averaged across the given season.
+
+These statistics can be [downloaded from the Status and Trends website](https://ebird.org/science/status-and-trends/download-data) for all regions and species; however, there may be situations where you want to calculate them over different regions than those provided. With that in mind, this vignette will cover how to calculate a couple of these statistics: mean relative abundance and days of occupation. The remaining 3 statistics can be calculated following the same approach with minor modifications.
+
+Since the example data used in this vignette is restricted to Michigan, we'll calculate the statistics over the counties in Michigan; however, this approach can easily be extended to any set of regions. Let's start by downloading county boundaries for Michigan.
+
+```{r counties}
+mi_counties <- getData("GADM", country = "USA", level = 2, path = dl_path) %>% 
+  st_as_sf() %>% 
+  filter(NAME_1 == "Michigan") %>% 
+  select(county = NAME_2, county_code = HASC_2) %>% 
+  st_transform(crs = projection(abd)) %>% 
+  # remove lakes which aren't true counties
+  filter(county_code != "US.MI.WB")
+```
+
+We'll also aggregate the data to coarser resolution to perform these calculations. This isn't necessary for the example dataset, but when this is extended to the full dataset it will become critical for making these calculations efficiently.
+
+```{r aggregate}
+abd_season_agg <- aggregate(abd_season, fact = 3, fun = mean, na.rm = TRUE)
+abd_agg <- aggregate(abd, fact = 3, fun = mean, na.rm = TRUE)
+```
+
+## Mean Relative Abundance
+
+Mean relative abundance is the easiest statistics to calculate: we simply average all the raster cells within each region polygon. This could be done with the `raster` function `extract()`; however, we'll `extract()` from the `velox` package instead, which is orders of magnitude faster.
+
+```{r mean-rel-abd}
+vx <- velox(abd_season_agg)
+abd_mean_region <- vx$extract(mi_counties, 
+                              fun = function(x) {mean(x, na.rm = TRUE)}, 
+                              df = TRUE) %>% 
+  # assign season names
+  setNames(c("id", names(abd_season_agg))) %>% 
+  # attach county attributes
+  mutate(county_code = mi_counties$county_code) %>% 
+  select(-id)
+# transpose to one season per row
+abd_mean_region <- abd_mean_region %>% 
+  gather(season, mean_abundance, -county_code)
+head(abd_mean_region)
+```
+
+Let's make a quick map comparing the breeding and non-breeding mean relative abundance within counties in Michigan.
+
+```{r mean-rel-abd-map}
+# join back to county boundaries
+abd_mean_proj <- abd_mean_region %>% 
+  inner_join(mi_counties, ., by = "county_code") %>% 
+  # transform to mollweide for plotting
+  st_transform(crs = mollweide)
+
+# plot
+ggplot(abd_mean_proj %>% filter(season %in% c("breeding", "nonbreeding"))) +
+  # abundance data
+  geom_sf(aes(fill = mean_abundance)) +
+  scale_fill_viridis_c(trans = "sqrt") +
+  guides(fill = guide_colorbar(title.position = "top", barwidth = 15)) +
+  facet_wrap(~ season, ncol = 2) +
+  labs(title = "Seasonal mean relative abundance in MI counties",
+       fill = "Relative abundance") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+```
+
+## Days of Occupation
+
+Days of occupation is the most challenging statistic to calculate because it involves several steps. First, for each week, we need to determine if a region (i.e. a county) is "occupied". We define occupied as at least 5% of the cells within the region having a non-zero abundance.
+
+```{r week-occ}
+threshold_occupied <- 0.05
+
+# weekly percent occupied
+calc_week_occupied <- function(wk) {
+  vx <- velox(abd_agg[[wk]])
+  vx$extract(mi_counties, 
+             fun = function(x) {sum(x > 0, na.rm = TRUE) / length(x)}, 
+             df = TRUE) %>%
+    # assign week, season, and county
+    transmute(week_date = weeks[wk],
+              season = weeks_season[wk],
+              county_code = mi_counties$county_code,
+              pct_occupied = coalesce(out, 0))
+}
+# process weeks independently otherwise we'll run into memory issues
+week_occupied <- lapply(seq_len(nlayers(abd_agg)), calc_week_occupied) %>% 
+  bind_rows() %>% 
+  mutate(occupied = (pct_occupied > threshold_occupied))
+```
+
+Next, we tally up the number of weeks each region is occupied, then convert to days by multiplying by 7.
+
+```{r day-occ}
+days_occupation <- week_occupied %>%
+  group_by(county_code, season) %>%
+  summarise(weeks_occ = sum(occupied)) %>%
+  ungroup() %>%
+  mutate(days_occ = round(7 * weeks_occ)) %>% 
+  select(county_code, season, days_occ)
+head(days_occupation)
+```
+
+Finally, let's produce a map comparing days occupation in the breeding and non-breeding season.
+
+```{r day-occ-map}
+# join back to county boundaries
+days_occ_proj <- days_occupation %>% 
+  inner_join(mi_counties, ., by = "county_code") %>% 
+  # transform to mollweide for plotting
+  st_transform(crs = mollweide)
+
+# plot
+ggplot(days_occ_proj %>% filter(season %in% c("breeding", "nonbreeding"))) +
+  # abundance data
+  geom_sf(aes(fill = days_occ)) +
+  scale_fill_viridis_c() +
+  guides(fill = guide_colorbar(title.position = "top", barwidth = 15)) +
+  facet_wrap(~ season, ncol = 2) +
+  labs(title = "Seasonal days of occupation in MI counties",
+       fill = "Days of occupation") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+```
+
+```{r cleanup, include = FALSE}
 unlink(sp_path, recursive = TRUE)
 ```
 

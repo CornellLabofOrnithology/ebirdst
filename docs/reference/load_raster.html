@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Data frame of species available — runs_w_names • ebirdst</title>
+<title>Load eBird Status and Trends raster data — load_raster • ebirdst</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,10 +30,11 @@
 
 
 
-<meta property="og:title" content="Data frame of species available — runs_w_names" />
+<meta property="og:title" content="Load eBird Status and Trends raster data — load_raster" />
 
-<meta property="og:description" content="A dataset containing the available species, with SPECIES_CODE, RUN_NAME,
-SCI_NAME, and PRIMARY_COM_NAME." />
+<meta property="og:description" content="Each of the eBird Status and Trends products is packaged as a GeoTIFF file
+with 52 bands, one for each week of the year. This function loads the data
+for a given product and species as a RasterStack object." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -103,38 +104,63 @@ SCI_NAME, and PRIMARY_COM_NAME." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Data frame of species available</h1>
-    <small class="dont-index">Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/R/data.R'><code>R/data.R</code></a></small>
-    <div class="hidden name"><code>runs_w_names.Rd</code></div>
+    <h1>Load eBird Status and Trends raster data</h1>
+    <small class="dont-index">Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/R/ebirdst-loading.R'><code>R/ebirdst-loading.R</code></a></small>
+    <div class="hidden name"><code>load_raster.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>A dataset containing the available species, with SPECIES_CODE, RUN_NAME,
-SCI_NAME, and PRIMARY_COM_NAME.</p>
+    <p>Each of the eBird Status and Trends products is packaged as a GeoTIFF file
+with 52 bands, one for each week of the year. This function loads the data
+for a given product and species as a <code>RasterStack</code> object.</p>
     
     </div>
 
-    <pre class="usage"><span class='no'>runs_w_names</span></pre>
-        
-    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
+    <pre class="usage"><span class='fu'>load_raster</span>(<span class='kw'>product</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"abundance_umean"</span>, <span class='st'>"occurrence_umean"</span>,
+  <span class='st'>"abundance_lower"</span>, <span class='st'>"abundance_upper"</span>), <span class='no'>path</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>product</th>
+      <td><p>character; status and trends product to load, options are
+relative abundance, occurrence, and upper and lower bounds on relative
+abundance</p></td>
+    </tr>
+    <tr>
+      <th>path</th>
+      <td><p>character; full path to the directory containing single species
+eBird Status and Trends products.</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A data frame with 107 rows and 4 variables:</p><dl class='dl-horizontal'>
-<dt>SPECIES_CODE</dt><dd><p>six letter eBird code in eBird Taxonomy v2016</p></dd>
-<dt>RUN_NAME</dt><dd><p>unique analysis identifier and the top level folder name for all results</p></dd>
-<dt>SCI_NAME</dt><dd><p>Scientific name from eBird Taxonomy v2016</p></dd>
-<dt>PRIMARY_COM_NAME</dt><dd><p>English common name from eBird Taxonomy v2016</p></dd>
-...
-</dl>
+    <p>A <code>RasterStack</code> of data for the given product.</p>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='co'># download example data</span>
+<span class='no'>dl_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/tempfile'>tempdir</a></span>()
+<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='download_data.html'>download_data</a></span>(<span class='st'>"example_data"</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>dl_path</span>)
+
+<span class='co'># load data</span>
+<span class='fu'>load_raster</span>(<span class='st'>"abundance_umean"</span>, <span class='no'>sp_path</span>)
+
+<span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
       
-      <li><a href="#format">Format</a></li>
-          </ul>
+      <li><a href="#value">Value</a></li>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
   </div>
 </div>

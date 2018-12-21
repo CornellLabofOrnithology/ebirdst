@@ -81,6 +81,52 @@ download_data <- function(species, path) {
 }
 
 
+#' Load eBird Status and Trends raster data
+#'
+#' Each of the eBird Status and Trends products is packaged as a GeoTIFF file
+#' with 52 bands, one for each week of the year. This function loads the data
+#' for a given product and species as a `RasterStack` object.
+#'
+#' @param product character; status and trends product to load, options are
+#'   relative abundance, occurrence, and upper and lower bounds on relative
+#'   abundance
+#' @param path character; full path to the directory containing single species
+#'   eBird Status and Trends products.
+#'
+#' @return A `RasterStack` of data for the given product.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' # download example data
+#' dl_path <- tempdir()
+#' sp_path <- download_data("example_data", path = dl_path)
+#'
+#' # load data
+#' load_raster("abundance_umean", sp_path)
+#'
+#' }
+load_raster <- function(product = c("abundance_umean",
+                                     "occurrence_umean",
+                                     "abundance_lower",
+                                     "abundance_upper"),
+                         path) {
+  stopifnot(is.character(path), length(path) == 1, dir.exists(path))
+  product <- match.arg(product)
+
+  # find the file
+  tif_path <- list.files(file.path(path, "results", "tifs"),
+                          pattern = paste0("hr_2016_", product, "\\.tif$"),
+                          full.names = TRUE)
+  if (length(tif_path) != 1 || !file.exists(tif_path)) {
+    stop(paste("Error locating GeoTIFF file for:", product))
+  }
+  return(raster::stack(tif_path))
+
+}
+
+
 #' Projects st_extent lat/lon list to sinusoidal raster Extent
 #'
 #' Internal function that converts the st_extent list used throughout this
@@ -627,7 +673,7 @@ raster_st_subset <- function(x, st_extent) {
 #' configuration variables from eBird Status and Trends products
 #' (from *_config.RData).
 #'
-#' @param path character; Full path to the directory containing single species
+#' @param path character; full path to the directory containing single species
 #' eBird Status and Trends products.
 #'
 #' @return environment object containing all run parameters.
@@ -670,7 +716,7 @@ load_config <- function(path) {
 #' Internal function used by [load_pis()] and [load_pds()] to get the stixel
 #' summary information (from summary.txt).
 #'
-#' @param path character; Full path to the directory containing single species
+#' @param path character; full path to the directory containing single species
 #'   eBird Status and Trends products.
 #'
 #' @return data.frame containing stixel summary information about each stixel
@@ -754,7 +800,7 @@ load_summary <- function(path) {
 #' Loads the predictor importance data (from pi.txt), joins with stixel summary
 #' data, sets the names from [load_config()], and cleans up the data.frame.
 #'
-#' @param path character; Full path to the directory containing single species
+#' @param path character; full path to the directory containing single species
 #'   eBird Status and Trends products.
 #'
 #' @return data.frame containing predictor importance values for each stixel, as
@@ -813,7 +859,7 @@ load_pis <- function(path) {
 #' This is one of the slower functions in the package, due to the size of the
 #' pd.txt file (usually multiple GB).
 #'
-#' @param path character; Full path to the directory containing single species
+#' @param path character; full path to the directory containing single species
 #'   eBird Status and Trends products.
 #'
 #' @return data.frame containing partial dependency values for each stixel, as

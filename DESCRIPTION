@@ -60,7 +60,9 @@ Suggests:
     rnaturalearth,
     sf,
     testthat,
-    tidyr
+    tidyr,
+    smoothr,
+    velox
 VignetteBuilder: 
     knitr
 Encoding: UTF-8

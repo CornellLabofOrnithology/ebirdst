@@ -7,7 +7,7 @@
 load_pds(path)
 }
 \arguments{
-\item{path}{character; Full path to the directory containing single species
+\item{path}{character; full path to the directory containing single species
 eBird Status and Trends products.}
 }
 \value{

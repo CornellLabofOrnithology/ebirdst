@@ -113,7 +113,7 @@ par(mfrow = c(1, 1), mar = c(0, 0, 0, 6))
 
 # use the extent object to set the spatial extent for the plot
 plot(as(extent(trim(abund_moll, values = NA)), "SpatialPolygons"), 
-     col = 'white', border = 'white')
+     col = "white", border = "white")
 
 # add background reference data
 plot(wh_states_moll, col = "#eeeeee", border = NA, add = TRUE)
@@ -155,4 +155,4 @@ plot(abund_moll ^ week_bins$power, col = lcol, legend.only = TRUE,
 plot(wh_states_moll, add = TRUE, border = "white", lwd = 1.5)
 ```
 
-<img src="README-quick_start-1.png" style="display: block; margin: auto;" />
+<img src="README-quick_start-1.png" width="\textwidth" style="display: block; margin: auto;" />

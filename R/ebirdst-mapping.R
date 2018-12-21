@@ -39,37 +39,27 @@ calc_full_extent <- function(x) {
   # convert 0s to NAs, otherwise trimming is slow and the extent is too broad
   stack[stack == 0] <- NA
 
-  # trim away 0s to get closest extent to positive values
-  stack <- raster::trim(stack, values = NA)
-
-  # save extent
-  map_extent <- raster::extent(stack)
+  # work on individual layers because trim has a bug when applied to stacks
+  # also this approach is faster
+  e <- c(NA_real_, NA_real_, NA_real_, NA_real_)
+  for (i in seq_len(nlayers(stack))) {
+    e_trim <- extent(trim(stack[[i]]))
+    e[1] <- min(e[1], e_trim[1], na.rm = TRUE)
+    e[2] <- max(e[2], e_trim[2], na.rm = TRUE)
+    e[3] <- min(e[3], e_trim[3], na.rm = TRUE)
+    e[4] <- max(e[4], e_trim[4], na.rm = TRUE)
+  }
+  e <- extent(e)
 
   # sometimes extent calculations get weird and you'll get a very broad
   # extent that goes further than you want, so check against the input
-  input_raster_extent <- raster::extent(x)
+  e_input <- raster::extent(x)
+  e[1] <- max(e[1], e_input[1], na.rm = TRUE)
+  e[2] <- min(e[2], e_input[2], na.rm = TRUE)
+  e[3] <- max(e[3], e_input[3], na.rm = TRUE)
+  e[4] <- min(e[4], e_input[4], na.rm = TRUE)
 
-  # xmin too low
-  if(map_extent[1] < input_raster_extent[1]) {
-    map_extent[1] <- input_raster_extent[1]
-  }
-
-  # xmax too high
-  if(map_extent[2] > input_raster_extent[2]) {
-    map_extent[2] <- input_raster_extent[2]
-  }
-
-  # ymin too low
-  if(map_extent[3] < input_raster_extent[3]) {
-    map_extent[3] <- input_raster_extent[3]
-  }
-
-  # ymax too high
-  if(map_extent[4] > input_raster_extent[4]) {
-    map_extent[4] <- input_raster_extent[4]
-  }
-
-  return(map_extent)
+  return(e)
 }
 
 
