@@ -26,8 +26,9 @@ the \code{st_extent} list are currently able to wrap time around the year
 \examples{
 \dontrun{
 
-# define species eBird Status and Trends product location and load pis
-sp_path <- "path to species product"
+# download and load example data
+dl_path <- tempdir()
+sp_path <- download_data("example_data", path = dl_path)
 pis <- load_pis(sp_path)
 
 # define st_extent list
@@ -40,6 +41,7 @@ ne_extent <- list(type = "rectangle",
                   t.max = 0.475)
 
 #subset pis with st_extent list
-data_st_subset(data = pis, st_extent = ne_extent, use_time = TRUE)
+data_st_subset(data = pis, st_extent = ne_extent)
+
 }
 }

@@ -1,15 +1,19 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-ebirdst: Tools to Load, Map, Plot, and Analyze eBird Status and Trends Data Products
-====================================================================================
+
+# ebirdst: Tools to Load, Map, Plot, and Analyze eBird Status and Trends Data Products
 
 <!-- [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0) -->
-**THIS PACKAGE IS UNDER ACTIVE DEVELOPMENT. FUNCTIONALITY MAY CHANGE AT ANY TIME.**
 
-The goal of this package is to provide tools for loading, mapping, plotting, and analyzing eBird Status and Trends data products. If you're looking for the previous version (known as stemhelper), which is no longer being maintained, please access the `stemhelper_archive` branch.
+**THIS PACKAGE IS UNDER ACTIVE DEVELOPMENT. FUNCTIONALITY MAY CHANGE AT
+ANY TIME.**
 
-Installation
-------------
+The goal of this package is to provide tools for loading, mapping,
+plotting, and analyzing eBird Status and Trends data products. If you’re
+looking for the previous version (known as stemhelper), which is no
+longer being maintained, please access the `stemhelper_archive` branch.
+
+## Installation
 
 You can install ebirdst from GitHub with:
 
@@ -19,19 +23,34 @@ You can install ebirdst from GitHub with:
 devtools::install_github("CornellLabofOrnithology/ebirdst")
 ```
 
-Vignette
---------
+## Vignette
 
 TODO: update website, then updated this section.
 
-For a full introduction and advanced usage, please see the package [website](https://cornelllabofornithology.github.io/ebirdst). An [introductory vignette](https://cornelllabofornithology.github.io/ebirdst/articles/stem-intro-mapping.html) is available, detailing the structure of the results and how to begin loading and mapping the results. Further, an [advanced vignette](https://cornelllabofornithology.github.io/ebirdst/articles/stem-pipd.html) details how to access additional information from the model results about predictor importance and directionality, as well as predictive performance metrics.
+For a full introduction and advanced usage, please see the package
+[website](https://cornelllabofornithology.github.io/ebirdst). An
+[introductory
+vignette](https://cornelllabofornithology.github.io/ebirdst/articles/stem-intro-mapping.html)
+is available, detailing the structure of the results and how to begin
+loading and mapping the results. Further, an [advanced
+vignette](https://cornelllabofornithology.github.io/ebirdst/articles/stem-pipd.html)
+details how to access additional information from the model results
+about predictor importance and directionality, as well as predictive
+performance metrics.
 
-Quick Start
------------
+## Quick Start
 
-This quick start guide will show you how to download example data and plot abundance values similar to how they are plotted for the [eBird Status and Trends Abundance animations](https://ebird.org/science/status-and-trends/woothr/abundance-map-weekly). **IMPORTANT. AFTER DOWNLOADING THE RESULTS, DO NOT CHANGE THE FILE STRUCTURE.** All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package.
+This quick start guide will show you how to download example data and
+plot abundance values similar to how they are plotted for the [eBird
+Status and Trends Abundance
+animations](https://ebird.org/science/status-and-trends/woothr/abundance-map-weekly).
+**IMPORTANT. AFTER DOWNLOADING THE RESULTS, DO NOT CHANGE THE FILE
+STRUCTURE.** All functionality in this package relies on the structure
+inherent in the delivered results. Changing the folder and file
+structure will cause errors with this package.
 
 ``` r
+library(ebirdst)
 library(viridis)
 library(raster)
 library(rnaturalearth)
@@ -42,14 +61,14 @@ library(rnaturalearth)
 # returns the full path of the results. Please note that the example_data is
 # for Yellow-bellied Sapsucker and has the same run code as the real data,
 # so if you download both, make sure you put the example_data somewhere else.
-sp_path <- download_data(species = "example_data", path = "~/tmp/")
-print(sp_path)
-#> [1] "/Users/mta45/tmp/yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"
+dl_dir <- tempdir()
+sp_path <- download_data(species = "example_data", path = dl_dir)
 
 # load estimated relative abundance and label with dates
-abunds <- raster::stack(list.files(path = paste0(sp_path, "/results/tifs/"),
-                                   pattern = "*_hr_2016_abundance_umean.tif",
-                                   full.names = TRUE))
+abunds_path <- list.files(file.path(sp_path, "results", "tifs"),
+                          pattern = "hr_2016_abundance_umean",
+                          full.names = TRUE)
+abunds <- stack(abunds_path)
 abunds <- label_raster_stack(abunds)
 
 # Note: if you want to work with a proper Date vector for the raster 
@@ -81,7 +100,7 @@ wh_sub <- wh_states[!is.na(wh_states$name) & wh_states$name == "Michigan", ]
 mollweide <- CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
 
 # the nearest neighbor method preserves cell values across projections
-abund_moll <- projectRaster(abund, crs = mollweide, method = 'ngb')
+abund_moll <- projectRaster(abund, crs = mollweide, method = "ngb")
 
 # project the reference data as well
 wh_states_moll <- spTransform(wh_states, mollweide)
@@ -94,25 +113,23 @@ par(mfrow = c(1, 1), mar = c(0, 0, 0, 6))
 
 # use the extent object to set the spatial extent for the plot
 plot(as(extent(trim(abund_moll, values = NA)), "SpatialPolygons"), 
-     col = 'white', border = 'white')
+     col = "white", border = "white")
 
 # add background reference data
 plot(wh_states_moll, col = "#eeeeee", border = NA, add = TRUE)
 
 # plot zeroes as gray
 plot(abund_moll == 0, maxpixels = ncell(abund_moll),
-     ext = extent(trim(abund_moll, values = NA)), col = '#dddddd', 
-     xaxt = 'n', yaxt = 'n', legend = FALSE, add = TRUE)
+     ext = extent(trim(abund_moll, values = NA)), col = "#dddddd", 
+     axes = FALSE, legend = FALSE, add = TRUE)
 
 # define color bins
-these_cols <- rev(viridis::plasma(length(week_bins$bins) - 2, end = 0.9))
-grayInt <- colorRampPalette(c("#dddddd", these_cols[1]))
-qcol <- c(grayInt(4)[2], these_cols)
+qcol <- abundance_palette(length(week_bins$bins) - 1, "weekly")
 
 # plot abundances
 plot(abund_moll, maxpixels = ncell(abund_moll),
      ext = extent(trim(abund_moll, values = NA)), breaks = week_bins$bins,
-     col = qcol, xaxt = 'n', yaxt = 'n', legend = FALSE, add = TRUE)
+     col = qcol, axes = FALSE, legend = FALSE, add = TRUE)
 
 # for legend, create a smaller set of bin labels
 bin_labels <- format(round(week_bins$bins, 2), nsmall = 2)
@@ -122,7 +139,7 @@ bin_labels[!(bin_labels %in% c(bin_labels[1],
 bin_labels <- c("0", bin_labels)
 
 # create colors that include gray for 0
-lcol <- c('#dddddd', qcol)
+lcol <- c("#dddddd", qcol)
 
 # set legend such that color ramp appears linearly
 ltq <- seq(from = week_bins$bins[1], to = week_bins$bins[length(week_bins$bins)],
@@ -135,7 +152,7 @@ plot(abund_moll ^ week_bins$power, col = lcol, legend.only = TRUE,
      legend.width = 2, axis.args = list(cex.axis = 0.9, lwd.ticks = 0))
 
 # add state boundaries on top
-plot(wh_states_moll, add = TRUE, border = 'white', lwd = 1.5)
+plot(wh_states_moll, add = TRUE, border = "white", lwd = 1.5)
 ```
 
-<img src="README-quick_start-1.png" style="display: block; margin: auto;" />
+<img src="README-quick_start-1.png" width="\textwidth" style="display: block; margin: auto;" />

@@ -28,8 +28,9 @@ an \code{st_extent} to see performance within spatiotemporal extent.
 \examples{
 \dontrun{
 
-sp_path <- "path to species eBird Status and Trends products"
-
+# download example data
+dl_path <- tempdir()
+sp_path <- download_data("example_data", path = dl_path)
 
 plot_binary_by_time(path = sp_path, metric = "Kappa", n_time_periods = 12)
 }

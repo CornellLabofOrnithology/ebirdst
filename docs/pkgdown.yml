@@ -1,0 +1,8 @@
+pandoc: 2.3.1
+pkgdown: 1.3.0
+pkgdown_sha: ~
+articles:
+  ebirdst-intro-mapping: ebirdst-intro-mapping.html
+  ebirdst-pipd: ebirdst-pipd.html
+  ebirdst-seasonal-maps: ebirdst-seasonal-maps.html
+

@@ -8,11 +8,13 @@ power-transformed data for mapping}
 calc_bins(x)
 }
 \arguments{
-\item{x}{RasterStack or RasterBrick; original eBird Status and
-Trends product raster GeoTiff with 52 bands, one for each week.}
+\item{x}{RasterStack or RasterBrick; original eBird Status and Trends product
+raster GeoTiff with 52 bands, one for each week.}
 }
 \value{
-A vector containing the break points of bins.
+A list with two elements: \code{bins} is a vector containing the break
+points of the bins and \code{power} is the optimal power used to transform data
+when calculating bins.
 }
 \description{
 Mapping species abundance across the full-annual cycle presents a challenge,
@@ -28,13 +30,25 @@ un-transforms the bins.
 \examples{
 \dontrun{
 
-sp_path <- "path to species eBird Status and Trends products"
-raster_stack <- stack(sp_path)
-year_bins <- calc_bins(raster_stack)
+# download and load example abundance data
+dl_path <- tempdir()
+sp_path <- download_data("example_data", path = dl_path)
+abd_path <- list.files(file.path(sp_path, "results", "tifs"),
+                       pattern = "hr_2016_abundance_umean",
+                       full.names = TRUE)
+abd <- raster::stack(abd_path)
 
-raster::plot(raster_stack[[1]], xaxt = 'n', yaxt = 'n', breaks = year_bins)
+# calculate bins
+year_bins <- calc_bins(abd)
+
+# plot
+raster::plot(abd[[30]], axes = FALSE, breaks = year_bins$bins)
+
 }
 }
 \references{
-Ross Maciejewski, Avin Pattah, Sungahn Ko, Ryan Hafen, William S. Cleveland, David S. Ebert.  Automated Box-Cox Transformations for Improved Visual Encoding. IEEE Transactions on Visualization and Computer Graphics, 19(1): 130-140, 2013.
+Ross Maciejewski, Avin Pattah, Sungahn Ko, Ryan Hafen, William S.
+Cleveland, David S. Ebert.  Automated Box-Cox Transformations for Improved
+Visual Encoding. IEEE Transactions on Visualization and Computer Graphics,
+19(1): 130-140, 2013.
 }

@@ -9,12 +9,14 @@ calc_effective_extent(st_extent, pis = NA, pds = NA, path)
 \arguments{
 \item{st_extent}{list; st_extent list containing spatiotemporal filter}
 
-\item{pis}{data.frame; from \code{load_pis()} Must supply either pis or pds.}
+\item{pis}{data.frame; predictor importance data from \code{\link[=load_pis]{load_pis()}}. Must
+supply either pis or pds.}
 
-\item{pds}{data.frame; from \code{load_pds()} Must supply either pis or pds.}
+\item{pds}{data.frame; partial dependence data from \code{\link[=load_pds]{load_pds()}}. Must supply
+either pis or pds.}
 
-\item{path}{character; Full path to directory containing the eBird Status
-and Trends products for a single species.}
+\item{path}{character; full path to directory containing the eBird Status and
+Trends products for a single species.}
 }
 \value{
 RasterLayer and plots the RasterLayer with centroid locations and
@@ -35,9 +37,12 @@ selected stixels are contributing information, ranging from 0 to 1.
 \examples{
 \dontrun{
 
-sp_path <- "path to species eBird Status and Trends products"
+# download and load example data
+dl_path <- tempdir()
+sp_path <- download_data("example_data", path = dl_path)
 pis <- load_pis(sp_path)
 
+# define a spatioremporal extent
 ne_extent <- list(type = "rectangle",
                   lat.min = 40,
                   lat.max = 47,
@@ -46,6 +51,7 @@ ne_extent <- list(type = "rectangle",
                   t.min = 0.425,
                   t.max = 0.475)
 
-eff_lay <- calc_effective_extent(st_extent = ne_extent, pis = pis)
+eff_lay <- calc_effective_extent(st_extent = ne_extent, pis = pis,
+                                 path = sp_path)
 }
 }

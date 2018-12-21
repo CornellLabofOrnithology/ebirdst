@@ -4,12 +4,13 @@
 \alias{map_centroids}
 \title{Map PI and PD centroid locations}
 \usage{
-map_centroids(pis, pds, st_extent = NA, plot_pis = TRUE, plot_pds = TRUE)
+map_centroids(pis, pds, st_extent = NA, plot_pis = TRUE,
+  plot_pds = TRUE)
 }
 \arguments{
-\item{pis}{data.frame; from \code{load_pis()}}
+\item{pis}{data.frame; predictor importance data from \code{\link[=load_pis]{load_pis()}}.}
 
-\item{pds}{data.frame; from \code{load_pds()}}
+\item{pds}{data.frame; partial depenence data from \code{\link[=load_pds]{load_pds()}}.}
 
 \item{st_extent}{list; Optional spatiotemporal filter using \code{st_extent} list.}
 
@@ -29,10 +30,13 @@ an optional spatiotemporal subset using an \code{st_extent} list.
 \examples{
 \dontrun{
 
-sp_path <- "path to species eBird Status and Trends products"
+# download and load example data
+dl_path <- tempdir()
+sp_path <- download_data("example_data", path = dl_path)
 pis <- load_pis(sp_path)
 pds <- load_pds(sp_path)
 
+# define a spatiotemporal extent to plot
 ne_extent <- list(type = "rectangle",
                   lat.min = 40,
                   lat.max = 47,
@@ -42,5 +46,6 @@ ne_extent <- list(type = "rectangle",
                   t.max = 0.475)
 
 map_centroids(pis = pis, pds = pds, st_extent = ne_extent)
+
 }
 }

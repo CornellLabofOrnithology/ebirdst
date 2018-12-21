@@ -4,13 +4,10 @@
 \alias{calc_full_extent}
 \title{Calculates spatial extent of non-zero data from Raster* object for plotting}
 \usage{
-calc_full_extent(x, path)
+calc_full_extent(x)
 }
 \arguments{
 \item{x}{Raster* object; either full RasterStack or subset.}
-
-\item{path}{character; Full path to directory containing the results
-for a single species.}
 }
 \value{
 raster Extent object
@@ -25,9 +22,19 @@ plotting. The returned Extent object can then be used for plotting.
 \examples{
 \dontrun{
 
-sp_path <- "path to species eBird Status and Trends products"
-raster_stack <- stack(sp_path)
-plot_extent <- calc_full_extent(raster_stack, path)
-raster::plot(raster_stack[[1]], ext = plot_extent)
+# download and load example abundance data
+dl_path <- tempdir()
+sp_path <- download_data("example_data", path = dl_path)
+abd_path <- list.files(file.path(sp_path, "results", "tifs"),
+                       pattern = "hr_2016_abundance_umean",
+                       full.names = TRUE)
+abd <- raster::stack(abd_path)
+
+# calculate full extent
+plot_extent <- calc_full_extent(abd)
+
+# plot
+raster::plot(abd[[1]], axes = FALSE, ext = plot_extent)
+
 }
 }
