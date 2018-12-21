@@ -7,7 +7,7 @@
 load_summary(path)
 }
 \arguments{
-\item{path}{character; Full path to the directory containing single species
+\item{path}{character; full path to the directory containing single species
 eBird Status and Trends products.}
 }
 \value{
@@ -15,15 +15,18 @@ data.frame containing stixel summary information about each stixel
 centroid.
 }
 \description{
-Internal function used by load_pis() and load_pds() to get the stixel
+Internal function used by \code{\link[=load_pis]{load_pis()}} and \code{\link[=load_pds]{load_pds()}} to get the stixel
 summary information (from summary.txt).
 }
 \examples{
 \dontrun{
 
-sp_path <- "path to species eBird Status and Trends products"
+# download example data
+dl_path <- tempdir()
+sp_path <- download_data("example_data", path = dl_path)
 
-summaries <- load_summary(sp_path)
+# stixel summaries
+summaries <- ebirdst:::load_summary(sp_path)
 }
 }
 \keyword{internal}

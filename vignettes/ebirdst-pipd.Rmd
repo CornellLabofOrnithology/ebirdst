@@ -5,18 +5,21 @@ date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Using Predictor Importance and Partial Dependence Information}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning = FALSE, 
-                      message = FALSE, 
+                      message = FALSE,
+                      collapse = TRUE,
+                      comment = "#>",
                       out.width = "\\textwidth", 
                       fig.height = 5, 
                       fig.width = 7, 
                       fig.align = "center")
-devtools::load_all()
 ```
 
 # Outline
@@ -48,17 +51,19 @@ The `ebirdst` package provides functions for accessing these, such that you shou
 
 # 2. Loading Centroids
 
-The first step when working with stixel centroid data is to load the Predictor Importances (PIs) and the Partial Dependencies (PDs). These files will be used for all of the functions in this vignette and are the input to many of the functions in `stemhelper`.
+The first step when working with stixel centroid data is to load the Predictor Importances (PIs) and the Partial Dependencies (PDs). These files will be used for all of the functions in this vignette and are the input to many of the functions in `ebirdst`.
 
 ```{r load_pipd}
+library(ebirdst)
+
 # DOWNLOAD DATA
 # Currently, example data is available on a public s3 bucket. The following 
 # download_data() function copies the species results to a selected path and 
 # returns the full path of the results. Please note that the example_data is
 # for Yellow-bellied Sapsucker and has the same run code as the real data,
 # so if you download both, make sure you put the example_data somewhere else.
-species <- "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"
-sp_path <- download_data(species = "example_data", path = "~/tmp/")
+dl_dir <- tempdir()
+sp_path <- download_data(species = "example_data", path = dl_dir)
 print(sp_path)
 
 pis <- load_pis(sp_path)
@@ -78,7 +83,7 @@ lp_extent <- list(type = "rectangle",
 		              t.min = 0.425,
 	 	              t.max = 0.475)
 
-map_centroids(pis = pis, pds = pds, st_extent = lp_extent)
+#map_centroids(pis = pis, pds = pds, st_extent = lp_extent)
 ```
 
 # 4. Plotting Centroids and Extent of Analysis
@@ -87,7 +92,7 @@ Similarly, the `calc_effective_extent` will analyze a spatiotemporal subset of P
 
 ```{r plot_extents}
 par(mfrow = c(1, 1), mar = c(0, 0, 0, 6))
-pi_extent <- calc_effective_extent(lp_extent, pis = pis, path = sp_path)
+#pi_extent <- calc_effective_extent(lp_extent, pis = pis, path = sp_path)
 ```
 
 # 5. Predictive Performance Metrics

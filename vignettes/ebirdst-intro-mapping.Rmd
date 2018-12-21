@@ -4,27 +4,28 @@ author: "Tom Auer, Daniel Fink"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
+  %\VignetteEncoding{UTF-8}
   %\VignetteIndexEntry{ebirdst: Introduction to loading, mapping, and plotting eBird Status and Trend products}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+editor_options: 
+  chunk_output_type: console
 ---
 
 <style type="text/css">
 .table {
-
     width: 50%;
-
 }
 </style>
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning = FALSE, 
-                      message = FALSE, 
-                      out.width="\\textwidth", 
-                      fig.height=4, 
-                      fig.width=7, 
-                      fig.align="center")
-devtools::load_all()
+                      message = FALSE,
+                      collapse = TRUE,
+                      comment = "#>",
+                      out.width = "\\textwidth", 
+                      fig.height = 4, 
+                      fig.width = 7, 
+                      fig.align = "center")
 ```
 
 # Outline
@@ -110,25 +111,33 @@ Once you have downloaded a set of eBird Status and Trends products, one of the f
 TODO: update data access.
 
 ```{r load_raster_stack}
+library(ebirdst)
+library(viridisLite)
+library(raster)
+library(rnaturalearth)
+library(ggplot2)
+
 # DOWNLOAD DATA
 # Currently, example data is available on a public s3 bucket. The following 
 # download_data() function copies the species results to a selected path and 
 # returns the full path of the results. Please note that the example_data is
 # for Yellow-bellied Sapsucker and has the same run code as the real data,
 # so if you download both, make sure you put the example_data somewhere else.
-species <- "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"
-sp_path <- download_data(species = "example_data", path = "~/tmp/")
-print(sp_path)
+dl_dir <- tempdir()
+sp_path <- download_data(species = "example_data", path = dl_dir)
+
 
 # load trimmed mean abundances and label dates
-abund_stack <- raster::stack(paste0(sp_path, "/results/tifs/", species,
-                               "_hr_2016_abundance_umean.tif"))
-abund_stack <- label_raster_stack(abund_stack)
-print(abund_stack)
+abunds_path <- list.files(file.path(sp_path, "results", "tifs"),
+                         pattern = "hr_2016_abundance_umean",
+                         full.names = TRUE)
+abunds <- stack(abunds_path)
+abunds <- label_raster_stack(abunds)
+print(abunds)
 
 # Note: if you want to work with a proper Date vector for the raster 
 # dates, use parse_raster_dates()
-date_vector <- parse_raster_dates(abund_stack)
+date_vector <- parse_raster_dates(abunds)
 print(date_vector)
 ```
 
@@ -141,21 +150,18 @@ One of the most common tasks with eBird Status and Trends products is to make ma
 The sinusoidal projection that NASA provides MODIS data in, while functional because of its equal-area property, is not good for mapping because of the significant distortion of land masses across the globe. In general, there are few global equal-area projections, including, but not limited to, Lambert Azimuthal Equal Area, Goode Homolosine, Mollweide, and Equal Area Cylindrical. Of these, we have selected Mollweide, used in the remainder of this section, for its pleasing conformal properties across the globe, ease of projection configuration within R and its proj4string construction, and the ease of setting central meridians that best display the Western Hemisphere. It is worth noting that while projecting to a more visually appealing projection is ideal for mapping, it is not necessary for quantitative analysis of eBird Status and Trends products, for which purposes the results can be left in the original Sinusoidal projection.
 
 ```{r project_stack}
-library(viridis)
-library(raster)
-
 # define mollweide projection
 mollweide <- CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
 
 # project single layer from stack to mollweide
-week38_moll <- projectRaster(abund_stack[[38]], crs = mollweide, method = 'ngb')
+week38_moll <- projectRaster(abunds[[38]], crs = mollweide, method = "ngb")
 
 # optionally, you can project an entire stack, but it takes much longer
-#abund_stack_moll <- projectRaster(abund_stack, crs = mollweide, method = 'ngb')
+# abund_moll <- projectRaster(abund, crs = mollweide, method = "ngb")
 
 # map single layer with full annual extent
 par(mar = c(0, 0, 0, 2))
-plot(week38_moll, xaxt = 'n', yaxt = 'n', bty = 'n', col = plasma(10),
+plot(week38_moll, col = plasma(10), axes = FALSE, box = FALSE, 
      maxpixels = ncell(week38_moll))
 ```
 
@@ -166,18 +172,24 @@ If working with a full set of data for a species, mapping the layer at the full 
 Most examples in this vignette focus primarily on relative abundance estimates, as they're the most novel and informative. However, we also provide estimates for the probability of occurrence. These are much simpler to map than abundance in terms of color scales and binning, as values range between 0 and 1 throughout the year.
 
 ```{r map_occurrence}
-occ_stack <- raster::stack(paste0(sp_path, "/results/tifs/", species,
-                               "_hr_2016_occurrence_umean.tif"))
-occ_stack <- label_raster_stack(occ_stack)
-occ_week <- occ_stack[[26]]
+occs_path <- list.files(file.path(sp_path, "results", "tifs"),
+                        pattern = "hr_2016_occurrence_umean",
+                        full.names = TRUE)
+occs <- stack(occs_path)
+occs <- label_raster_stack(occs)
+
+# select a week in the summer
+occ <- occs[[26]]
 
 # create breaks every 0.05 from 0 to 1
 occ_bins <- seq(0, 1, by = 0.05)
-occ_week26 <- projectRaster(occ_week, crs = mollweide, method = 'ngb')
+occ_moll <- projectRaster(occ, crs = mollweide, method = "ngb")
 
 par(mar = c(0, 0, 0, 2), cex = 0.9)
-plot(occ_week26, xaxt = 'n', yaxt = 'n', bty = 'n', breaks = occ_bins,
-     col = plasma(length(occ_bins) - 1), maxpixels = ncell(occ_week26),
+plot(occ_moll, 
+     breaks = occ_bins, col = plasma(length(occ_bins) - 1),
+     axes = FALSE, box = FALSE, 
+     maxpixels = ncell(occ_moll),
      legend.width = 2, legend.shrink = 0.97)
 ```
 
@@ -188,46 +200,50 @@ Mapping relative abundance estimates across the full-annual cycle presents a cha
 To compare, we first scale the colors linearly, based on the maximum from the entire year. Since the max is quite high, times of the year with low concentration appear flat.
 
 ```{r map_linear}
-year_max <- max(maxValue(abund_stack), na.rm = TRUE)
+year_max <- max(maxValue(abunds), na.rm = TRUE)
 
-week14_moll <- projectRaster(abund_stack[[14]], crs = mollweide, method = 'ngb')
+week14_moll <- projectRaster(abunds[[14]], crs = mollweide, method = "ngb")
 
 # set graphical params
-par(mfrow = c(1,2), mar = c(0, 0, 0, 0))
+par(mfrow = c(1, 2), mar = c(0, 0, 0, 0))
 
 # adding this extent to the background provides a better extent for the example
 plot(as(extent(trim(week38_moll, values = NA)), "SpatialPolygons"), 
-     col = 'white', border = 'white')
+     col = "white", border = "white")
 # plot the abundance
-plot(week38_moll, xaxt = 'n', yaxt = 'n', bty = 'n', zlim = c(0, year_max),
-     col = plasma(20), maxpixels = ncell(week38_moll), legend = FALSE, add = TRUE)
+plot(week38_moll,zlim = c(0, year_max), col = plasma(20), 
+     axes = FALSE, box = FALSE, 
+     maxpixels = ncell(week38_moll), legend = FALSE, add = TRUE)
 
 # do the same for week 14
 par(mar = c(0, 0, 0, 4))
 plot(as(extent(trim(week38_moll, values = NA)), "SpatialPolygons"), 
-     col = 'white', border = 'white')
-plot(week14_moll, xaxt = 'n', yaxt = 'n', bty = 'n', zlim = c(0, year_max),
-     col = plasma(20), maxpixels = ncell(week14_moll), legend.shrink = 0.97, add = TRUE)
+     col = "white", border = "white")
+plot(week14_moll, zlim = c(0, year_max), col = plasma(20), 
+     axes = FALSE, box = FALSE, 
+     maxpixels = ncell(week14_moll), legend.shrink = 0.97, add = TRUE)
 ```
 
 We can compare this with maps made using the `calc_bins()` method.
 
 ```{r map_bins}
 # calculate ideal color bins for abundance values
-year_bins <- calc_bins(abund_stack)
+year_bins <- calc_bins(abunds)
 
 # plot
 par(mfrow = c(1, 2), mar = c(0, 0, 0, 6))
 plot(as(extent(trim(week38_moll, values = NA)), "SpatialPolygons"), 
-     col = 'white', border = 'white')
-plot(week38_moll, xaxt = 'n', yaxt = 'n', bty = 'n', breaks = year_bins$bins,
-     col = viridis::plasma(length(year_bins$bins) - 1), 
+     col = "white", border = "white")
+plot(week38_moll, 
+     breaks = year_bins$bins, col = plasma(length(year_bins$bins) - 1), 
+     axes = FALSE, box = FALSE, 
      maxpixels = ncell(week38_moll), legend = FALSE, add = TRUE)
 par(mar = c(0, 0, 0, 6))
 plot(as(extent(trim(week38_moll, values = NA)), "SpatialPolygons"), 
-     col = 'white', border = 'white')
-plot(week14_moll, xaxt = 'n', yaxt = 'n', bty = 'n', breaks = year_bins$bins,
-     col = viridis::plasma(length(year_bins$bins) - 1), 
+     col = "white", border = "white")
+plot(week14_moll, 
+     breaks = year_bins$bins, col = plasma(length(year_bins$bins) - 1), 
+     axes = FALSE, box = FALSE, 
      maxpixels = ncell(week14_moll), legend = FALSE, add = TRUE)
 
 # create a thinner set of labels
@@ -238,7 +254,7 @@ bin_labels[!(bin_labels %in% c(bin_labels[1],
 
 # plot legend
 plot(week38_moll ^ year_bins$power, 
-     col = viridis::plasma(length(year_bins$bins) - 1), legend.only = TRUE, 
+     col = plasma(length(year_bins$bins) - 1), legend.only = TRUE, 
      breaks = year_bins$bins ^ year_bins$power, lab.breaks = bin_labels,
      legend.shrink = 0.97, legend.width = 2,  axis.args = list(cex.axis = 0.9, 
                                                                lwd.ticks = 0))
@@ -249,23 +265,20 @@ plot(week38_moll ^ year_bins$power,
 As seen in the map above, the `calc_bins` method excludes zeroes. However, with color bins that accurately represent the data distribution, we can add in details about zeroes, tweak the legend, and add some reference data to make a complete map. Like the quick start guide, this will show you how to download example data and plot abundance values similar to how they are plotted for the [eBird Status and Trends Abundance animations](https://ebird.org/science/status-and-trends/woothr/abundance-map-weekly).
 
 ```{r map_w_es, out.width = NULL}
-library(rnaturalearth)
-
 # to add context, let's pull in some reference data to add
 wh <- ne_countries(continent = c("North America", "South America"))
 wh_states <- ne_states(iso_a2 = unique(wh@data$iso_a2))
 wh_moll <- spTransform(wh, mollweide)
 wh_states_moll <- spTransform(wh_states, mollweide)
 
-week26_moll <- projectRaster(abund_stack[[26]], crs = mollweide, method = 'ngb')
+week26_moll <- projectRaster(abunds[[26]], crs = mollweide, method = "ngb")
 
 # set graphics params
 par(mfrow = c(1, 1), mar = c(0, 0, 0, 6))
 
 # use the extent object to set the spatial extent for the plot
-# use the extent object to set the spatial extent for the plot
 plot(as(extent(trim(week26_moll, values = NA)), "SpatialPolygons"), 
-     col = 'white', border = 'white')
+     col = "white", border = "white")
 
 # add background spatial context
 plot(wh_states_moll, col = "#eeeeee", border = NA, add = TRUE)
@@ -273,17 +286,15 @@ plot(wh_states_moll, col = "#eeeeee", border = NA, add = TRUE)
 # plot zeroes as gray
 plot(week26_moll == 0, maxpixels = ncell(week26_moll),
      ext = extent(trim(week26_moll, values = NA)), col = '#dddddd', 
-     xaxt = 'n', yaxt = 'n', legend = FALSE, add = TRUE)
+     axes = FALSE, legend = FALSE, add = TRUE)
 
 # define color bins
-these_cols <- rev(viridis::plasma(length(year_bins$bins) - 2, end = 0.9))
-grayInt <- colorRampPalette(c("#dddddd", these_cols[1]))
-qcol <- c(grayInt(4)[2], these_cols)
+qcol <- abundance_palette(length(year_bins$bins) - 1, "weekly")
 
 # plot abundances
 plot(week26_moll, maxpixels = ncell(week26_moll),
      ext = extent(trim(week26_moll, values = NA)), breaks = year_bins$bins,
-     col = qcol, xaxt = 'n', yaxt = 'n', legend = FALSE, add = TRUE)
+     col = qcol, axes = FALSE, legend = FALSE, add = TRUE)
 
 # for legend, create a smaller set of bin labels
 bin_labels <- format(round(year_bins$bins, 2), nsmall = 2)
@@ -293,7 +304,7 @@ bin_labels[!(bin_labels %in% c(bin_labels[1],
 bin_labels <- c("0", bin_labels)
 
 # create colors that include gray for 0
-lcol <- c('#dddddd', qcol)
+lcol <- c("#dddddd", qcol)
 
 # set legend such that color ramp appears linearly
 ltq <- seq(from = year_bins$bins[1], to = year_bins$bins[length(year_bins$bins)],
@@ -306,7 +317,7 @@ plot(week26_moll ^ year_bins$power, col = lcol, legend.only = TRUE,
      legend.width = 2, axis.args = list(cex.axis = 0.9, lwd.ticks = 0))
 
 # add state boundaries on top
-plot(wh_states_moll, add = TRUE, border = 'white', lwd = 1.5)
+plot(wh_states_moll, add = TRUE, border = "white", lwd = 1.5)
 ```
 
 ```{r set_figures, include = FALSE}
@@ -320,18 +331,20 @@ In addition to occurrence and abundance estimates, we also provide confidence in
 ```{r map_confidence_band}
 # load lower and upper stacks
 # load trimmed mean abundances and label dates
-lower_stack <- raster::stack(paste0(sp_path, "/results/tifs/", species,
-                               "_hr_2016_abundance_lower.tif"))
-upper_stack <- raster::stack(paste0(sp_path, "/results/tifs/", species,
-                               "_hr_2016_abundance_upper.tif"))
+lower <- stack(list.files(file.path(sp_path, "results", "tifs"),
+                                pattern = "hr_2016_abundance_lower",
+                                full.names = TRUE))
+upper <- stack(list.files(file.path(sp_path, "results", "tifs"),
+                                pattern = "hr_2016_abundance_upper",
+                                full.names = TRUE))
 
 # calculate band width
-conf_band <- upper_stack[[26]] - lower_stack[[26]]
+conf_band <- upper[[26]] - lower[[26]]
 
-conf_week26 <- projectRaster(conf_band, crs = mollweide, method = 'ngb')
+conf_week26 <- projectRaster(conf_band, crs = mollweide, method = "ngb")
 
 par(mar = c(0, 0, 0, 2))
-plot(conf_week26, xaxt = 'n', yaxt = 'n', bty = 'n', col = magma(20),
+plot(conf_week26, col = magma(20), axes = FALSE, box = FALSE,
      maxpixel = ncell(conf_week26))
 ```
 
@@ -343,30 +356,27 @@ With `RasterStacks` for relative abundance estimates, as well as upper and lower
 # set a point
 coords <- cbind(-88.1, 46.7)
 pt <- SpatialPoints(coords, proj4string = CRS("+init=epsg:4326"))
-pt_prj <- spTransform(pt, CRS(proj4string(abund_stack)))
+pt_prj <- spTransform(pt, CRS(proj4string(abunds)))
 
 # extract
-abund_traj <- unlist(extract(abund_stack, pt_prj, fun = mean, na.rm = TRUE))
-upper_traj <- unlist(extract(upper_stack, pt_prj, fun = mean, na.rm = TRUE))
-lower_traj <- unlist(extract(lower_stack, pt_prj, fun = mean, na.rm = TRUE))
+abund_traj <- unlist(extract(abunds, pt_prj, fun = mean, na.rm = TRUE))
+upper_traj <- unlist(extract(upper, pt_prj, fun = mean, na.rm = TRUE))
+lower_traj <- unlist(extract(lower, pt_prj, fun = mean, na.rm = TRUE))
 
-# Plot trajectories
-library(ggplot2)
-
+# plot trajectories
 plot_frame <- data.frame(x = 1:length(abund_traj),
                          y = c(unname(abund_traj)),
                          upper = c(unname(upper_traj)),
                          lower = c(unname(lower_traj)))
 
-g <- ggplot(plot_frame, aes(x, y)) +
-     geom_line(data = plot_frame) +
-     geom_ribbon(data = plot_frame, 
-                 aes(ymin = lower, ymax = upper), 
-                 alpha = 0.3) +
-     ylab("Expected Count (count/(km hr))") +
-     xlab("Week") +
-     theme_light()
-g
+ggplot(plot_frame, aes(x, y)) +
+  geom_line(data = plot_frame) +
+  geom_ribbon(data = plot_frame, 
+              aes(ymin = lower, ymax = upper), 
+              alpha = 0.3) +
+  ylab("Expected Count (count/(km hr))") +
+  xlab("Week") +
+  theme_light()
 ```
 
 It is also possible to extract trajectories for regions, but it takes a little more data work.
@@ -377,32 +387,29 @@ mi <- wh_states[!is.na(wh_states$name) & wh_states$name == "Michigan", ]
 
 # extract
 # because we're using a region, we get lots of values that we need to average together
-abund_traj <- extract(abund_stack, mi, fun = mean, na.rm = TRUE)
+abund_traj <- extract(abunds, mi, fun = mean, na.rm = TRUE)
 abund_traj <- apply(abund_traj, 2, mean, na.rm = TRUE)
 
-upper_traj <- extract(upper_stack, mi, fun = mean, na.rm = TRUE)
+upper_traj <- extract(upper, mi, fun = mean, na.rm = TRUE)
 upper_traj <- apply(upper_traj, 2, mean, na.rm = TRUE)
 
-lower_traj <- extract(lower_stack, mi, fun = mean, na.rm = TRUE)
+lower_traj <- extract(lower, mi, fun = mean, na.rm = TRUE)
 lower_traj <- apply(lower_traj, 2, mean, na.rm = TRUE)
 
-# Plot trajectories
-library(ggplot2)
-
+# plot trajectories
 plot_frame <- data.frame(x = 1:length(abund_traj),
                          y = c(unname(abund_traj)),
                          upper = c(unname(upper_traj)),
                          lower = c(unname(lower_traj)))
 
-g <- ggplot(plot_frame, aes(x, y)) +
-     geom_line(data = plot_frame) +
-     geom_ribbon(data = plot_frame, 
-                 aes(ymin = lower, ymax =upper), 
-                 alpha = 0.3) +
-     ylab("Expected Count (count/(km hr))") +
-     xlab("Week") +
-     theme_light()
-g
+ggplot(plot_frame, aes(x, y)) +
+  geom_line(data = plot_frame) +
+  geom_ribbon(data = plot_frame, 
+              aes(ymin = lower, ymax =upper), 
+              alpha = 0.3) +
+  ylab("Expected Count (count/(km hr))") +
+  xlab("Week") +
+  theme_light()
 ```
 
 # 5. Conversion
@@ -412,8 +419,8 @@ The `raster` package has a lot of functionality and the `RasterLayer` format is 
 ```{r conversion}
 # To convert the data to a simpler geographic format and access tabularly	
 # reproject into geographic (decimal degrees) 
-abund_stack_ll <- projectRaster(abund_stack[[26]], crs = CRS("+init=epsg:4326"), 
-                                method = 'ngb')
+abund_stack_ll <- projectRaster(abunds[[26]], crs = CRS("+init=epsg:4326"), 
+                                method = "ngb")
 
 # Convert raster object into a matrix
 p <- rasterToPoints(abund_stack_ll)
@@ -421,7 +428,7 @@ colnames(p) <- c("longitude", "latitude", "abundance_umean")
 head(p)
 ```
 
-```{r conversion_write, eval=FALSE}
+```{r conversion_write, eval = FALSE}
 # Write a CSV file of the matrix
 write.csv(p, file = "yebsap_week26.csv", row.names = FALSE)
 ```

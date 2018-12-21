@@ -28,7 +28,7 @@ ne_extent <- list(type = "rectangle",
                   t.max = 0.475)
 
 # convert
-sinu_e <- get_sinu_ext(ne_extent)
+sinu_e <- ebirdst:::get_sinu_ext(ne_extent)
 sinu_e
 }
 \keyword{internal}

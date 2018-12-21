@@ -2,27 +2,39 @@
 % Please edit documentation in R/ebirdst-loading.R
 \name{parse_raster_dates}
 \alias{parse_raster_dates}
-\title{Parses the names attached to a Raster* from label_raster_stack()}
+\title{Parses the names attached to a Raster from label_raster_stack()}
 \usage{
-parse_raster_dates(raster)
+parse_raster_dates(x)
 }
 \arguments{
-\item{raster}{RasterLayer, RasterStack, or RasterBrick; full or subser of
-original eBird Status and Trends product raster GeoTiff.}
+\item{x}{\code{Raster} object; full or subset of original eBird Status and
+Trends product raster GeoTiff.}
 }
 \value{
 Date vector.
 }
 \description{
-The label_raster_stack() function labels the dates of the estimate rasters
+The \code{\link[=label_raster_stack]{label_raster_stack()}} function labels the dates of the estimate rasters
 in the format of "XYYYY.MM.DD", because of constraints in the \code{raster}
 packge. This function converts that character vector into an ISO compliant
 Date vector.
 }
 \examples{
 \dontrun{
-rs <- stack("/path to GeoTiff/")
-rs_labeled <- label_raster_stack(raster_data)
-rs_dates <- parse_raster_dates(rs_labeled)
+
+# download and load example abundance data
+dl_path <- tempdir()
+sp_path <- download_data("example_data", path = dl_path)
+abd_path <- list.files(file.path(sp_path, "results", "tifs"),
+                       pattern = "hr_2016_abundance_umean",
+                       full.names = TRUE)
+abd <- raster::stack(abd_path)
+
+# label
+abd <- label_raster_stack(abd)
+
+# parse dates
+parse_raster_dates(abd)
+
 }
 }

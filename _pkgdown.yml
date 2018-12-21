@@ -6,6 +6,8 @@ navbar:
     href: articles/ebirdst-intro-mapping.html
   - text: Advanced Vignette
     href: articles/ebirdst-pipd.html
+  - text: Seasonal Vignette
+    href: articles/ebirdst-seasonal-maps.html
   - text: Function Reference
     href: reference/index.html
   right:

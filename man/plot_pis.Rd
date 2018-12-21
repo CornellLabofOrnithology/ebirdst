@@ -4,30 +4,32 @@
 \alias{plot_pis}
 \title{Plot predictor importances as barplots}
 \usage{
-plot_pis(path, pis, st_extent, by_cover_class = FALSE, num_top_preds = 50,
-  return_top = FALSE, pretty_names = TRUE, print_plot = TRUE)
+plot_pis(path, pis, st_extent, by_cover_class = FALSE,
+  num_top_preds = 50, return_top = FALSE, pretty_names = TRUE,
+  print_plot = TRUE)
 }
 \arguments{
-\item{path}{character; Full path to single species eBird Status and Trends products.}
+\item{path}{character; full path to single species eBird Status and Trends
+products.}
 
-\item{pis}{data.frame; From \code{load_pis()}.}
+\item{pis}{data.frame; predictory importance data rom \code{\link[=load_pis]{load_pis()}}.}
 
-\item{st_extent}{list; st_extent list for spatiotemporal filtering. Required,
-as results are less meaningful over large spatiotemporal extents.}
+\item{st_extent}{list; \code{st_extent} list for spatiotemporal filtering.
+Required, as results are less meaningful over large spatiotemporal extents.}
 
-\item{by_cover_class}{logical; Default is FALSE. If TRUE, aggregate Fragstats
-for the land cover classes into single values for the land cover classes.}
+\item{by_cover_class}{logical; whether to aggregate FRAGSTATS metrics for the
+land cover classes into single values for the land cover classes.}
 
-\item{num_top_preds}{int; Integer showing how many predictors to show.}
+\item{num_top_preds}{integer; how many predictors to show.}
 
-\item{return_top}{logical; Default is FALSE. If TRUE, returns a vecotr of the
-top predictors, based on the \code{num_top_preds} param.}
+\item{return_top}{logical; wether to returns a vector of the top predictors,
+based on the \code{num_top_preds} param.}
 
-\item{pretty_names}{logical; Default is TRUE. Set to convert cryptic land
-cover codes to readable land cover class names.}
+\item{pretty_names}{logical; whether to convert cryptic land cover codes to
+readable land cover class names.}
 
-\item{print_plot}{logical; Default is TRUE. Toggle to print plot, to allow
-only the return the top predictors, if desired.}
+\item{print_plot}{logical; whether to print plot, to allow only the return
+the top predictors, if desired.}
 }
 \value{
 Plots barplot and/or returns a vector of top predictors.
@@ -41,9 +43,12 @@ customized plots.
 \examples{
 \dontrun{
 
-sp_path <- "path to species eBird Status and Trends products"
+# download and load example data
+dl_path <- tempdir()
+sp_path <- download_data("example_data", path = dl_path)
 pis <- load_pis(sp_path)
 
+# define a spatioremporal extent
 ne_extent <- list(type = "rectangle",
                   lat.min = 40,
                   lat.max = 47,
@@ -53,5 +58,6 @@ ne_extent <- list(type = "rectangle",
                   t.max = 0.475)
 
 plot_pis(path = sp_path, pis = pis, st_extent = ne_extent)
+
 }
 }

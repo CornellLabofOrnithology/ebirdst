@@ -7,7 +7,8 @@
 plot_pds(pd_name, pds, st_extent, plot_quantiles = FALSE,
   pointwise_pi = TRUE, stixel_pds = FALSE, k.cont.res = 25,
   gbm.n.trees = 500, nnn.bs = 100, equivalent.ensemble.ss = 10,
-  ci.alpha = 0.05, mean.all.data = FALSE, ylim = NA, print_plot = TRUE)
+  ci.alpha = 0.05, mean.all.data = FALSE, ylim = NA,
+  print_plot = TRUE)
 }
 \arguments{
 \item{pd_name}{character; Single predictor name from PDs (via \code{load_pds()}).
@@ -62,9 +63,12 @@ dependency, with two options for smoothing.
 \examples{
 \dontrun{
 
-sp_path <- "path to species eBird Status and Trends products"
+# download and load example data
+dl_path <- tempdir()
+sp_path <- download_data("example_data", path = dl_path)
 pds <- load_pds(sp_path)
 
+# define a spatioremporal extent
 ne_extent <- list(type = "rectangle",
                   lat.min = 40,
                   lat.max = 47,
@@ -74,5 +78,6 @@ ne_extent <- list(type = "rectangle",
                   t.max = 0.475)
 
 plot_pds(pd_name = "TIME", pds = pds, st_extent = ne_extent)
+
 }
 }
