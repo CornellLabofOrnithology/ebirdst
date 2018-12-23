@@ -71,7 +71,7 @@
       <h1>Generating Seasonal Abundance and Range Maps and Stats</h1>
                         <h4 class="author">Matt Strimas-Mackey, Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2018-12-21</h4>
+            <h4 class="date">2018-12-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-seasonal-maps.Rmd"><code>vignettes/ebirdst-seasonal-maps.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-seasonal-maps.Rmd</code></div>
@@ -213,18 +213,22 @@
 <a class="sourceLine" id="cb6-4" data-line-number="4">weeks &lt;-<span class="st"> </span>weeks[week_pass]</a>
 <a class="sourceLine" id="cb6-5" data-line-number="5">weeks_season &lt;-<span class="st"> </span>weeks_season[week_pass]</a>
 <a class="sourceLine" id="cb6-6" data-line-number="6"><span class="co"># average over weeks in season</span></a>
-<a class="sourceLine" id="cb6-7" data-line-number="7">abd_season &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/stackApply">stackApply</a></span>(abd, <span class="dt">indices =</span> weeks_season, <span class="dt">fun =</span> mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/names">names</a></span>(abd_season) &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/grep">gsub</a></span>(<span class="st">"^index_"</span>, <span class="st">""</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/names">names</a></span>(abd_season))</a>
-<a class="sourceLine" id="cb6-9" data-line-number="9">abd_season</a>
-<a class="sourceLine" id="cb6-10" data-line-number="10"><span class="co">#&gt; class       : RasterBrick </span></a>
-<a class="sourceLine" id="cb6-11" data-line-number="11"><span class="co">#&gt; dimensions  : 259, 276, 71484, 4  (nrow, ncol, ncell, nlayers)</span></a>
-<a class="sourceLine" id="cb6-12" data-line-number="12"><span class="co">#&gt; resolution  : 2779.876, 2779.876  (x, y)</span></a>
-<a class="sourceLine" id="cb6-13" data-line-number="13"><span class="co">#&gt; extent      : -7202659, -6435414, 4636834, 5356822  (xmin, xmax, ymin, ymax)</span></a>
-<a class="sourceLine" id="cb6-14" data-line-number="14"><span class="co">#&gt; coord. ref. : +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs </span></a>
-<a class="sourceLine" id="cb6-15" data-line-number="15"><span class="co">#&gt; data source : in memory</span></a>
-<a class="sourceLine" id="cb6-16" data-line-number="16"><span class="co">#&gt; names       : nonbreeding, prebreeding_migration,  breeding, postbreeding_migration </span></a>
-<a class="sourceLine" id="cb6-17" data-line-number="17"><span class="co">#&gt; min values  :   0.0000000,             0.1460964, 0.0000000,              0.0000000 </span></a>
-<a class="sourceLine" id="cb6-18" data-line-number="18"><span class="co">#&gt; max values  :   0.6754810,             1.6710625, 2.0053043,              0.9763988</span></a></code></pre></div>
+<a class="sourceLine" id="cb6-7" data-line-number="7">mean_season &lt;-<span class="st"> </span><span class="cf">function</span>(s) {</a>
+<a class="sourceLine" id="cb6-8" data-line-number="8">  <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/calc">calc</a></span>(abd[[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(weeks_season <span class="op">==</span><span class="st"> </span>s)]], mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb6-9" data-line-number="9">}</a>
+<a class="sourceLine" id="cb6-10" data-line-number="10">seasons &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/unique">unique</a></span>(weeks_season)</a>
+<a class="sourceLine" id="cb6-11" data-line-number="11">abd_season &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">lapply</a></span>(seasons, mean_season) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb6-12" data-line-number="12"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/stack">stack</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb6-13" data-line-number="13"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/setNames">setNames</a></span>(seasons)</a>
+<a class="sourceLine" id="cb6-14" data-line-number="14">abd_season</a>
+<a class="sourceLine" id="cb6-15" data-line-number="15"><span class="co">#&gt; class       : RasterStack </span></a>
+<a class="sourceLine" id="cb6-16" data-line-number="16"><span class="co">#&gt; dimensions  : 259, 276, 71484, 4  (nrow, ncol, ncell, nlayers)</span></a>
+<a class="sourceLine" id="cb6-17" data-line-number="17"><span class="co">#&gt; resolution  : 2779.876, 2779.876  (x, y)</span></a>
+<a class="sourceLine" id="cb6-18" data-line-number="18"><span class="co">#&gt; extent      : -7202659, -6435414, 4636834, 5356822  (xmin, xmax, ymin, ymax)</span></a>
+<a class="sourceLine" id="cb6-19" data-line-number="19"><span class="co">#&gt; coord. ref. : +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs </span></a>
+<a class="sourceLine" id="cb6-20" data-line-number="20"><span class="co">#&gt; names       : nonbreeding, prebreeding_migration,  breeding, postbreeding_migration </span></a>
+<a class="sourceLine" id="cb6-21" data-line-number="21"><span class="co">#&gt; min values  :   0.0000000,             0.1460964, 0.0000000,              0.0000000 </span></a>
+<a class="sourceLine" id="cb6-22" data-line-number="22"><span class="co">#&gt; max values  :   0.6754810,             1.6710625, 2.0053043,              0.9763988</span></a></code></pre></div>
 </div>
 <div id="abundance-maps" class="section level1">
 <h1 class="hasAnchor">
@@ -274,7 +278,7 @@
 <a class="sourceLine" id="cb8-17" data-line-number="17">show_yearround</a>
 <a class="sourceLine" id="cb8-18" data-line-number="18"><span class="co">#&gt; [1] TRUE</span></a></code></pre></div>
 <p>Mapping relative abundance across the full-annual cycle requires a specialized set of color bins in order to ensure the full range of abundance values is effectively displayed. The function <code><a href="../reference/calc_bins.html">calc_bins()</a></code> calculates the optimal break points of bins for Status and Trends abundance data.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">bin_breaks &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calc_bins.html">calc_bins</a></span>(abd)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">bin_breaks &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calc_bins.html">calc_bins</a></span>(abd_season)</a></code></pre></div>
 <p>Now that everything is in place, we can actually make the seasonal relative abundance map! Note that the Status and Trends maps distinguish between regions of zero abundance and <a href="https://ebird.org/science/status-and-trends/faq#no-prediction">regions with no prediction</a>, which are displayed in different shades of gray, and regions with non-zero abundance, shown in color. To account for this, we’ll need to generate a raster layer delineating the region within which predictions were made.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="co"># project the abundance data to mollweide</span></a>
 <a class="sourceLine" id="cb10-2" data-line-number="2"><span class="co"># use nearest neighbour resampling to preserve true zeros</span></a>

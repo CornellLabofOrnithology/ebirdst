@@ -4,8 +4,8 @@ author: "Tom Auer, Daniel Fink"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteEncoding{UTF-8}
   %\VignetteIndexEntry{ebirdst: Introduction to loading, mapping, and plotting eBird Status and Trend products}
+  %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   chunk_output_type: console
@@ -26,6 +26,10 @@ knitr::opts_chunk$set(warning = FALSE,
                       fig.height = 4, 
                       fig.width = 7, 
                       fig.align = "center")
+# only build vignettes local and not for R CMD check
+is_check <- ("CheckExEnv" %in% search()) || 
+  any(c("_R_CHECK_TIMINGS_", "_R_CHECK_LICENSE_") %in% names(Sys.getenv()))
+knitr::opts_chunk$set(eval = nzchar(Sys.getenv("BUILD_VIGNETTES")) && !is_check)
 ```
 
 # Outline
