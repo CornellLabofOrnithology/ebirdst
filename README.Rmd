@@ -1,5 +1,5 @@
 ---
-output: github_document
+output: md_document
 editor_options: 
   chunk_output_type: console
 ---

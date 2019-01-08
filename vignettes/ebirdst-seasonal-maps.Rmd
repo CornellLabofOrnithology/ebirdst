@@ -2,9 +2,7 @@
 title: "Generating Seasonal Abundance and Range Maps and Stats"
 author: "Matt Strimas-Mackey, Tom Auer, Daniel Fink"
 date: "`r Sys.Date()`"
-output: 
-  rmarkdown::html_vignette:
-    number_sections: true
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Generating Seasonal Abundance and Range Maps and Stats}
   %\VignetteEncoding{UTF-8}
@@ -22,6 +20,10 @@ knitr::opts_chunk$set(warning = FALSE,
                       fig.height = 5, 
                       fig.width = 7, 
                       fig.align = "center")
+# only build vignettes local and not for R CMD check
+is_check <- ("CheckExEnv" %in% search()) || 
+  any(c("_R_CHECK_TIMINGS_", "_R_CHECK_LICENSE_") %in% names(Sys.getenv()))
+knitr::opts_chunk$set(eval = nzchar(Sys.getenv("BUILD_VIGNETTES")) && !is_check)
 ```
 
 # Outline
@@ -169,8 +171,13 @@ abd <- abd[[which(week_pass)]]
 weeks <- weeks[week_pass]
 weeks_season <- weeks_season[week_pass]
 # average over weeks in season
-abd_season <- stackApply(abd, indices = weeks_season, fun = mean, na.rm = TRUE)
-names(abd_season) <- gsub("^index_", "", names(abd_season))
+mean_season <- function(s) {
+  calc(abd[[which(weeks_season == s)]], mean, na.rm = TRUE)
+}
+seasons <- unique(weeks_season)
+abd_season <- lapply(seasons, mean_season) %>% 
+  stack() %>% 
+  setNames(seasons)
 abd_season
 ```
 
@@ -227,7 +234,7 @@ show_yearround
 Mapping relative abundance across the full-annual cycle requires a specialized set of color bins in order to ensure the full range of abundance values is effectively displayed. The function `calc_bins()` calculates the optimal break points of bins for Status and Trends abundance data.
 
 ```{r breaks}
-bin_breaks <- calc_bins(abd)
+bin_breaks <- calc_bins(abd_season)
 ```
 
 Now that everything is in place, we can actually make the seasonal relative abundance map! Note that the Status and Trends maps distinguish between regions of zero abundance and [regions with no prediction](https://ebird.org/science/status-and-trends/faq#no-prediction), which are displayed in different shades of gray, and regions with non-zero abundance, shown in color. To account for this, we'll need to generate a raster layer delineating the region within which predictions were made. 
