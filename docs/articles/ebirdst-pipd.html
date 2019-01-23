@@ -71,7 +71,7 @@
       <h1>Advanced Vignette: Using Predictor Importance and Partial Dependence Information</h1>
                         <h4 class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2018-12-23</h4>
+            <h4 class="date">2019-01-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-pipd.Rmd"><code>vignettes/ebirdst-pipd.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-pipd.Rmd</code></div>
@@ -118,34 +118,29 @@
 <a class="sourceLine" id="cb1-6" data-line-number="6"><span class="co"># returns the full path of the results. Please note that the example_data is</span></a>
 <a class="sourceLine" id="cb1-7" data-line-number="7"><span class="co"># for Yellow-bellied Sapsucker and has the same run code as the real data,</span></a>
 <a class="sourceLine" id="cb1-8" data-line-number="8"><span class="co"># so if you download both, make sure you put the example_data somewhere else.</span></a>
-<a class="sourceLine" id="cb1-9" data-line-number="9">dl_dir &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/tempfile">tempdir</a></span>()</a>
-<a class="sourceLine" id="cb1-10" data-line-number="10">sp_path &lt;-<span class="st"> </span><span class="kw"><a href="../reference/download_data.html">download_data</a></span>(<span class="dt">species =</span> <span class="st">"example_data"</span>, <span class="dt">path =</span> dl_dir)</a>
-<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(sp_path)</a>
-<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="co">#&gt; [1] "/private/var/folders/mg/qh40qmqd7376xn8qxd6hm5lwjyy0h2/T/RtmpEQRkac/yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"</span></a>
-<a class="sourceLine" id="cb1-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb1-14" data-line-number="14">pis &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_pis.html">load_pis</a></span>(sp_path)</a>
-<a class="sourceLine" id="cb1-15" data-line-number="15">pds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_pds.html">load_pds</a></span>(sp_path)</a></code></pre></div>
+<a class="sourceLine" id="cb1-9" data-line-number="9">sp_path &lt;-<span class="st"> </span><span class="kw"><a href="../reference/download_data.html">download_data</a></span>(<span class="dt">species =</span> <span class="st">"example_data"</span>)</a>
+<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(sp_path)</a>
+<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="co">#&gt; [1] "/Users/mes335/Library/Application Support/ebirdst/yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"</span></a>
+<a class="sourceLine" id="cb1-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb1-13" data-line-number="13">pis &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_pis.html">load_pis</a></span>(sp_path)</a>
+<a class="sourceLine" id="cb1-14" data-line-number="14">pds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_pds.html">load_pds</a></span>(sp_path)</a></code></pre></div>
 </div>
 <div id="selecting-region-and-season" class="section level1">
 <h1 class="hasAnchor">
 <a href="#selecting-region-and-season" class="anchor"></a>3. Selecting Region and Season</h1>
-<p>When working with Predictive Performance Metrics (PPMs), PIs, and/or PDs, it is very common to select a subset of space and time for analysis. In <code>ebirdst</code> this is done with a list object with a particular structure. This list object defines the region and season for analysis and is passed to many functions in <code>ebirdst</code>. To review the available stixel centroids associated with both PIs and PDs and to see which have been selected by a spatiotemporal subset, use the <code>map_centroids</code> function, which will map and summarize this information.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">lp_extent &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">type =</span> <span class="st">"rectangle"</span>,</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">                  <span class="dt">lat.min =</span> <span class="dv">42</span>,  </a>
-<a class="sourceLine" id="cb2-3" data-line-number="3">                      <span class="dt">lat.max =</span> <span class="dv">45</span>,</a>
-<a class="sourceLine" id="cb2-4" data-line-number="4">                      <span class="dt">lon.min =</span> <span class="dv">-86</span>,</a>
-<a class="sourceLine" id="cb2-5" data-line-number="5">                      <span class="dt">lon.max =</span> <span class="dv">-83</span>,</a>
-<a class="sourceLine" id="cb2-6" data-line-number="6">                      <span class="dt">t.min =</span> <span class="fl">0.425</span>,</a>
-<a class="sourceLine" id="cb2-7" data-line-number="7">                      <span class="dt">t.max =</span> <span class="fl">0.475</span>)</a>
-<a class="sourceLine" id="cb2-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="co">#map_centroids(pis = pis, pds = pds, st_extent = lp_extent)</span></a></code></pre></div>
+<p>When working with Predictive Performance Metrics (PPMs), PIs, and/or PDs, it is very common to select a subset of space and time for analysis. In <code>ebirdst</code> this is done by creating a spatiotemporal extent object with <code><a href="../reference/ebirdst_extent.html">ebirdst_extent()</a></code>. These objects define the region and season for analysis and are passed to many functions in <code>ebirdst</code>. To review the available stixel centroids associated with both PIs and PDs and to see which have been selected by a spatiotemporal subset, use the <code>map_centroids</code> function, which will map and summarize this information.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">lp_extent &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ebirdst_extent.html">ebirdst_extent</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dt">xmin =</span> <span class="dv">-86</span>, <span class="dt">xmax =</span> <span class="dv">-83</span>, <span class="dt">ymin =</span> <span class="dv">42</span>, <span class="dt">ymax =</span> <span class="dv">45</span>),</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">                            <span class="dt">t =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="fl">0.425</span>, <span class="fl">0.475</span>))</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="kw"><a href="../reference/map_centroids.html">map_centroids</a></span>(sp_path, <span class="dt">ext =</span> lp_extent)</a></code></pre></div>
+<p><img src="ebirdst-pipd_files/figure-html/map_centroids-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="plotting-centroids-and-extent-of-analysis" class="section level1">
 <h1 class="hasAnchor">
 <a href="#plotting-centroids-and-extent-of-analysis" class="anchor"></a>4. Plotting Centroids and Extent of Analysis</h1>
-<p>Similarly, the <code>calc_effective_extent</code> will analyze a spatiotemporal subset of PIs or PDs and plot the selected stixel centroids, as well as a <code>RasterLayer</code> depicting where a majority of the information is coming from. The map ranges from 0 to 1, with pixels have a value of 1 meaning that 100% of the selected stixels are contributing information at that pixel. The function returns the <code>RasterLayer</code> in addition to mapping.</p>
+<p>Similarly, <code><a href="../reference/calc_effective_extent.html">calc_effective_extent()</a></code> will analyze a spatiotemporal subset of PIs or PDs and plot the selected stixel centroids, as well as a <code>RasterLayer</code> depicting where a majority of the information is coming from. The map ranges from 0 to 1, with pixels have a value of 1 meaning that 100% of the selected stixels are contributing information at that pixel. The function returns the <code>RasterLayer</code> in addition to mapping.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>, <span class="dv">1</span>), <span class="dt">mar =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">6</span>))</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co">#pi_extent &lt;- calc_effective_extent(lp_extent, pis = pis, path = sp_path)</span></a></code></pre></div>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="kw"><a href="../reference/calc_effective_extent.html">calc_effective_extent</a></span>(sp_path, <span class="dt">ext =</span> lp_extent)</a></code></pre></div>
+<p><img src="ebirdst-pipd_files/figure-html/plot_extents-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="predictive-performance-metrics" class="section level1">
 <h1 class="hasAnchor">
@@ -154,14 +149,14 @@
 <div id="binary-metrics-by-time" class="section level2">
 <h2 class="hasAnchor">
 <a href="#binary-metrics-by-time" class="anchor"></a>Binary Metrics by Time</h2>
-<p>The <code>plot_binary_by_time</code> function analyzes a species’ entire range of data and plots predictive performance metrics by a custom time interval (typicall either 52 for weeks or 12 for months).</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="../reference/plot_binary_by_time.html">plot_binary_by_time</a></span>(sp_path, <span class="dt">metric =</span> <span class="st">"Kappa"</span>, <span class="dt">n_time_periods =</span> <span class="dv">52</span>)</a></code></pre></div>
+<p>The <code><a href="../reference/plot_binary_by_time.html">plot_binary_by_time()</a></code> function analyzes a species’ entire range of data and plots predictive performance metrics by a custom time interval (typically either 52 for weeks or 12 for months).</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="../reference/plot_binary_by_time.html">plot_binary_by_time</a></span>(<span class="dt">path =</span> sp_path, <span class="dt">metric =</span> <span class="st">"kappa"</span>, <span class="dt">n_time_periods =</span> <span class="dv">12</span>)</a></code></pre></div>
 <p><img src="ebirdst-pipd_files/figure-html/binary_by_time-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="all-metrics-for-spatiotemporal-extent" class="section level2">
 <h2 class="hasAnchor">
 <a href="#all-metrics-for-spatiotemporal-extent" class="anchor"></a>All Metrics for Spatiotemporal Extent</h2>
-<p>The <code>plot_all_ppms</code> function provides all available predictive performance metrics and is important for determining predictive performance within a spatiotemporal subset region and season. This function is also useful in comparing the performance between subsets.</p>
+<p>The <code><a href="../reference/plot_all_ppms.html">plot_all_ppms()</a></code> function provides all available predictive performance metrics and is important for determining predictive performance within a spatiotemporal subset region and season. This function is also useful in comparing the performance between subsets.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw"><a href="../reference/plot_all_ppms.html">plot_all_ppms</a></span>(sp_path, lp_extent)</a></code></pre></div>
 <p><img src="ebirdst-pipd_files/figure-html/all_ppms-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
@@ -169,24 +164,22 @@
 <div id="plot-predictor-importance" class="section level1">
 <h1 class="hasAnchor">
 <a href="#plot-predictor-importance" class="anchor"></a>6. Plot Predictor Importance</h1>
-<p>Once predictive performance has been evaluated, exploring information about habitat association and/or avoidance can be done using the PIs and PDs. The <code>plot_pis</code> function generates a bar plot showing a rank of the most important predictors within a spatiotemporal subset. There is an option to show all predictors or to aggregate Fragstats by the land cover types.</p>
+<p>Once predictive performance has been evaluated, exploring information about habitat association and/or avoidance can be done using the PIs and PDs. The <code><a href="../reference/plot_pis.html">plot_pis()</a></code> function generates a bar plot showing a rank of the most important predictors within a spatiotemporal subset. There is an option to show all predictors or to aggregate Fragstats by the land cover types.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="co"># with all classes</span></a>
-<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="kw"><a href="../reference/plot_pis.html">plot_pis</a></span>(<span class="dt">path =</span> sp_path, pis, <span class="dt">st_extent =</span> lp_extent, <span class="dt">by_cover_class =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="kw"><a href="../reference/plot_pis.html">plot_pis</a></span>(pis, <span class="dt">ext =</span> lp_extent, <span class="dt">by_cover_class =</span> <span class="ot">FALSE</span>, <span class="dt">n_top_pred =</span> <span class="dv">15</span>)</a></code></pre></div>
 <p><img src="ebirdst-pipd_files/figure-html/plot_pis-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"></a>
 <a class="sourceLine" id="cb7-2" data-line-number="2"><span class="co"># aggregating fragstats for cover classes</span></a>
-<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="kw"><a href="../reference/plot_pis.html">plot_pis</a></span>(<span class="dt">path =</span> sp_path, pis, <span class="dt">st_extent =</span> lp_extent, <span class="dt">by_cover_class =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="kw"><a href="../reference/plot_pis.html">plot_pis</a></span>(pis, <span class="dt">ext =</span> lp_extent, <span class="dt">by_cover_class =</span> <span class="ot">TRUE</span>, <span class="dt">n_top_pred =</span> <span class="dv">15</span>)</a></code></pre></div>
 <p><img src="ebirdst-pipd_files/figure-html/plot_pis-2.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="plot-partial-depedencies" class="section level1">
 <h1 class="hasAnchor">
 <a href="#plot-partial-depedencies" class="anchor"></a>7. Plot Partial Depedencies</h1>
-<p>Complementary to <code>plot_pis</code>, the <code>plot_pds</code> function plots the partial dependency curves for individual predictors, with various levels of detail and smoothing available.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">mypds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/plot_pds.html">plot_pds</a></span>(<span class="dt">pd_name =</span> <span class="st">"EFFORT_HRS"</span>, </a>
-<a class="sourceLine" id="cb8-2" data-line-number="2">                  <span class="dt">pds =</span> pds, </a>
-<a class="sourceLine" id="cb8-3" data-line-number="3">                  <span class="dt">st_extent =</span> lp_extent, </a>
-<a class="sourceLine" id="cb8-4" data-line-number="4">                  <span class="dt">pointwise_pi =</span> <span class="ot">TRUE</span>, </a>
-<a class="sourceLine" id="cb8-5" data-line-number="5">                  <span class="dt">stixel_pds =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<p>Complementary to <code><a href="../reference/plot_pis.html">plot_pis()</a></code>, the <code><a href="../reference/plot_pds.html">plot_pds()</a></code> function plots the partial dependency curves for individual predictors, with various levels of detail and smoothing available.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">mypds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/plot_pds.html">plot_pds</a></span>(pds, <span class="dt">predictor =</span> <span class="st">"effort_hrs"</span>, </a>
+<a class="sourceLine" id="cb8-2" data-line-number="2">                  <span class="dt">ext =</span> lp_extent, </a>
+<a class="sourceLine" id="cb8-3" data-line-number="3">                  <span class="dt">bootstrap_smooth =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <p><img src="ebirdst-pipd_files/figure-html/plot_pds-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 <div id="references" class="section level2">
 <h2 class="hasAnchor">

@@ -33,9 +33,9 @@
 <meta property="og:title" content="Plot binary occurrence metrics by time — plot_binary_by_time" />
 
 <meta property="og:description" content="For a specified number of time periods (ideally weeks or months), plots one
-of four (Kappa, AUC, Sensitivity, Specificity) box plots. Use default,
-without st_extent to see range-wide predictive performance, or provide
-an st_extent to see performance within spatiotemporal extent." />
+of four (Kappa, AUC, Sensitivity, Specificity) box plots. Provide an
+ebirdst_extent onject to see performance within a spatiotemporal extent,
+otherwise rangewide performance will be shown." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -113,48 +113,56 @@ an st_extent to see performance within spatiotemporal extent." />
     <div class="ref-description">
     
     <p>For a specified number of time periods (ideally weeks or months), plots one
-of four (Kappa, AUC, Sensitivity, Specificity) box plots. Use default,
-without <code>st_extent</code> to see range-wide predictive performance, or provide
-an <code>st_extent</code> to see performance within spatiotemporal extent.</p>
+of four (Kappa, AUC, Sensitivity, Specificity) box plots. Provide an
+<code>ebirdst_extent</code> onject to see performance within a spatiotemporal extent,
+otherwise rangewide performance will be shown.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>plot_binary_by_time</span>(<span class='no'>path</span>, <span class='no'>metric</span>, <span class='kw'>n_time_periods</span> <span class='kw'>=</span> <span class='fl'>52</span>, <span class='kw'>st_extent</span> <span class='kw'>=</span> <span class='fl'>NA</span>)</pre>
+    <pre class="usage"><span class='fu'>plot_binary_by_time</span>(<span class='no'>path</span>, <span class='kw'>metric</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"kappa"</span>, <span class='st'>"auc"</span>, <span class='st'>"sensitivity"</span>,
+  <span class='st'>"specificity"</span>), <span class='kw'>n_time_periods</span> <span class='kw'>=</span> <span class='fl'>52</span>, <span class='no'>ext</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>path</th>
-      <td><p>character; Full path to single species eBird Status and Trends products.</p></td>
+      <td><p>character; full path to directory containing the eBird Status and
+Trends products for a single species.</p></td>
     </tr>
     <tr>
       <th>metric</th>
-      <td><p>character; One of: "Kappa", "AUC", "Sensitivity",
-"Specificity".</p></td>
+      <td><p>character; the PPM to plot, eith "kappa", "auc", "sensitivity",
+or "specificity".</p></td>
     </tr>
     <tr>
       <th>n_time_periods</th>
-      <td><p>int; Greater than 1 (e.g., 52 for weeks).</p></td>
+      <td><p>integer; number of periods to divide the year into to
+calculate the PPMs, e.g. use 52 to divide into weeks and 12 to divide into
+months.</p></td>
     </tr>
     <tr>
-      <th>st_extent</th>
-      <td><p>list; st_extent list for spatiotemporal filtering.</p></td>
+      <th>ext</th>
+      <td><p><a href='ebirdst_extent.html'>ebirdst_extent</a> object (optional); the spatiotemporal
+extent to filter the data to. The temporal component will be ignored since
+n_time_periods defines the temporal periods over which to calculate the
+PPMs.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Plot of metric box plots by time.</p>
+    <p>Boxplot of PPM over time.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='co'># download example data</span>
-<span class='no'>dl_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/tempfile'>tempdir</a></span>()
-<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='download_data.html'>download_data</a></span>(<span class='st'>"example_data"</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>dl_path</span>)
+<span class='co'># download and load example data</span>
+<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='download_data.html'>download_data</a></span>(<span class='st'>"example_data"</span>)
 
-<span class='fu'>plot_binary_by_time</span>(<span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>sp_path</span>, <span class='kw'>metric</span> <span class='kw'>=</span> <span class='st'>"Kappa"</span>, <span class='kw'>n_time_periods</span> <span class='kw'>=</span> <span class='fl'>12</span>)
+<span class='co'># plot monthly kappa</span>
+<span class='fu'>plot_binary_by_time</span>(<span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>sp_path</span>, <span class='kw'>metric</span> <span class='kw'>=</span> <span class='st'>"kappa"</span>, <span class='kw'>n_time_periods</span> <span class='kw'>=</span> <span class='fl'>12</span>)
+
 <span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

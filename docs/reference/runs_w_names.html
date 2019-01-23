@@ -33,7 +33,12 @@
 <meta property="og:title" content="Data frame of species available — runs_w_names" />
 
 <meta property="og:description" content="A dataset containing the available species, with SPECIES_CODE, RUN_NAME,
-SCI_NAME, and PRIMARY_COM_NAME." />
+SCI_NAME, and PRIMARY_COM_NAME. In addition, the dates defining the
+boundaries of the seasons are provided. These seasons are defined on a
+species-specific basis through expert review. For information on the details
+of defining seasons, please see the seasons section of the FAQ. Note that
+missing dates imply that a season failed expert review for that species
+within that season." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -111,7 +116,12 @@ SCI_NAME, and PRIMARY_COM_NAME." />
     <div class="ref-description">
     
     <p>A dataset containing the available species, with SPECIES_CODE, RUN_NAME,
-SCI_NAME, and PRIMARY_COM_NAME.</p>
+SCI_NAME, and PRIMARY_COM_NAME. In addition, the dates defining the
+boundaries of the seasons are provided. These seasons are defined on a
+species-specific basis through expert review. For information on the details
+of defining seasons, please see the <a href='https://ebird.org/science/status-and-trends/faq#seasons'>seasons section of the FAQ</a>. Note that
+missing dates imply that a season failed expert review for that species
+within that season.</p>
     
     </div>
 
@@ -119,12 +129,22 @@ SCI_NAME, and PRIMARY_COM_NAME.</p>
         
     <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <p>A data frame with 107 rows and 4 variables:</p><dl class='dl-horizontal'>
-<dt>SPECIES_CODE</dt><dd><p>six letter eBird code in eBird Taxonomy v2016</p></dd>
-<dt>RUN_NAME</dt><dd><p>unique analysis identifier and the top level folder name for all results</p></dd>
+    <p>A data frame with 107 rows and 14 variables:</p><dl class='dl-horizontal'>
+<dt>SPECIES_CODE</dt><dd><p>Six letter eBird code in eBird Taxonomy v2016</p></dd>
+<dt>RUN_NAME</dt><dd><p>Unique analysis identifier and the top level folder name
+for all results</p></dd>
 <dt>SCI_NAME</dt><dd><p>Scientific name from eBird Taxonomy v2016</p></dd>
 <dt>PRIMARY_COM_NAME</dt><dd><p>English common name from eBird Taxonomy v2016</p></dd>
-...
+<dt>BREEDING_START_DT</dt><dd><p>Breeding season start date</p></dd>
+<dt>BREEDING_END_DT</dt><dd><p>Breeding season start date</p></dd>
+<dt>NONBREEDING_START_DT</dt><dd><p>Non-breeding season start date</p></dd>
+<dt>NONBREEDING_END_DT</dt><dd><p>Non-breeding season start date</p></dd>
+<dt>POSTBREEDING_MIGRATION_START_DT</dt><dd><p>Post-breeding season start date</p></dd>
+<dt>POSTBREEDING_MIGRATION_END_DT</dt><dd><p>Post-breeding season start date</p></dd>
+<dt>PREBREEDING_MIGRATION_START_DT</dt><dd><p>Pre-breeding season start date</p></dd>
+<dt>PREBREEDING_MIGRATION_END_DT</dt><dd><p>Pre-breeding season start date</p></dd>
+<dt>YEAR_ROUND_START_DT</dt><dd><p>For resident species, the year-round start date</p></dd>
+<dt>YEAR_ROUND_END_DT</dt><dd><p>For resident species, the year-round end date</p></dd>
 </dl>
     
 

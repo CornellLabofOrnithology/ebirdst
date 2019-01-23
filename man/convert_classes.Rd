@@ -4,10 +4,10 @@
 \alias{convert_classes}
 \title{Converts cryptic cover class names to readable land cover names}
 \usage{
-convert_classes(cov_names, by_cover_class = FALSE, pretty = FALSE)
+convert_classes(x, by_cover_class = FALSE, pretty = FALSE)
 }
 \arguments{
-\item{cov_names}{character; vector of cover class names to convert.}
+\item{x}{character; vector of land cover variable names to convert.}
 
 \item{by_cover_class}{logical; whether to replace FRAGSTATS cover class name
 with a name for the cover class as whole.}
@@ -22,7 +22,7 @@ Internal function that converts the cryptic predictor class names to
 readable land cover names.
 }
 \examples{
-cns <- c("UMD_FS_C1_1500_PLAND", "MODISWATER_FS_C7_1500_LPI")
-converted <- ebirdst:::convert_classes(cov_names = cns, pretty = TRUE)
+predictors <- c("UMD_FS_C1_1500_PLAND", "MODISWATER_FS_C7_1500_LPI", "ELEV")
+ebirdst:::convert_classes(predictors, pretty = TRUE)
 }
 \keyword{internal}

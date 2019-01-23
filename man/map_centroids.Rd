@@ -4,48 +4,37 @@
 \alias{map_centroids}
 \title{Map PI and PD centroid locations}
 \usage{
-map_centroids(pis, pds, st_extent = NA, plot_pis = TRUE,
-  plot_pds = TRUE)
+map_centroids(path, ext, plot_pis = TRUE, plot_pds = TRUE)
 }
 \arguments{
-\item{pis}{data.frame; predictor importance data from \code{\link[=load_pis]{load_pis()}}.}
+\item{path}{character; full path to directory containing the eBird Status and
+Trends products for a single species.}
 
-\item{pds}{data.frame; partial depenence data from \code{\link[=load_pds]{load_pds()}}.}
+\item{ext}{\link{ebirdst_extent} object (optional); the spatiotemporal extent to
+filter the data to.}
 
-\item{st_extent}{list; Optional spatiotemporal filter using \code{st_extent} list.}
+\item{plot_pis}{logical; whether to show PI stixel centroid locations.}
 
-\item{plot_pis}{logical; Default is TRUE. Set to FALSE to hide the plotting
-of PI stixel centroid locations.}
-
-\item{plot_pds}{logical; Default is TRUE. Set to FALSE to hide the plotting
-of PD stixel centroid locations.}
+\item{plot_pds}{logical; whether to show PD stixel centroid locations.}
 }
 \value{
 Plot showing locations of PIs and/or PDs.
 }
 \description{
 Creates a map showing the stixel centroid locations for PIs and/or PDs, with
-an optional spatiotemporal subset using an \code{st_extent} list.
+an optional spatiotemporal subset using an \link{ebirdst_extent} object
 }
 \examples{
 \dontrun{
 
 # download and load example data
-dl_path <- tempdir()
-sp_path <- download_data("example_data", path = dl_path)
-pis <- load_pis(sp_path)
-pds <- load_pds(sp_path)
+sp_path <- download_data("example_data")
 
 # define a spatiotemporal extent to plot
-ne_extent <- list(type = "rectangle",
-                  lat.min = 40,
-                  lat.max = 47,
-                  lon.min = -80,
-                  lon.max = -70,
-                  t.min = 0.425,
-                  t.max = 0.475)
+bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
+e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 
-map_centroids(pis = pis, pds = pds, st_extent = ne_extent)
+map_centroids(path = sp_path, ext = e)
 
 }
 }

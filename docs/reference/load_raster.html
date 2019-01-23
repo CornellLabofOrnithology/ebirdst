@@ -118,7 +118,7 @@ for a given product and species as a <code>RasterStack</code> object.</p>
     </div>
 
     <pre class="usage"><span class='fu'>load_raster</span>(<span class='kw'>product</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"abundance_umean"</span>, <span class='st'>"occurrence_umean"</span>,
-  <span class='st'>"abundance_lower"</span>, <span class='st'>"abundance_upper"</span>), <span class='no'>path</span>)</pre>
+  <span class='st'>"abundance_lower"</span>, <span class='st'>"abundance_upper"</span>, <span class='st'>"template"</span>), <span class='no'>path</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -127,7 +127,7 @@ for a given product and species as a <code>RasterStack</code> object.</p>
       <th>product</th>
       <td><p>character; status and trends product to load, options are
 relative abundance, occurrence, and upper and lower bounds on relative
-abundance</p></td>
+abundance. It is also possible to return a template raster with no data.</p></td>
     </tr>
     <tr>
       <th>path</th>
@@ -144,8 +144,7 @@ eBird Status and Trends products.</p></td>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
 <span class='co'># download example data</span>
-<span class='no'>dl_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/tempfile'>tempdir</a></span>()
-<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='download_data.html'>download_data</a></span>(<span class='st'>"example_data"</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>dl_path</span>)
+<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='download_data.html'>download_data</a></span>(<span class='st'>"example_data"</span>)
 
 <span class='co'># load data</span>
 <span class='fu'>load_raster</span>(<span class='st'>"abundance_umean"</span>, <span class='no'>sp_path</span>)

@@ -4,7 +4,8 @@
 \alias{download_data}
 \title{Download eBird Status and Trends Data}
 \usage{
-download_data(species, path)
+download_data(species, path = rappdirs::user_data_dir("ebirdst"),
+  force = FALSE)
 }
 \arguments{
 \item{species}{character; a single six-letter species code (e.g. rufhum).
@@ -14,7 +15,12 @@ frame included in this package. To download the example dataset, use
 
 \item{path}{character; directory to download the data to. All downloaded
 files will be placed in a sub-directory of this directory named according
-to the unique run ID associated with this species.}
+to the unique run ID associated with this species. Defaults to a persistent
+data directory, which can be found by calling
+rappdirs::user_data_dir("ebirdst")).}
+
+\item{force}{logical; if the data have already been downloaded, should a
+fresh copy be downloaded anyway.}
 }
 \value{
 Path to the run-specific root of the downloaded files.
@@ -28,8 +34,7 @@ than the full dataset making these data quicker to download and process.
 \examples{
 \dontrun{
 
-dl_path <- tempdir()
-download_data("example_data", path = dl_path)
+download_data("example_data", force = TRUE)
 
 }
 }

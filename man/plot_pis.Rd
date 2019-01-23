@@ -2,37 +2,34 @@
 % Please edit documentation in R/ebirdst-plotting.R
 \name{plot_pis}
 \alias{plot_pis}
-\title{Plot predictor importances as barplots}
+\title{Plot predictor importances boxplot}
 \usage{
-plot_pis(path, pis, st_extent, by_cover_class = FALSE,
-  num_top_preds = 50, return_top = FALSE, pretty_names = TRUE,
-  print_plot = TRUE)
+plot_pis(pis, ext, by_cover_class = FALSE, n_top_pred = 50,
+  pretty_names = TRUE, plot = TRUE)
 }
 \arguments{
-\item{path}{character; full path to single species eBird Status and Trends
-products.}
+\item{pis}{data.frame; predictor importance data rom \code{\link[=load_pis]{load_pis()}}.}
 
-\item{pis}{data.frame; predictory importance data rom \code{\link[=load_pis]{load_pis()}}.}
+\item{ext}{\link{ebirdst_extent} object; the spatiotemporal extent to
+filter the data to. Required, since results are less meaningful over large
+spatiotemporal extents.}
 
-\item{st_extent}{list; \code{st_extent} list for spatiotemporal filtering.
-Required, as results are less meaningful over large spatiotemporal extents.}
+\item{by_cover_class}{logical; whether to aggregate the four FRAGSTATS
+metrics for the land cover classes into single values for the land cover
+classes.}
 
-\item{by_cover_class}{logical; whether to aggregate FRAGSTATS metrics for the
-land cover classes into single values for the land cover classes.}
-
-\item{num_top_preds}{integer; how many predictors to show.}
-
-\item{return_top}{logical; wether to returns a vector of the top predictors,
-based on the \code{num_top_preds} param.}
+\item{n_top_pred}{integer; how many predictors to show.}
 
 \item{pretty_names}{logical; whether to convert cryptic land cover codes to
 readable land cover class names.}
 
-\item{print_plot}{logical; whether to print plot, to allow only the return
-the top predictors, if desired.}
+\item{plot}{logical; whether to plot predictor importance or just return top
+predictors.}
 }
 \value{
-Plots barplot and/or returns a vector of top predictors.
+Plots a boxplot of predictor importance and invisibly returns a named
+vector of top predictors, and their median predictor importance, based on
+the \code{n_top_pred} param.
 }
 \description{
 For all of the available predictors in a single set of species eBird
@@ -44,20 +41,15 @@ customized plots.
 \dontrun{
 
 # download and load example data
-dl_path <- tempdir()
-sp_path <- download_data("example_data", path = dl_path)
+sp_path <- download_data("example_data")
 pis <- load_pis(sp_path)
 
-# define a spatioremporal extent
-ne_extent <- list(type = "rectangle",
-                  lat.min = 40,
-                  lat.max = 47,
-                  lon.min = -80,
-                  lon.max = -70,
-                  t.min = 0.425,
-                  t.max = 0.475)
+# define a spatiotemporal extent to plot data from
+bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
+e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 
-plot_pis(path = sp_path, pis = pis, st_extent = ne_extent)
+top_pred <- plot_pis(pis, ext = e, by_cover_class = TRUE)
+top_pred
 
 }
 }

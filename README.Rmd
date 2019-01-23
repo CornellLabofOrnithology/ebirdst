@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 
 **THIS PACKAGE IS UNDER ACTIVE DEVELOPMENT. FUNCTIONALITY MAY CHANGE AT ANY TIME.**
 
-The goal of this package is to provide tools for loading, mapping, plotting, and analyzing eBird Status and Trends data products. If you're looking for the previous version (known as stemhelper), which is no longer being maintained, please access the `stemhelper_archive` branch.
+The goal of this package is to provide tools for loading, mapping, plotting, and analyzing eBird Status and Trends data products.
 
 ## Installation
 
@@ -39,36 +39,31 @@ devtools::install_github("CornellLabofOrnithology/ebirdst")
 
 TODO: update website, then updated this section.
 
-For a full introduction and advanced usage, please see the package [website](https://cornelllabofornithology.github.io/ebirdst). An [introductory vignette](https://cornelllabofornithology.github.io/ebirdst/articles/stem-intro-mapping.html) is available, detailing the structure of the results and how to begin loading and mapping the results. Further, an [advanced vignette](https://cornelllabofornithology.github.io/ebirdst/articles/stem-pipd.html) details how to access additional information from the model results about predictor importance and directionality, as well as predictive performance metrics.
+For a full introduction and advanced usage, please see the package [website](https://cornelllabofornithology.github.io/ebirdst). An [introductory vignette](https://cornelllabofornithology.github.io/ebirdst/articles/stem-intro-mapping.html) is available, detailing the structure of the results and how to begin loading and mapping the results. Further, an [advanced vignette](https://cornelllabofornithology.github.io/ebirdst/articles/stem-pipd.html) details how to access additional information from the model results about predictor importance and directionality, as well as predictive performance metrics. Finally, a [third vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-seasonal-maps.html) shows how to reproduce the seasonal maps and statistics on the [eBird Status and Trends website](https://ebird.org/science/status-and-trends).
 
 ## Quick Start
 
-This quick start guide will show you how to download example data and plot abundance values similar to how they are plotted for the [eBird Status and Trends Abundance animations](https://ebird.org/science/status-and-trends/woothr/abundance-map-weekly). **IMPORTANT. AFTER DOWNLOADING THE RESULTS, DO NOT CHANGE THE FILE STRUCTURE.** All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package.
+This quick start guide will show you how to download example data and plot abundance values similar to how they are plotted for the [eBird Status and Trends Abundance animations](https://ebird.org/science/status-and-trends/woothr/abundance-map-weekly). **Important note: after downloading the results, do not change the file structure.** All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package.
 
 ```{r quick_start}
 library(ebirdst)
 library(viridis)
 library(raster)
+library(sf)
 library(rnaturalearth)
 
-# DOWNLOAD DATA
-# Currently, example data is available on a public AWS s3 bucket. The following 
-# download_data() function copies the species results to a selected path and 
-# returns the full path of the results. Please note that the example_data is
-# for Yellow-bellied Sapsucker and has the same run code as the real data,
-# so if you download both, make sure you put the example_data somewhere else.
-dl_dir <- tempdir()
-sp_path <- download_data(species = "example_data", path = dl_dir)
+# download data
+# download a simplified example dataset from aws s3
+# example data are for yellow-bellied sapsucker in michigan
+# fby default ile will be stored in a persistent data directory:
+# rappdirs::user_data_dir("ebirdst"))
+sp_path <- download_data(species = "example_data")
 
 # load estimated relative abundance and label with dates
-abunds_path <- list.files(file.path(sp_path, "results", "tifs"),
-                          pattern = "hr_2016_abundance_umean",
-                          full.names = TRUE)
-abunds <- stack(abunds_path)
-abunds <- label_raster_stack(abunds)
+# this raster stack has 52 layers, one for each week of the year
+abunds <- load_raster("abundance_umean", path = sp_path)
 
-# Note: if you want to work with a proper Date vector for the raster 
-# dates, use parse_raster_dates()
+# use parse_raster_dates() to get actual date objects for each layer
 date_vector <- parse_raster_dates(abunds)
 print(date_vector)
 
@@ -76,45 +71,43 @@ print(date_vector)
 abund <- abunds[[26]]
 rm(abunds)
 
-# get reference data from the rnaturalearth package
-# the example data currently shows only the US state of Michigan
-wh_states <- ne_states(country = c("United States of America", "Canada"))
-wh_sub <- wh_states[!is.na(wh_states$name) & wh_states$name == "Michigan", ]
-
-# project to Mollweide for mapping and extent calc
-mollweide <- CRS("+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84")
-
+# project to mollweide for mapping
 # the nearest neighbor method preserves cell values across projections
+mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
 abund_moll <- projectRaster(abund, crs = mollweide, method = "ngb")
 
-# project the reference data as well
-wh_states_moll <- spTransform(wh_states, mollweide)
-
+# get reference data from the rnaturalearth package
+# the example data currently shows only the US state of Michigan
+wh_states <- ne_states(country = c("United States of America", "Canada"),
+                    returnclass = "sf") %>% 
+  st_transform(crs = mollweide) %>% 
+  st_geometry()
+  
 # calculate ideal color bins for abundance values for this week
 week_bins <- calc_bins(abund_moll)
 
 # start plotting
 par(mfrow = c(1, 1), mar = c(0, 0, 0, 6))
 
-# use the extent object to set the spatial extent for the plot
-plot(as(extent(trim(abund_moll, values = NA)), "SpatialPolygons"), 
-     col = "white", border = "white")
+# use raster bounding box to set the spatial extent for the plot
+bb <- st_as_sfc(st_bbox(trim(abund_moll)))
+plot(bb, col = "white", border = "white")
 
 # add background reference data
-plot(wh_states_moll, col = "#eeeeee", border = NA, add = TRUE)
+plot(wh_states, col = "#eeeeee", border = NA, add = TRUE)
 
 # plot zeroes as gray
-plot(abund_moll == 0, maxpixels = ncell(abund_moll),
-     ext = extent(trim(abund_moll, values = NA)), col = "#dddddd", 
+plot(abund_moll == 0, col = "#dddddd", 
+     maxpixels = ncell(abund_moll),
      axes = FALSE, legend = FALSE, add = TRUE)
 
 # define color bins
 qcol <- abundance_palette(length(week_bins$bins) - 1, "weekly")
 
 # plot abundances
-plot(abund_moll, maxpixels = ncell(abund_moll),
-     ext = extent(trim(abund_moll, values = NA)), breaks = week_bins$bins,
-     col = qcol, axes = FALSE, legend = FALSE, add = TRUE)
+plot(abund_moll, col = qcol, breaks = week_bins$bins,
+     maxpixels = ncell(abund_moll),
+     axes = FALSE, legend = FALSE, add = TRUE)
 
 # for legend, create a smaller set of bin labels
 bin_labels <- format(round(week_bins$bins, 2), nsmall = 2)
@@ -132,10 +125,12 @@ ltq <- seq(from = week_bins$bins[1], to = week_bins$bins[length(week_bins$bins)]
 ltq <- c(0, ltq)
 
 # plot legend
-plot(abund_moll ^ week_bins$power, col = lcol, legend.only = TRUE,
-     breaks = ltq ^ week_bins$power, lab.breaks = bin_labels, legend.shrink = 0.97,
+plot(abund_moll ^ week_bins$power, legend.only = TRUE,
+     col = lcol,
+     breaks = ltq ^ week_bins$power, 
+     lab.breaks = bin_labels, legend.shrink = 0.97,
      legend.width = 2, axis.args = list(cex.axis = 0.9, lwd.ticks = 0))
 
 # add state boundaries on top
-plot(wh_states_moll, add = TRUE, border = "white", lwd = 1.5)
+plot(st_geometry(wh_states), add = TRUE, col = NA, border = "white", lwd = 1.5)
 ```
