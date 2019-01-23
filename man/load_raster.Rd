@@ -5,12 +5,12 @@
 \title{Load eBird Status and Trends raster data}
 \usage{
 load_raster(product = c("abundance_umean", "occurrence_umean",
-  "abundance_lower", "abundance_upper"), path)
+  "abundance_lower", "abundance_upper", "template"), path)
 }
 \arguments{
 \item{product}{character; status and trends product to load, options are
 relative abundance, occurrence, and upper and lower bounds on relative
-abundance}
+abundance. It is also possible to return a template raster with no data.}
 
 \item{path}{character; full path to the directory containing single species
 eBird Status and Trends products.}
@@ -27,8 +27,7 @@ for a given product and species as a \code{RasterStack} object.
 \dontrun{
 
 # download example data
-dl_path <- tempdir()
-sp_path <- download_data("example_data", path = dl_path)
+sp_path <- download_data("example_data")
 
 # load data
 load_raster("abundance_umean", sp_path)

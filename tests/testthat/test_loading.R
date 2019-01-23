@@ -1,28 +1,21 @@
-context("Loading functions")
-context("raster_st_subset")
+context("Loading and subsetting functions")
 
-test_that("ebirdst raster_st_subset", {
-  abunds <- raster::stack(paste0(sp_path, "/results/tifs/", species,
-                                 "_hr_2016_abundance_umean.tif"))
+test_that("subset raster", {
+  abunds <- load_raster("abundance_umean", sp_path)
   expect_is(abunds, "RasterStack")
 
-  ne_extent <- list(type = "rectangle",
-                    lat.min = 42,
-                    lat.max = 47,
-                    lon.min = -88,
-                    lon.max = -82,
-                    t.min = 0.5,
-                    t.max = 0.6)
+  lp_extent <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 45),
+                              t = c(0.425, 0.475))
 
-  abund_sub <- raster_st_subset(abunds, ne_extent)
+  abund_sub <- ebirdst_subset(abunds, lp_extent)
 
-  ### expected
+  # expected
   # number of layers
   # check type
   # number of cells
   expect_gt(raster::ncell(abund_sub), 1)
   expect_equal(raster::nlayers(abund_sub), 5)
-  expect_equal(class(abund_sub)[1], "RasterBrick")
+  expect_i(class(abund_sub)[1], "RasterBrick")
 
   ### variations
   # without temporal info
@@ -92,8 +85,7 @@ test_that("ebirdst raster_st_subset", {
 context("label_raster_stack and parse_raster_dates")
 
 test_that("ebirdst label_raster_stack", {
-  abunds <- raster::stack(paste0(sp_path, "/results/tifs/", species,
-                                 "_hr_2016_abundance_umean.tif"))
+  abunds <- load_raster("abundance_umean", sp_path)
 
   # expected
   abunds_labeled <- label_raster_stack(abunds)
@@ -121,17 +113,15 @@ test_that("ebirdst load_pis", {
   expect_gt(nrow(load_pis(sp_path)), 0)
 
   # broken path
-  expect_error(load_pis('~/some/messed/up/path/that/does/not/exist'),
-               "RData file does not exist")
+  expect_error(load_pis("~/some/messed/up/path/that/does/not/exist"))
 })
 
 context("load_pds")
 
-test_that("stemhelpe load_pds", {
+test_that("ebirdst load_pds", {
   expect_is(load_pds(sp_path), "data.frame")
   expect_gt(nrow(load_pds(sp_path)), 0)
 
   # broken path
-  expect_error(load_pds('~/some/messed/up/path/that/does/not/exist'),
-               "RData file does not exist")
+  expect_error(load_pds("~/some/messed/up/path/that/does/not/exist"))
 })

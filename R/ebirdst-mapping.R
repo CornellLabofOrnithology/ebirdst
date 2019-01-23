@@ -16,12 +16,8 @@
 #' \dontrun{
 #'
 #' # download and load example abundance data
-#' dl_path <- tempdir()
-#' sp_path <- download_data("example_data", path = dl_path)
-#' abd_path <- list.files(file.path(sp_path, "results", "tifs"),
-#'                        pattern = "hr_2016_abundance_umean",
-#'                        full.names = TRUE)
-#' abd <- raster::stack(abd_path)
+#' sp_path <- download_data("example_data")
+#' abd <- load_raster("abundance_umean", sp_path)
 #'
 #' # calculate full extent
 #' plot_extent <- calc_full_extent(abd)
@@ -42,14 +38,14 @@ calc_full_extent <- function(x) {
   # work on individual layers because trim has a bug when applied to stacks
   # also this approach is faster
   e <- c(NA_real_, NA_real_, NA_real_, NA_real_)
-  for (i in seq_len(nlayers(stack))) {
-    e_trim <- extent(trim(stack[[i]]))
+  for (i in seq_len(raster::nlayers(stack))) {
+    e_trim <- raster::extent(raster::trim(stack[[i]]))
     e[1] <- min(e[1], e_trim[1], na.rm = TRUE)
     e[2] <- max(e[2], e_trim[2], na.rm = TRUE)
     e[3] <- min(e[3], e_trim[3], na.rm = TRUE)
     e[4] <- max(e[4], e_trim[4], na.rm = TRUE)
   }
-  e <- extent(e)
+  e <- raster::extent(e)
 
   # sometimes extent calculations get weird and you'll get a very broad
   # extent that goes further than you want, so check against the input
@@ -94,24 +90,21 @@ calc_full_extent <- function(x) {
 #' \dontrun{
 #'
 #' # download and load example abundance data
-#' dl_path <- tempdir()
-#' sp_path <- download_data("example_data", path = dl_path)
-#' abd_path <- list.files(file.path(sp_path, "results", "tifs"),
-#'                        pattern = "hr_2016_abundance_umean",
-#'                        full.names = TRUE)
-#' abd <- raster::stack(abd_path)
+#' sp_path <- download_data("example_data")
+#' abd <- load_raster("abundance_umean", sp_path)
 #'
 #' # calculate bins
 #' year_bins <- calc_bins(abd)
 #'
 #' # plot
-#' raster::plot(abd[[30]], axes = FALSE, breaks = year_bins$bins)
+#' raster::plot(abd[[30]], axes = FALSE, breaks = year_bins$bins,
+#'              col = viridisLite::viridis(length(year_bins$bins) - 1))
 #'
 #' }
 calc_bins <- function(x) {
   stopifnot(inherits(x, "Raster"))
 
-  if(all(is.na(raster::maxValue(x))) & all(is.na(raster::minValue(x)))) {
+  if (all(is.na(raster::maxValue(x))) & all(is.na(raster::minValue(x)))) {
     stop("Input Raster* object must have non-NA values.")
   }
 
@@ -148,30 +141,30 @@ calc_bins <- function(x) {
   # lots of checks for values outside of the upper and lower bounds
 
   # remove +3 sd break if it is greater than max
-  if(maxl < mdl + (3.00 * sdl)) {
+  if (maxl < mdl + (3.00 * sdl)) {
     log_sd <- log_sd[1:length(log_sd) - 1]
   }
 
   # add max if the max is greater than +3 sd break
-  if(maxl > mdl + (3.00 * sdl) | maxl > log_sd[length(log_sd)]) {
+  if (maxl > mdl + (3.00 * sdl) | maxl > log_sd[length(log_sd)]) {
     log_sd <- append(log_sd, maxl)
   }
 
   # remove the -3 sd break if it is less than the min
-  if(minl > mdl - (3.00 * sdl)) {
+  if (minl > mdl - (3.00 * sdl)) {
     log_sd <- log_sd[2:length(log_sd)]
   }
 
   # add min if the min is less than -3 sd break
-  if(minl < mdl - (3.00 * sdl) | minl < log_sd[1]) {
+  if (minl < mdl - (3.00 * sdl) | minl < log_sd[1]) {
     log_sd <- append(log_sd, minl, after = 0)
   }
 
-  if(log_sd[1] < 0) {
+  if (log_sd[1] < 0) {
     log_sd[1] <- 0.01 ^ this_power
   }
 
-  if(log_sd[1] ^ (1 / this_power) < 0.01) {
+  if (log_sd[1] ^ (1 / this_power) < 0.01) {
     log_sd[1] <- 0.01 ^ this_power
   }
 
@@ -180,7 +173,7 @@ calc_bins <- function(x) {
   rm(log_sd)
 
   # if transform power was negative, flip bins
-  if(this_power < 0) {
+  if (this_power < 0) {
     bins <- rev(bins)
   }
 
@@ -191,15 +184,14 @@ calc_bins <- function(x) {
 #' Map PI and PD centroid locations
 #'
 #' Creates a map showing the stixel centroid locations for PIs and/or PDs, with
-#' an optional spatiotemporal subset using an `st_extent` list.
+#' an optional spatiotemporal subset using an [ebirdst_extent] object
 #'
-#' @param pis data.frame; predictor importance data from [load_pis()].
-#' @param pds data.frame; partial depenence data from [load_pds()].
-#' @param st_extent list; Optional spatiotemporal filter using `st_extent` list.
-#' @param plot_pis logical; Default is TRUE. Set to FALSE to hide the plotting
-#'   of PI stixel centroid locations.
-#' @param plot_pds logical; Default is TRUE. Set to FALSE to hide the plotting
-#'   of PD stixel centroid locations.
+#' @param path character; full path to directory containing the eBird Status and
+#'   Trends products for a single species.
+#' @param ext [ebirdst_extent] object (optional); the spatiotemporal extent to
+#'   filter the data to.
+#' @param plot_pis logical; whether to show PI stixel centroid locations.
+#' @param plot_pds logical; whether to show PD stixel centroid locations.
 #'
 #' @return Plot showing locations of PIs and/or PDs.
 #'
@@ -209,166 +201,118 @@ calc_bins <- function(x) {
 #' \dontrun{
 #'
 #' # download and load example data
-#' dl_path <- tempdir()
-#' sp_path <- download_data("example_data", path = dl_path)
-#' pis <- load_pis(sp_path)
-#' pds <- load_pds(sp_path)
+#' sp_path <- download_data("example_data")
 #'
 #' # define a spatiotemporal extent to plot
-#' ne_extent <- list(type = "rectangle",
-#'                   lat.min = 40,
-#'                   lat.max = 47,
-#'                   lon.min = -80,
-#'                   lon.max = -70,
-#'                   t.min = 0.425,
-#'                   t.max = 0.475)
+#' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
+#' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #'
-#' map_centroids(pis = pis, pds = pds, st_extent = ne_extent)
+#' map_centroids(path = sp_path, ext = e)
 #'
 #' }
-map_centroids <- function(pis,
-                          pds,
-                          st_extent = NA,
-                          plot_pis = TRUE,
-                          plot_pds = TRUE) {
-
-  if(plot_pds == FALSE & plot_pis == FALSE) {
+map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
+  stopifnot(is.character(path), length(path) == 1, dir.exists(path))
+  stopifnot(is.logical(plot_pis), length(plot_pis) == 1)
+  stopifnot(is.logical(plot_pds), length(plot_pds) == 1)
+  if (!plot_pds & !plot_pis) {
     stop("Plotting of both PIs and PDs set to FALSE. Nothing to plot!")
   }
-
-  if(!all(is.na(st_extent))) {
-    if(!is.list(st_extent)) {
-      stop("The st_extent argument must be a list object.")
-    }
+  if (!missing(ext)) {
+    stopifnot(inherits(ext, "ebirdst_extent"))
   }
 
-  # projection information
-  ll <- "+init=epsg:4326"
-  mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
+  # convert data to spatial, find bounding box
+  # pds
+  if (isTRUE(plot_pds)) {
+    pds <- load_pds(path = path)
+    pds <- dplyr::distinct(pds[, c("lon", "lat", "date")])
+    pds <- sf::st_as_sf(pds, coords = c("lon", "lat"), crs = 4326)
+    pds <- sf::st_transform(pds, crs = mollweide)
+  } else {
+    pds <- NULL
+  }
+  # pis
+  if (isTRUE(plot_pis)) {
+    pis <- load_pis(path = path)
+    pis <- dplyr::distinct(pis[, c("lon", "lat", "date")])
+    pis <- sf::st_as_sf(pis, coords = c("lon", "lat"), crs = 4326)
+    pis <- sf::st_transform(pis, crs = mollweide)
+  } else {
+    pis <- NULL
+  }
+  # bbox
+  bb <- sf::st_as_sfc(sf::st_bbox(rbind(pis, pds)))
 
   # initialize graphical parameters
-  graphics::par(mfrow = c(1, 1), mar = c(0, 0, 0, 0), bg = "black")
+  p <- graphics::par(mfrow = c(1, 1), mar = c(0, 0, 0, 0), bg = "white")
 
-  # Plotting PDs
-  if(plot_pds == TRUE) {
-    tpds <- unique(pds[, c("lon", "lat", "date")])
-    tpds_sp <- sp::SpatialPointsDataFrame(tpds[, c("lon", "lat")],
-                                          tpds,
-                                          proj4string = sp::CRS(ll))
-    tpds_prj <- sp::spTransform(tpds_sp, sp::CRS(mollweide))
-    rm(tpds)
+  # plot base map
+  graphics::plot(bb, col = NA, border = NA)
+  graphics::plot(sf::st_geometry(ned_wh_co_moll),
+                 col = "#5a5a5a", border = "#000000", lwd = 1, add = TRUE)
+  # label setup
+  usr <- graphics::par("usr")
+  xwidth <- usr[2] - usr[1]
+  yheight <- usr[4] - usr[3]
 
-    # start plot with all possible PDs
-    suppressWarnings(raster::plot(tpds_prj, ext = raster::extent(tpds_prj),
-                                  col = "#1b9377", cex = 0.01, pch = 16))
-
-    suppressWarnings(sp::plot(ned_wh_co_moll, col = "#5a5a5a", add = TRUE))
-
-    suppressWarnings(raster::plot(tpds_prj, ext = raster::extent(tpds_prj),
-                                  col = "#1b9377", cex = 0.4, pch = 16,
-                                  add = TRUE))
-
-    if(!all(is.na(st_extent))) {
-      tpds_sub <- data_st_subset(tpds_sp, st_extent)
-
-      tpds_region <- sp::spTransform(tpds_sub, sp::CRS(mollweide))
-      rm(tpds_sub)
-
-      # plot PDs in st_extent
-      suppressWarnings(raster::plot(tpds_region, ext = raster::extent(tpds_prj),
-                                    col = "#b3e2cd", cex = 0.4, pch = 16,
-                                    add = TRUE))
-    }
-    rm(tpds_sp)
-
-    # xmin, xmax, ymin, ymax
-    usr <- graphics::par("usr")
-    xwidth <- usr[2] - usr[1]
-    yheight <- usr[4] - usr[3]
-
-    graphics::text(x = usr[1] + xwidth/8,
-                   y = usr[3] + yheight/7,
-                   paste("Available PDs: ", nrow(tpds_prj), sep = ""),
+  # plotting pds
+  if (isTRUE(plot_pds)) {
+    # first plot all possible pds
+    graphics::plot(sf::st_geometry(pds), col = "#1b9377", cex = 0.4, pch = 16,
+                   add = TRUE)
+    graphics::text(x = usr[1] + xwidth / 8,
+                   y = usr[3] + yheight / 7,
+                   paste("Available PDs: ", nrow(pds), sep = ""),
                    cex = 1,
                    col = "#1b9377")
 
-    if(!all(is.na(st_extent))) {
-      graphics::text(x = usr[1] + xwidth/8,
-                     y = usr[3] + yheight/9,
-                     paste("Selected PDs: ", nrow(tpds_region), sep = ""),
+    # plot pds within extent
+    if (!missing(ext)) {
+      pds_sub <- ebirdst_subset(pds, ext)
+      graphics::plot(sf::st_geometry(pds_sub),
+                     col = "#b3e2cd", cex = 0.4, pch = 16,
+                     add = TRUE)
+      graphics::text(x = usr[1] + xwidth / 8,
+                     y = usr[3] + yheight / 9,
+                     paste("Selected PDs: ", nrow(pds_sub), sep = ""),
                      cex = 1,
                      col = "#b3e2cd")
-
-      rm(tpds_region)
     }
-
-    wh_extent <- raster::extent(tpds_prj)
-    rm(tpds_prj)
   }
 
-  # Plotting PIs
-  if(plot_pis == TRUE) {
-    tpis <- unique(pis[, c("lon", "lat", "date")])
-    tpis_sp <- sp::SpatialPointsDataFrame(tpis[, c("lon", "lat")],
-                                          tpis,
-                                          proj4string = sp::CRS(ll))
-    tpis_prj <- sp::spTransform(tpis_sp, mollweide)
-    rm(tpis)
-
-    if(plot_pds == FALSE) {
-      wh_extent <- raster::extent(tpis_prj)
-
-      # start plot with all possible PDs
-      suppressWarnings(raster::plot(tpis_prj, ext = wh_extent, col = "#1b9377",
-                                    cex = 0.01, pch = 16))
-
-      suppressWarnings(sp::plot(ned_wh_co_moll, col = "#5a5a5a", add = TRUE))
-    }
-
-    # start plot with all possible PIs
-    suppressWarnings(raster::plot(tpis_prj, ext = wh_extent, col = "#d95f02",
-                                  cex = 0.4, pch = 16, add = TRUE))
-
-    if(!all(is.na(st_extent))) {
-      tpis_sub <- data_st_subset(tpis_sp, st_extent)
-
-      tpis_region <- sp::spTransform(tpis_sub, sp::CRS(mollweide))
-
-      # plot PIs in st_extent
-      suppressWarnings(raster::plot(tpis_region, ext = wh_extent,
-                                    col = "#fdcdac", cex = 0.4, pch = 16,
-                                    add = TRUE))
-    }
-    rm(tpis_sp)
-
-    # xmin, xmax, ymin, ymax
-    usr <- suppressWarnings(graphics::par("usr"))
-    xwidth <- usr[2] - usr[1]
-    yheight <- usr[4] - usr[3]
-
-    graphics::text(x = usr[1] + xwidth/8,
-                   y = usr[3] + yheight/12,
-                   paste("Available PIs: ", nrow(tpis_prj), sep = ""),
+  # plotting pis
+  if (isTRUE(plot_pis)) {
+    # first plot all possible pis
+    graphics::plot(sf::st_geometry(pis), col = "#d95f02", cex = 0.4, pch = 16,
+                   add = TRUE)
+    graphics::text(x = usr[1] + xwidth / 8,
+                   y = usr[3] + yheight / 12,
+                   paste("Available PIs: ", nrow(pis), sep = ""),
                    cex = 1,
                    col = "#d95f02")
-    rm(tpis_prj)
 
-    if(!all(is.na(st_extent))) {
-      graphics::text(x = usr[1] + xwidth/8,
-                     y = usr[3] + yheight/17,
-                     paste("Selected PIs: ", nrow(tpis_region), sep = ""),
+    # plot pds within extent
+    if (!missing(ext)) {
+      pis_sub <- ebirdst_subset(pis, ext)
+      graphics::plot(sf::st_geometry(pis_sub),
+                     col = "#fdcdac", cex = 0.4, pch = 16,
+                     add = TRUE)
+      graphics::text(x = usr[1] + xwidth / 8,
+                     y = usr[3] + yheight / 17,
+                     paste("Selected PIs: ", nrow(pis_sub), sep = ""),
                      cex = 1,
                      col = "#fdcdac")
-      rm(tpis_region)
     }
   }
 
   # plot reference data
-  suppressWarnings(raster::plot(ned_wh_co_moll, ext = wh_extent, lwd = 0.25,
-                                border = 'black', add = TRUE))
+  graphics::plot(sf::st_geometry(ned_wh_co_moll),
+                 col = NA, border = "#000000", lwd = 1, add = TRUE)
+  graphics::plot(sf::st_geometry(ned_wh_st_moll),
+                 col = NA, border = "#000000", lwd = 0.75, add = TRUE)
 
-  suppressWarnings(raster::plot(ned_wh_st_moll, ext = wh_extent, lwd = 0.25,
-                                border = 'black', add = TRUE))
+  graphics::par(p)
+  invisible()
 }
 
 
@@ -385,175 +329,111 @@ map_centroids <- function(pis,
 #' for reference. The legend shows, for each pixel, what percentage of the
 #' selected stixels are contributing information, ranging from 0 to 1.
 #'
-#' @param st_extent list; st_extent list containing spatiotemporal filter
-#' @param pis data.frame; predictor importance data from [load_pis()]. Must
-#'   supply either pis or pds.
-#' @param pds data.frame; partial dependence data from [load_pds()]. Must supply
-#'   either pis or pds.
 #' @param path character; full path to directory containing the eBird Status and
 #'   Trends products for a single species.
+#' @param ext [ebirdst_extent] object (optional); the spatiotemporal
+#'   extent to filter the data to.
+#' @param pi_pd character; whether to use predictor importance (`"pi"`) or
+#'   partial dependence (`"pd"`) for stixel centroids.
+#' @param plot logical; whether to plot the results or just return a raster
+#'   without plotting.
 #'
-#' @return RasterLayer and plots the RasterLayer with centroid locations and
-#'   st_extent boundaries.
+#' @return A raster showing the percentage of the selected stixels that are
+#'   contributing to each grid cell. In addition, if `plot = TRUE` this raster
+#'   will be plotted along with centroid locations and [ebirdst_extent]
+#'   boundaries.
 #'
-#' @import sp
 #' @export
 #'
 #' @examples
 #' \dontrun{
 #'
 #' # download and load example data
-#' dl_path <- tempdir()
-#' sp_path <- download_data("example_data", path = dl_path)
-#' pis <- load_pis(sp_path)
+#' sp_path <- download_data("example_data")
 #'
 #' # define a spatioremporal extent
-#' ne_extent <- list(type = "rectangle",
-#'                   lat.min = 40,
-#'                   lat.max = 47,
-#'                   lon.min = -80,
-#'                   lon.max = -70,
-#'                   t.min = 0.425,
-#'                   t.max = 0.475)
+#' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
+#' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #'
-#' eff_lay <- calc_effective_extent(st_extent = ne_extent, pis = pis,
-#'                                  path = sp_path)
+#' eff <- calc_effective_extent(path = sp_path, ext = e, pi_pd = "pi")
+#'
 #' }
-calc_effective_extent <- function(st_extent, pis = NA, pds = NA, path) {
-
-  if(is.null(nrow(pis)) & is.null(nrow(pds))) {
-    stop("Both PIs and PDs are NA. Nothing to calculate.")
+calc_effective_extent <- function(path, ext, pi_pd = c("pi", "pd"),
+                                  plot = TRUE) {
+  stopifnot(is.character(path), length(path) == 1, dir.exists(path))
+  stopifnot(inherits(ext, "ebirdst_extent"))
+  pi_pd <- match.arg(pi_pd)
+  stopifnot(is.logical(plot), length(plot) == 1)
+  if (identical(ext$t, c(0, 1))) {
+    warning(paste("Without temporal limits in ext, this function will take",
+                  "considerably longer to run and is less informative."))
   }
 
-  if(!is.null(nrow(pis)) & !is.null(nrow(pds))) {
-    stop("Unable to calculate for both PIs and PDs, supply one or the other.")
-  }
-
-  if(all(is.na(st_extent))) {
-    stop("Missing spatiotemporal extent.")
+  # load data
+  r_tmplt <- load_raster(product = "template", path = path)
+  if (pi_pd == "pi") {
+    pipd <- load_pis(path = path)
   } else {
-    if(!is.list(st_extent)) {
-      stop("The st_extent argument must be a list object.")
-    }
+    pipd <- load_pds(path = path)
   }
 
-  if(is.null(st_extent$t.min) | is.null(st_extent$t.max)) {
-    warning(paste0("Without temporal limits (t.min, t.max) in st_extent, ",
-                   "function will take considerably longer to run and is ",
-                   "less informative."))
-  }
+  # subset
+  pipd <- dplyr::distinct(pipd[, c("lon", "lat", "date", "stixel_width",
+                                   "stixel_height")])
+  pipd <- ebirdst_subset(pipd, ext = ext)
+  # stixelize
+  stixels <- stixelize(pipd)
+  # project to template raster projection
+  stixels <- sf::st_transform(stixels, crs = sf::st_crs(r_tmplt))
 
-  # projection info
-  ll <- "+init=epsg:4326"
-  mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
-
-  # load template raster
-  f_tmplt <- list.files(file.path(path, "data"),
-                        pattern = "srd_raster_template.tif",
-                        full.names = TRUE)
-  template_raster <- raster::raster(f_tmplt)
-
-  # set object based on whether using PIs or PDs
-  if(!is.null(nrow(pis))) {
-    stixels <- pis
-  } else {
-    stixels <- pds
-  }
-  rm(pis, pds)
-
-  # subset, create spatial data, project
-  tpis <- unique(stixels[, c("lon", "lat", "date", "stixel_width",
-                             "stixel_height")])
-  tpis_sp <- sp::SpatialPointsDataFrame(tpis[, c("lon","lat")],
-                                        tpis,
-                                        proj4string = sp::CRS(ll))
-  rm(tpis)
-
-  tpis_sub <- data_st_subset(tpis_sp, st_extent)
-  rm(tpis_sp)
-
-  # build stixels as polygons
-  # create corners
-  xPlus <- tpis_sub$lon + (tpis_sub$stixel_width / 2)
-  yPlus <- tpis_sub$lat + (tpis_sub$stixel_height / 2)
-  xMinus <- tpis_sub$lon - (tpis_sub$stixel_width / 2)
-  yMinus <- tpis_sub$lat - (tpis_sub$stixel_height / 2)
-
-  ID <- row.names(tpis_sub)
-
-  square <- cbind(xMinus, yPlus, xPlus, yPlus, xPlus,
-                  yMinus, xMinus, yMinus, xMinus, yPlus)
-
-  polys <- sp::SpatialPolygons(mapply(function(poly, id) {
-    xy <- matrix(poly, ncol = 2, byrow = TRUE)
-    sp::Polygons(list(sp::Polygon(xy)), ID = id)
-  }, split(square, row(square)), ID), proj4string = sp::CRS("+init=epsg:4326"))
-
-  tdspolydf <- sp::SpatialPolygonsDataFrame(polys, tpis_sub@data)
-  rm(xPlus, yPlus, xMinus, yMinus, ID, square, polys)
-
-  # assign value
-  tdspolydf$weight <- 1
-
-  # project to template raster
-  tdspolydf_prj <- sp::spTransform(tdspolydf,
-                                   sp::CRS(
-                                     sp::proj4string(template_raster)))
-  rm(tdspolydf)
-
-  # summarize...not sure how to do this step
-  tpis_r <- raster::crop(raster::rasterize(tdspolydf_prj, template_raster,
-                                           field = "weight", fun = sum),
-                         raster::extent(tdspolydf_prj))
-
-  tpis_per <- tpis_r / nrow(tpis_sub)
-  rm(tpis_r)
-  #tpis_per[tpis_per < 0.50] <- NA
+  # summarize: % of stixels overlapping each cell
+  r_stix <- raster::crop(
+    fasterize::fasterize(stixels, r_tmplt, fun = "count"),
+    raster::extent(stixels))
+  r_stix <- r_stix / nrow(stixels)
 
   # plot
-  tpis_per_prj <- raster::projectRaster(tpis_per, crs = mollweide)
+  if (isTRUE(plot)) {
+    r_stix_moll <- raster::projectRaster(r_stix, crs = mollweide,
+                                         method = "ngb")
+    r_stix_moll[r_stix_moll >= 1] <- 1
+    stixels_moll <- sf::st_transform(stixels, crs = mollweide)
+    pipd_sf <- sf::st_as_sf(pipd, coords = c("lon", "lat"), crs = 4326)
+    pipd_sf <- sf::st_transform(pipd_sf, mollweide)
 
-  tdspolydf_moll <- sp::spTransform(tdspolydf_prj, mollweide)
+    # convert extent to polygon and mollweide for plotting
+    if (ext$type == "bbox") {
+      ext_poly <- sf::st_as_sfc(ext$extent)
+    } else if (ext$type == "polygon") {
+      ext_poly <- ext$extent
+    } else {
+      stop("Spatiotemporal extent type not accepted.")
+    }
+    ext_poly_moll <- sf::st_transform(ext_poly, crs = mollweide)
 
-  # project the selected points to mollweide
-  tpis_sub_moll <- sp::spTransform(tpis_sub, mollweide)
+    # plot
+    p <- graphics::par(mar = c(0.25, 0.25, 0.25, 0.25), bg = "#ffffff")
 
-  # convert st_extent to polygon and mollweide for plotting
-  if(st_extent$type == "rectangle") {
-    st_ext <- raster::extent(st_extent$lon.min,
-                             st_extent$lon.max,
-                             st_extent$lat.min,
-                             st_extent$lat.max)
-    st_extp <- methods::as(st_ext, "SpatialPolygons")
-    raster::projection(st_extp) <- sp::CRS(ll)
-    st_extp_prj <- sp::spTransform(st_extp, sp::CRS(mollweide))
-    rm(st_ext, st_extp)
-  } else if(st_extent$type == "polygon") {
-    st_extp_prj <- sp::spTransform(st_extent$polygon, sp::CRS(mollweide))
-  } else {
-    stop("Spatiotemporal extent type not accepted.")
+    raster::plot(r_stix_moll, ext = raster::extent(stixels_moll),
+                 breaks = c(0, seq(0.5, 1, by = 0.05)),
+                 col = viridisLite::viridis(11), colNA = "#000000",
+                 maxpixels = raster::ncell(r_stix_moll),
+                 axis.args = list(at = c(0, seq(0.5, 1, by = 0.1)),
+                                  labels = c(0, seq(0.5, 1, by = 0.1))),
+                 axes = FALSE, box = FALSE, legend = TRUE)
+
+    graphics::plot(sf::st_geometry(ned_wh_co_moll),
+                   border = "#ffffff", col = NA, lwd = 1.5, add = TRUE)
+    graphics::plot(sf::st_geometry(ned_wh_st_moll),
+                   border = "#ffffff", col = NA, lwd = 1, add = TRUE)
+    graphics::plot(sf::st_geometry(ext_poly_moll),
+                   border = "red", col = NA, lwd = 1.5, add = TRUE)
+    graphics::plot(sf::st_geometry(pipd_sf),
+                   col = "#000000", pch = 16, cex = 1 * graphics::par()$cex,
+                   add = TRUE)
+    graphics::par(p)
   }
-
-  graphics::par(mar = c(0, 0, 0, 2))
-
-  tpis_per_prj[tpis_per_prj >= 1] <- 1
-
-  raster::plot(tpis_per_prj,
-               xaxt = "n",
-               yaxt = "n",
-               bty = "n",
-               breaks = c(0, seq(0.5, 1, by = 0.05)),
-               ext = raster::extent(tdspolydf_moll),
-               col = viridisLite::viridis(11),
-               maxpixels = raster::ncell(tpis_per_prj),
-               legend = TRUE)
-
-  sp::plot(ned_wh_co_moll, add = TRUE, border = "gray")
-  sp::plot(ned_wh_st_moll, add = TRUE, border = "gray")
-  sp::plot(st_extp_prj, add = TRUE, border = "red")
-  sp::plot(tpis_sub_moll, add = TRUE, pch = 16, cex = 1 * graphics::par()$cex)
-
-  return(tpis_per)
+  invisible(r_stix)
 }
 
 

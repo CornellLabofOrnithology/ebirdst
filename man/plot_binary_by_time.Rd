@@ -4,34 +4,42 @@
 \alias{plot_binary_by_time}
 \title{Plot binary occurrence metrics by time}
 \usage{
-plot_binary_by_time(path, metric, n_time_periods = 52, st_extent = NA)
+plot_binary_by_time(path, metric = c("kappa", "auc", "sensitivity",
+  "specificity"), n_time_periods = 52, ext)
 }
 \arguments{
-\item{path}{character; Full path to single species eBird Status and Trends products.}
+\item{path}{character; full path to directory containing the eBird Status and
+Trends products for a single species.}
 
-\item{metric}{character; One of: "Kappa", "AUC", "Sensitivity",
-"Specificity".}
+\item{metric}{character; the PPM to plot, eith "kappa", "auc", "sensitivity",
+or "specificity".}
 
-\item{n_time_periods}{int; Greater than 1 (e.g., 52 for weeks).}
+\item{n_time_periods}{integer; number of periods to divide the year into to
+calculate the PPMs, e.g. use 52 to divide into weeks and 12 to divide into
+months.}
 
-\item{st_extent}{list; st_extent list for spatiotemporal filtering.}
+\item{ext}{\link{ebirdst_extent} object (optional); the spatiotemporal
+extent to filter the data to. The temporal component will be ignored since
+n_time_periods defines the temporal periods over which to calculate the
+PPMs.}
 }
 \value{
-Plot of metric box plots by time.
+Boxplot of PPM over time.
 }
 \description{
 For a specified number of time periods (ideally weeks or months), plots one
-of four (Kappa, AUC, Sensitivity, Specificity) box plots. Use default,
-without \code{st_extent} to see range-wide predictive performance, or provide
-an \code{st_extent} to see performance within spatiotemporal extent.
+of four (Kappa, AUC, Sensitivity, Specificity) box plots. Provide an
+\code{ebirdst_extent} onject to see performance within a spatiotemporal extent,
+otherwise rangewide performance will be shown.
 }
 \examples{
 \dontrun{
 
-# download example data
-dl_path <- tempdir()
-sp_path <- download_data("example_data", path = dl_path)
+# download and load example data
+sp_path <- download_data("example_data")
 
-plot_binary_by_time(path = sp_path, metric = "Kappa", n_time_periods = 12)
+# plot monthly kappa
+plot_binary_by_time(path = sp_path, metric = "kappa", n_time_periods = 12)
+
 }
 }

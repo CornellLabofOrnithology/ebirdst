@@ -4,37 +4,34 @@
 \alias{plot_all_ppms}
 \title{Plot all predictive performance metrics}
 \usage{
-plot_all_ppms(path, st_extent)
+plot_all_ppms(path, ext)
 }
 \arguments{
-\item{path}{character; Full path to single species eBird Status and Trends products.}
+\item{path}{character; full path to directory containing the eBird Status and
+Trends products for a single species.}
 
-\item{st_extent}{list; st_extent list for spatiotemporal filtering.}
+\item{ext}{\link{ebirdst_extent} object; the spatiotemporal extent to filter the
+data to.}
 }
 \value{
 Plot of metric box plots by category
 }
 \description{
 For a spatiotemporal extent, plots bar plots for all available predictive
-performance metrics within three sets: Binary Occurrence, Occurrence
+performance metrics within three categories: Binary Occurrence, Occurrence
 Probability, and Abundance.
 }
 \examples{
 \dontrun{
 
 # download example data
-dl_path <- tempdir()
-sp_path <- download_data("example_data", path = dl_path)
+sp_path <- download_data("example_data")
 
-# define a spatioremporal extent
-ne_extent <- list(type = "rectangle",
-                  lat.min = 40,
-                  lat.max = 47,
-                  lon.min = -80,
-                  lon.max = -70,
-                  t.min = 0.425,
-                  t.max = 0.475)
+# define a spatiotemporal extent to plot data from
+bb_vec <- c(xmin = -91, xmax = -82, ymin = 41, ymax = 48)
+e <- ebirdst_extent(bb_vec, t = c("04-01", "06-30"))
 
-plot_all_ppms(path = sp_path, st_extent = ne_extent)
+plot_all_ppms(path = sp_path, ext = e)
+
 }
 }

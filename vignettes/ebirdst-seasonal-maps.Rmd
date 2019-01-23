@@ -21,9 +21,7 @@ knitr::opts_chunk$set(warning = FALSE,
                       fig.width = 7, 
                       fig.align = "center")
 # only build vignettes local and not for R CMD check
-is_check <- ("CheckExEnv" %in% search()) || 
-  any(c("_R_CHECK_TIMINGS_", "_R_CHECK_LICENSE_") %in% names(Sys.getenv()))
-knitr::opts_chunk$set(eval = nzchar(Sys.getenv("BUILD_VIGNETTES")) && !is_check)
+knitr::opts_chunk$set(eval = nzchar(Sys.getenv("BUILD_VIGNETTES")))
 ```
 
 # Outline
@@ -63,7 +61,7 @@ Before we do anything else, we'll need to download and load the example abundanc
 # download to a temp directory for the vigette
 # in practice, change to permanent directory the status and trends downloads
 dl_path <- tempdir()
-sp_path <- download_data(species = "example_data", path = dl_path)
+sp_path <- download_data(species = "example_data")
 # load the abundance data
 abd <- load_raster("abundance_umean", path = sp_path) %>% 
   # label the raster layers with their corresponding dates
@@ -92,26 +90,26 @@ wh_subset <- function(x) {
 # country lines
 ne_country_lines <- ne_download(scale = ne_scale, category = "cultural",
                                 type = "admin_0_boundary_lines_land",
-                                returnclass = "sf") %>% 
-  st_geometry() %>% 
+                                returnclass = "sf") %>%
+  st_geometry() %>%
   wh_subset()
 # state lines
 ne_state_lines <- ne_download(scale = ne_scale, category = "cultural",
                               type = "admin_1_states_provinces_lines",
-                              returnclass = "sf") %>% 
-  st_geometry() %>% 
+                              returnclass = "sf") %>%
+  st_geometry() %>%
   wh_subset()
 # rivers
 ne_rivers <- ne_download(scale = ne_scale, category = "physical",
                          type = "rivers_lake_centerlines",
-                         returnclass = "sf") %>% 
-  st_geometry() %>% 
+                         returnclass = "sf") %>%
+  st_geometry() %>%
   wh_subset()
 # lakes
 ne_lakes <- ne_download(scale = ne_scale, category = "physical",
                         type = "lakes",
-                        returnclass = "sf") %>% 
-  st_geometry() %>% 
+                        returnclass = "sf") %>%
+  st_geometry() %>%
   wh_subset()
 ne_land <- st_transform(ne_land, crs = mollweide)
 ```
