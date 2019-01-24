@@ -58,7 +58,8 @@ Suggests:
     rnaturalearth,
     smoothr,
     testthat,
-    velox
+    velox,
+    fields
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
