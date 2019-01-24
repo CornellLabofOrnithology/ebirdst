@@ -32,7 +32,7 @@ Depends:
 Imports: 
     car,
     data.table,
-    dplyr,
+    dplyr (>= 0.7.0),
     fasterize,
     gbm (>= 2.1.5),
     ggplot2,
