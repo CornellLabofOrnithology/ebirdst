@@ -140,11 +140,7 @@ compute_ppms <- function(path, ext) {
 
   for (i_mc in seq_len(n_mc)) {
     # case control sampling
-    x <- sf::st_as_sf(ppm_data, coords = c("lon", "lat"), crs = 4326)
-    sinu <- paste("+proj=sinu +lon_0=0 +x_0=0 +y_0=0",
-                  "+a=6371007.181 +b=6371007.181 +units=m +no_defs")
-    x <- sf::st_transform(x, crs = sinu)
-    sampled <- sample_case_control(x,
+    sampled <- sample_case_control(ppm_data,
                                    res = c(10000, 10000),
                                    t_res = 7 / 365,
                                    n = 1,
@@ -292,6 +288,7 @@ plot_binary_by_time <- function(path,
   t_breaks <- seq(0, 1, length.out = n_time_periods + 1)
   t_dates <- t_breaks[-length(t_breaks)] + diff(t_breaks) / 2
   t_dates <- from_srd_date(t_dates)
+
   # calculate ppms for each
   ppms <- list(NA)
   for (i_t in seq_len(n_time_periods)) {
