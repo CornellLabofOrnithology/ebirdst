@@ -7,9 +7,11 @@ devtools::document()
 devtools::install_local(force = TRUE)
 
 devtools::test()
-devtools::check()
+devtools::check(run_dont_test = TRUE)
 
-rmarkdown::render("README.Rmd")
+Sys.setenv(BUILD_VIGNETTES = TRUE)
 devtools::build_vignettes()
+rmarkdown::render("README.Rmd")
 pkgdown::build_site()
 file.copy(list.files(".", "README.*png", full.names = TRUE), "docs/")
+Sys.unsetenv("BUILD_VIGNETTES")

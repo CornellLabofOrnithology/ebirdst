@@ -104,7 +104,8 @@ calc_full_extent <- function(x) {
 calc_bins <- function(x) {
   stopifnot(inherits(x, "Raster"))
 
-  if (all(is.na(raster::maxValue(x))) & all(is.na(raster::minValue(x)))) {
+  if (all(is.na(suppressWarnings(raster::maxValue(x)))) &
+      all(is.na(suppressWarnings(raster::minValue(x))))) {
     stop("Input Raster* object must have non-NA values.")
   }
 
@@ -217,7 +218,9 @@ map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
   if (!plot_pds & !plot_pis) {
     stop("Plotting of both PIs and PDs set to FALSE. Nothing to plot!")
   }
-  if (!missing(ext)) {
+  if (missing(ext)) {
+    stop("A spatiotemporal extent must be provided.")
+  } else {
     stopifnot(inherits(ext, "ebirdst_extent"))
   }
 
@@ -260,8 +263,9 @@ map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
     # first plot all possible pds
     graphics::plot(sf::st_geometry(pds), col = "#1b9377", cex = 0.4, pch = 16,
                    add = TRUE)
-    graphics::text(x = usr[1] + xwidth / 8,
-                   y = usr[3] + yheight / 7,
+    graphics::text(x = usr[1] + 0.05 * xwidth,
+                   y = usr[3] + 0.2 * yheight,
+                   adj = 0,
                    paste("Available PDs: ", nrow(pds), sep = ""),
                    cex = 1,
                    col = "#1b9377")
@@ -272,8 +276,9 @@ map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
       graphics::plot(sf::st_geometry(pds_sub),
                      col = "#b3e2cd", cex = 0.4, pch = 16,
                      add = TRUE)
-      graphics::text(x = usr[1] + xwidth / 8,
-                     y = usr[3] + yheight / 9,
+      graphics::text(x = usr[1] + 0.05 * xwidth,
+                     y = usr[3] + 0.16 * yheight,
+                     adj = 0,
                      paste("Selected PDs: ", nrow(pds_sub), sep = ""),
                      cex = 1,
                      col = "#b3e2cd")
@@ -285,8 +290,9 @@ map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
     # first plot all possible pis
     graphics::plot(sf::st_geometry(pis), col = "#d95f02", cex = 0.4, pch = 16,
                    add = TRUE)
-    graphics::text(x = usr[1] + xwidth / 8,
-                   y = usr[3] + yheight / 12,
+    graphics::text(x = usr[1] + 0.05 * xwidth,
+                   y = usr[3] + 0.12 * yheight,
+                   adj = 0,
                    paste("Available PIs: ", nrow(pis), sep = ""),
                    cex = 1,
                    col = "#d95f02")
@@ -297,8 +303,9 @@ map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
       graphics::plot(sf::st_geometry(pis_sub),
                      col = "#fdcdac", cex = 0.4, pch = 16,
                      add = TRUE)
-      graphics::text(x = usr[1] + xwidth / 8,
-                     y = usr[3] + yheight / 17,
+      graphics::text(x = usr[1] + 0.05 * xwidth,
+                     y = usr[3] + 0.08 * yheight,
+                     adj = 0,
                      paste("Selected PIs: ", nrow(pis_sub), sep = ""),
                      cex = 1,
                      col = "#fdcdac")
@@ -310,6 +317,47 @@ map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
                  col = NA, border = "#000000", lwd = 1, add = TRUE)
   graphics::plot(sf::st_geometry(ned_wh_st_moll),
                  col = NA, border = "#000000", lwd = 0.75, add = TRUE)
+
+  # label
+  usr <- graphics::par("usr")
+  xwidth <- usr[2] - usr[1]
+  yheight <- usr[4] - usr[3]
+
+  # pds
+  if (isTRUE(plot_pds)) {
+    graphics::text(x = usr[1] + 0.05 * xwidth,
+                   y = usr[3] + 0.2 * yheight,
+                   adj = 0,
+                   paste("Available PDs: ", nrow(pds), sep = ""),
+                   cex = 1,
+                   col = "#1b9377")
+    if (!missing(ext)) {
+      graphics::text(x = usr[1] + 0.05 * xwidth,
+                     y = usr[3] + 0.16 * yheight,
+                     adj = 0,
+                     paste("Selected PDs: ", nrow(pds_sub), sep = ""),
+                     cex = 1,
+                     col = "#b3e2cd")
+    }
+  }
+
+  # pis
+  if (isTRUE(plot_pis)) {
+    graphics::text(x = usr[1] + 0.05 * xwidth,
+                   y = usr[3] + 0.12 * yheight,
+                   adj = 0,
+                   paste("Available PIs: ", nrow(pis), sep = ""),
+                   cex = 1,
+                   col = "#d95f02")
+    if (!missing(ext)) {
+      graphics::text(x = usr[1] + 0.05 * xwidth,
+                     y = usr[3] + 0.08 * yheight,
+                     adj = 0,
+                     paste("Selected PIs: ", nrow(pis_sub), sep = ""),
+                     cex = 1,
+                     col = "#fdcdac")
+    }
+  }
 
   graphics::par(p)
   invisible()
@@ -364,7 +412,7 @@ calc_effective_extent <- function(path, ext, pi_pd = c("pi", "pd"),
   stopifnot(inherits(ext, "ebirdst_extent"))
   pi_pd <- match.arg(pi_pd)
   stopifnot(is.logical(plot), length(plot) == 1)
-  if (identical(ext$t, c(0, 1))) {
+  if (all(c(0, 1) == round(ext$t, 2))) {
     warning(paste("Without temporal limits in ext, this function will take",
                   "considerably longer to run and is less informative."))
   }
@@ -394,8 +442,9 @@ calc_effective_extent <- function(path, ext, pi_pd = c("pi", "pd"),
 
   # plot
   if (isTRUE(plot)) {
-    r_stix_moll <- raster::projectRaster(r_stix, crs = mollweide,
-                                         method = "ngb")
+    r_stix_moll <- suppressWarnings(raster::projectRaster(r_stix,
+                                                          crs = mollweide,
+                                                          method = "ngb"))
     r_stix_moll[r_stix_moll >= 1] <- 1
     stixels_moll <- sf::st_transform(stixels, crs = mollweide)
     pipd_sf <- sf::st_as_sf(pipd, coords = c("lon", "lat"), crs = 4326)

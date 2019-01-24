@@ -105,7 +105,7 @@ sample_grid.sf <- function(x, res, t_res, n = 1, replace = FALSE,
   is_sampled <- rep(FALSE, nrow(x))
   is_sampled[sampled] <- TRUE
 
-  return(sampled)
+  return(is_sampled)
 }
 
 #' @export
@@ -155,7 +155,7 @@ sample_case_control.sf <- function(x, res, t_res, n = 1, replace = FALSE,
   is_sampled <- rep(FALSE, nrow(x))
   is_sampled[sampled] <- TRUE
 
-  return(sampled)
+  return(is_sampled)
 }
 
 

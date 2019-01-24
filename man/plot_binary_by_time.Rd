@@ -5,7 +5,7 @@
 \title{Plot binary occurrence metrics by time}
 \usage{
 plot_binary_by_time(path, metric = c("kappa", "auc", "sensitivity",
-  "specificity"), n_time_periods = 52, ext)
+  "specificity"), ext, n_time_periods = 52)
 }
 \arguments{
 \item{path}{character; full path to directory containing the eBird Status and
@@ -14,14 +14,14 @@ Trends products for a single species.}
 \item{metric}{character; the PPM to plot, eith "kappa", "auc", "sensitivity",
 or "specificity".}
 
-\item{n_time_periods}{integer; number of periods to divide the year into to
-calculate the PPMs, e.g. use 52 to divide into weeks and 12 to divide into
-months.}
-
 \item{ext}{\link{ebirdst_extent} object (optional); the spatiotemporal
 extent to filter the data to. The temporal component will be ignored since
 n_time_periods defines the temporal periods over which to calculate the
 PPMs.}
+
+\item{n_time_periods}{integer; number of periods to divide the year into to
+calculate the PPMs, e.g. use 52 to divide into weeks and 12 to divide into
+months.}
 }
 \value{
 Boxplot of PPM over time.

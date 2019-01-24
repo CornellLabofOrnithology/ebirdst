@@ -9,7 +9,7 @@ download_data(species, path = rappdirs::user_data_dir("ebirdst"),
 }
 \arguments{
 \item{species}{character; a single six-letter species code (e.g. rufhum).
-The full list of valid codes is can be viewed in the \link{runs_w_names} data
+The full list of valid codes is can be viewed in the \link{ebirdst_runs} data
 frame included in this package. To download the example dataset, use
 "example_data".}
 

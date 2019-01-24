@@ -6,7 +6,7 @@
 #' than the full dataset making these data quicker to download and process.
 #'
 #' @param species character; a single six-letter species code (e.g. rufhum).
-#'   The full list of valid codes is can be viewed in the [runs_w_names] data
+#'   The full list of valid codes is can be viewed in the [ebirdst_runs] data
 #'   frame included in this package. To download the example dataset, use
 #'   "example_data".
 #' @param path character; directory to download the data to. All downloaded
@@ -42,13 +42,13 @@ download_data <- function(species,
     bucket_url <- "https://clo-is-da-example-data.s3.amazonaws.com/"
     run <- "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"
   } else {
-    row_id <- which(ebirdst::runs_w_names$SPECIES_CODE == species)
+    row_id <- which(ebirdst::ebirdst_runs$SPECIES_CODE == species)
     if (length(row_id) != 1) {
       stop(sprintf("species = %s does not uniquely identify a species."))
     }
     # presumably this url will change
     bucket_url <- "https://clo-is-da-example-data.s3.amazonaws.com/"
-    run <- ebirdst::runs_w_names$RUN_NAME[row_id]
+    run <- ebirdst::ebirdst_runs$RUN_NAME[row_id]
   }
 
   if (dir.exists(file.path(path, run))) {
@@ -360,7 +360,7 @@ load_pis <- function(path, return_sf = FALSE) {
   summary_df <- summary_df[, 1:12]
 
   # merge pis with summary
-  pi_summary <- dplyr::inner_join(summary_df, pi_df, by = "stixel.id")
+  pi_summary <- dplyr::inner_join(summary_df, pi_df, by = "stixel_id")
 
   pi_summary <- as.data.frame(pi_summary)
   if (isTRUE(return_sf)) {
@@ -433,7 +433,7 @@ load_pds <- function(path, return_sf = FALSE) {
   summary_df <- summary_df[, 1:12]
 
   # merge
-  pd_summary <- dplyr::right_join(pd_df, summary_df, by = "stixel.id")
+  pd_summary <- dplyr::right_join(pd_df, summary_df, by = "stixel_id")
   rm(pd_df, summary_df)
 
   pd_summary <- as.data.frame(pd_summary)
@@ -491,13 +491,14 @@ load_test_data_raw <- function(path, return_sf = FALSE) {
   td_df <- td_df[, "type" := NULL]
 
   # fix names
-  nm_idx <- match(c("longitude", "latitude"), tolower(names(td_df)))
+  names(td_df) <- stringr::str_replace_all(stringr::str_to_lower(names(td_df)),
+                                           "\\.", "_")
+  nm_idx <- match(c("longitude", "latitude"), names(td_df))
   names(td_df)[nm_idx] <- c("lon", "lat")
 
   td_df <- as.data.frame(td_df)
   if (isTRUE(return_sf)) {
-    td_df <- sf::st_as_sf(td_df, coords = c("LONGITUDE", "LATITUDE"),
-                          crs = 4326)
+    td_df <- sf::st_as_sf(td_df, coords = c("lon", "lat"), crs = 4326)
   }
   return(td_df)
 }
@@ -545,7 +546,6 @@ load_test_data <- function(path, return_sf = FALSE) {
   # load pd.txt
   td_df <- data.table::fread(td_file,
                              col.names= ebirdst_td_names,
-                             #col.names = ebirdst_td_names_tidy,
                              stringsAsFactors = FALSE,
                              showProgress = FALSE)
   td_df <- td_df[, "data_type" := NULL]

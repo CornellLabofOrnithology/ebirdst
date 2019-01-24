@@ -45,13 +45,7 @@ compute_ppms <- function(path, ext) {
 
   # load the test data and assign names
   ppm_data <- load_test_data(path = path)
-  names(ppm_data) <- stringr::str_replace_all(
-    stringr::str_to_lower(names(ppm_data)),
-    "\\.", "_")
   ppm_data_raw <- load_test_data_raw(path = path)
-  names(ppm_data_raw) <- stringr::str_replace_all(
-    stringr::str_to_lower(names(ppm_data_raw)),
-    "\\.", "_")
 
   # add aditional rows from raw data file
   ppm_data_raw <- ppm_data_raw[c("row_id", "lon", "lat", "dates", "y")]
@@ -146,7 +140,11 @@ compute_ppms <- function(path, ext) {
 
   for (i_mc in seq_len(n_mc)) {
     # case control sampling
-    sampled <- sample_case_control(ppm_data,
+    x <- sf::st_as_sf(ppm_data, coords = c("lon", "lat"), crs = 4326)
+    sinu <- paste("+proj=sinu +lon_0=0 +x_0=0 +y_0=0",
+                  "+a=6371007.181 +b=6371007.181 +units=m +no_defs")
+    x <- sf::st_transform(x, crs = sinu)
+    sampled <- sample_case_control(x,
                                    res = c(10000, 10000),
                                    t_res = 7 / 365,
                                    n = 1,
@@ -252,13 +250,13 @@ compute_ppms <- function(path, ext) {
 #'   Trends products for a single species.
 #' @param metric character; the PPM to plot, eith "kappa", "auc", "sensitivity",
 #'   or "specificity".
-#' @param n_time_periods integer; number of periods to divide the year into to
-#'   calculate the PPMs, e.g. use 52 to divide into weeks and 12 to divide into
-#'   months.
 #' @param ext [ebirdst_extent] object (optional); the spatiotemporal
 #'   extent to filter the data to. The temporal component will be ignored since
 #'   n_time_periods defines the temporal periods over which to calculate the
 #'   PPMs.
+#' @param n_time_periods integer; number of periods to divide the year into to
+#'   calculate the PPMs, e.g. use 52 to divide into weeks and 12 to divide into
+#'   months.
 #'
 #' @return Boxplot of PPM over time.
 #'
@@ -277,8 +275,7 @@ compute_ppms <- function(path, ext) {
 plot_binary_by_time <- function(path,
                                 metric = c("kappa", "auc", "sensitivity",
                                            "specificity"),
-                                n_time_periods = 52,
-                                ext) {
+                                ext, n_time_periods = 52) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
   metric <- match.arg(metric)
   stopifnot(is_integer(n_time_periods), length(n_time_periods) == 1,
@@ -363,7 +360,7 @@ plot_binary_by_time <- function(path,
 plot_all_ppms <- function(path, ext) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
   stopifnot(inherits(ext, "ebirdst_extent"))
-  if (identical(c(0, 1), ext$t)) {
+  if (all(c(0, 1) == round(ext$t, 2))) {
     stop("Must provide temporal limits for spatiotemporal extent.")
   }
 
