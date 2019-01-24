@@ -233,21 +233,27 @@ plot_pds <- function(pds, predictor, ext,
   pds <- pds[!is.na(pds$y1), ]
 
   # transform to long format for plotting
-  x_long <- dplyr::select(pds, .data$stixel_id, dplyr::starts_with("x"))
+  x_long <- pds[c("stixel_id", paste0("x", 1:50))]
   n_preds <- ncol(x_long) - 1
   x_long <- tidyr::gather(x_long, key = "key", value = "x",
                           dplyr::starts_with("x"))
-  y_long <- dplyr::select(pds, .data$stixel_id, dplyr::starts_with("y"))
+  y_long <- pds[c("stixel_id", paste0("y", 1:50))]
   y_long <- tidyr::gather(y_long, key = "key", value = "y",
                           dplyr::starts_with("y"))
   pd_long <- cbind(x_long[c("stixel_id", "x")], y_long["y"])
-  pd_long <- dplyr::arrange(pd_long, .data$stixel_id, .data$x)
   rm(x_long, y_long, pds)
 
   # transform y to be relative to mean
-  pd_long <- dplyr::group_by(pd_long, .data$stixel_id)
-  pd_long <- dplyr::mutate(pd_long, y = .data$y - mean(.data$y, na.rm = TRUE))
-  pd_long <- dplyr::ungroup(pd_long)
+  stix_mean <- aggregate(pd_long["y"],
+                         list(stixel_id = pd_long$stixel_id),
+                         mean, na.rm = TRUE)
+  names(stix_mean) <- c("stixel_id", "y_mean")
+  pd_long <- dplyr::inner_join(pd_long, stix_mean, by = "stixel_id")
+  pd_long$y <- pd_long$y - pd_long$y_mean
+  pd_long[["y_mean"]] <- NULL
+  # pd_long <- dplyr::group_by(pd_long, .data$stixel_id)
+  # pd_long <- dplyr::mutate(pd_long, y =  y - mean(y, na.rm = TRUE))
+  # pd_long <- dplyr::ungroup(pd_long)
 
   # gam pointwise ci for conditional mean estimate via bootstrapping
   if (bootstrap_smooth) {

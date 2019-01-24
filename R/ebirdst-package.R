@@ -6,5 +6,4 @@
 #'
 #' @name ebirdst
 #' @docType package
-#' @importFrom dplyr .data
 NULL
