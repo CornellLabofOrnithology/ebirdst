@@ -178,7 +178,7 @@ calc_bins <- function(x) {
     bins <- rev(bins)
   }
 
-  return(list(bins = bins, power = this_power))
+  return(list(bins = unname(bins), power = unname(this_power)))
 }
 
 
