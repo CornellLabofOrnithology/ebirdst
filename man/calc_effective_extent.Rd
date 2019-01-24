@@ -4,23 +4,26 @@
 \alias{calc_effective_extent}
 \title{Calculate and map effective extent of selected centroids}
 \usage{
-calc_effective_extent(st_extent, pis = NA, pds = NA, path)
+calc_effective_extent(path, ext, pi_pd = c("pi", "pd"), plot = TRUE)
 }
 \arguments{
-\item{st_extent}{list; st_extent list containing spatiotemporal filter}
-
-\item{pis}{data.frame; predictor importance data from \code{\link[=load_pis]{load_pis()}}. Must
-supply either pis or pds.}
-
-\item{pds}{data.frame; partial dependence data from \code{\link[=load_pds]{load_pds()}}. Must supply
-either pis or pds.}
-
 \item{path}{character; full path to directory containing the eBird Status and
 Trends products for a single species.}
+
+\item{ext}{\link{ebirdst_extent} object (optional); the spatiotemporal
+extent to filter the data to.}
+
+\item{pi_pd}{character; whether to use predictor importance (\code{"pi"}) or
+partial dependence (\code{"pd"}) for stixel centroids.}
+
+\item{plot}{logical; whether to plot the results or just return a raster
+without plotting.}
 }
 \value{
-RasterLayer and plots the RasterLayer with centroid locations and
-st_extent boundaries.
+A raster showing the percentage of the selected stixels that are
+contributing to each grid cell. In addition, if \code{plot = TRUE} this raster
+will be plotted along with centroid locations and \link{ebirdst_extent}
+boundaries.
 }
 \description{
 The selection of stixel centroids for analysis of PIs and/or PDs yields an
@@ -38,20 +41,13 @@ selected stixels are contributing information, ranging from 0 to 1.
 \dontrun{
 
 # download and load example data
-dl_path <- tempdir()
-sp_path <- download_data("example_data", path = dl_path)
-pis <- load_pis(sp_path)
+sp_path <- download_data("example_data")
 
 # define a spatioremporal extent
-ne_extent <- list(type = "rectangle",
-                  lat.min = 40,
-                  lat.max = 47,
-                  lon.min = -80,
-                  lon.max = -70,
-                  t.min = 0.425,
-                  t.max = 0.475)
+bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
+e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 
-eff_lay <- calc_effective_extent(st_extent = ne_extent, pis = pis,
-                                 path = sp_path)
+eff <- calc_effective_extent(path = sp_path, ext = e, pi_pd = "pi")
+
 }
 }

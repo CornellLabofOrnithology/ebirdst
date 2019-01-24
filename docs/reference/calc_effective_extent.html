@@ -131,56 +131,52 @@ selected stixels are contributing information, ranging from 0 to 1.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>calc_effective_extent</span>(<span class='no'>st_extent</span>, <span class='kw'>pis</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>pds</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='no'>path</span>)</pre>
+    <pre class="usage"><span class='fu'>calc_effective_extent</span>(<span class='no'>path</span>, <span class='no'>ext</span>, <span class='kw'>pi_pd</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"pi"</span>, <span class='st'>"pd"</span>), <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>st_extent</th>
-      <td><p>list; st_extent list containing spatiotemporal filter</p></td>
-    </tr>
-    <tr>
-      <th>pis</th>
-      <td><p>data.frame; predictor importance data from <code><a href='load_pis.html'>load_pis()</a></code>. Must
-supply either pis or pds.</p></td>
-    </tr>
-    <tr>
-      <th>pds</th>
-      <td><p>data.frame; partial dependence data from <code><a href='load_pds.html'>load_pds()</a></code>. Must supply
-either pis or pds.</p></td>
-    </tr>
-    <tr>
       <th>path</th>
       <td><p>character; full path to directory containing the eBird Status and
 Trends products for a single species.</p></td>
+    </tr>
+    <tr>
+      <th>ext</th>
+      <td><p><a href='ebirdst_extent.html'>ebirdst_extent</a> object (optional); the spatiotemporal
+extent to filter the data to.</p></td>
+    </tr>
+    <tr>
+      <th>pi_pd</th>
+      <td><p>character; whether to use predictor importance (<code>"pi"</code>) or
+partial dependence (<code>"pd"</code>) for stixel centroids.</p></td>
+    </tr>
+    <tr>
+      <th>plot</th>
+      <td><p>logical; whether to plot the results or just return a raster
+without plotting.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>RasterLayer and plots the RasterLayer with centroid locations and
-st_extent boundaries.</p>
+    <p>A raster showing the percentage of the selected stixels that are
+contributing to each grid cell. In addition, if <code>plot = TRUE</code> this raster
+will be plotted along with centroid locations and <a href='ebirdst_extent.html'>ebirdst_extent</a>
+boundaries.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
 <span class='co'># download and load example data</span>
-<span class='no'>dl_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/tempfile'>tempdir</a></span>()
-<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='download_data.html'>download_data</a></span>(<span class='st'>"example_data"</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>dl_path</span>)
-<span class='no'>pis</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='load_pis.html'>load_pis</a></span>(<span class='no'>sp_path</span>)
+<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='download_data.html'>download_data</a></span>(<span class='st'>"example_data"</span>)
 
 <span class='co'># define a spatioremporal extent</span>
-<span class='no'>ne_extent</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"rectangle"</span>,
-                  <span class='kw'>lat.min</span> <span class='kw'>=</span> <span class='fl'>40</span>,
-                  <span class='kw'>lat.max</span> <span class='kw'>=</span> <span class='fl'>47</span>,
-                  <span class='kw'>lon.min</span> <span class='kw'>=</span> -<span class='fl'>80</span>,
-                  <span class='kw'>lon.max</span> <span class='kw'>=</span> -<span class='fl'>70</span>,
-                  <span class='kw'>t.min</span> <span class='kw'>=</span> <span class='fl'>0.425</span>,
-                  <span class='kw'>t.max</span> <span class='kw'>=</span> <span class='fl'>0.475</span>)
+<span class='no'>bb_vec</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='kw'>xmin</span> <span class='kw'>=</span> -<span class='fl'>86.6</span>, <span class='kw'>xmax</span> <span class='kw'>=</span> -<span class='fl'>82.2</span>, <span class='kw'>ymin</span> <span class='kw'>=</span> <span class='fl'>41.5</span>, <span class='kw'>ymax</span> <span class='kw'>=</span> <span class='fl'>43.5</span>)
+<span class='no'>e</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_extent.html'>ebirdst_extent</a></span>(<span class='no'>bb_vec</span>, <span class='kw'>t</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"05-01"</span>, <span class='st'>"05-31"</span>))
 
-<span class='no'>eff_lay</span> <span class='kw'>&lt;-</span> <span class='fu'>calc_effective_extent</span>(<span class='kw'>st_extent</span> <span class='kw'>=</span> <span class='no'>ne_extent</span>, <span class='kw'>pis</span> <span class='kw'>=</span> <span class='no'>pis</span>,
-                                 <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>sp_path</span>)
+<span class='no'>eff</span> <span class='kw'>&lt;-</span> <span class='fu'>calc_effective_extent</span>(<span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>sp_path</span>, <span class='kw'>ext</span> <span class='kw'>=</span> <span class='no'>e</span>, <span class='kw'>pi_pd</span> <span class='kw'>=</span> <span class='st'>"pi"</span>)
+
 <span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

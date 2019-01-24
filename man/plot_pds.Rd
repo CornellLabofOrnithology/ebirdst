@@ -2,82 +2,85 @@
 % Please edit documentation in R/ebirdst-plotting.R
 \name{plot_pds}
 \alias{plot_pds}
-\title{Plot partial dependency as line plot}
+\title{Plot partial dependency line plots}
 \usage{
-plot_pds(pd_name, pds, st_extent, plot_quantiles = FALSE,
-  pointwise_pi = TRUE, stixel_pds = FALSE, k.cont.res = 25,
-  gbm.n.trees = 500, nnn.bs = 100, equivalent.ensemble.ss = 10,
-  ci.alpha = 0.05, mean.all.data = FALSE, ylim = NA,
-  print_plot = TRUE)
+plot_pds(pds, predictor, ext, bootstrap_smooth = TRUE,
+  show_stixel_pds = FALSE, show_quantiles = FALSE, n_bs = 100,
+  ss_equivalent = 10, k = 25, ci_alpha = 0.05, gbm_n_trees = 500,
+  ylim = NULL, plot = TRUE)
 }
 \arguments{
-\item{pd_name}{character; Single predictor name from PDs (via \code{load_pds()}).
-Unique predictors can be listed by calling \code{pds <- load_pds(path)} and
-then calling \code{unique(pds$V4)}.}
+\item{pds}{data.frame; partial dependence data from \code{load_pds()}.}
 
-\item{pds}{data.frame; From \code{load_pds()}.}
+\item{predictor}{character; single predictor name to plot PD for. For a full
+list of predictors, and their associated definitions, see
+\link{ebirdst_predictors}.}
 
-\item{st_extent}{list; st_extent list for spatiotemporal filtering. Required,
-as results are less meaningful over large spatiotemporal extents.}
+\item{ext}{\link{ebirdst_extent} object; the spatiotemporal extent to
+filter the data to. Required, since results are less meaningful over large
+spatiotemporal extents.}
 
-\item{plot_quantiles}{logical; Default is FALSE. Adds a band for the
-upper (90th) and lower (10th) quantiles of the individual stixel PD values.}
+\item{bootstrap_smooth}{logical; the ideal visualization of the PD data is a
+pointwise GAM smoothing of the individual stixel PD values. This argument
+specifies whether this should be done directly on the full PD dataset
+(\code{bootstrap_smooth = FALSE}) or by subsampling abd bootstrapping. The
+latter approach deals with the randomness in the data and can be more
+efficient for large datasets. Defaults to TRUE.}
 
-\item{pointwise_pi}{logical; Default is TRUE. A pointwise smoothing of
-individual stixel PD values. Ideal visualization of the PD values.}
+\item{show_stixel_pds}{logical; whether to plot the individual stixel PD
+values as semi-transparent lines. Defaults to FALSE.}
 
-\item{stixel_pds}{logical; Default is FALSE. Toggle to plot the individual
-stixel PD values as semi-transparent lines.}
+\item{show_quantiles}{logical; adds a band for the upper (90th) and lower
+(10th) quantiles of the individual stixel PD values. These are calculated
+using quantile regression. Defaults to FALSE.}
 
-\item{k.cont.res}{int; Default is 25. Number of knots to use in GAM based on
-continuining resolution of the current eBird Status and Trends products.}
+\item{n_bs}{int; number of GAM bootstrap iterations when estimating PD
+confidence intervals. Ignored if \code{bootstrap_smooth = FALSE}.
+Default is 100.}
 
-\item{gbm.n.trees}{int; Default is 500. Number of trees to use in pointwise
-GAM.}
+\item{ss_equivalent}{int; when bootstrapping to estimate PD confidence
+intervals, this argument specifies the size of the subsample of the
+original data. In particular, \code{ss_equivalent} should be an integer
+representing the equivalent sampling size when averaging this number of PD
+estimates. Defaults to 10.}
 
-\item{nnn.bs}{int; Default is 100.}
+\item{k}{integer; number of knots to use in the GAM when smooth the PD
+relationship. Default is 25.}
 
-\item{equivalent.ensemble.ss}{int; Default is 10.}
+\item{ci_alpha}{numeric; alpha level of confidence intervals. Default is
+0.05.}
 
-\item{ci.alpha}{numeric; Default is 0.05. Alpha transparency of confidence
-intervals.}
+\item{gbm_n_trees}{integer; number of trees to fit in the GBM when estimating
+quantiles. Ignored if \code{show_quantiles = FALSE}. Default is 500.}
 
-\item{mean.all.data}{logical; Default is FALSE.}
+\item{ylim}{numeric; 2-element vector to pre-define the y-limits of plotting.
+In the format c(ymin, ymax).}
 
-\item{ylim}{vector pair; Opportunity to pre-define plot y-min and y-max as
-vector pair (e.g., c(-1, 1)).}
-
-\item{print_plot}{logical; Default is TRUE. Set to FALSE to turn off plotting and
-only get return of pointwise pi values.}
+\item{plot}{logical; whether to plot the PD relationships or just return
+data.}
 }
 \value{
-Plots barplot and returns a list containing the quantiles
-(if plot_quantiles = TRUE) and/or the pointwise_pis upper, lower, and
-median (if pointwise_pi = TRUE).
+Plots the smoothed partial dependence relationship and returns a data
+frame of the smoothed curve with confidence intervals.
 }
 \description{
 For all of the available predictors in a single species set of eBird Status
 and Trends products, this function makes a line plot of a single partial
-dependency, with two options for smoothing.
+dependency (PD), with two options for smoothing.
 }
 \examples{
 \dontrun{
 
 # download and load example data
-dl_path <- tempdir()
-sp_path <- download_data("example_data", path = dl_path)
+sp_path <- download_data("example_data")
 pds <- load_pds(sp_path)
 
-# define a spatioremporal extent
-ne_extent <- list(type = "rectangle",
-                  lat.min = 40,
-                  lat.max = 47,
-                  lon.min = -80,
-                  lon.max = -70,
-                  t.min = 0.425,
-                  t.max = 0.475)
+# define a spatiotemporal extent to plot data from
+bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
+e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 
-plot_pds(pd_name = "TIME", pds = pds, st_extent = ne_extent)
+pd_smooth <- plot_pds(pds, predictor = "time", ext = e)
+dplyr::glimpse(pd_smooth)
 
 }
 }

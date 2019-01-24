@@ -115,7 +115,7 @@ summary information (from summary.txt).</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>load_summary</span>(<span class='no'>path</span>)</pre>
+    <pre class="usage"><span class='fu'>load_summary</span>(<span class='no'>path</span>, <span class='kw'>return_sf</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -124,6 +124,11 @@ summary information (from summary.txt).</p>
       <th>path</th>
       <td><p>character; full path to the directory containing single species
 eBird Status and Trends products.</p></td>
+    </tr>
+    <tr>
+      <th>return_sf</th>
+      <td><p>logical; whether to return an sf object of spatial points
+rather then the default data frame.</p></td>
     </tr>
     </table>
     
@@ -136,11 +141,12 @@ centroid.</p>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
 <span class='co'># download example data</span>
-<span class='no'>dl_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/tempfile'>tempdir</a></span>()
-<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='download_data.html'>download_data</a></span>(<span class='st'>"example_data"</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>dl_path</span>)
+<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='download_data.html'>download_data</a></span>(<span class='st'>"example_data"</span>)
 
 <span class='co'># stixel summaries</span>
 <span class='no'>summaries</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>ebirdst</span><span class='kw ns'>:::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/ebirdst/topics/load_summary'>load_summary</a></span>(<span class='no'>sp_path</span>)
+<span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>glimpse</a></span>(<span class='no'>summaries</span>)
+
 <span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

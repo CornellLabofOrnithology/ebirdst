@@ -6,39 +6,56 @@
 #' than the full dataset making these data quicker to download and process.
 #'
 #' @param species character; a single six-letter species code (e.g. rufhum).
-#'   The full list of valid codes is can be viewed in the [runs_w_names] data
+#'   The full list of valid codes is can be viewed in the [ebirdst_runs] data
 #'   frame included in this package. To download the example dataset, use
 #'   "example_data".
 #' @param path character; directory to download the data to. All downloaded
 #'   files will be placed in a sub-directory of this directory named according
-#'   to the unique run ID associated with this species.
+#'   to the unique run ID associated with this species. Defaults to a persistent
+#'   data directory, which can be found by calling
+#'   rappdirs::user_data_dir("ebirdst")).
+#' @param force logical; if the data have already been downloaded, should a
+#'   fresh copy be downloaded anyway.
 #'
 #' @return Path to the run-specific root of the downloaded files.
 #' @export
 #' @examples
 #' \dontrun{
 #'
-#' dl_path <- tempdir()
-#' download_data("example_data", path = dl_path)
+#' download_data("example_data", force = TRUE)
 #'
 #' }
-download_data <- function(species, path) {
+download_data <- function(species,
+                          path = rappdirs::user_data_dir("ebirdst"),
+                          force = FALSE) {
   stopifnot(is.character(species), length(species) == 1)
-  stopifnot(is.character(path), length(path) == 1, dir.exists(path))
+  stopifnot(is.character(path), length(path) == 1)
+  stopifnot(is.logical(force), length(force) == 1)
   species <- tolower(species)
+
+  if (!dir.exists(path)) {
+    dir.create(path, recursive = TRUE)
+  }
 
   # example data or a real run
   if (species == "example_data") {
     bucket_url <- "https://clo-is-da-example-data.s3.amazonaws.com/"
     run <- "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"
   } else {
-    row_id <- which(ebirdst::runs_w_names$SPECIES_CODE == species)
+    row_id <- which(ebirdst::ebirdst_runs$SPECIES_CODE == species)
     if (length(row_id) != 1) {
       stop(sprintf("species = %s does not uniquely identify a species."))
     }
     # presumably this url will change
     bucket_url <- "https://clo-is-da-example-data.s3.amazonaws.com/"
-    run <- ebirdst::runs_w_names$RUN_NAME[row_id]
+    run <- ebirdst::ebirdst_runs$RUN_NAME[row_id]
+  }
+
+  if (dir.exists(file.path(path, run))) {
+    if (!force) {
+      message("Data already exists, use force = TRUE to re-download.")
+      return(invisible(normalizePath(file.path(path, run))))
+    }
   }
 
   # get bucket contents
@@ -89,7 +106,7 @@ download_data <- function(species, path) {
 #'
 #' @param product character; status and trends product to load, options are
 #'   relative abundance, occurrence, and upper and lower bounds on relative
-#'   abundance
+#'   abundance. It is also possible to return a template raster with no data.
 #' @param path character; full path to the directory containing single species
 #'   eBird Status and Trends products.
 #'
@@ -100,96 +117,41 @@ download_data <- function(species, path) {
 #' \dontrun{
 #'
 #' # download example data
-#' dl_path <- tempdir()
-#' sp_path <- download_data("example_data", path = dl_path)
+#' sp_path <- download_data("example_data")
 #'
 #' # load data
 #' load_raster("abundance_umean", sp_path)
 #'
 #' }
 load_raster <- function(product = c("abundance_umean",
-                                     "occurrence_umean",
-                                     "abundance_lower",
-                                     "abundance_upper"),
-                         path) {
+                                    "occurrence_umean",
+                                    "abundance_lower",
+                                    "abundance_upper",
+                                    "template"),
+                        path) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
   product <- match.arg(product)
 
   # find the file
-  tif_path <- list.files(file.path(path, "results", "tifs"),
-                          pattern = paste0("hr_2016_", product, "\\.tif$"),
-                          full.names = TRUE)
+  if (product == "template") {
+    tif_path <- list.files(file.path(path, "data"),
+                           pattern = "srd_raster_template\\.tif$",
+                           full.names = TRUE)
+  } else {
+    tif_path <- list.files(file.path(path, "results", "tifs"),
+                           pattern = paste0("hr_2016_", product, "\\.tif$"),
+                           full.names = TRUE)
+  }
   if (length(tif_path) != 1 || !file.exists(tif_path)) {
     stop(paste("Error locating GeoTIFF file for:", product))
   }
-  return(raster::stack(tif_path))
 
-}
-
-
-#' Projects st_extent lat/lon list to sinusoidal raster Extent
-#'
-#' Internal function that converts the st_extent list used throughout this
-#' package from lat/lon corners to a raster Extent using the same
-#' Sinusoidal projection as the eBird Status and Trends products.
-#'
-#' @param st_extent list; st_extent list with lat/lon coordinates.
-#'
-#' @return A raster Extent in Sinusoidal projection.
-#'
-#' @keywords internal
-#'
-#' @examples
-#' # define st_extent list
-#' ne_extent <- list(type = "rectangle",
-#'                   lat.min = 40,
-#'                   lat.max = 47,
-#'                   lon.min = -80,
-#'                   lon.max = -70,
-#'                   t.min = 0.425,
-#'                   t.max = 0.475)
-#'
-#' # convert
-#' sinu_e <- ebirdst:::get_sinu_ext(ne_extent)
-#' sinu_e
-get_sinu_ext <- function(st_extent) {
-  if(!all(is.na(st_extent))) {
-    if(!is.list(st_extent)) {
-      stop("The st_extent argument must be a list object.")
-    }
-
-    if(!is.null(st_extent$lat.min) & !is.null(st_extent$lat.max)) {
-      if(st_extent$lat.min > st_extent$lat.max) {
-        stop("Minimum latitude is greater than maximum latitude")
-      }
-    } else {
-      stop("Either lat.min or lat.max missing.")
-    }
-
-    if(!is.null(st_extent$lon.min) & !is.null(st_extent$lon.max)) {
-      if(st_extent$lon.min > st_extent$lon.max) {
-        stop("Minimum longitude is greater than maximum longitude")
-      }
-    } else {
-      stop("Either lon.min or lon.max missing.")
-    }
+  # return
+  if (product == "template") {
+    return(raster::raster(tif_path))
+  } else {
+    return(label_raster_stack(raster::stack(tif_path)))
   }
-
-  # projection information
-  ll <- "+init=epsg:4326"
-  sinu <- "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs"
-
-  sp_ext <- raster::extent(st_extent$lon.min,
-                           st_extent$lon.max,
-                           st_extent$lat.min,
-                           st_extent$lat.max)
-  extllr <- raster::raster(ext = sp_ext)
-  extllr[is.na(extllr)] <- 0
-  raster::crs(extllr) <- ll
-
-  extsinur <- raster::projectRaster(extllr, crs = sinu)
-
-  return(raster::extent(extsinur))
 }
 
 
@@ -216,12 +178,8 @@ get_sinu_ext <- function(st_extent) {
 #' \dontrun{
 #'
 #' # download and load example abundance data
-#' dl_path <- tempdir()
-#' sp_path <- download_data("example_data", path = dl_path)
-#' abd_path <- list.files(file.path(sp_path, "results", "tifs"),
-#'                        pattern = "hr_2016_abundance_umean",
-#'                        full.names = TRUE)
-#' abd <- raster::stack(abd_path)
+#' sp_path <- download_data("example_data")
+#' abd <- load_raster("abundance_umean", sp_path)
 #'
 #' # label
 #' abd <- label_raster_stack(abd)
@@ -273,12 +231,8 @@ label_raster_stack <- function(x) {
 #' \dontrun{
 #'
 #' # download and load example abundance data
-#' dl_path <- tempdir()
-#' sp_path <- download_data("example_data", path = dl_path)
-#' abd_path <- list.files(file.path(sp_path, "results", "tifs"),
-#'                        pattern = "hr_2016_abundance_umean",
-#'                        full.names = TRUE)
-#' abd <- raster::stack(abd_path)
+#' sp_path <- download_data("example_data")
+#' abd <- load_raster("abundance_umean", sp_path)
 #'
 #' # label
 #' abd <- label_raster_stack(abd)
@@ -293,421 +247,7 @@ parse_raster_dates <- function(x) {
     stop("Raster names not in correct format, call label_raster_stack() first.")
   }
 
-  dates <- as.Date(gsub("\\.", "-", gsub("X", "", names(x))), "%Y-%m-%d")
-
-  return(dates)
-}
-
-
-#' Spatiotemporal subsetter for eBird Status and Trends products table
-#'
-#' Internal function that takes a data.frame or SpatialPointsDataFrame and
-#' a st_extent list and returns a subset of the data object. Currently
-#' designed to handle either a 'rectangle' as defined by a lat/lon bounding
-#' box or a 'polygon' as defined by a SpatialPolygon* object. The function
-#' will use temporal information if provided. The t.min and t.max objects in
-#' the `st_extent` list are currently able to wrap time around the year
-#' (e.g., t.min = 0.9 and t.max = 0.1 is acceptable).
-#'
-#' @param data data.frame or SpatialPointsDataFrame; originating from results.
-#' @param st_extent list; st_extent list object
-#'
-#' @return Subset of input data as same type.
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#'
-#' # download and load example data
-#' dl_path <- tempdir()
-#' sp_path <- download_data("example_data", path = dl_path)
-#' pis <- load_pis(sp_path)
-#'
-#' # define st_extent list
-#' ne_extent <- list(type = "rectangle",
-#'                   lat.min = 40,
-#'                   lat.max = 47,
-#'                   lon.min = -80,
-#'                   lon.max = -70,
-#'                   t.min = 0.425,
-#'                   t.max = 0.475)
-#'
-#' #subset pis with st_extent list
-#' data_st_subset(data = pis, st_extent = ne_extent)
-#'
-#' }
-data_st_subset <- function(data, st_extent) {
-  # check st_extent object
-  if(!all(is.na(st_extent))) {
-    if(!is.list(st_extent)) {
-      stop("The st_extent argument must be a list object.")
-    }
-
-    if(st_extent$type == "rectangle") {
-      if(is.null(st_extent$lon.max)) {
-        stop("Missing max longitude")
-      } else if(is.null(st_extent$lon.min)) {
-        stop("Missing min longitude")
-      } else if(is.null(st_extent$lat.max)) {
-        stop("Missing max latitude")
-      } else if(is.null(st_extent$lat.min)) {
-        stop("Missing min latitude")
-      }
-
-      if(!is.null(st_extent$lat.min) & !is.null(st_extent$lat.max)) {
-        if(st_extent$lat.min > st_extent$lat.max) {
-          stop("Minimum latitude is greater than maximum latitude")
-        }
-
-        if(st_extent$lat.max < st_extent$lat.min) {
-          stop("Latitude maximum is less than latitude minimum.")
-        }
-      } else {
-        stop("Either lat.min or lat.max missing.")
-      }
-
-      if(!is.null(st_extent$lon.min) & !is.null(st_extent$lon.max)) {
-        if(st_extent$lon.min > st_extent$lon.max) {
-          stop("Minimum longitude is greater than maximum longitude")
-        }
-
-        if(st_extent$lon.max < st_extent$lon.min) {
-          stop("Longitude maximum is less than longitude minimum.")
-        }
-      } else {
-        stop("Either lon.min or lon.max missing.")
-      }
-    } else if(st_extent$type == "polygon") {
-      # check Polygons
-      if(is.null(st_extent$polygon)) {
-        stop("polygon data not present.")
-      }
-    } else {
-      stop(paste("Spatiotemporal extent type not accepted. ",
-                 "Use either 'rectangle' or 'polygon'.",
-                 sep = ""))
-    }
-  } else {
-    stop("st_extent object is empty.")
-  }
-
-  # check to see if the time parts of the extent parameter are there
-  if(is.null(st_extent$t.min) | is.null(st_extent$t.max)) {
-    warning("Temporal information missing or incomplete. This may be intentional.")
-    use_time <- FALSE
-  } else {
-    use_time <- TRUE
-  }
-
-  if(st_extent$type == "rectangle") {
-    if(use_time == TRUE) {
-      if(st_extent$t.min > st_extent$t.max) {
-        subset_data <- data[(data$date > st_extent$t.min |
-                               data$date <= st_extent$t.max) &
-                              data$lat > st_extent$lat.min &
-                              data$lat <= st_extent$lat.max &
-                              data$lon > st_extent$lon.min &
-                              data$lon <= st_extent$lon.max, ]
-      } else {
-        subset_data <- data[data$date > st_extent$t.min &
-                              data$date <= st_extent$t.max &
-                              data$lat > st_extent$lat.min &
-                              data$lat <= st_extent$lat.max &
-                              data$lon > st_extent$lon.min &
-                              data$lon <= st_extent$lon.max, ]
-      }
-    } else {
-      subset_data <- data[data$lat > st_extent$lat.min &
-                            data$lat <= st_extent$lat.max &
-                            data$lon > st_extent$lon.min &
-                            data$lon <= st_extent$lon.max, ]
-    }
-  } else if(st_extent$type == "polygon") {
-    ll_epsg <- "+init=epsg:4326"
-    ll <- "+proj=longlat +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
-
-    # check Polygons
-    if(is.null(st_extent$polygon)) {
-      stop("polygon data not present.")
-    }
-
-    # cast data to SpatialPoints
-    if(is.data.frame(data)) {
-      sites <- sp::SpatialPointsDataFrame(coords = data[, c("lon", "lat")],
-                                          data = data,
-                                          proj4string = sp::CRS(ll_epsg))
-    } else {
-      sites <- data
-    }
-
-    # check prj
-    if(!sp::identicalCRS(sites, st_extent$polygon)) {
-      plygn <- sp::spTransform(st_extent$polygon,
-                               sp::CRS(sp::proj4string(sites)))
-    } else {
-      plygn <- st_extent$polygon
-    }
-
-    # use for subset
-    subset_data <- sites[!is.na(over(sites,
-                                     methods::as(plygn,
-                                                 "SpatialPolygons"))), ]
-
-    if(is.data.frame(data)) {
-      subset_data <- subset_data@data
-    }
-
-    if(use_time == TRUE) {
-      if(st_extent$t.min > st_extent$t.max) {
-        subset_data <- subset_data[(subset_data$date > st_extent$t.min |
-                                      subset_data$date <= st_extent$t.max), ]
-      } else {
-        subset_data <- subset_data[subset_data$date > st_extent$t.min &
-                                     subset_data$date <= st_extent$t.max, ]
-      }
-    }
-  } else {
-    stop(paste("Spatiotemporal extent type not accepted.",
-               "Use either 'rectangle' or 'polygon'."))
-  }
-
-  return(subset_data)
-}
-
-
-#' Spatiotemporal subsetter for eBird Status and Trends products raster
-#'
-#' Internal function that takes a RasterStack or RasterBrick and a st_extent
-#' list and returns a spatiotemporal subset of the data object. Currently
-#' designed to handle either a 'rectangle' as defined by a lat/lon bounding
-#' box or a 'polygon' as defined by a SpatialPolygon* object. The function
-#' will use temporal information if provided. The t.min and t.max objects in
-#' the `st_extent` list are currently able to wrap time around the year
-#' (e.g., t.min = 0.9 and t.max = 0.1 is acceptable). This function will also
-#' returned a date labeled `RasterStack` or `RasterBrick`, so there is no need
-#' to use the [label_raster_stack()] directly if subsetting.
-#'
-#' @param x RasterStack or RasterBrick; one of four GeoTiff files provided
-#'   with results.
-#' @param st_extent list; st_extent list object.
-#'
-#' @return Subset of input data as same type, with layers labeled with dates
-#'   from label_raster_stack().
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#'
-#' # download and load example abundance data
-#' dl_path <- tempdir()
-#' sp_path <- download_data("example_data", path = dl_path)
-#' abd_path <- list.files(file.path(sp_path, "results", "tifs"),
-#'                        pattern = "hr_2016_abundance_umean",
-#'                        full.names = TRUE)
-#' abd <- raster::stack(abd_path)
-#'
-#' # define st_extent list
-#' ne_extent <- list(type = "rectangle",
-#'                   lat.min = 40,
-#'                   lat.max = 47,
-#'                   lon.min = -80,
-#'                   lon.max = -70,
-#'                   t.min = 0.5,
-#'                   t.max = 0.6)
-#'
-#' # subset stack with extent
-#' raster_st_subset(abd, st_extent = ne_extent)
-#'
-#' }
-raster_st_subset <- function(x, st_extent) {
-  stopifnot(inherits(x, "Raster"))
-
-  # check st_extent object
-  if(!all(is.na(st_extent))) {
-    if(!is.list(st_extent)) {
-      stop("The st_extent argument must be a list object.")
-    }
-
-    if(st_extent$type == "rectangle") {
-      if(is.null(st_extent$lon.max)) {
-        stop("Missing max longitude")
-      } else if(is.null(st_extent$lon.min)) {
-        stop("Missing min longitude")
-      } else if(is.null(st_extent$lat.max)) {
-        stop("Missing max latitude")
-      } else if(is.null(st_extent$lat.min)) {
-        stop("Missing min latitude")
-      }
-
-      if(!is.null(st_extent$lat.min) & !is.null(st_extent$lat.max)) {
-        if(st_extent$lat.min > st_extent$lat.max) {
-          stop("Minimum latitude is greater than maximum latitude")
-        }
-
-        if(st_extent$lat.max < st_extent$lat.min) {
-          stop("Latitude maximum is less than latitude minimum.")
-        }
-      } else {
-        stop("Either lat.min or lat.max missing.")
-      }
-
-      if(!is.null(st_extent$lon.min) & !is.null(st_extent$lon.max)) {
-        if(st_extent$lon.min > st_extent$lon.max) {
-          stop("Minimum longitude is greater than maximum longitude")
-        }
-
-        if(st_extent$lon.max < st_extent$lon.min) {
-          stop("Longitude maximum is less than longitude minimum.")
-        }
-      } else {
-        stop("Either lon.min or lon.max missing.")
-      }
-    } else if(st_extent$type == "polygon") {
-      # check Polygons
-      if(is.null(st_extent$polygon)) {
-        stop("polygon data not present.")
-      }
-    } else {
-      stop(paste("Spatiotemporal extent type not accepted. ",
-                 "Use either 'rectangle' or 'polygon'.",
-                 sep = ""))
-    }
-  } else {
-    stop("st_extent object is empty.")
-  }
-
-  if(is.null(st_extent$t.min) | is.null(st_extent$t.max)) {
-    warning("Temporal information missing or incomplete. This may be intentional.")
-    use_time <- FALSE
-  } else {
-    use_time <- TRUE
-  }
-
-  # convert st_extent to sinu
-  if(st_extent$type == "rectangle") {
-    sinu_ext <- get_sinu_ext(st_extent)
-  }
-
-  # check length
-  if((raster::nlayers(x) != 52)) {
-    stop(paste0("The raster_data object must be full stack or brick of 52",
-                " layers as originally provided."))
-  }
-
-  # check names
-  if(length(grep("X2016.", names(x)[1])) == 0) {
-    x <- label_raster_stack(x)
-  }
-
-  # subset stack for time
-  if(use_time == TRUE) {
-    srd_date_vec <- seq(from = 0, to= 1, length = 52 + 1)
-    srd_date_vec <- (srd_date_vec[1:52] + srd_date_vec[2:(52 + 1)]) / 2
-    srd_date_vec <- round(srd_date_vec, digits = 4)
-
-    p_time <- strptime(x = paste(round(srd_date_vec * 366), 2015), "%j %Y")
-    date_names <- paste(formatC(p_time$mon + 1, width = 2, format = "d",
-                                flag = "0"),
-                        formatC(p_time$mday, width = 2, format = "d",
-                                flag = "0"),
-                        sep = "-")
-
-    # select from srd_date_vec where between st_extent$t.min and st_extent$t.max
-    if(st_extent$t.min > st_extent$t.max) {
-      # date wrapping case
-      weeks <- c(which(date_names %in%
-                         date_names[srd_date_vec >= st_extent$t.min]),
-                 which(date_names %in%
-                         date_names[srd_date_vec <= st_extent$t.max]))
-    } else {
-      weeks <- which(date_names %in%
-                       date_names[srd_date_vec >= st_extent$t.min &
-                                    srd_date_vec <= st_extent$t.max])
-    }
-
-    if(length(weeks) < 1) {
-      stop("Time period in st_extent does not included any weeks of the year.")
-    }
-
-    x <- x[[weeks]]
-  }
-
-  # crop
-  if(st_extent$type == "rectangle") {
-    x <- raster::crop(x, sinu_ext)
-  } else if(st_extent$type == "polygon") {
-    ll_epsg <- "+init=epsg:4326"
-    ll <- "+proj=longlat +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
-
-    # check Polygons
-    if(is.null(st_extent$polygon)) {
-      stop("polygon data not present.")
-    }
-
-    # check prj
-    if(!sp::identicalCRS(x, st_extent$polygon)) {
-      plygn <- sp::spTransform(st_extent$polygon,
-                               sp::CRS(sp::proj4string(x)))
-    } else {
-      plygn <- st_extent$polygon
-    }
-
-    raster_data <- raster::trim(raster::mask(raster::crop(x,
-                                                          raster::extent(plygn)),
-                                             plygn),
-                                values = NA)
-  } else {
-    stop(paste("Spatiotemporal extent type not accepted.",
-               "Use either 'rectangle' or 'polygon'."))
-  }
-
-  return(x)
-}
-
-
-#' Config file loader
-#'
-#' Internal function used by load_summary(), load_pis(), and load_pds() to get
-#' configuration variables from eBird Status and Trends products
-#' (from *_config.RData).
-#'
-#' @param path character; full path to the directory containing single species
-#' eBird Status and Trends products.
-#'
-#' @return environment object containing all run parameters.
-#'
-#' @keywords internal
-#'
-#' @examples
-#' \dontrun{
-#'
-#' # download example data
-#' dl_path <- tempdir()
-#' sp_path <- download_data("example_data", path = dl_path)
-#'
-#' # load configuration file
-#' e <- ebirdst:::load_config(sp_path)
-#' e
-#'
-#' }
-load_config <- function(path) {
-  stopifnot(dir.exists(path))
-
-  config_file <- list.files(file.path(path, "data"), pattern = "*_config*",
-                            full.names = TRUE)
-  if (length(config_file) != 1 || !file.exists(config_file)) {
-    stop(paste("*_config.RData file not found.",
-               "Check your paths so that they look like this:",
-               "~/directory/<six_letter_code-ERD2016-PROD-date-uuid>/.",
-               "Make sure you do not change the file structure of the results."))
-  }
-
-  e <- new.env()
-  load(config_file, envir = e)
-
-  return(e)
+  as.Date(names(x), format = "X%Y.%m.%d")
 }
 
 
@@ -718,6 +258,8 @@ load_config <- function(path) {
 #'
 #' @param path character; full path to the directory containing single species
 #'   eBird Status and Trends products.
+#' @param return_sf logical; whether to return an [sf] object of spatial points
+#'   rather then the default data frame.
 #'
 #' @return data.frame containing stixel summary information about each stixel
 #'   centroid.
@@ -728,54 +270,16 @@ load_config <- function(path) {
 #' \dontrun{
 #'
 #' # download example data
-#' dl_path <- tempdir()
-#' sp_path <- download_data("example_data", path = dl_path)
+#' sp_path <- download_data("example_data")
 #'
 #' # stixel summaries
 #' summaries <- ebirdst:::load_summary(sp_path)
+#' dplyr::glimpse(summaries)
+#'
 #' }
-load_summary <- function(path) {
+load_summary <- function(path, return_sf = FALSE) {
   stopifnot(dir.exists(path))
-
-  # load config vars
-  e <- load_config(path)
-
-  # define stixel summary fields
-  train_covariate_means_names <- paste("train.cov.mean",
-                                       e$PREDICTOR_LIST,
-                                       sep = "_")
-  srd_covariate_means_names <- paste("srd.cov.mean",
-                                     e$PREDICTOR_LIST,
-                                     sep = "_")
-  summary_vec_name_vec <- c("srd.n",
-                            "lon",
-                            "lat",
-                            "date",
-                            "stixel_width",
-                            "stixel_height",
-                            "stixel_area",
-                            "train.n",
-                            "positive.ob_n",
-                            "stixel_prevalence",
-                            "mean_non_zero_count",
-                            "binary_Kappa",
-                            "binary_AUC",
-                            "binary.deviance_model",
-                            "binary.deviance_mean",
-                            "binary.deviance_explained",
-                            "pois.deviance_model",
-                            "pois.deviance_mean",
-                            "posi.deviance_explained",
-                            "total_EFFORT_HRS",
-                            "total_EFFORT_DISTANCE_KM",
-                            "total_NUMBER_OBSERVERS",
-                            "train_elevation_mean",
-                            train_covariate_means_names, #k-covariate values
-                            "train_covariate_entropy",
-                            "srd_elevation_mean",
-                            srd_covariate_means_names, #k-covariate values
-                            "srd_covariate_entropy",
-                            "max_time")
+  stopifnot(is.logical(return_sf), length(return_sf) == 1)
 
   stixel_path <- file.path(path, "results", "abund_preds", "unpeeled_folds")
   summary_file <- file.path(stixel_path, "summary.txt")
@@ -784,24 +288,31 @@ load_summary <- function(path) {
     stop(paste0("The file summary.txt does not exist at ", stixel_path))
   }
 
-  summary_vec <- data.table::fread(summary_file, showProgress = FALSE)
-  names(summary_vec)[3] <- "stixel.id"
-  names(summary_vec)[4:ncol(summary_vec)] <- summary_vec_name_vec
+  summary_df <- data.table::fread(summary_file,
+                                  col.names = ebirdst_summary_names,
+                                  #col.names = ebirdst_summary_names_tidy,
+                                  stringsAsFactors = FALSE,
+                                  showProgress = FALSE)
+  summary_df <- summary_df[, c("stixel", "data_type") := NULL]
+  summary_df <- summary_df[!is.na(summary_df$lon), ]
 
-  summary_nona <- summary_vec[!is.na(summary_vec$lon), ]
-  rm(summary_vec, summary_file)
-
-  return(as.data.frame(summary_nona))
+  summary_df <- as.data.frame(summary_df)
+  if (isTRUE(return_sf)) {
+    summary_df <- sf::st_as_sf(summary_df, coords = c("lon", "lat"), crs = 4326)
+  }
+  return(summary_df)
 }
 
 
 #' Load predictor importances for single species eBird Status and Trends products
 #'
 #' Loads the predictor importance data (from pi.txt), joins with stixel summary
-#' data, sets the names from [load_config()], and cleans up the data.frame.
+#' data, sets column names, and cleans up the data.frame.
 #'
 #' @param path character; full path to the directory containing single species
 #'   eBird Status and Trends products.
+#' @param return_sf logical; whether to return an [sf] object of spatial points
+#'   rather then the default data frame.
 #'
 #' @return data.frame containing predictor importance values for each stixel, as
 #'   well as stixel summary information.
@@ -813,19 +324,22 @@ load_summary <- function(path) {
 #' \dontrun{
 #'
 #' # download example data
-#' dl_path <- tempdir()
-#' sp_path <- download_data("example_data", path = dl_path)
+#' sp_path <- download_data("example_data")
 #'
 #' # load predictor importance
 #' pis <- load_pis(sp_path)
+#'
+#' # plot the top 15 predictor importances
+#' # define a spatiotemporal extent to plot data from
+#' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
+#' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
+#' plot_pis(pis, ext = e, n_top_pred = 15, by_cover_class = TRUE)
+#'
 #' }
-load_pis <- function(path) {
+load_pis <- function(path, return_sf = FALSE) {
   stopifnot(dir.exists(path))
+  stopifnot(is.logical(return_sf), length(return_sf) == 1)
 
-  # load config vars
-  e <- load_config(path)
-
-  # load pi.txt and set column names
   stixel_path <- file.path(path, "results", "abund_preds", "unpeeled_folds")
   pi_file <- file.path(stixel_path, "pi.txt")
 
@@ -833,37 +347,48 @@ load_pis <- function(path) {
     stop(paste("The file pi.txt does not exist at:", stixel_path))
   }
 
-  pi_vec <- data.table::fread(pi_file, showProgress = FALSE)
-  names(pi_vec)[4:ncol(pi_vec)] <- e$PI_VARS
-  names(pi_vec)[3] <- "stixel.id"
+  # pi file
+  pi_df <- data.table::fread(pi_file,
+                             col.names = ebirdst_pi_names,
+                             #col.names = ebirdst_pi_names_tidy,
+                             stringsAsFactors = FALSE,
+                             showProgress = FALSE)
+  pi_df <- pi_df[, c("stixel", "data_type") := NULL]
 
-  # get summary file
-  summary_file <- load_summary(path)
+  # summary file
+  summary_df <- load_summary(path)
+  summary_df <- summary_df[, 1:12]
 
   # merge pis with summary
-  pi_summary <- merge(pi_vec, summary_file, by = "stixel.id")
-  rm(pi_vec, summary_file)
+  pi_summary <- dplyr::inner_join(summary_df, pi_df, by = "stixel_id")
 
-  # return subset
-  pi_summary[, c("V1.x", "V2.x", "V1.y", "V2.y") := NULL]
-  pi_summary <- pi_summary[, 1:(length(e$PI_VARS) + 12)]
-
-  return(as.data.frame(pi_summary))
+  pi_summary <- as.data.frame(pi_summary)
+  if (isTRUE(return_sf)) {
+    pi_summary <- sf::st_as_sf(pi_summary, coords = c("lon", "lat"), crs = 4326)
+  }
+  return(pi_summary)
 }
 
 
 #' Load partial dependencies for single species eBird Status and Trends products
 #'
 #' Loads the partial dependency data (from pd.txt), joins with stixel summary
-#' data, sets the names from [load_config()], and cleans up the data.frame.
-#' This is one of the slower functions in the package, due to the size of the
-#' pd.txt file (usually multiple GB).
+#' data, sets the names`, and cleans up the data.frame. This is one of the
+#' slower functions in the package, due to the size of the pd.txt file (usually
+#' multiple GB).
 #'
 #' @param path character; full path to the directory containing single species
 #'   eBird Status and Trends products.
+#' @param return_sf logical; whether to return an [sf] object of spatial points
+#'   rather then the default data frame.
 #'
 #' @return data.frame containing partial dependency values for each stixel, as
-#'   well as stixel summary information.
+#'   well as stixel summary information. To make these data more compact,
+#'   they're stored in a wide format. Each row corresponds to the partial
+#'   dependence relationship of one predictor for a single stixel. There are
+#'   50 columns (x1-x50) at which the partial dependence is measured and 50
+#'   columns (y1-y50) that give the resulting probability of occurrence on the
+#'   logit scale.
 #'
 #' @import data.table
 #' @export
@@ -872,20 +397,22 @@ load_pis <- function(path) {
 #' \dontrun{
 #'
 #' # download example data
-#' dl_path <- tempdir()
-#' sp_path <- download_data("example_data", path = dl_path)
+#' sp_path <- download_data("example_data")
 #'
 #' # load partial dependence
 #' pds <- load_pds(sp_path)
 #'
+#' # plot partial dependence for effort hours
+#' # define a spatiotemporal extent to plot data from
+#' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
+#' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
+#' plot_pds(pds, "effort_hrs", ext = e)
+#'
 #' }
-load_pds <- function(path) {
+load_pds <- function(path, return_sf = FALSE) {
   stopifnot(dir.exists(path))
+  stopifnot(is.logical(return_sf), length(return_sf) == 1)
 
-  # load config vars
-  e <- load_config(path)
-
-  # load pi.txt
   stixel_path <- file.path(path, "results", "abund_preds", "unpeeled_folds")
   pd_file <- file.path(stixel_path, "pd.txt")
 
@@ -894,19 +421,139 @@ load_pds <- function(path) {
   }
 
   # load pd.txt
-  pd_vec <- data.table::fread(pd_file, showProgress = FALSE)
-  names(pd_vec)[3] <- "stixel.id"
+  pd_df <- data.table::fread(pd_file,
+                             col.names = ebirdst_pd_names,
+                             #col.names = ebirdst_pi_names_tidy,
+                             stringsAsFactors = FALSE,
+                             showProgress = FALSE)
+  pd_df <- pd_df[, c("stixel", "data_type", "spacer") := NULL]
 
   # load summary file
-  summary_file <- load_summary(path)
+  summary_df <- load_summary(path)
+  summary_df <- summary_df[, 1:12]
 
   # merge
-  pd_summary <- merge(pd_vec, summary_file, by = c("stixel.id"), all.y = TRUE)
-  rm(pd_vec, summary_file)
+  pd_summary <- dplyr::right_join(pd_df, summary_df, by = "stixel_id")
+  rm(pd_df, summary_df)
 
-  # return a subset of the fields
-  pd_summary[, c("V1.x", "V2.x", "V1.y", "V2.y") := NULL]
-  pd_summary <- pd_summary[, 1:(length(e$PD_VARS) + 28)]
+  pd_summary <- as.data.frame(pd_summary)
+  if (isTRUE(return_sf)) {
+    pd_summary <- sf::st_as_sf(pd_summary, coords = c("lon", "lat"), crs = 4326)
+  }
+  return(pd_summary)
+}
 
-  return(as.data.frame(pd_summary))
+
+#' Raw test data loader
+#'
+#' Internal function used by [load_test_data()] to get the full test data for
+#' calculating predictive performance metrics. This file contains the observed
+#' counts and model predicted relative occurrence and abundance values.
+#'
+#' @param path character; full path to the directory containing single species
+#'   eBird Status and Trends products.
+#' @param return_sf logical; whether to return an [sf] object of spatial points
+#'   rather then the default data frame.
+#'
+#' @return data.frame containing test data, including checklist locations,
+#'   observed counts, and predicted mean and associated error for relative
+#'   occurrence and abundance.
+#'
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#'
+#' # download example data
+#' sp_path <- download_data("example_data")
+#'
+#' # test data
+#' test_data <- ebirdst:::load_test_data_raw(sp_path)
+#' dplyr::glimpse(test_data)
+#'
+#' }
+load_test_data_raw <- function(path, return_sf = FALSE) {
+  stopifnot(dir.exists(path))
+
+  data_path <- file.path(path, "data")
+  td_file <- list.files(data_path,
+                        pattern = "erd\\.test\\.data\\.csv",
+                        full.names = TRUE)
+
+  if (length(td_file) != 1 || !file.exists(td_file)) {
+    stop(paste("Error locating raw test data file at:", data_path))
+  }
+
+  # load pd.txt
+  td_df <- data.table::fread(td_file,
+                             stringsAsFactors = FALSE,
+                             showProgress = FALSE)
+  td_df <- td_df[, "type" := NULL]
+
+  # fix names
+  names(td_df) <- stringr::str_replace_all(stringr::str_to_lower(names(td_df)),
+                                           "\\.", "_")
+  nm_idx <- match(c("longitude", "latitude"), names(td_df))
+  names(td_df)[nm_idx] <- c("lon", "lat")
+
+  td_df <- as.data.frame(td_df)
+  if (isTRUE(return_sf)) {
+    td_df <- sf::st_as_sf(td_df, coords = c("lon", "lat"), crs = 4326)
+  }
+  return(td_df)
+}
+
+
+#' Test data loader
+#'
+#' Internal function used by [compute_ppms()] to get the test data for
+#' calculating predictive performance metrics. This file contains the observed
+#' counts and model predicted relative occurrence and abundance values.
+#'
+#' @param path character; full path to the directory containing single species
+#'   eBird Status and Trends products.
+#' @param return_sf logical; whether to return an [sf] object of spatial points
+#'   rather then the default data frame.
+#'
+#' @return data.frame containing test data, including checklist locations,
+#'   observed counts, and predicted mean and associated error for relative
+#'   occurrence and abundance.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' # download example data
+#' sp_path <- download_data("example_data")
+#'
+#' # test data
+#' test_data <- load_test_data(sp_path)
+#' dplyr::glimpse(test_data)
+#'
+#' }
+load_test_data <- function(path, return_sf = FALSE) {
+  stopifnot(dir.exists(path))
+  stopifnot(is.logical(return_sf), length(return_sf) == 1)
+
+  stixel_path <- file.path(path, "results", "abund_preds", "unpeeled_folds")
+  td_file <- file.path(stixel_path, "test.pred.ave.txt")
+
+  if(!file.exists(td_file)) {
+    stop(paste("The file test.pred.ave.txt does not exist at:", stixel_path))
+  }
+
+  # load pd.txt
+  td_df <- data.table::fread(td_file,
+                             col.names= ebirdst_td_names,
+                             stringsAsFactors = FALSE,
+                             showProgress = FALSE)
+  td_df <- td_df[, "data_type" := NULL]
+
+
+  td_df <- as.data.frame(td_df)
+  if (isTRUE(return_sf)) {
+    td_df <- sf::st_as_sf(td_df, coords = c("lon", "lat"), crs = 4326)
+  }
+  return(td_df)
 }

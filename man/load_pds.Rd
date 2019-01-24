@@ -4,31 +4,44 @@
 \alias{load_pds}
 \title{Load partial dependencies for single species eBird Status and Trends products}
 \usage{
-load_pds(path)
+load_pds(path, return_sf = FALSE)
 }
 \arguments{
 \item{path}{character; full path to the directory containing single species
 eBird Status and Trends products.}
+
+\item{return_sf}{logical; whether to return an \link{sf} object of spatial points
+rather then the default data frame.}
 }
 \value{
 data.frame containing partial dependency values for each stixel, as
-well as stixel summary information.
+well as stixel summary information. To make these data more compact,
+they're stored in a wide format. Each row corresponds to the partial
+dependence relationship of one predictor for a single stixel. There are
+50 columns (x1-x50) at which the partial dependence is measured and 50
+columns (y1-y50) that give the resulting probability of occurrence on the
+logit scale.
 }
 \description{
 Loads the partial dependency data (from pd.txt), joins with stixel summary
-data, sets the names from \code{\link[=load_config]{load_config()}}, and cleans up the data.frame.
-This is one of the slower functions in the package, due to the size of the
-pd.txt file (usually multiple GB).
+data, sets the names`, and cleans up the data.frame. This is one of the
+slower functions in the package, due to the size of the pd.txt file (usually
+multiple GB).
 }
 \examples{
 \dontrun{
 
 # download example data
-dl_path <- tempdir()
-sp_path <- download_data("example_data", path = dl_path)
+sp_path <- download_data("example_data")
 
 # load partial dependence
 pds <- load_pds(sp_path)
+
+# plot partial dependence for effort hours
+# define a spatiotemporal extent to plot data from
+bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
+e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
+plot_pds(pds, "effort_hrs", ext = e)
 
 }
 }

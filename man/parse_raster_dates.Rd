@@ -23,12 +23,8 @@ Date vector.
 \dontrun{
 
 # download and load example abundance data
-dl_path <- tempdir()
-sp_path <- download_data("example_data", path = dl_path)
-abd_path <- list.files(file.path(sp_path, "results", "tifs"),
-                       pattern = "hr_2016_abundance_umean",
-                       full.names = TRUE)
-abd <- raster::stack(abd_path)
+sp_path <- download_data("example_data")
+abd <- load_raster("abundance_umean", sp_path)
 
 # label
 abd <- label_raster_stack(abd)

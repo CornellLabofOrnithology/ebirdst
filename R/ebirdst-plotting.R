@@ -1,26 +1,26 @@
-#' Plot predictor importances as barplots
+#' Plot predictor importances boxplot
 #'
 #' For all of the available predictors in a single set of species eBird
 #' Status and Trends products, this function makes a bar plot of those relative
 #' importances, from highest to lowest. Many function parameters allow for
 #' customized plots.
 #'
-#' @param path character; full path to single species eBird Status and Trends
-#'   products.
-#' @param pis data.frame; predictory importance data rom [load_pis()].
-#' @param st_extent list; `st_extent` list for spatiotemporal filtering.
-#'   Required, as results are less meaningful over large spatiotemporal extents.
-#' @param by_cover_class logical; whether to aggregate FRAGSTATS metrics for the
-#'   land cover classes into single values for the land cover classes.
-#' @param num_top_preds integer; how many predictors to show.
-#' @param return_top logical; wether to returns a vector of the top predictors,
-#'   based on the `num_top_preds` param.
+#' @param pis data.frame; predictor importance data rom [load_pis()].
+#' @param ext [ebirdst_extent] object; the spatiotemporal extent to
+#'   filter the data to. Required, since results are less meaningful over large
+#'   spatiotemporal extents.
+#' @param by_cover_class logical; whether to aggregate the four FRAGSTATS
+#'   metrics for the land cover classes into single values for the land cover
+#'   classes.
+#' @param n_top_pred integer; how many predictors to show.
 #' @param pretty_names logical; whether to convert cryptic land cover codes to
 #'   readable land cover class names.
-#' @param print_plot logical; whether to print plot, to allow only the return
-#'   the top predictors, if desired.
+#' @param plot logical; whether to plot predictor importance or just return top
+#'   predictors.
 #'
-#' @return Plots barplot and/or returns a vector of top predictors.
+#' @return Plots a boxplot of predictor importance and invisibly returns a named
+#'   vector of top predictors, and their median predictor importance, based on
+#'   the `n_top_pred` param.
 #'
 #' @export
 #'
@@ -28,196 +28,143 @@
 #' \dontrun{
 #'
 #' # download and load example data
-#' dl_path <- tempdir()
-#' sp_path <- download_data("example_data", path = dl_path)
+#' sp_path <- download_data("example_data")
 #' pis <- load_pis(sp_path)
 #'
-#' # define a spatioremporal extent
-#' ne_extent <- list(type = "rectangle",
-#'                   lat.min = 40,
-#'                   lat.max = 47,
-#'                   lon.min = -80,
-#'                   lon.max = -70,
-#'                   t.min = 0.425,
-#'                   t.max = 0.475)
+#' # define a spatiotemporal extent to plot data from
+#' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
+#' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #'
-#' plot_pis(path = sp_path, pis = pis, st_extent = ne_extent)
+#' top_pred <- plot_pis(pis, ext = e, by_cover_class = TRUE)
+#' top_pred
 #'
 #' }
-plot_pis <- function(path,
-                     pis,
-                     st_extent,
+plot_pis <- function(pis, ext,
                      by_cover_class = FALSE,
-                     num_top_preds = 50,
-                     return_top = FALSE,
+                     n_top_pred = 50,
                      pretty_names = TRUE,
-                     print_plot = TRUE) {
-  stopifnot(dir.exists(path))
-  e <- load_config(path)
-
-  if(num_top_preds < 2) {
-    stop("num_top_preds must be greater than 1.")
+                     plot = TRUE) {
+  stopifnot(is.data.frame(pis))
+  stopifnot(inherits(ext, "ebirdst_extent"))
+  stopifnot(is.logical(by_cover_class), length(by_cover_class) == 1)
+  stopifnot(is.numeric(n_top_pred), length(n_top_pred) == 1,
+            n_top_pred > 1, n_top_pred <= nrow(ebirdst::ebirdst_predictors))
+  stopifnot(is.logical(pretty_names), length(pretty_names) == 1)
+  stopifnot(is.logical(plot), length(plot) == 1)
+  if (all(c(0, 1) == round(ext$t, 2))) {
+    stop("Must subset temporally, results not meaningful for full year.")
   }
 
-  if(print_plot == FALSE & return_top == FALSE) {
-    stop("Both print and return params are FALSE. Nothing to do!")
-  }
+  # subset
+  pis <- ebirdst_subset(pis, ext = ext)
+  pis <- pis[, ebirdst::ebirdst_predictors$predictor_tidy]
 
-  if(!all(is.na(st_extent))) {
-    if(!is.list(st_extent)) {
-      stop("The st_extent argument must be a list object.")
-    }
-  }
-
-  if(is.null(st_extent$t.min) | is.null(st_extent$t.max)) {
-    stop("Must provide t.min and t.max as part of st_extent for this function.")
-  }
-
-
-  # subset for extent
-  ttt_sub <- data_st_subset(pis, st_extent)
-  ttt <- ttt_sub[, e$PI_VARS]
-  rm(ttt_sub)
-
-  # if aggregating by cover class
-  # aggregate the fragstats into land cover classes
-  if(by_cover_class == TRUE) {
-    land.cover.class.codes <- c(1:10, 12, 13, 16)
-    lc.tag <- "UMD_FS_C"
-
-    water.cover.class.codes <- c(0, 2, 3, 5, 6, 7)
-    wc.tag <- "MODISWATER_FS_C"
-
-    predictor.names <- names(ttt)
-
-    ttt.new <- NULL
-    for (iii.pred in 1:length(land.cover.class.codes)) {
-      new.pred.name <- paste(lc.tag,
-                             land.cover.class.codes[iii.pred],
-                             "_",
-                             sep = "")
-      pred.nindex <- grep(new.pred.name, x = predictor.names)
-
-      if(length(pred.nindex) == 1) {
-        ttt.new <- cbind(ttt.new, ttt[, pred.nindex])
+  # if aggregating by cover class aggregate the fragstats metrics
+  if (isTRUE(by_cover_class)) {
+    # find landcover classes
+    lc <- convert_classes(names(pis), by_cover_class = TRUE,
+                          pretty = pretty_names)
+    lc_groups <- unique(lc)
+    # aggregate over classes
+    m <- matrix(nrow = nrow(pis), ncol = length(lc_groups))
+    colnames(m) <- lc_groups
+    for (i in lc_groups) {
+      if (sum(lc == i) == 1) {
+        m[, i] <- pis[, lc == i]
       } else {
-        ttt.new <- cbind(ttt.new, apply(ttt[, pred.nindex], 1, mean, na.rm=T))
+        m[, i] <- apply(pis[, lc == i], 1, FUN = mean, na.rm = TRUE)
       }
-
-      ttt.new <- as.data.frame(ttt.new)
-      names(ttt.new)[ncol(ttt.new)] <- paste(lc.tag,
-                                             land.cover.class.codes[iii.pred],
-                                             sep="")
     }
-    for (iii.pred in 1:length(water.cover.class.codes)) {
-      new.pred.name <- paste(wc.tag,
-                             water.cover.class.codes[iii.pred],
-                             "_",
-                             sep = "")
-      pred.nindex <- grep(new.pred.name, x = predictor.names)
-
-      if(length(pred.nindex) == 1) {
-        ttt.new <- cbind(ttt.new, ttt[, pred.nindex])
-      } else {
-        ttt.new <- cbind(ttt.new, apply(ttt[, pred.nindex], 1, mean, na.rm=T))
-      }
-
-      ttt.new <- as.data.frame(ttt.new)
-      names(ttt.new)[ncol(ttt.new)] <- paste(wc.tag,
-                                             water.cover.class.codes[iii.pred],
-                                             sep = "")
-    }
-
-    ttt <- ttt.new
-    rm(ttt.new)
+    pis <- as.data.frame(m, stringsAsFactors = FALSE)
+  } else {
+    names(pis) <- convert_classes(names(pis), by_cover_class = FALSE,
+                                  pretty = pretty_names)
   }
 
-  # replace names with readable
-  if(pretty_names == TRUE) {
-    names(ttt) <- convert_classes(names(ttt),
-                                  by_cover_class = by_cover_class,
-                                  pretty = by_cover_class)
-  }
+  # compute median predictor importance across stixels
+  pi_median <- apply(pis, 2, stats::median, na.rm = TRUE)
+  pi_median <- sort(pi_median, decreasing = TRUE)
 
-  # compute median
-  pi_median <- apply(ttt, 2, stats::median, na.rm = T)
-
-  # find the top preds based on function variable num_top_preds
-  top_names <- names(pi_median)[order(pi_median,
-                                      decreasing = T)][1:round(num_top_preds)]
-  rm(pi_median)
+  # find the top preds based on function variable n_top_pred
+  top_names <- names(pi_median)[1:min(round(n_top_pred), length(pi_median))]
   top_names <- stats::na.omit(top_names)
 
   # subset all values based on top_names
-  top_pis <- ttt[, top_names]
+  pis_top <- pis[, top_names]
 
-  # munging and filtering for ggplot
-  pi_stack <- utils::stack(top_pis)
-  rm(top_pis)
+  # gather to long format from wide
+  pis_top <- tidyr::gather(pis_top, "predictor", "pi")
 
-  # PIs have have spurious large values, NAs and NaNs
+  # pis have have spurious large values, NAs and NaNs
   # so clean up, trim, and check for complete cases
-  pi_stack$values[!is.numeric(pi_stack$values)] <- NA
-  pi_stack <- pi_stack[pi_stack$values < stats::quantile(pi_stack$values,
-                                                         probs = c(0.98),
-                                                         na.rm = TRUE), ]
-  pi_stack <- pi_stack[stats::complete.cases(pi_stack), ]
+  pis_top$pi <- as.numeric(pis_top$pi)
+  p98 <- stats::quantile(pis_top$pi, probs = 0.98, na.rm = TRUE)
+  pis_top <- pis_top[pis_top$pi < p98, ]
+  pis_top <- pis_top[stats::complete.cases(pis_top), ]
+  pis_top$predictor <- stats::reorder(pis_top$predictor,
+                                      pis_top$pi,
+                                      FUN = stats::median)
 
   # plot
-  if(print_plot == TRUE) {
-    pi_bars <- ggplot2::ggplot(pi_stack,
-                               ggplot2::aes(stats::reorder(pi_stack$ind,
-                                                           pi_stack$values,
-                                                           FUN = stats::median),
-                                            pi_stack$values)) +
+  if (isTRUE(plot)) {
+    g <- ggplot2::ggplot(pis_top) +
+      ggplot2::aes_string(x = "predictor", y = "pi") +
       ggplot2::geom_boxplot() +
       ggplot2::coord_flip() +
-      ggplot2::labs(y = "Relative PI", x = "") +
+      ggplot2::labs(y = "Relative PI", x = NULL) +
       ggplot2::theme_light()
-    print(pi_bars)
+    print(g)
   }
 
-  if(return_top == TRUE) {
-    return(top_names)
-  }
+  invisible(pi_median[top_names])
 }
 
-#' Plot partial dependency as line plot
+
+#' Plot partial dependency line plots
 #'
 #' For all of the available predictors in a single species set of eBird Status
 #' and Trends products, this function makes a line plot of a single partial
-#' dependency, with two options for smoothing.
+#' dependency (PD), with two options for smoothing.
 #'
-#' @param pd_name character; Single predictor name from PDs (via `load_pds()`).
-#' Unique predictors can be listed by calling `pds <- load_pds(path)` and
-#' then calling `unique(pds$V4)`.
-#' @param pds data.frame; From `load_pds()`.
-#' @param st_extent list; st_extent list for spatiotemporal filtering. Required,
-#' as results are less meaningful over large spatiotemporal extents.
-#' @param plot_quantiles logical; Default is FALSE. Adds a band for the
-#' upper (90th) and lower (10th) quantiles of the individual stixel PD values.
-#' @param pointwise_pi logical; Default is TRUE. A pointwise smoothing of
-#' individual stixel PD values. Ideal visualization of the PD values.
-#' @param stixel_pds logical; Default is FALSE. Toggle to plot the individual
-#' stixel PD values as semi-transparent lines.
-#' @param k.cont.res int; Default is 25. Number of knots to use in GAM based on
-#' continuining resolution of the current eBird Status and Trends products.
-#' @param gbm.n.trees int; Default is 500. Number of trees to use in pointwise
-#' GAM.
-#' @param nnn.bs int; Default is 100.
-#' @param equivalent.ensemble.ss int; Default is 10.
-#' @param ci.alpha numeric; Default is 0.05. Alpha transparency of confidence
-#' intervals.
-#' @param mean.all.data logical; Default is FALSE.
-#' @param ylim vector pair; Opportunity to pre-define plot y-min and y-max as
-#' vector pair (e.g., c(-1, 1)).
-#' @param print_plot logical; Default is TRUE. Set to FALSE to turn off plotting and
-#' only get return of pointwise pi values.
-
+#' @param pds data.frame; partial dependence data from `load_pds()`.
+#' @param predictor character; single predictor name to plot PD for. For a full
+#'   list of predictors, and their associated definitions, see
+#'   [ebirdst_predictors].
+#' @param ext [ebirdst_extent] object; the spatiotemporal extent to
+#'   filter the data to. Required, since results are less meaningful over large
+#'   spatiotemporal extents.
+#' @param bootstrap_smooth logical; the ideal visualization of the PD data is a
+#'   pointwise GAM smoothing of the individual stixel PD values. This argument
+#'   specifies whether this should be done directly on the full PD dataset
+#'   (`bootstrap_smooth = FALSE`) or by subsampling abd bootstrapping. The
+#'   latter approach deals with the randomness in the data and can be more
+#'   efficient for large datasets. Defaults to TRUE.
+#' @param show_stixel_pds logical; whether to plot the individual stixel PD
+#'   values as semi-transparent lines. Defaults to FALSE.
+#' @param show_quantiles logical; adds a band for the upper (90th) and lower
+#'   (10th) quantiles of the individual stixel PD values. These are calculated
+#'   using quantile regression. Defaults to FALSE.
+#' @param n_bs int; number of GAM bootstrap iterations when estimating PD
+#'   confidence intervals. Ignored if `bootstrap_smooth = FALSE`.
+#'   Default is 100.
+#' @param ss_equivalent int; when bootstrapping to estimate PD confidence
+#'   intervals, this argument specifies the size of the subsample of the
+#'   original data. In particular, `ss_equivalent` should be an integer
+#'   representing the equivalent sampling size when averaging this number of PD
+#'   estimates. Defaults to 10.
+#' @param k integer; number of knots to use in the GAM when smooth the PD
+#'   relationship. Default is 25.
+#' @param ci_alpha numeric; alpha level of confidence intervals. Default is
+#'   0.05.
+#' @param gbm_n_trees integer; number of trees to fit in the GBM when estimating
+#'   quantiles. Ignored if `show_quantiles = FALSE`. Default is 500.
+#' @param ylim numeric; 2-element vector to pre-define the y-limits of plotting.
+#'   In the format c(ymin, ymax).
+#' @param plot logical; whether to plot the PD relationships or just return
+#'   data.
 #'
-#' @return Plots barplot and returns a list containing the quantiles
-#' (if plot_quantiles = TRUE) and/or the pointwise_pis upper, lower, and
-#' median (if pointwise_pi = TRUE).
+#' @return Plots the smoothed partial dependence relationship and returns a data
+#' frame of the smoothed curve with confidence intervals.
 #'
 #' @export
 #'
@@ -225,369 +172,238 @@ plot_pis <- function(path,
 #' \dontrun{
 #'
 #' # download and load example data
-#' dl_path <- tempdir()
-#' sp_path <- download_data("example_data", path = dl_path)
+#' sp_path <- download_data("example_data")
 #' pds <- load_pds(sp_path)
 #'
-#' # define a spatioremporal extent
-#' ne_extent <- list(type = "rectangle",
-#'                   lat.min = 40,
-#'                   lat.max = 47,
-#'                   lon.min = -80,
-#'                   lon.max = -70,
-#'                   t.min = 0.425,
-#'                   t.max = 0.475)
+#' # define a spatiotemporal extent to plot data from
+#' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
+#' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #'
-#' plot_pds(pd_name = "TIME", pds = pds, st_extent = ne_extent)
+#' pd_smooth <- plot_pds(pds, predictor = "time", ext = e)
+#' dplyr::glimpse(pd_smooth)
 #'
 #' }
-plot_pds <- function(pd_name,
-                     pds,
-                     st_extent,
-                     plot_quantiles = FALSE,
-                     pointwise_pi = TRUE,
-                     stixel_pds = FALSE,
-                     k.cont.res = 25,
-                     gbm.n.trees = 500,
-                     nnn.bs = 100,
-                     equivalent.ensemble.ss = 10,
-                     ci.alpha = 0.05,
-                     mean.all.data = FALSE,
-                     ylim = NA,
-                     print_plot = TRUE) {
-
-  if(!(pd_name %in% unique(pds$V4))) {
-    stop("Predictor name not in PDs.")
+plot_pds <- function(pds, predictor, ext,
+                     bootstrap_smooth = TRUE,
+                     show_stixel_pds = FALSE,
+                     show_quantiles = FALSE,
+                     n_bs = 100, ss_equivalent = 10, k = 25, ci_alpha = 0.05,
+                     gbm_n_trees = 500,
+                     ylim = NULL,
+                     plot = TRUE) {
+  stopifnot(is.data.frame(pds), "predictor" %in% names(pds))
+  stopifnot(is.character(predictor), length(predictor) == 1)
+  stopifnot(inherits(ext, "ebirdst_extent"))
+  stopifnot(is.logical(bootstrap_smooth), length(bootstrap_smooth) == 1)
+  stopifnot(is.logical(show_stixel_pds), length(show_stixel_pds) == 1)
+  stopifnot(is.logical(show_quantiles), length(show_quantiles) == 1)
+  stopifnot(is.logical(plot), length(plot) == 1, !is.na(plot))
+  stopifnot(is_integer(ss_equivalent), length(ss_equivalent) == 1,
+            ss_equivalent > 0)
+  stopifnot(is_integer(k), length(k) == 1, k > 0)
+  stopifnot(is.numeric(ci_alpha), length(ci_alpha) == 1,
+            ci_alpha > 0, ci_alpha < 0.5)
+  stopifnot(is_integer(gbm_n_trees), length(gbm_n_trees) == 1, gbm_n_trees > 0)
+  stopifnot(is.logical(plot), length(plot) == 1)
+  if (all(c(0, 1) == round(ext$t, 2))) {
+    stop("Must subset temporally, results not meaningful for full year.")
+  }
+  if (!is.null(ylim)) {
+    stopifnot(is.numeric(ylim), length(ylim) == 2, ylim[1] < ylim[2])
   }
 
-  if(plot_quantiles == FALSE & pointwise_pi == FALSE & stixel_pds == FALSE) {
-    stop(paste("Nothing to plot! Change one of the following to TRUE: ",
-               "plot_quantiles, pointwise_pi, or stixel_pds.", sep = ""))
-  }
+  # fixed parameters
+  # defines extent of pd predictions along x-axis
+  # data are trimmed at both ends where they are sparser to avoid edge effects
+  x_tail_level  <- 0.0
 
-  if(!all(is.na(st_extent))) {
-    if(!is.list(st_extent)) {
-      stop("The st_extent argument must be a list object.")
+  # match predictor
+  predictor <- stringr::str_to_lower(predictor)
+  predictor <- stringr::str_replace_all(predictor, "\\.", "_")
+  if (!predictor %in% ebirdst::ebirdst_predictors$predictor_tidy) {
+    stop(paste(predictor, "is not a valid predictor variable."))
+  }
+  predictor_raw <- match(predictor, ebirdst::ebirdst_predictors$predictor_tidy)
+  predictor_raw <- ebirdst::ebirdst_predictors$predictor[predictor_raw]
+  predictor_label <- convert_classes(predictor, pretty = TRUE)
+
+  # subset pd
+  pds <- ebirdst_subset(pds, ext = ext)
+  pds <- pds[pds$predictor == predictor_raw, ]
+  pds <- pds[!is.na(pds$y1), ]
+
+  # transform to long format for plotting
+  x_long <- dplyr::select(pds, .data$stixel_id, dplyr::starts_with("x"))
+  n_preds <- ncol(x_long) - 1
+  x_long <- tidyr::gather(x_long, key = "key", value = "x",
+                          dplyr::starts_with("x"))
+  y_long <- dplyr::select(pds, .data$stixel_id, dplyr::starts_with("y"))
+  y_long <- tidyr::gather(y_long, key = "key", value = "y",
+                          dplyr::starts_with("y"))
+  pd_long <- cbind(x_long[c("stixel_id", "x")], y_long["y"])
+  pd_long <- dplyr::arrange(pd_long, .data$stixel_id, .data$x)
+  rm(x_long, y_long, pds)
+
+  # transform y to be relative to mean
+  pd_long <- dplyr::group_by(pd_long, .data$stixel_id)
+  pd_long <- dplyr::mutate(pd_long, y = .data$y - mean(.data$y, na.rm = TRUE))
+  pd_long <- dplyr::ungroup(pd_long)
+
+  # gam pointwise ci for conditional mean estimate via bootstrapping
+  if (bootstrap_smooth) {
+    # values to predict at for bootstrap iterations
+    trimmed <- stats::quantile(pd_long$x,
+                               probs = c(x_tail_level, 1 - x_tail_level),
+                               na.rm = TRUE)
+    nd <- data.frame(x = seq(from = trimmed[1], to = trimmed[2],
+                             length = n_preds))
+    bs_gam_pred <- matrix(NA, n_preds, n_bs)
+
+    for (i in seq_len(n_bs)) {
+      # use random sample of pd points to account for randomness in x
+      # also reduces computation time
+      # these ci's represent the sampling variation of an ensemble estimate
+      # based on a given number of stixel pd estimates
+
+      sample_freq <- ss_equivalent * n_preds / nrow(pd_long)
+      pd_sample <- dplyr::sample_frac(pd_long, size = sample_freq)
+      s <- mgcv::s
+      pd_gam <- mgcv::gam(y ~ s(x, k = k, bs = "ds", m = 1),
+                          data = pd_sample, gamma = 1.5)
+
+      bs_gam_pred[, i] <- stats::predict(pd_gam, newdata = nd, se = FALSE)
     }
+
+    # summarize bootstrap iterations to calc median and ci's
+    pd_ci <- apply(bs_gam_pred, 1, stats::quantile,
+                   probs = c(0.5, ci_alpha, 1 - ci_alpha),
+                   na.rm = TRUE)
+    pd_ci <- stats::setNames(as.data.frame(t(pd_ci)),
+                             c("pd_median", "pd_lower", "pd_upper"))
+    pd_ci <- cbind(nd, pd_ci)
+    rm(pd_gam, bs_gam_pred)
+  } else {
+    # alternatively, use all the data
+    s <- mgcv::s
+    pd_gam <- mgcv::gam(y ~ s(x, k = k, bs = "ds", m = 1),
+                        data = pd_long, gamma = 1.2)
+
+    # calculate median and ci's
+    pd_ci <- stats::predict(pd_gam, newdata = nd, se = TRUE)
+    pd_ci <- data.frame(pd_median = pd_ci$fit, pd_se = pd_ci$se.fit)
+    pd_ci$pd_lower <- pd_ci$pd_median - 2 * pd_ci$pd_se
+    pd_ci$pd_upper <- pd_ci$pd_median + 2 * pd_ci$pd_se
+    pd_ci <- cbind(nd, pd_ci)
+
+    rm(pd_gam, bs_gam_pred)
   }
 
-  if(is.null(st_extent$t.min) | is.null(st_extent$t.max)) {
-    stop("Must provide t.min and t.max as part of st_extent for this function.")
+  # gbm quantiles
+  gbm_tail_prob <- 0.1
+  gbm_cv_folds <- 0
+  if (isTRUE(show_quantiles)) {
+    gam_ul <- gbm::gbm(y ~ x,
+                       data = pd_long,
+                       distribution = list(name = "quantile",
+                                           alpha = (1 - gbm_tail_prob)),
+                       n.trees = gbm_n_trees,
+                       interaction.depth = 4,
+                       shrinkage = 0.05,
+                       bag.fraction = 0.5,
+                       train.fraction = 1.0,
+                       cv.folds = gbm_cv_folds,
+                       verbose = FALSE,
+                       n.cores = 1)
+
+    gam_ll <- gbm::gbm(y ~ x,
+                       data = pd_long,
+                       distribution = list(name = "quantile",
+                                           alpha = gbm_tail_prob),
+                       n.trees = gbm_n_trees,
+                       interaction.depth = 4,
+                       shrinkage = 0.05,
+                       bag.fraction = 0.5,
+                       train.fraction = 1.0,
+                       cv.folds = gbm_cv_folds,
+                       verbose = FALSE,
+                       n.cores = 1)
+
+    pd_ci$pd_lower_quantile <- suppressWarnings(
+      stats::predict(gam_ll, newdata = nd, n.trees = gbm_n_trees)
+    )
+    pd_ci$pd_upper_quantile <- suppressWarnings(
+      stats::predict(gam_ul, newdata = nd, n.trees = gbm_n_trees)
+    )
+    rm(gam_ul, gam_ll)
   }
 
-  # static variables
-  PD_MAX_RESOLUTION <- 50
-  t.ul <- NULL
-  t.ll <- NULL
-  t.median <- NULL
-  # Defines extent of PD predictions along independent axis
-  # X.tail.level of data are trimmed the both ends where data are sparser.
-  # This avoids edge effects.
-  x.tail.level  <- 0.0
-  # Confidence level for replicate/stixel level prediction Intervals
-  # Because of the relatively small sample sizes I am using 80% PIs
-  gbm.tail.prob <- 0.10  # Tail probabilty [0, 0.49]
-  # Number of CV folds for data driven selection of gbm's n.trees
-  # parameter. Since this doesn't work on my machine I have
-  # take the simpler approach of fixing the n.trees == 200
-  # This seems to work well.
-  gbm.cv.folds <- 0  # >= 5 computational vs statistical efficiecy
-  best.iter <- gbm.n.trees
-  # Number of bootstrap replicasted for Conditional Mean
-  #nnn.bs <- 25
-  # Number of evaluation points on x-axis / indepent var
-  nd.pred.size <- PD_MAX_RESOLUTION
-
-  return_list <- list()
-
-  # subset based on extent
-  pd_vec <- data_st_subset(pds, st_extent)
-
-  rm(pds)
-
-  # Select PD Variable
-  var_pd <- pd_vec[pd_vec$V4 == pd_name, ]
-  rm(pd_vec)
-  # Clean
-  var_pd <- var_pd[!is.na(var_pd$V5), ]
-
-  pd_name <- convert_classes(pd_name, pretty = TRUE)
-
-  # Each Column is one replicate estimate of PD
-  # 	x = x coordinate values
-  # 	y = y coordinate values
-  pd.x <- matrix(NA, PD_MAX_RESOLUTION, nrow(var_pd))
-  pd.y <- matrix(NA, PD_MAX_RESOLUTION, nrow(var_pd))
-  pd.mean <- rep(NA, nrow(var_pd))
-
-  for (rid in 1:nrow(var_pd)) {
-    #rid <- 100
-    pd.x[, rid] <- as.numeric(
-      var_pd[rid, (PD_MAX_RESOLUTION+4):(2*PD_MAX_RESOLUTION+3)])
-    ttt <- as.numeric(var_pd[rid, 3:(PD_MAX_RESOLUTION+2)])
-    pd.mean[rid] <- mean(ttt, na.rm=T)
-    pd.y[, rid] <- ttt - pd.mean[rid]
-  }
-
-  pd.x <- as.data.frame(pd.x)
-  pd.y <- as.data.frame(pd.y)
-  rm(var_pd)
-
-  # Compute Prediction Design for 1D PD
-  ttt <- data.frame(x = utils::stack(pd.x)[,1],
-                    y = utils::stack(pd.y)[,1])
-  nd <- data.frame(x = seq(from = stats::quantile(ttt$x,
-                                                  probs = x.tail.level,
-                                                  na.rm = T),
-                           to = stats::quantile(ttt$x,
-                                                probs = 1 - x.tail.level,
-                                                na.rm = T),
-                           length = nd.pred.size))
-
-  # PLOT STIXEL PD Replicates or just set up plot
-  if(print_plot == TRUE) {
-      if(stixel_pds) {
-        if(all(is.na(ylim))) {
-          ylim <- c(min(pd.y, na.rm = TRUE), max(pd.y, na.rm = TRUE))
-        }
-
-        graphics::matplot(jitter(as.matrix(pd.x), amount = 0.00),
-                          pd.y,
-                          ylim = ylim,
-                          xlab = '',
-                          ylab = "Deviation E(Logit Occurrence)",
-                          type= "l",
-                          lwd = 5,
-                          lty = 1,
-                          col = scales::alpha("black", .025))
+  if (isTRUE(plot)) {
+    # y limits
+    if (is.null(ylim)) {
+      if (show_quantiles) {
+        ylim <- c(min(c(pd_ci$pd_lower, pd_ci$pd_lower_quantile), na.rm = TRUE),
+                  max(c(pd_ci$pd_upper, pd_ci$pd_upper_quantile), na.rm = TRUE))
+      } else {
+        ylim <- c(min(pd_ci$pd_lower, na.rm = TRUE),
+                  max(pd_ci$pd_upper, na.rm = TRUE))
       }
-  }
-
-  # -----------------
-  # GBM Quantiles
-  # -----------------
-  if(plot_quantiles) {
-    ttt <- data.frame(x = utils::stack(pd.x)[,1],
-                      y = utils::stack(pd.y)[,1])
-
-    ttt <- stats::na.omit(ttt)
-
-    d.ul <- gbm::gbm(y ~ x,
-                     data = ttt,
-                     distribution = list(name = "quantile",
-                                         alpha = (1 - gbm.tail.prob)),
-                     n.trees = gbm.n.trees,
-                     interaction.depth = 4,
-                     shrinkage = 0.05,
-                     bag.fraction = 0.5,
-                     train.fraction = 1.0,
-                     cv.folds = gbm.cv.folds,
-                     verbose = FALSE,
-                     n.cores = 1)
-
-    d.ll <- gbm::gbm(y ~ x,
-                     data = ttt,
-                     distribution = list(name = "quantile",
-                                         alpha = gbm.tail.prob),
-                     n.trees = gbm.n.trees,
-                     interaction.depth = 4,
-                     shrinkage = 0.05,
-                     bag.fraction = 0.5,
-                     train.fraction = 1.0,
-                     cv.folds = gbm.cv.folds,
-                     verbose = FALSE,
-                     n.cores = 1)
-
-    t.ul <- stats::predict(d.ul, newdata = nd, n.trees = best.iter)
-    t.ll <- stats::predict(d.ll, newdata = nd, n.trees = best.iter)
-    rm(d.ul, d.ll)
-
-    poly.x <- c(nd[, 1], rev(nd[, 1]))
-    poly.y <- c(t.ll, rev(t.ul))
-
-    if(print_plot == TRUE) {
-
-      if(stixel_pds == FALSE) {
-        qymin <- min(t.ll, na.rm = TRUE)
-        qymax <- max(t.ul, na.rm = TRUE)
-
-        if(all(is.na(ylim))) {
-          ylim <- c(qymin, qymax)
-        }
-
-        plot(pd.x[,1],
-             pd.y[,1],
-             xlab = '',
-             xlim = c(min(nd, na.rm = TRUE), max(nd, na.rm = TRUE)),
-             ylim = ylim,
-             ylab = "Deviation E(Logit Occurrence)",
-             type = "n")
-      }
-
-
-      graphics::polygon(poly.x,
-                        poly.y,
-                        col = scales::alpha("red", 0.25),
-                        border = FALSE)
     }
 
-    quantiles <- list(t.ul = t.ul, t.ll = t.ll)
-    return_list$quantiles <- quantiles
-  }
-
-  # -----------------
-  # GAM Pointwise CI for conditional mean estimate
-  # via bootstrapping
-  # -----------------
-  if(pointwise_pi) {
-    bs.gam.pred <- matrix(NA, nd.pred.size, nnn.bs)
-
-    for (iii.bs in 1:nnn.bs) {
-      # Take Random Sample of evaluation points
-      # to account for randomness in X
-      # and reduces computational time.
-      # E.g. We could do this taking random
-      # sample of replicates and evalution points,
-      # (randomly drawing from rows and columns)
-      # and set the GAM sample size at 500,
-      # or the equivalent sample size when averaging
-      # 10 replicate PD's each evaluated at 50 x-values.
-      #
-      # This suggests a nice interpretation;
-      # these CI's represent the sampling variation
-      # of an ensemble estimate based on a given number
-      # of STIXEL PD replicates.
-      #
-      # equivalent.ensemble.ss <- 10
-      #
-      # Note that the SAME set of rows is used for every
-      # column! This should be changed!
-      # ------
-      # Sample of STIXEL replicates
-      # bs.index <- sample.int(
-      # 	n = nrow(var_pd),
-      # 	size = round(nrow(var_pd)*0.5),
-      # 	replace = T)
-      # replicate.ss <- ceiling(
-      # 	equivalent.ensemble.ss*PD_MAX_RESOLUTION/length(bs.index))
-      # row.index <- sample.int(
-      # 	n = PD_MAX_RESOLUTION,
-      # 	size = replicate.ss,
-      # 	# This sets a constant fraction of available
-      # 	#round(PD_MAX_RESOLUTION*0.25),
-      # 	replace = F)
-
-      rbprob <- equivalent.ensemble.ss * PD_MAX_RESOLUTION/nrow(pd.x)/ncol(pd.x)
-      random.index <-  matrix((stats::rbinom(n = nrow(pd.x) * ncol(pd.x),
-                                             size = 1,
-                                             prob = rbprob) == 1),
-                              nrow(pd.x),
-                              ncol(pd.x))
-
-      ttt <- data.frame(x = pd.x[random.index],
-                        y = pd.y[random.index])
-
-      s = mgcv::s
-      d.gam <- mgcv::gam(y ~ s(x, k = k.cont.res, bs="ds", m=1),
-                         data = ttt,
-                         gamma = 1.5)
-
-      bs.gam.pred[, iii.bs] <- stats::predict(d.gam, newdata = nd, se = FALSE)
-      rm(d.gam)
+    # should stixel relationships be shown
+    if (show_stixel_pds) {
+      g_stix <- ggplot2::geom_line(data = pd_long,
+                                   ggplot2::aes_string(x = "x", y = "y",
+                                                       group = "stixel_id"),
+                                   alpha = 0.2)
+    } else {
+      g_stix <- ggplot2::geom_blank()
     }
 
-    t.ul <- apply(bs.gam.pred,
-                  1,
-                  stats::quantile,
-                  probs = 1 - ci.alpha,
-                  na.rm = TRUE)
-    t.ll <- apply(bs.gam.pred,
-                  1,
-                  stats::quantile,
-                  probs = ci.alpha,
-                  na.rm = TRUE)
-    t.median <- apply(bs.gam.pred,
-                      1,
-                      stats::quantile,
-                      probs = 0.5,
-                      na.rm = TRUE)
-
-    poly.x <- c(nd[, 1], rev(nd[, 1]))
-    poly.y <- c(t.ll, rev(t.ul))
-    if(print_plot == TRUE) {
-
-      if(stixel_pds == FALSE & plot_quantiles == FALSE) {
-        qymin <- min(t.ll, na.rm = TRUE)
-        qymax <- max(t.ul, na.rm = TRUE)
-
-        if(all(is.na(ylim))) {
-          ylim <- c(qymin, qymax)
-        }
-
-        plot(pd.x[,1],
-             pd.y[,1],
-             xlab = '',
-             xlim = c(min(nd, na.rm = TRUE), max(nd, na.rm = TRUE)),
-             ylim = ylim,
-             ylab = "Deviation E(Logit Occurrence)",
-             type = "n")
-      }
-
-
-      graphics::polygon(poly.x,
-                        poly.y,
-                        col = scales::alpha("blue", 0.25),
-                        border = FALSE)
-      graphics::lines(nd[, 1],
-                      t.median,
-                      col = scales::alpha("darkorange", 1.0),
-                      lwd = 2 * graphics::par()$cex)
+    # should quantiles be shown
+    if (show_quantiles) {
+      g_ul <- ggplot2::geom_line(
+        ggplot2::aes_string(x = "x", y = "pd_upper_quantile"),
+        col = "#e41a1c", linetype = "dashed")
+      g_ll <- ggplot2::geom_line(
+        ggplot2::aes_string(x = "x", y = "pd_lower_quantile"),
+        col = "#e41a1c", linetype = "dashed")
+    } else {
+      g_ul <- ggplot2::geom_blank()
+      g_ll <- ggplot2::geom_blank()
     }
 
-    pointwise <- list(t.median = t.median, t.ul = t.ul, t.ll = t.ll)
-    return_list$pointwise <- pointwise
+    # main plot
+    g <- ggplot2::ggplot(pd_ci) +
+      ggplot2::aes_string(x = "x", y = "pd_median") +
+      ggplot2::geom_hline(yintercept = 0, lwd = 0.5, col = "#000000") +
+      g_stix +
+      # confidence intervals
+      ggplot2::geom_ribbon(ggplot2::aes_string(ymin = "pd_lower",
+                                               ymax = "pd_upper"),
+                           fill = "#a7dBd8", alpha = 0.5) +
+      # quantiles
+      g_ul +
+      g_ll +
+      # smoothed line
+      ggplot2::geom_line(col = "#fa6900", lwd = 1.5) +
+      ggplot2::ylim(ylim) +
+      ggplot2::labs(x = NULL, y = "Deviation E(Logit Occurrence)",
+                    title = predictor_label) +
+      ggplot2::theme_light()
+
+    suppressWarnings(print(g))
   }
 
-  # GAM CONDITIONAL MEAN - ALL DATA
-  if(mean.all.data) {
-    ttt <- data.frame(x = utils::stack(pd.x)[, 1],
-                      y = utils::stack(pd.y)[, 1])
-
-    d.gam <- mgcv::gam(y ~ s(x, k = k.cont.res, bs="ds", m=1),
-                       data = ttt,
-                       gamma = 1.5)
-
-    p.gam <- stats::predict(d.gam, newdata = nd, se = TRUE)
-    rm(d.gam)
-
-    if(print_plot == TRUE) {
-      graphics::polygon(x = c(nd[, 1], rev(nd[, 1])),
-                        y = c(p.gam$fit + 2 * p.gam$se.fit,
-                              rev(p.gam$fit - 2 * p.gam$se.fit)),
-                        col = scales::alpha("lightblue", 0.25),
-                        border = NA)
-      graphics::lines(nd[, 1],
-                      p.gam$fit,
-                      col = scales::alpha("yellow", 0.75),
-                      lwd = 2 * graphics::par()$cex)
-    }
-  }
-
-  if(print_plot == TRUE) {
-    graphics::title(pd_name, line = -2)
-    graphics::abline(0, 0, col="black", lwd = 3 * graphics::par()$cex)
-  }
-
-
-  return(return_list)
+  invisible(pd_ci)
 }
+
 
 #' Converts cryptic cover class names to readable land cover names
 #'
 #' Internal function that converts the cryptic predictor class names to
 #' readable land cover names.
 #'
-#' @param cov_names character; vector of cover class names to convert.
+#' @param x character; vector of land cover variable names to convert.
 #' @param by_cover_class logical; whether to replace FRAGSTATS cover class name
 #'   with a name for the cover class as whole.
 #' @param pretty logical; whether to convert from capital case to title case.
@@ -597,62 +413,34 @@ plot_pds <- function(pd_name,
 #' @keywords internal
 #'
 #' @examples
-#' cns <- c("UMD_FS_C1_1500_PLAND", "MODISWATER_FS_C7_1500_LPI")
-#' converted <- ebirdst:::convert_classes(cov_names = cns, pretty = TRUE)
-convert_classes <- function(cov_names,
-                            by_cover_class = FALSE,
-                            pretty = FALSE) {
+#' predictors <- c("UMD_FS_C1_1500_PLAND", "MODISWATER_FS_C7_1500_LPI", "ELEV")
+#' ebirdst:::convert_classes(predictors, pretty = TRUE)
+convert_classes <- function(x, by_cover_class = FALSE, pretty = FALSE) {
+  stopifnot(is.character(x))
+  stopifnot(is.logical(by_cover_class), length(by_cover_class) == 1)
+  stopifnot(is.logical(pretty), length(pretty) == 1)
 
-  if(by_cover_class == TRUE) {
-    ending <- ""
+  x <- stringr::str_replace_all(stringr::str_to_lower(x), "\\.", "_")
+  idx <- match(x, ebirdst::ebirdst_predictors$predictor_tidy)
+
+  if (isTRUE(by_cover_class)) {
+    if (isTRUE(pretty)) {
+      y <- dplyr::coalesce(ebirdst::ebirdst_predictors$lc_class_label[idx], x)
+    } else {
+      y <- dplyr::coalesce(ebirdst::ebirdst_predictors$lc_class[idx],
+                           ebirdst::ebirdst_predictors$predictor_tidy[idx],
+                           x)
+    }
   } else {
-    ending <- "_"
+    if (isTRUE(pretty)) {
+      y <- dplyr::coalesce(ebirdst::ebirdst_predictors$predictor_label[idx], x)
+    } else {
+      y <- dplyr::coalesce(ebirdst::ebirdst_predictors$predictor_tidy[idx], x)
+    }
   }
+  return(y)
+}
 
-  # subset to cover classes
-  land.cover.class.codes <- c(1:10, 12, 13, 16)
-  lc.tag <- "UMD_FS_C"
-  land_covers <- paste(lc.tag, land.cover.class.codes, ending, sep = "")
-
-  water.cover.class.codes <- c(0, 2, 3, 5, 6, 7)
-  wc.tag <- "MODISWATER_FS_C"
-  water_covers <- paste(wc.tag, water.cover.class.codes, ending, sep = "")
-
-  both_covers <- c(land_covers, water_covers)
-
-  land_cover_names <- c("EVERGREEN_NEEDLELEAF_FOREST",
-                        "EVERGREEN_BROADLEAF_FOREST",
-                        "DECIDUOUS_NEEDLELEAF_FOREST",
-                        "DECIDUOUS_BROADLEAF_FOREST",
-                        "MIXED_FOREST",
-                        "CLOSED_SHRUBLANDS",
-                        "OPEN_SHRUBLANDS",
-                        "WOODY_SAVANNAS",
-                        "SAVANNAS",
-                        "GRASSLANDS",
-                        "CROPLANDS",
-                        "URBAN",
-                        "BARREN")
-
-  water_cover_names <- c("SHALLOW_OCEAN", "OCEAN_COASTLINES_AND_LAKE_SHORES",
-                         "SHALLOW_INLAND_WATER", "DEEP_INLAND_WATER",
-                         "MODERATE_OCEAN", "DEEP_OCEAN")
-
-  both_names <- paste(c(land_cover_names, water_cover_names), ending, sep = "")
-
-  converted <- c()
-  for(n in cov_names) {
-    a <- both_covers[which(!is.na(pmatch(both_covers, n)))]
-    b <- both_names[which(!is.na(pmatch(both_covers, n)))]
-
-    conv <- ifelse(length(a) > 0, stringr::str_replace_all(n, a, b), n)
-    converted <- c(converted, conv)
-  }
-
-  if(pretty == TRUE) {
-    converted <- lettercase::str_title_case(
-      lettercase::str_lower_case(converted))
-  }
-
-  return(converted)
+is_integer <- function(x) {
+  is.integer(x) || (is.numeric(x) && all(x == as.integer(x)))
 }

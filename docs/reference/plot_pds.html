@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot partial dependency as line plot — plot_pds • ebirdst</title>
+<title>Plot partial dependency line plots — plot_pds • ebirdst</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,11 +30,11 @@
 
 
 
-<meta property="og:title" content="Plot partial dependency as line plot — plot_pds" />
+<meta property="og:title" content="Plot partial dependency line plots — plot_pds" />
 
 <meta property="og:description" content="For all of the available predictors in a single species set of eBird Status
 and Trends products, this function makes a line plot of a single partial
-dependency, with two options for smoothing." />
+dependency (PD), with two options for smoothing." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -104,7 +104,7 @@ dependency, with two options for smoothing." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot partial dependency as line plot</h1>
+    <h1>Plot partial dependency line plots</h1>
     <small class="dont-index">Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/R/ebirdst-plotting.R'><code>R/ebirdst-plotting.R</code></a></small>
     <div class="hidden name"><code>plot_pds.Rd</code></div>
     </div>
@@ -113,112 +113,113 @@ dependency, with two options for smoothing." />
     
     <p>For all of the available predictors in a single species set of eBird Status
 and Trends products, this function makes a line plot of a single partial
-dependency, with two options for smoothing.</p>
+dependency (PD), with two options for smoothing.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>plot_pds</span>(<span class='no'>pd_name</span>, <span class='no'>pds</span>, <span class='no'>st_extent</span>, <span class='kw'>plot_quantiles</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>pointwise_pi</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>stixel_pds</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>k.cont.res</span> <span class='kw'>=</span> <span class='fl'>25</span>,
-  <span class='kw'>gbm.n.trees</span> <span class='kw'>=</span> <span class='fl'>500</span>, <span class='kw'>nnn.bs</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>equivalent.ensemble.ss</span> <span class='kw'>=</span> <span class='fl'>10</span>,
-  <span class='kw'>ci.alpha</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>mean.all.data</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>ylim</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>print_plot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>plot_pds</span>(<span class='no'>pds</span>, <span class='no'>predictor</span>, <span class='no'>ext</span>, <span class='kw'>bootstrap_smooth</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>show_stixel_pds</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>show_quantiles</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>n_bs</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='kw'>ss_equivalent</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>25</span>, <span class='kw'>ci_alpha</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>gbm_n_trees</span> <span class='kw'>=</span> <span class='fl'>500</span>,
+  <span class='kw'>ylim</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>pd_name</th>
-      <td><p>character; Single predictor name from PDs (via <code><a href='load_pds.html'>load_pds()</a></code>).
-Unique predictors can be listed by calling <code>pds &lt;- load_pds(path)</code> and
-then calling <code><a href='https://www.rdocumentation.org/packages/base/topics/unique'>unique(pds$V4)</a></code>.</p></td>
-    </tr>
-    <tr>
       <th>pds</th>
-      <td><p>data.frame; From <code><a href='load_pds.html'>load_pds()</a></code>.</p></td>
+      <td><p>data.frame; partial dependence data from <code><a href='load_pds.html'>load_pds()</a></code>.</p></td>
     </tr>
     <tr>
-      <th>st_extent</th>
-      <td><p>list; st_extent list for spatiotemporal filtering. Required,
-as results are less meaningful over large spatiotemporal extents.</p></td>
+      <th>predictor</th>
+      <td><p>character; single predictor name to plot PD for. For a full
+list of predictors, and their associated definitions, see
+<a href='ebirdst_predictors.html'>ebirdst_predictors</a>.</p></td>
     </tr>
     <tr>
-      <th>plot_quantiles</th>
-      <td><p>logical; Default is FALSE. Adds a band for the
-upper (90th) and lower (10th) quantiles of the individual stixel PD values.</p></td>
+      <th>ext</th>
+      <td><p><a href='ebirdst_extent.html'>ebirdst_extent</a> object; the spatiotemporal extent to
+filter the data to. Required, since results are less meaningful over large
+spatiotemporal extents.</p></td>
     </tr>
     <tr>
-      <th>pointwise_pi</th>
-      <td><p>logical; Default is TRUE. A pointwise smoothing of
-individual stixel PD values. Ideal visualization of the PD values.</p></td>
+      <th>bootstrap_smooth</th>
+      <td><p>logical; the ideal visualization of the PD data is a
+pointwise GAM smoothing of the individual stixel PD values. This argument
+specifies whether this should be done directly on the full PD dataset
+(<code>bootstrap_smooth = FALSE</code>) or by subsampling abd bootstrapping. The
+latter approach deals with the randomness in the data and can be more
+efficient for large datasets. Defaults to TRUE.</p></td>
     </tr>
     <tr>
-      <th>stixel_pds</th>
-      <td><p>logical; Default is FALSE. Toggle to plot the individual
-stixel PD values as semi-transparent lines.</p></td>
+      <th>show_stixel_pds</th>
+      <td><p>logical; whether to plot the individual stixel PD
+values as semi-transparent lines. Defaults to FALSE.</p></td>
     </tr>
     <tr>
-      <th>k.cont.res</th>
-      <td><p>int; Default is 25. Number of knots to use in GAM based on
-continuining resolution of the current eBird Status and Trends products.</p></td>
+      <th>show_quantiles</th>
+      <td><p>logical; adds a band for the upper (90th) and lower
+(10th) quantiles of the individual stixel PD values. These are calculated
+using quantile regression. Defaults to FALSE.</p></td>
     </tr>
     <tr>
-      <th>gbm.n.trees</th>
-      <td><p>int; Default is 500. Number of trees to use in pointwise
-GAM.</p></td>
+      <th>n_bs</th>
+      <td><p>int; number of GAM bootstrap iterations when estimating PD
+confidence intervals. Ignored if <code>bootstrap_smooth = FALSE</code>.
+Default is 100.</p></td>
     </tr>
     <tr>
-      <th>nnn.bs</th>
-      <td><p>int; Default is 100.</p></td>
+      <th>ss_equivalent</th>
+      <td><p>int; when bootstrapping to estimate PD confidence
+intervals, this argument specifies the size of the subsample of the
+original data. In particular, <code>ss_equivalent</code> should be an integer
+representing the equivalent sampling size when averaging this number of PD
+estimates. Defaults to 10.</p></td>
     </tr>
     <tr>
-      <th>equivalent.ensemble.ss</th>
-      <td><p>int; Default is 10.</p></td>
+      <th>k</th>
+      <td><p>integer; number of knots to use in the GAM when smooth the PD
+relationship. Default is 25.</p></td>
     </tr>
     <tr>
-      <th>ci.alpha</th>
-      <td><p>numeric; Default is 0.05. Alpha transparency of confidence
-intervals.</p></td>
+      <th>ci_alpha</th>
+      <td><p>numeric; alpha level of confidence intervals. Default is
+0.05.</p></td>
     </tr>
     <tr>
-      <th>mean.all.data</th>
-      <td><p>logical; Default is FALSE.</p></td>
+      <th>gbm_n_trees</th>
+      <td><p>integer; number of trees to fit in the GBM when estimating
+quantiles. Ignored if <code>show_quantiles = FALSE</code>. Default is 500.</p></td>
     </tr>
     <tr>
       <th>ylim</th>
-      <td><p>vector pair; Opportunity to pre-define plot y-min and y-max as
-vector pair (e.g., c(-1, 1)).</p></td>
+      <td><p>numeric; 2-element vector to pre-define the y-limits of plotting.
+In the format c(ymin, ymax).</p></td>
     </tr>
     <tr>
-      <th>print_plot</th>
-      <td><p>logical; Default is TRUE. Set to FALSE to turn off plotting and
-only get return of pointwise pi values.</p></td>
+      <th>plot</th>
+      <td><p>logical; whether to plot the PD relationships or just return
+data.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Plots barplot and returns a list containing the quantiles
-(if plot_quantiles = TRUE) and/or the pointwise_pis upper, lower, and
-median (if pointwise_pi = TRUE).</p>
+    <p>Plots the smoothed partial dependence relationship and returns a data
+frame of the smoothed curve with confidence intervals.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
 <span class='co'># download and load example data</span>
-<span class='no'>dl_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/tempfile'>tempdir</a></span>()
-<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='download_data.html'>download_data</a></span>(<span class='st'>"example_data"</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>dl_path</span>)
+<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='download_data.html'>download_data</a></span>(<span class='st'>"example_data"</span>)
 <span class='no'>pds</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='load_pds.html'>load_pds</a></span>(<span class='no'>sp_path</span>)
 
-<span class='co'># define a spatioremporal extent</span>
-<span class='no'>ne_extent</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"rectangle"</span>,
-                  <span class='kw'>lat.min</span> <span class='kw'>=</span> <span class='fl'>40</span>,
-                  <span class='kw'>lat.max</span> <span class='kw'>=</span> <span class='fl'>47</span>,
-                  <span class='kw'>lon.min</span> <span class='kw'>=</span> -<span class='fl'>80</span>,
-                  <span class='kw'>lon.max</span> <span class='kw'>=</span> -<span class='fl'>70</span>,
-                  <span class='kw'>t.min</span> <span class='kw'>=</span> <span class='fl'>0.425</span>,
-                  <span class='kw'>t.max</span> <span class='kw'>=</span> <span class='fl'>0.475</span>)
+<span class='co'># define a spatiotemporal extent to plot data from</span>
+<span class='no'>bb_vec</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='kw'>xmin</span> <span class='kw'>=</span> -<span class='fl'>86.6</span>, <span class='kw'>xmax</span> <span class='kw'>=</span> -<span class='fl'>82.2</span>, <span class='kw'>ymin</span> <span class='kw'>=</span> <span class='fl'>41.5</span>, <span class='kw'>ymax</span> <span class='kw'>=</span> <span class='fl'>43.5</span>)
+<span class='no'>e</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_extent.html'>ebirdst_extent</a></span>(<span class='no'>bb_vec</span>, <span class='kw'>t</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"05-01"</span>, <span class='st'>"05-31"</span>))
 
-<span class='fu'>plot_pds</span>(<span class='kw'>pd_name</span> <span class='kw'>=</span> <span class='st'>"TIME"</span>, <span class='kw'>pds</span> <span class='kw'>=</span> <span class='no'>pds</span>, <span class='kw'>st_extent</span> <span class='kw'>=</span> <span class='no'>ne_extent</span>)
+<span class='no'>pd_smooth</span> <span class='kw'>&lt;-</span> <span class='fu'>plot_pds</span>(<span class='no'>pds</span>, <span class='kw'>predictor</span> <span class='kw'>=</span> <span class='st'>"time"</span>, <span class='kw'>ext</span> <span class='kw'>=</span> <span class='no'>e</span>)
+<span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>glimpse</a></span>(<span class='no'>pd_smooth</span>)
 
 <span class='co'># }</span></pre>
   </div>

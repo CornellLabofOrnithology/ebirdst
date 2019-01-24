@@ -4,11 +4,14 @@
 \alias{load_pis}
 \title{Load predictor importances for single species eBird Status and Trends products}
 \usage{
-load_pis(path)
+load_pis(path, return_sf = FALSE)
 }
 \arguments{
 \item{path}{character; full path to the directory containing single species
 eBird Status and Trends products.}
+
+\item{return_sf}{logical; whether to return an \link{sf} object of spatial points
+rather then the default data frame.}
 }
 \value{
 data.frame containing predictor importance values for each stixel, as
@@ -16,16 +19,22 @@ well as stixel summary information.
 }
 \description{
 Loads the predictor importance data (from pi.txt), joins with stixel summary
-data, sets the names from \code{\link[=load_config]{load_config()}}, and cleans up the data.frame.
+data, sets column names, and cleans up the data.frame.
 }
 \examples{
 \dontrun{
 
 # download example data
-dl_path <- tempdir()
-sp_path <- download_data("example_data", path = dl_path)
+sp_path <- download_data("example_data")
 
 # load predictor importance
 pis <- load_pis(sp_path)
+
+# plot the top 15 predictor importances
+# define a spatiotemporal extent to plot data from
+bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
+e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
+plot_pis(pis, ext = e, n_top_pred = 15, by_cover_class = TRUE)
+
 }
 }
