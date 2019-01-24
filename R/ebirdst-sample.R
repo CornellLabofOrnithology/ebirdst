@@ -141,7 +141,7 @@ sample_case_control.sf <- function(x, res, t_res, n = 1, replace = FALSE,
 
   # spit into presence and absence
   x$row_id <- seq_len(nrow(x))
-  x_split <- split(x, ifelse(x$obs > 1, "pres", "abs"))
+  x_split <- split(x, ifelse(x$obs > 0, "pres", "abs"))
 
   # sample indedendently
   for (i_pa in names(x_split)) {
