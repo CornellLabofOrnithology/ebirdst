@@ -4,39 +4,45 @@
 \alias{compute_ppms}
 \title{Computes the Predictive Performance Metrics for a spatiotemporal extent}
 \usage{
-compute_ppms(path, st_extent = NA)
+compute_ppms(path, ext)
 }
 \arguments{
-\item{path}{character; Full path to single species eBird Status and Trends products.}
+\item{path}{character; full path to directory containing the eBird Status and
+Trends products for a single species.}
 
-\item{st_extent}{list; st_extent list for spatiotemporal filtering.}
+\item{ext}{\link{ebirdst_extent} object (optional); the spatiotemporal extent to
+filter the data to.}
 }
 \value{
-list of data.frames: binary_stats, occ_stats, count_stats
+A list of three data frames: \code{binary_ppms}, \code{occ_ppms}, and
+\code{abd_ppms}. These data frames have 25 rows corresponding to 25 Monte Carlo
+iterations each estimating the PPMs using a spatiotemporal subsample of the
+test data. Columns correspond to the different PPMS. \code{binary_ppms} contains
+binary or range-based PPMS, \code{occ_ppms} contains within-range occupancy
+probability PPMS, and \code{abd_ppms} contains within-range abundance PPMs. In
+some cases, PPMs may be missing, either because there isn't a large enough
+test set within the spatiotemporal extent or because average occurrence or
+abundance is too low. In these cases, try increasing the size of the
+\link{ebirdst_extent} object.
 }
 \description{
 Loads test data and ensemble support values and then calculates the
-predictive performance metrics within a spatiotemporal extent defined by
-\code{st_extent}. Use this function directly to access the computed metrics, or
-use \code{plot_all_ppms()} or \code{plot_binary_by_time()} to summarize the metrics.
+predictive performance metrics (PPMs) within a spatiotemporal extent defined by an
+\link{ebirdst_extent} object. Use this function directly to access the computed
+metrics, or use \code{plot_all_ppms()} or \code{plot_binary_by_time()} to summarize the
+metrics.
 }
 \examples{
 \dontrun{
 
-# download example data
-dl_path <- tempdir()
-sp_path <- download_data("example_data", path = dl_path)
+# download and load example data
+sp_path <- download_data("example_data")
 
-# define a spatioremporal extent
-ne_extent <- list(type = "rectangle",
-                  lat.min = 40,
-                  lat.max = 47,
-                  lon.min = -80,
-                  lon.max = -70,
-                  t.min = 0.425,
-                  t.max = 0.475)
+# define a spatiotemporal extent to plot
+bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
+e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 
-ppms <- compute_ppms(path = sp_path, st_extent = ne_extent)
+ppms <- compute_ppms(path = sp_path, ext = e)
 
 }
 }

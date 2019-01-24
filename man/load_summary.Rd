@@ -4,11 +4,14 @@
 \alias{load_summary}
 \title{Stixel summary file loader}
 \usage{
-load_summary(path)
+load_summary(path, return_sf = FALSE)
 }
 \arguments{
 \item{path}{character; full path to the directory containing single species
 eBird Status and Trends products.}
+
+\item{return_sf}{logical; whether to return an \link{sf} object of spatial points
+rather then the default data frame.}
 }
 \value{
 data.frame containing stixel summary information about each stixel
@@ -22,11 +25,12 @@ summary information (from summary.txt).
 \dontrun{
 
 # download example data
-dl_path <- tempdir()
-sp_path <- download_data("example_data", path = dl_path)
+sp_path <- download_data("example_data")
 
 # stixel summaries
 summaries <- ebirdst:::load_summary(sp_path)
+dplyr::glimpse(summaries)
+
 }
 }
 \keyword{internal}

@@ -119,7 +119,8 @@ than the full dataset making these data quicker to download and process.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>download_data</span>(<span class='no'>species</span>, <span class='no'>path</span>)</pre>
+    <pre class="usage"><span class='fu'>download_data</span>(<span class='no'>species</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='kw pkg'>rappdirs</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/rappdirs/topics/user_data_dir'>user_data_dir</a></span>(<span class='st'>"ebirdst"</span>),
+  <span class='kw'>force</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -127,7 +128,7 @@ than the full dataset making these data quicker to download and process.</p>
     <tr>
       <th>species</th>
       <td><p>character; a single six-letter species code (e.g. rufhum).
-The full list of valid codes is can be viewed in the <a href='runs_w_names.html'>runs_w_names</a> data
+The full list of valid codes is can be viewed in the <a href='ebirdst_runs.html'>ebirdst_runs</a> data
 frame included in this package. To download the example dataset, use
 "example_data".</p></td>
     </tr>
@@ -135,7 +136,14 @@ frame included in this package. To download the example dataset, use
       <th>path</th>
       <td><p>character; directory to download the data to. All downloaded
 files will be placed in a sub-directory of this directory named according
-to the unique run ID associated with this species.</p></td>
+to the unique run ID associated with this species. Defaults to a persistent
+data directory, which can be found by calling
+rappdirs::user_data_dir("ebirdst")).</p></td>
+    </tr>
+    <tr>
+      <th>force</th>
+      <td><p>logical; if the data have already been downloaded, should a
+fresh copy be downloaded anyway.</p></td>
     </tr>
     </table>
     
@@ -146,8 +154,7 @@ to the unique run ID associated with this species.</p></td>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='no'>dl_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/tempfile'>tempdir</a></span>()
-<span class='fu'>download_data</span>(<span class='st'>"example_data"</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>dl_path</span>)
+<span class='fu'>download_data</span>(<span class='st'>"example_data"</span>, <span class='kw'>force</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='co'># }</span></pre>
   </div>

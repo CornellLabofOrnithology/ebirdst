@@ -21,9 +21,7 @@ knitr::opts_chunk$set(warning = FALSE,
                       fig.width = 7, 
                       fig.align = "center")
 # only build vignettes local and not for R CMD check
-is_check <- ("CheckExEnv" %in% search()) || 
-  any(c("_R_CHECK_TIMINGS_", "_R_CHECK_LICENSE_") %in% names(Sys.getenv()))
-knitr::opts_chunk$set(eval = nzchar(Sys.getenv("BUILD_VIGNETTES")) && !is_check)
+knitr::opts_chunk$set(eval = nzchar(Sys.getenv("BUILD_VIGNETTES")))
 ```
 
 # Outline
@@ -50,6 +48,7 @@ library(smoothr)
 library(rnaturalearth)
 library(dplyr)
 library(tidyr)
+library(stringr)
 library(ggplot2)
 # resolve namespace conflicts
 select <- dplyr::select
@@ -62,12 +61,10 @@ Before we do anything else, we'll need to download and load the example abundanc
 ```{r st-download}
 # download to a temp directory for the vigette
 # in practice, change to permanent directory the status and trends downloads
-dl_path <- tempdir()
-sp_path <- download_data(species = "example_data", path = dl_path)
+sp_path <- download_data(species = "example_data")
 # load the abundance data
-abd <- load_raster("abundance_umean", path = sp_path) %>% 
-  # label the raster layers with their corresponding dates
-  label_raster_stack()
+# this automaticaaly labels layers with their dates
+abd <- load_raster("abundance_umean", path = sp_path)
 ```
 
 The abundance data now consist of a `RasterStack` object with 52 layers, each corresponding to the relative abundance for a single week.
@@ -92,44 +89,43 @@ wh_subset <- function(x) {
 # country lines
 ne_country_lines <- ne_download(scale = ne_scale, category = "cultural",
                                 type = "admin_0_boundary_lines_land",
-                                returnclass = "sf") %>% 
-  st_geometry() %>% 
+                                returnclass = "sf") %>%
+  st_geometry() %>%
   wh_subset()
 # state lines
 ne_state_lines <- ne_download(scale = ne_scale, category = "cultural",
                               type = "admin_1_states_provinces_lines",
-                              returnclass = "sf") %>% 
-  st_geometry() %>% 
+                              returnclass = "sf") %>%
+  st_geometry() %>%
   wh_subset()
 # rivers
 ne_rivers <- ne_download(scale = ne_scale, category = "physical",
                          type = "rivers_lake_centerlines",
-                         returnclass = "sf") %>% 
-  st_geometry() %>% 
+                         returnclass = "sf") %>%
+  st_geometry() %>%
   wh_subset()
 # lakes
 ne_lakes <- ne_download(scale = ne_scale, category = "physical",
                         type = "lakes",
-                        returnclass = "sf") %>% 
-  st_geometry() %>% 
+                        returnclass = "sf") %>%
+  st_geometry() %>%
   wh_subset()
 ne_land <- st_transform(ne_land, crs = mollweide)
 ```
 
 # Seasonal Abundance
 
-Generally, the seasons for eBird Status and Trends products are defined on a species-specific basis through expert review. For information on the details of defining seasons, please see the [seasons section of the FAQ](https://ebird.org/science/status-and-trends/faq#seasons). While it is certainly possible to define your own seasons when making seasonal abundance and range maps, if you want to recreate the products with the same seasons as the website, you'll need to use the definitions included in the `runs_w_names` data frame included in this package.
+Generally, the seasons for eBird Status and Trends products are defined on a species-specific basis through expert review. For information on the details of defining seasons, please see the [seasons section of the FAQ](https://ebird.org/science/status-and-trends/faq#seasons). While it is certainly possible to define your own seasons when making seasonal abundance and range maps, if you want to recreate the products with the same seasons as the website, you'll need to use the definitions included in the `ebirdst_runs` data frame included in this package.
 
-Let's start by getting the seasonal definitions for Yellow-bellied Sapsucker and transforming the data into a more usable format. For some species, expert review may have indicated that the models are poor in certain seasons. These problematic seasons are identified by missing dates in `runs_w_names` for the season in question. Although all seasons passed review for Yellow-bellied Sapsucker, for generality I'll add an additional column (`passed`) indicating whether a seasonal model passed review.
+Let's start by getting the seasonal definitions for Yellow-bellied Sapsucker and transforming the data into a more usable format. For some species, expert review may have indicated that the models are poor in certain seasons. These problematic seasons are identified by missing dates in `ebirdst_runs` for the season in question. Although all seasons passed review for Yellow-bellied Sapsucker, for generality I'll add an additional column (`passed`) indicating whether a seasonal model passed review.
 
 ```{r season-defs}
 # subset to the yellow-bellied sapsucker season definitions
-yebsap_dates <- filter(runs_w_names, SPECIES_CODE == "yebsap") %>% 
+yebsap_dates <- filter(ebirdst_runs, species_code == "yebsap") %>% 
   # just keep the seasonal definition columns
-  select(setdiff(matches("(START)|(END)"), matches("YEAR_ROUND"))) %>% 
+  select(setdiff(matches("(start)|(end)"), matches("year_round"))) %>% 
   # transpose
   gather("label", "date") %>% 
-  mutate(label = tolower(label)) %>% 
   # spread data so start and end dates are in separate columns
   separate(label, c("season", "start_end"), "_(?=s|e)") %>% 
   spread(start_end, date) %>% 
@@ -160,6 +156,7 @@ for (i in seq_len(nrow(yebsap_dates))) {
   }
   weeks_season[in_season] <- s$season
 }
+table(weeks_season)
 ```
 
 Finally, let's average all the weeks within each season to produce seasonal relative abundance rasters.
@@ -209,7 +206,7 @@ n_just / n_all
 split_migration
 ```
 
-In this case, there is essentially complete overlap between pre- and post-breeding migration, so we won't split them into separate colors on the map. Next, we'll calculate the average annual abundance, which we'll display as a separate color  if at least 1% of the range is occupied in all four seasons.
+In this case, there is essentially complete overlap between pre- and post-breeding migration, so we won't split them into separate colors on the map. Next, we'll calculate the average annual abundance, which we'll display as a separate color if at least 1% of the range is occupied in all four seasons.
 
 ```{r show-yr}
 threshold_yearround <- 0.01
@@ -272,7 +269,8 @@ plot(ne_lakes, col = "#ffffff", border =  "#444444", lwd = 0.5, add = TRUE)
 # land border
 plot(ne_land, col = NA, border = "#444444", lwd = 0.5, add = TRUE)
 # seasonal layer
-for (s in intersect(season_order, names(abd_no_zero))) {
+plot_seasons <- intersect(season_order, names(abd_no_zero))
+for (s in plot_seasons) {
   # handle splitting of migration seasons into different colors
   if (!split_migration && s %in% c("prebreeding_migration", 
                                    "postbreeding_migration")) {
@@ -299,6 +297,46 @@ if (show_yearround) {
 plot(ne_rivers, col = "#ffffff", lwd = 0.75, add = TRUE)
 plot(ne_state_lines, col = "#ffffff", lwd = 1.5, add = TRUE)
 plot(ne_country_lines, col = "#ffffff", lwd = 2, add = TRUE)
+
+# legends
+legend_seasons <- plot_seasons
+if (split_migration) {
+  legend_seasons[legend_seasons %in% c("prebreeding_migration", 
+                                       "postbreeding_migration")] <- "migration"
+  legend_seasons <- unique(legend_seasons)
+}
+if (show_yearround) {
+  legend_seasons <- c(legend_seasons, "year_round")
+}
+# thin out labels
+lbl_at <- bin_breaks$bins^bin_breaks$power
+lbl_at <- c(min(lbl_at), median(lbl_at), max(lbl_at))
+lbl <- lbl_at^(1 / bin_breaks$power)
+lbl <- format(round(lbl, 2), nsmall = 2)
+# plot legends
+for (i in seq_along(legend_seasons)) {
+  pal <- abundance_palette(length(bin_breaks$bins) - 1, legend_seasons[i])
+  if (i == 1) {
+    axis_args <- list(at = lbl_at, labels = lbl, line = -1,
+                      cex.axis = 0.75, lwd = 0)
+  } else {
+    axis_args <- list(at = lbl_at, labels = rep("", 3),
+                      cex.axis = 0.75, lwd = 0)
+  }
+  legend_title <- legend_seasons[i] %>% 
+    str_replace_all("_", " ") %>% 
+    str_to_title()
+  fields::image.plot(zlim = range(bin_breaks$bins^bin_breaks$power), 
+                   legend.only = TRUE, 
+                   breaks = bin_breaks$bins^bin_breaks$power, col = pal,
+                   smallplot = c(0.05, 0.35, 0.01 + 0.06 * i, 0.03 + 0.06 * i),
+                   horizontal = TRUE,
+                   axis.args = axis_args,
+                   legend.args = list(text = legend_title, side = 3, 
+                                      cex = 0.9, col = "black", line = 0.1))
+}
+title("Yellow-bellied Sapsucker Relative Abundance (birds per km/hr)", 
+      line = -1, cex.main = 1)
 ```
 
 # Range Maps
@@ -414,6 +452,15 @@ if (show_yearround) {
 plot(ne_rivers, col = "#ffffff", lwd = 0.75, add = TRUE)
 plot(ne_state_lines, col = "#ffffff", lwd = 1.5, add = TRUE)
 plot(ne_country_lines, col = "#ffffff", lwd = 2, add = TRUE)
+
+# legend
+rng_legend <- rev(range_palette[legend_seasons])
+names(rng_legend) <- names(rng_legend) %>% 
+    str_replace_all("_", " ") %>% 
+    str_to_title()
+legend("bottomleft", legend = names(rng_legend), fill = rng_legend)
+title("Yellow-bellied Sapsucker Seasonal Range Map", 
+      line = -1, cex.main = 1)
 ```
 
 # Regional Statistics
@@ -431,7 +478,7 @@ These statistics can be [downloaded from the Status and Trends website](https://
 Since the example data used in this vignette is restricted to Michigan, we'll calculate the statistics over the counties in Michigan; however, this approach can easily be extended to any set of regions. Let's start by downloading county boundaries for Michigan.
 
 ```{r counties}
-mi_counties <- getData("GADM", country = "USA", level = 2, path = dl_path) %>% 
+mi_counties <- getData("GADM", country = "USA", level = 2, path = tempdir()) %>% 
   st_as_sf() %>% 
   filter(NAME_1 == "Michigan") %>% 
   select(county = NAME_2, county_code = HASC_2) %>% 
@@ -547,8 +594,3 @@ ggplot(days_occ_proj %>% filter(season %in% c("breeding", "nonbreeding"))) +
   theme_bw() +
   theme(legend.position = "bottom")
 ```
-
-```{r cleanup, include = FALSE}
-unlink(sp_path, recursive = TRUE)
-```
-

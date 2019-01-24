@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Projects st_extent lat/lon list to sinusoidal raster Extent — get_sinu_ext • ebirdst</title>
+<title>Raw test data loader — load_test_data_raw • ebirdst</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,11 +30,11 @@
 
 
 
-<meta property="og:title" content="Projects st_extent lat/lon list to sinusoidal raster Extent — get_sinu_ext" />
+<meta property="og:title" content="Raw test data loader — load_test_data_raw" />
 
-<meta property="og:description" content="Internal function that converts the st_extent list used throughout this
-package from lat/lon corners to a raster Extent using the same
-Sinusoidal projection as the eBird Status and Trends products." />
+<meta property="og:description" content="Internal function used by load_test_data() to get the full test data for
+calculating predictive performance metrics. This file contains the observed
+counts and model predicted relative occurrence and abundance values." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -104,52 +104,53 @@ Sinusoidal projection as the eBird Status and Trends products." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Projects st_extent lat/lon list to sinusoidal raster Extent</h1>
+    <h1>Raw test data loader</h1>
     <small class="dont-index">Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/R/ebirdst-loading.R'><code>R/ebirdst-loading.R</code></a></small>
-    <div class="hidden name"><code>get_sinu_ext.Rd</code></div>
+    <div class="hidden name"><code>load_test_data_raw.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Internal function that converts the st_extent list used throughout this
-package from lat/lon corners to a raster Extent using the same
-Sinusoidal projection as the eBird Status and Trends products.</p>
+    <p>Internal function used by <code><a href='load_test_data.html'>load_test_data()</a></code> to get the full test data for
+calculating predictive performance metrics. This file contains the observed
+counts and model predicted relative occurrence and abundance values.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>get_sinu_ext</span>(<span class='no'>st_extent</span>)</pre>
+    <pre class="usage"><span class='fu'>load_test_data_raw</span>(<span class='no'>path</span>, <span class='kw'>return_sf</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>st_extent</th>
-      <td><p>list; st_extent list with lat/lon coordinates.</p></td>
+      <th>path</th>
+      <td><p>character; full path to the directory containing single species
+eBird Status and Trends products.</p></td>
+    </tr>
+    <tr>
+      <th>return_sf</th>
+      <td><p>logical; whether to return an sf object of spatial points
+rather then the default data frame.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A raster Extent in Sinusoidal projection.</p>
+    <p>data.frame containing test data, including checklist locations,
+observed counts, and predicted mean and associated error for relative
+occurrence and abundance.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># define st_extent list</span>
-<span class='no'>ne_extent</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"rectangle"</span>,
-                  <span class='kw'>lat.min</span> <span class='kw'>=</span> <span class='fl'>40</span>,
-                  <span class='kw'>lat.max</span> <span class='kw'>=</span> <span class='fl'>47</span>,
-                  <span class='kw'>lon.min</span> <span class='kw'>=</span> -<span class='fl'>80</span>,
-                  <span class='kw'>lon.max</span> <span class='kw'>=</span> -<span class='fl'>70</span>,
-                  <span class='kw'>t.min</span> <span class='kw'>=</span> <span class='fl'>0.425</span>,
-                  <span class='kw'>t.max</span> <span class='kw'>=</span> <span class='fl'>0.475</span>)
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='co'># download example data</span>
+<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='download_data.html'>download_data</a></span>(<span class='st'>"example_data"</span>)
 
-<span class='co'># convert</span>
-<span class='no'>sinu_e</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>ebirdst</span><span class='kw ns'>:::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/ebirdst/topics/get_sinu_ext'>get_sinu_ext</a></span>(<span class='no'>ne_extent</span>)
-<span class='no'>sinu_e</span></div><div class='output co'>#&gt; class       : Extent 
-#&gt; xmin        : -6836828 
-#&gt; xmax        : -5286748 
-#&gt; ymin        : 4426967 
-#&gt; ymax        : 5247767 </div></pre>
+<span class='co'># test data</span>
+<span class='no'>test_data</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>ebirdst</span><span class='kw ns'>:::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/ebirdst/topics/load_test_data_raw'>load_test_data_raw</a></span>(<span class='no'>sp_path</span>)
+<span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>glimpse</a></span>(<span class='no'>test_data</span>)
+
+<span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

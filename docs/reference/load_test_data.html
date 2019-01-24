@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Spatiotemporal subsetter for eBird Status and Trends products raster — raster_st_subset • ebirdst</title>
+<title>Test data loader — load_test_data • ebirdst</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,17 +30,11 @@
 
 
 
-<meta property="og:title" content="Spatiotemporal subsetter for eBird Status and Trends products raster — raster_st_subset" />
+<meta property="og:title" content="Test data loader — load_test_data" />
 
-<meta property="og:description" content="Internal function that takes a RasterStack or RasterBrick and a st_extent
-list and returns a spatiotemporal subset of the data object. Currently
-designed to handle either a 'rectangle' as defined by a lat/lon bounding
-box or a 'polygon' as defined by a SpatialPolygon* object. The function
-will use temporal information if provided. The t.min and t.max objects in
-the st_extent list are currently able to wrap time around the year
-(e.g., t.min = 0.9 and t.max = 0.1 is acceptable). This function will also
-returned a date labeled RasterStack or RasterBrick, so there is no need
-to use the label_raster_stack() directly if subsetting." />
+<meta property="og:description" content="Internal function used by compute_ppms() to get the test data for
+calculating predictive performance metrics. This file contains the observed
+counts and model predicted relative occurrence and abundance values." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -110,68 +104,51 @@ to use the label_raster_stack() directly if subsetting." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Spatiotemporal subsetter for eBird Status and Trends products raster</h1>
+    <h1>Test data loader</h1>
     <small class="dont-index">Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/R/ebirdst-loading.R'><code>R/ebirdst-loading.R</code></a></small>
-    <div class="hidden name"><code>raster_st_subset.Rd</code></div>
+    <div class="hidden name"><code>load_test_data.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Internal function that takes a RasterStack or RasterBrick and a st_extent
-list and returns a spatiotemporal subset of the data object. Currently
-designed to handle either a 'rectangle' as defined by a lat/lon bounding
-box or a 'polygon' as defined by a SpatialPolygon* object. The function
-will use temporal information if provided. The t.min and t.max objects in
-the <code>st_extent</code> list are currently able to wrap time around the year
-(e.g., t.min = 0.9 and t.max = 0.1 is acceptable). This function will also
-returned a date labeled <code>RasterStack</code> or <code>RasterBrick</code>, so there is no need
-to use the <code><a href='label_raster_stack.html'>label_raster_stack()</a></code> directly if subsetting.</p>
+    <p>Internal function used by <code><a href='compute_ppms.html'>compute_ppms()</a></code> to get the test data for
+calculating predictive performance metrics. This file contains the observed
+counts and model predicted relative occurrence and abundance values.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>raster_st_subset</span>(<span class='no'>x</span>, <span class='no'>st_extent</span>)</pre>
+    <pre class="usage"><span class='fu'>load_test_data</span>(<span class='no'>path</span>, <span class='kw'>return_sf</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>RasterStack or RasterBrick; one of four GeoTiff files provided
-with results.</p></td>
+      <th>path</th>
+      <td><p>character; full path to the directory containing single species
+eBird Status and Trends products.</p></td>
     </tr>
     <tr>
-      <th>st_extent</th>
-      <td><p>list; st_extent list object.</p></td>
+      <th>return_sf</th>
+      <td><p>logical; whether to return an sf object of spatial points
+rather then the default data frame.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Subset of input data as same type, with layers labeled with dates
-from label_raster_stack().</p>
+    <p>data.frame containing test data, including checklist locations,
+observed counts, and predicted mean and associated error for relative
+occurrence and abundance.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='co'># download and load example abundance data</span>
-<span class='no'>dl_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/tempfile'>tempdir</a></span>()
-<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='download_data.html'>download_data</a></span>(<span class='st'>"example_data"</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>dl_path</span>)
-<span class='no'>abd_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list.files'>list.files</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='no'>sp_path</span>, <span class='st'>"results"</span>, <span class='st'>"tifs"</span>),
-                       <span class='kw'>pattern</span> <span class='kw'>=</span> <span class='st'>"hr_2016_abundance_umean"</span>,
-                       <span class='kw'>full.names</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-<span class='no'>abd</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>raster</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/raster/topics/stack'>stack</a></span>(<span class='no'>abd_path</span>)
+<span class='co'># download example data</span>
+<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='download_data.html'>download_data</a></span>(<span class='st'>"example_data"</span>)
 
-<span class='co'># define st_extent list</span>
-<span class='no'>ne_extent</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"rectangle"</span>,
-                  <span class='kw'>lat.min</span> <span class='kw'>=</span> <span class='fl'>40</span>,
-                  <span class='kw'>lat.max</span> <span class='kw'>=</span> <span class='fl'>47</span>,
-                  <span class='kw'>lon.min</span> <span class='kw'>=</span> -<span class='fl'>80</span>,
-                  <span class='kw'>lon.max</span> <span class='kw'>=</span> -<span class='fl'>70</span>,
-                  <span class='kw'>t.min</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
-                  <span class='kw'>t.max</span> <span class='kw'>=</span> <span class='fl'>0.6</span>)
-
-<span class='co'># subset stack with extent</span>
-<span class='fu'>raster_st_subset</span>(<span class='no'>abd</span>, <span class='kw'>st_extent</span> <span class='kw'>=</span> <span class='no'>ne_extent</span>)
+<span class='co'># test data</span>
+<span class='no'>test_data</span> <span class='kw'>&lt;-</span> <span class='fu'>load_test_data</span>(<span class='no'>sp_path</span>)
+<span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>glimpse</a></span>(<span class='no'>test_data</span>)
 
 <span class='co'># }</span></pre>
   </div>
