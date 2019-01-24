@@ -46,6 +46,8 @@ ebirdst_subset.data.frame <- function(x, ext) {
     } else {
       x <- x[x$date > ext$t[1] | x$date <= ext$t[2], ]
     }
+  } else {
+    warning("Temporal extent missing or incomplete. This may be intentional.")
   }
 
   # spatial filtering
@@ -84,6 +86,8 @@ ebirdst_subset.sf <- function(x, ext) {
     } else {
       x <- x[x$date > ext$t[1] | x$date <= ext$t[2], ]
     }
+  } else {
+    warning("Temporal extent missing or incomplete. This may be intentional.")
   }
 
   # spatial filtering
@@ -123,6 +127,8 @@ ebirdst_subset.Raster <- function(x, ext) {
       r_in <- r_dates > ext$t[1] | r_dates <= ext$t[2]
     }
     x <- x[[which(r_in)]]
+  } else {
+    warning("Temporal extent missing or incomplete. This may be intentional.")
   }
 
   # spatial filtering
@@ -133,7 +139,7 @@ ebirdst_subset.Raster <- function(x, ext) {
     x <- raster::trim(
       raster::mask(
         raster::crop(x, bbox_to_extent(sf::st_bbox(e_ll$extent))),
-        e_ll$extent),
+        sf::st_sf(e_ll$extent)),
       values = NA)
   } else {
     stop("Invalid ebirdst_extent object.")

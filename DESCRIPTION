@@ -43,7 +43,6 @@ Imports:
     PresenceAbsence,
     rappdirs,
     raster,
-    rlang,
     scales,
     sf,
     stats,

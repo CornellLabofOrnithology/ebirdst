@@ -1,132 +1,50 @@
 context("Plotting functions")
-context("plot_pis")
 
+sp_path <- download_data("example_data")
+lp_extent <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 45),
+                            t = c(0.5, 0.6))
+
+context("plot_pis")
 # plot_pis
 test_that("ebirdst plot_pis", {
   pis <- load_pis(sp_path)
 
-  # expected with st_extent
-  ne_extent <- list(type = "rectangle",
-                    lat.min = 42,
-                    lat.max = 47,
-                    lon.min = -88,
-                    lon.max = -82,
-                    t.min = 0.425,
-                    t.max = 0.475)
-  expect_error(plot_pis(path = sp_path,
-                        pis = pis,
-                        st_extent = ne_extent),
-               NA)
-  expect_error(plot_pis(path = sp_path,
-                        pis = pis,
-                        st_extent = ne_extent,
-                        by_cover_class = TRUE),
-               NA)
-  expect_error(plot_pis(path = sp_path,
-                        pis = pis,
-                        st_extent = ne_extent,
-                        num_top_preds = 10),
-               NA)
-  expect_error(plot_pis(path = sp_path,
-                        pis = pis,
-                        st_extent = ne_extent,
-                        return_top = TRUE),
-               NA)
-  expect_error(plot_pis(path = sp_path,
-                        pis = pis,
-                        st_extent = ne_extent,
-                        pretty_names = FALSE),
-               NA)
-  expect_error(plot_pis(path = sp_path,
-                        pis = pis,
-                        st_extent = ne_extent,
-                        return_top = TRUE,
-                        print_plot = FALSE),
-               NA)
+  # expected with ebirdst_extent
+  top_pi <- plot_pis(pis = pis, ext = lp_extent, plot = FALSE)
+  expect_is(top_pi, "numeric")
 
-  # checking return quality
-  expect_equal(length(plot_pis(path = sp_path,
-                        pis = pis,
-                        st_extent = ne_extent,
-                        num_top_preds = 25,
-                        return_top = TRUE)),
-               25)
-  expect_is(plot_pis(path = sp_path,
-                     pis = pis,
-                     st_extent = ne_extent,
-                     num_top_preds = 25,
-                     return_top = TRUE),
-               "character")
+  # check names and lengths work correctly
+  expect_true("Mixed Forest ED" %in% names(top_pi))
+  top_pi <- plot_pis(pis = pis, ext = lp_extent, pretty_names = FALSE,
+                     plot = FALSE)
+  expect_true("umd_fs_c5_1500_ed" %in% names(top_pi))
+  top_pi <- plot_pis(pis = pis, ext = lp_extent, pretty_names = FALSE,
+                     by_cover_class = TRUE, plot = FALSE)
+  expect_true("umd_fs_c5" %in% names(top_pi))
+  top_pi <- plot_pis(pis = pis, ext = lp_extent, pretty_names = TRUE,
+                     by_cover_class = TRUE, plot = FALSE)
+  expect_true("Mixed Forest" %in% names(top_pi))
 
-  # nothing to do
-  expect_error(plot_pis(path = sp_path,
-                        pis = pis,
-                        st_extent = ne_extent,
-                        return_top = FALSE,
-                        print_plot = FALSE),
-               "Both print and return params are FALSE")
+  # checking length
+  top_pi <- plot_pis(pis = pis, ext = lp_extent, n_top_pred = 10,
+                     plot = FALSE)
+  expect_length(top_pi, 10)
+  top_pi <- plot_pis(pis = pis, ext = lp_extent, n_top_pred = 10,
+                     by_cover_class = TRUE, plot = FALSE)
+  expect_length(top_pi, 10)
 
   # not enough num_top_preds
-  expect_error(plot_pis(path = sp_path,
-                        pis = pis,
-                        st_extent = ne_extent,
-                        num_top_preds = 1),
-               "num_top_preds must be greater than 1")
+  expect_error(plot_pis(pis = pis, ext = lp_extent, n_top_pred = 1,
+                        plot = FALSE))
 
-  # broken path
-  expect_error(plot_pis(path = '~/some/messed/up/path/that/does/not/exist',
-                        pis = pis,
-                        st_extent = ne_extent),
-               "RData file does not exist")
+  # broken input
+  expect_error(plot_pis(pis = pis))
+  expect_error(plot_pis(pis = 1:10, ext = lp_extent))
+  expect_error(plot_pis(pis = data.frame(), ext = lp_extent))
 
   # missing temporal info
-  ne_extent <- list(type = "rectangle",
-                    lat.min = 42,
-                    lat.max = 45,
-                    lon.min = -88,
-                    lon.max = -82)
-  expect_error(plot_pis(path = sp_path,
-                     pis = pis,
-                     st_extent = ne_extent),
-               "Must provide t.min and t.max")
-
-  # reversed min max
-  ne_extent <- list(type = "rectangle",
-                    lat.min = 47,
-                    lat.max = 40,
-                    lon.min = -80,
-                    lon.max = -70,
-                    t.min = 0.425,
-                    t.max = 0.475)
-  expect_error(plot_pis(path = sp_path,
-                        pis = pis,
-                        st_extent = ne_extent),
-               "Minimum latitude is greater than maximum latitude")
-
-  # missing a corner
-  ne_extent <- list(type = "rectangle",
-                    lat.min = 47,
-                    lat.max = 40,
-                    lon.min = -80,
-                    t.min = 0.425,
-                    t.max = 0.475)
-  expect_error(plot_pis(path = sp_path,
-                        pis = pis,
-                        st_extent = ne_extent),
-               "Missing max longitude")
-
-  # st_extent is not list
-  ne_extent <- c(type = "rectangle",
-                 lat.min = 40,
-                 lat.max = 47,
-                 lon.min = -80,
-                 lon.max = -70,
-                 t.min = 0.425,
-                 t.max = 0.475)
-  expect_error(plot_pis(path = sp_path,
-                        pis = pis,
-                        st_extent = ne_extent),
-               "st_extent argument must be a list")
+  nt <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 45))
+  expect_error(plot_pis(pis = pis, ext = nt))
 })
 
 context("plot_pds")
@@ -135,140 +53,40 @@ context("plot_pds")
 test_that("ebirdst plot_pds", {
   pds <- load_pds(sp_path)
 
-  # expected with st_extent
-  ne_extent <- list(type = "rectangle",
-                    lat.min = 42,
-                    lat.max = 45,
-                    lon.min = -88,
-                    lon.max = -82,
-                    t.min = 0.425,
-                    t.max = 0.475)
-  expect_error(plot_pds(pd_name = "EFFORT_HRS",
-                        pds = pds,
-                        st_extent = ne_extent), NA)
-
   # checking return quality
-  expect_is(plot_pds(pd_name = "EFFORT_HRS",
-                     pds = pds,
-                     st_extent = ne_extent), "list")
-  expect_equal(length(plot_pds(pd_name = "EFFORT_HRS",
-                               pds = pds,
-                               st_extent = ne_extent)$pointwise), 3)
-  expect_equal(length(plot_pds(pd_name = "EFFORT_HRS",
-                               pds = pds,
-                               st_extent = ne_extent)$pointwise$t.median), 50)
-  expect_is(plot_pds(pd_name = "EFFORT_HRS",
-                     pds = pds,
-                     st_extent = ne_extent)$pointwise, "list")
-  expect_is(plot_pds(pd_name = "EFFORT_HRS",
-                     pds = pds,
-                     st_extent = ne_extent)$pointwise$t.median, "numeric")
+  pds_data <- plot_pds(pds = pds, predictor = "effort_hrs",
+                       ext = lp_extent, plot = FALSE)
+  expect_is(pds_data, "data.frame")
+  expect_named(pds_data, c("x", "pd_median", "pd_lower", "pd_upper"))
+  expect_equal(nrow(pds_data), 50)
 
-  # params
-  # quantiles
-  expect_error(plot_pds(pd_name = "EFFORT_HRS",
-                        pds = pds,
-                        st_extent = ne_extent,
-                        plot_quantiles = TRUE), NA)
-  expect_is(plot_pds(pd_name = "EFFORT_HRS",
-                     pds = pds,
-                     st_extent = ne_extent,
-                     plot_quantiles = TRUE), "list")
-  expect_equal(length(plot_pds(pd_name = "EFFORT_HRS",
-                     pds = pds,
-                     st_extent = ne_extent,
-                     plot_quantiles = TRUE)), 2)
-  expect_is(plot_pds(pd_name = "EFFORT_HRS",
-                     pds = pds,
-                     st_extent = ne_extent,
-                     plot_quantiles = TRUE)$quantiles, "list")
-  expect_equal(length(plot_pds(pd_name = "EFFORT_HRS",
-                     pds = pds,
-                     st_extent = ne_extent,
-                     plot_quantiles = TRUE)$quantiles), 2)
-  expect_is(plot_pds(pd_name = "EFFORT_HRS",
-                     pds = pds,
-                     st_extent = ne_extent,
-                     plot_quantiles = TRUE)$quantiles$t.ul, "numeric")
-  expect_equal(length(plot_pds(pd_name = "EFFORT_HRS",
-                               pds = pds,
-                               st_extent = ne_extent,
-                               plot_quantiles = TRUE)$quantiles$t.ul), 50)
+  # quantiles working
+  pds_data_q <- plot_pds(pds = pds, predictor = "effort_hrs",
+                         ext = lp_extent, show_quantiles = TRUE, plot = FALSE)
+  expect_is(pds_data_q, "data.frame")
+  expect_named(pds_data_q, c("x", "pd_median", "pd_lower", "pd_upper",
+                             "pd_lower_quantile", "pd_upper_quantile"))
+  expect_equal(nrow(pds_data_q), 50)
 
   # more params
-  expect_error(plot_pds(pd_name = "EFFORT_HRS",
-                        pds = pds,
-                        st_extent = ne_extent,
-                        plot_quantiles = TRUE,
-                        pointwise_pi = FALSE), NA)
-  expect_error(plot_pds(pd_name = "EFFORT_HRS",
-                        pds = pds,
-                        st_extent = ne_extent,
-                        stixel_pds = TRUE), NA)
-  expect_error(plot_pds(pd_name = "EFFORT_HRS",
-                        pds = pds,
-                        st_extent = ne_extent,
-                        ylim = 1), "invalid 'ylim' value")
-  expect_error(plot_pds(pd_name = "EFFORT_HRS",
-                        pds = pds,
-                        st_extent = ne_extent,
-                        print_plot = FALSE), NA)
+  expect_is(plot_pds(pds = pds,
+                     predictor = "EFFORT_HRS",
+                     ext = lp_extent,
+                     show_quantiles = TRUE,
+                     show_stixel_pds = TRUE), "data.frame")
+  expect_is(plot_pds(pds = pds,
+                    predictor = "EFFORT_HRS",
+                    ext = lp_extent,
+                    ylim = c(-1, 1)), "data.frame")
+  expect_error(plot_pds(pds = pds,
+                      predictor = "EFFORT_HRS",
+                      ext = lp_extent,
+                      ylim = 1))
 
   # TODO add more tests for GBM parms
 
-  # nothing to do
-  expect_error(plot_pds(pd_name = "EFFORT_HRS",
-                        pds = pds,
-                        st_extent = ne_extent,
-                        pointwise_pi = FALSE),
-               "Nothing to plot")
-
   # missing temporal info
-  ne_extent <- list(type = "rectangle",
-                    lat.min = 40,
-                    lat.max = 47,
-                    lon.min = -80,
-                    lon.max = -70)
-  expect_error(plot_pds(pd_name = "EFFORT_HRS",
-                        pds = pds,
-                        st_extent = ne_extent),
-               "Must provide t.min and t.max")
-
-  # reversed min max
-  ne_extent <- list(type = "rectangle",
-                    lat.min = 47,
-                    lat.max = 40,
-                    lon.min = -80,
-                    lon.max = -70,
-                    t.min = 0.425,
-                    t.max = 0.475)
-  expect_error(plot_pds(pd_name = "EFFORT_HRS",
-                        pds = pds,
-                        st_extent = ne_extent),
-               "Minimum latitude is greater than maximum latitude")
-
-  # missing a corner
-  ne_extent <- list(type = "rectangle",
-                    lat.min = 47,
-                    lat.max = 40,
-                    lon.min = -80,
-                    t.min = 0.425,
-                    t.max = 0.475)
-  expect_error(plot_pds(pd_name = "EFFORT_HRS",
-                        pds = pds,
-                        st_extent = ne_extent),
-               "Missing max longitude")
-
-  # st_extent is not list
-  ne_extent <- c(type = "rectangle",
-                 lat.min = 40,
-                 lat.max = 47,
-                 lon.min = -80,
-                 lon.max = -70,
-                 t.min = 0.425,
-                 t.max = 0.475)
-  expect_error(plot_pds(pd_name = "EFFORT_HRS",
-                        pds = pds,
-                        st_extent = ne_extent),
-               "st_extent argument must be a list")
+  nt <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 45))
+  expect_error(plot_pds(pds = pds, predictor = "effort_hrs",
+                        ext = nt, plot = FALSE))
 })

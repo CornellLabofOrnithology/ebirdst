@@ -51,13 +51,11 @@ plot_pis <- function(pis, ext,
             n_top_pred > 1, n_top_pred <= nrow(ebirdst::ebirdst_predictors))
   stopifnot(is.logical(pretty_names), length(pretty_names) == 1)
   stopifnot(is.logical(plot), length(plot) == 1)
-  if (identical(ext$t, c(0, 1))) {
+  if (all(c(0, 1) == round(ext$t, 2))) {
     stop("Must subset temporally, results not meaningful for full year.")
   }
 
   # subset
-  names(pis) <- stringr::str_replace_all(stringr::str_to_lower(names(pis)),
-                                         "\\.", "_")
   pis <- ebirdst_subset(pis, ext = ext)
   pis <- pis[, ebirdst::ebirdst_predictors$predictor_tidy]
 
@@ -207,7 +205,7 @@ plot_pds <- function(pds, predictor, ext,
             ci_alpha > 0, ci_alpha < 0.5)
   stopifnot(is_integer(gbm_n_trees), length(gbm_n_trees) == 1, gbm_n_trees > 0)
   stopifnot(is.logical(plot), length(plot) == 1)
-  if (identical(ext$t, c(0, 1))) {
+  if (all(c(0, 1) == round(ext$t, 2))) {
     stop("Must subset temporally, results not meaningful for full year.")
   }
   if (!is.null(ylim)) {
@@ -231,8 +229,6 @@ plot_pds <- function(pds, predictor, ext,
 
   # subset pd
   pds <- ebirdst_subset(pds, ext = ext)
-  names(pds) <- stringr::str_to_lower(names(pds))
-  names(pds) <- stringr::str_replace_all(names(pds), "\\.", "_")
   pds <- pds[pds$predictor == predictor_raw, ]
   pds <- pds[!is.na(pds$y1), ]
 
@@ -332,10 +328,12 @@ plot_pds <- function(pds, predictor, ext,
                        verbose = FALSE,
                        n.cores = 1)
 
-    pd_ci$pd_upper_quantile <- stats::predict(gam_ul, newdata = nd,
-                                              n.trees = gbm_n_trees)
-    pd_ci$pd_lower_quantile <- stats::predict(gam_ll, newdata = nd,
-                                              n.trees = gbm_n_trees)
+    pd_ci$pd_lower_quantile <- suppressWarnings(
+      stats::predict(gam_ll, newdata = nd, n.trees = gbm_n_trees)
+    )
+    pd_ci$pd_upper_quantile <- suppressWarnings(
+      stats::predict(gam_ul, newdata = nd, n.trees = gbm_n_trees)
+    )
     rm(gam_ul, gam_ll)
   }
 

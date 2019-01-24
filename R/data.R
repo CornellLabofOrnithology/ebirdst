@@ -1,33 +1,33 @@
-#' Data frame of species available
+#' Data frame of available eBird Status and Trends species
 #'
-#' A dataset containing the available species, with SPECIES_CODE, RUN_NAME,
-#' SCI_NAME, and PRIMARY_COM_NAME. In addition, the dates defining the
-#' boundaries of the seasons are provided. These seasons are defined on a
-#' species-specific basis through expert review. For information on the details
-#' of defining seasons, please see the [seasons section of the
+#' A dataset containing the species for which eBird Status and Trends data are
+#' avialable. In addition, the dates defining the boundaries of the seasons are
+#' provided. These seasons are defined on a species-specific basis through
+#' expert review. For information on the details of defining seasons, please see
+#' the [seasons section of the
 #' FAQ](https://ebird.org/science/status-and-trends/faq#seasons). Note that
 #' missing dates imply that a season failed expert review for that species
 #' within that season.
 #'
 #' @format A data frame with 107 rows and 14 variables:
 #' \describe{
-#'   \item{SPECIES_CODE}{Six letter eBird code in eBird Taxonomy v2016}
-#'   \item{RUN_NAME}{Unique analysis identifier and the top level folder name
+#'   \item{species_code}{Six letter eBird code in eBird Taxonomy v2016}
+#'   \item{run_name}{Unique analysis identifier and the top level folder name
 #'                   for all results}
-#'   \item{SCI_NAME}{Scientific name from eBird Taxonomy v2016}
-#'   \item{PRIMARY_COM_NAME}{English common name from eBird Taxonomy v2016}
-#'   \item{BREEDING_START_DT}{Breeding season start date}
-#'   \item{BREEDING_END_DT}{Breeding season start date}
-#'   \item{NONBREEDING_START_DT}{Non-breeding season start date}
-#'   \item{NONBREEDING_END_DT}{Non-breeding season start date}
-#'   \item{POSTBREEDING_MIGRATION_START_DT}{Post-breeding season start date}
-#'   \item{POSTBREEDING_MIGRATION_END_DT}{Post-breeding season start date}
-#'   \item{PREBREEDING_MIGRATION_START_DT}{Pre-breeding season start date}
-#'   \item{PREBREEDING_MIGRATION_END_DT}{Pre-breeding season start date}
-#'   \item{YEAR_ROUND_START_DT}{For resident species, the year-round start date}
-#'   \item{YEAR_ROUND_END_DT}{For resident species, the year-round end date}
+#'   \item{scientific_name}{Scientific name from eBird Taxonomy v2016}
+#'   \item{common_name}{English common name from eBird Taxonomy v2016}
+#'   \item{breeding_start_dt}{Breeding season start date}
+#'   \item{breeding_end_dt}{Breeding season start date}
+#'   \item{nonbreeding_start_dt}{Non-breeding season start date}
+#'   \item{nonbreeding_end_dt}{Non-breeding season start date}
+#'   \item{postbreeding_migration_start_dt}{Post-breeding season start date}
+#'   \item{postbreeding_migration_end_dt}{Post-breeding season start date}
+#'   \item{prebreeding_migration_start_dt}{Pre-breeding season start date}
+#'   \item{prebreeding_migration_end_dt}{Pre-breeding season start date}
+#'   \item{year_round_start_dt}{For resident species, the year-round start date}
+#'   \item{year_round_end_dt}{For resident species, the year-round end date}
 #' }
-"runs_w_names"
+"ebirdst_runs"
 
 #' eBird Status and Trends predictors
 #'

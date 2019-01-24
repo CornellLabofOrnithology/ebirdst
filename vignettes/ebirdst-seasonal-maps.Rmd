@@ -116,15 +116,15 @@ ne_land <- st_transform(ne_land, crs = mollweide)
 
 # Seasonal Abundance
 
-Generally, the seasons for eBird Status and Trends products are defined on a species-specific basis through expert review. For information on the details of defining seasons, please see the [seasons section of the FAQ](https://ebird.org/science/status-and-trends/faq#seasons). While it is certainly possible to define your own seasons when making seasonal abundance and range maps, if you want to recreate the products with the same seasons as the website, you'll need to use the definitions included in the `runs_w_names` data frame included in this package.
+Generally, the seasons for eBird Status and Trends products are defined on a species-specific basis through expert review. For information on the details of defining seasons, please see the [seasons section of the FAQ](https://ebird.org/science/status-and-trends/faq#seasons). While it is certainly possible to define your own seasons when making seasonal abundance and range maps, if you want to recreate the products with the same seasons as the website, you'll need to use the definitions included in the `ebirdst_runs` data frame included in this package.
 
-Let's start by getting the seasonal definitions for Yellow-bellied Sapsucker and transforming the data into a more usable format. For some species, expert review may have indicated that the models are poor in certain seasons. These problematic seasons are identified by missing dates in `runs_w_names` for the season in question. Although all seasons passed review for Yellow-bellied Sapsucker, for generality I'll add an additional column (`passed`) indicating whether a seasonal model passed review.
+Let's start by getting the seasonal definitions for Yellow-bellied Sapsucker and transforming the data into a more usable format. For some species, expert review may have indicated that the models are poor in certain seasons. These problematic seasons are identified by missing dates in `ebirdst_runs` for the season in question. Although all seasons passed review for Yellow-bellied Sapsucker, for generality I'll add an additional column (`passed`) indicating whether a seasonal model passed review.
 
 ```{r season-defs}
 # subset to the yellow-bellied sapsucker season definitions
-yebsap_dates <- filter(runs_w_names, SPECIES_CODE == "yebsap") %>% 
+yebsap_dates <- filter(ebirdst_runs, species_code == "yebsap") %>% 
   # just keep the seasonal definition columns
-  select(setdiff(matches("(START)|(END)"), matches("YEAR_ROUND"))) %>% 
+  select(setdiff(matches("(start)|(end)"), matches("year_round"))) %>% 
   # transpose
   gather("label", "date") %>% 
   mutate(label = tolower(label)) %>% 
