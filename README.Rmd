@@ -21,13 +21,9 @@ knitr::opts_chunk$set(
 
 <!-- [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0) -->
 
-**THIS PACKAGE IS UNDER ACTIVE DEVELOPMENT. FUNCTIONALITY MAY CHANGE AT ANY TIME.**
-
-The goal of this package is to provide tools for loading, mapping, plotting, and analyzing eBird Status and Trends data products.
-
 ## Installation
 
-You can install ebirdst from GitHub with:
+You can install `ebirdst` from GitHub with:
 
 ```{r gh-installation, eval = FALSE}
 # install the development version from GitHub
@@ -35,15 +31,13 @@ You can install ebirdst from GitHub with:
 devtools::install_github("CornellLabofOrnithology/ebirdst")
 ```
 
-## Vignette
+## Vignettes
 
-TODO: update website, then updated this section.
-
-For a full introduction and advanced usage, please see the package [website](https://cornelllabofornithology.github.io/ebirdst). An [introductory vignette](https://cornelllabofornithology.github.io/ebirdst/articles/stem-intro-mapping.html) is available, detailing the structure of the results and how to begin loading and mapping the results. Further, an [advanced vignette](https://cornelllabofornithology.github.io/ebirdst/articles/stem-pipd.html) details how to access additional information from the model results about predictor importance and directionality, as well as predictive performance metrics. Finally, a [third vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-seasonal-maps.html) shows how to reproduce the seasonal maps and statistics on the [eBird Status and Trends website](https://ebird.org/science/status-and-trends).
+For a full introduction and advanced usage, please see the package [website](https://cornelllabofornithology.github.io/ebirdst). An [introductory vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html) details the structure of the results and how to begin loading and mapping the results. The [advanced vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-pipd.html) details how to access additional information from the model results about predictor importance and directionality, as well as predictive performance metrics. Finally, the [seasonal vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-seasonal-maps.html) shows how to reproduce the seasonal maps and statistics on the [eBird Status and Trends website](https://ebird.org/science/status-and-trends).
 
 ## Quick Start
 
-This quick start guide will show you how to download example data and plot abundance values similar to how they are plotted for the [eBird Status and Trends Abundance animations](https://ebird.org/science/status-and-trends/woothr/abundance-map-weekly). **Important note: after downloading the results, do not change the file structure.** All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package.
+This quick start guide show how to download example data and plot abundance values similar to how they are plotted for the [eBird Status and Trends Abundance animations](https://ebird.org/science/status-and-trends/woothr/abundance-map-weekly). **Important note: after downloading the results, do not change the file structure.** All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package. If you use this package to analyze the results, you do not ever need to interact with the files directly, outside of R.
 
 ```{r quick_start}
 library(ebirdst)

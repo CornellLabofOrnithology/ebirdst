@@ -42,12 +42,12 @@ Beyond estimates of occurrence and relative abundance, the eBird Status and Tren
 
 **IMPORTANT. AFTER DOWNLOADING THE RESULTS, DO NOT CHANGE THE FILE STRUCTURE.** All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package.
 
-Data are stored in four files, found under \\\<six_letter_code-ERD2016-PROD-date-uuid>\\results\\abund_preds\\unpeeled\_folds, as described below.
+Data are stored in four files, found under \\\<run_name>\\results\\abund_preds\\unpeeled\_folds, as described below.
 
-\\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>\\results\\abund_preds\\unpeeled_folds\\pd.txt
-\\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>\\results\\abund_preds\\unpeeled_folds\\pi.txt 
-\\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>\\results\\abund_preds\\unpeeled_folds\\summary.txt 
-\\\<six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>\\results\\abund_preds\\unpeeled_folds\\test.pred.ave.txt 
+\\\<run_name>\\results\\abund_preds\\unpeeled_folds\\pd.txt
+\\\<run_name>\\results\\abund_preds\\unpeeled_folds\\pi.txt 
+\\\<run_name>\\results\\abund_preds\\unpeeled_folds\\summary.txt 
+\\\<run_name>\\results\\abund_preds\\unpeeled_folds\\test.pred.ave.txt 
 
 The `ebirdst` package provides functions for accessing these, such that you should never have to handle them manually, granted that the original file structure of the results is maintained. These data are stored at "stixel centroids," which are the centers of the independent, partioned model extents (see Fink et al. 2010, Fink et al. 2013).
 
