@@ -1,11 +1,11 @@
 ---
-title: "ebirdst: Introduction to loading, mapping, and plotting eBird Status and Trend products"
+title: "Introduction to loading, mapping, and plotting"
 author: "Tom Auer, Daniel Fink"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteEncoding{UTF-8}
-  %\VignetteIndexEntry{ebirdst: Introduction to loading, mapping, and plotting eBird Status and Trend products}
+  %\VignetteIndexEntry{Introduction to loading, mapping, and plotting}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   chunk_output_type: console
@@ -32,81 +32,15 @@ knitr::opts_chunk$set(eval = nzchar(Sys.getenv("BUILD_VIGNETTES")))
 
 # Outline
 
-1. Background
-2. Projections and Loading Rasters
-3. Mapping Occurrence and Abundance
-4. Extracting Trajectories with Uncertainty
-5. Conversion
+1. [Loading Rasters](#loading-rasters)
+2. [Mapping Occurrence and Abundance](#mapping-occurrence-and-abundance)
+3. [Extracting Trajectories with Uncertainty](#extracting-trajectories-with-uncertainty)
 
-# 1. Background
-
-Many ecological and conservation problems require comprehensive, high-resolution information about the spatial and temporal distribution and abundance of species’ populations. This poses a challenge because observations of species are often sparsely and irregularly distributed, especially for widely distributed species. To address this challenge, species distribution models are used to estimate species’ distributions in unobserved locations and times. By associating local environmental characteristics with observed patterns of species occurrence and abundance statistical models provide a framework to harness available data and make estimates in unobserved areas. Additionally, these models can be used to control for known sources of biases that arise from the observation process.
-
-The relative abundance estimates described here were based on bird observation data from [eBird](www.ebird.org), a citizen-science program administered by Cornell Lab of Ornithology, and local land cover descriptions derived from NASA MODIS and other remote sensing data. Individual species’ distributions and abundance were modeled using a spatio-temporal ensemble of boosted regression using the Spatio-Temporal Exploratory Model (STEM) framework (see Fink et al. 2010, 2014 and Johnston et al. 2015).
-
-These models were then used to produce one daily abundance and occurrence estimate per week for all 52 weeks of the year. For each week, estimates were made across a regular grid of locations that cover terrestrial North America at a resolution of 2.8km x 2.8km. Variation in detectability associated with the search effort is controlled by standardizing the estimates to be the expected count of the species on a search conducted for one hour while traveling 1 km at the optimal time of day for detection of that species, on the given day at the given location by a skilled eBirder.
-
-Each relative abundance estimate was computed as an ensemble average of up to 100 randomized base models. Averaging across an ensemble of base model estimates, each trained on random subsample of the data, produces a smoothed bootstrap (Efron 2014) or a bagged estimator. For each abundance estimate we also computed upper and lower limits as the 10th and 90th percentiles across the ensemble. These limits are conservative estimates of the sampling variation of the smoothed bootstrap estimator, for the reasons discussed in Efron (2014), and because they are based on subsamples of the full data set.
-
-## Data access
-
-**DATA ACCESS TO BE PROVIDED VIA AWS IN THE NEXT 2-4 MONTHS**
-
-## Data Structure and Types
-
-**IMPORTANT. AFTER DOWNLOADING THE RESULTS AND UNZIPPING THEM, DO NOT CHANGE THE FILE STRUCTURE.** All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package.If you use this package to analyze the results, you do not ever need to interact with the files directly, outside of R.
-
-eBird Status and Trends abundance and occurrence estimates are currently provided in the widely used GeoTiff raster format. These are easily opened with the `raster` package in R, as well as with a variety of GIS software tools. Results are grouped by species, using a unique run name. The structure of the run name is: <six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>. A full list of species and run names can be found in the `ebirdst_runs` [data frame](https://cornelllabofornithology.github.io/ebirdst/reference/ebirdst_runs.html). 
-
-The results are structured in the following way, with the abundance and occurrence estimate GeoTiff files for being found under the \\\<run_name>\\results\\tifs\\ directory.
-  
-\\\<run_name>\\data\\ebird.abund_<run_name>_erd.test.data.csv
-\\\<run_name>\\data\\<run_name>_srd_raster_template.tif
-\\\<run_name>\\results\\abund_preds\\unpeeled_folds\\pd.txt
-\\\<run_name>\\results\\abund_preds\\unpeeled_folds\\pi.txt 
-\\\<run_name>\\results\\abund_preds\\unpeeled_folds\\summary.txt 
-\\\<run_name>\\results\\abund_preds\\unpeeled_folds\\test.pred.ave.txt 
-\\\<run_name>\\results\\tifs\\<run_name>_hr_2016_abundance_umean.tif
-\\\<run_name>\\results\\tifs\\<run_name>_hr_2016_abundance_upper.tif
-\\\<run_name>\\results\\tifs\\<run_name>_hr_2016_abundance_lower.tif
-\\\<run_name>\\results\\tifs\\<run_name>_hr_2016_occurrence_umean.tif
-    
-### Raster Layer Descriptions
-
-| Type | Measure | File Name |
-| ---------- | ---------- |  ---------- |
-| occurrence | trimmed mean | \*\_hr\_2016\_occurrence\_umean.tif  |
-| abundance  | trimmed mean | \*\_hr\_2016\_abundance\_umean.tif |
-| abundance  | 10th quantile | \*\_hr\_2016\_abundance\_lower.tif  |
-| abundance  | 90th quantile | \*\_hr\_2016\_abundance\_upper.tif  |
-    
-#### occurrence_umean
-
-This layer represents the mean probability of occurrence, ranging from 0 to 1, for a 1-hour, 1-kilometre eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.
-
-#### abundance_umean
-
-This layer represents the mean estimated relative abundance of the species, defined as the expected number of birds encountered on a 1-hour, 1-kilometre eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.
-
-#### abundance_lower
-
-This layer represents the lower 10th quantile of the estimated relative abundance of the species, defined as the expected number of birds encountered on a 1-hour, 1-kilometre eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.
-
-#### abundance_upper
-
-This layer represents the upper 90th quantile of the estimated relative abundance of the species, defined as the expected number of birds encountered on a 1-hour, 1-kilometre eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.
-
-# 2. Projection and Loading Rasters
-
-## Projection
-
-The GeoTiffs use the same Sinusoidal projection as NASA MODIS data. As part of this package, we provide a template raster (\\\<run_name>\\data\\<run_name_srd_raster_template.tif), that contains the spatial extent and resolution for the full Western Hemisphere extent. Note that this year's result cover only North America. Accessing this raster directly through the package is not necessary, but can be applied elsewhere (e.g., other GIS software).
-
-## Loading Rasters
+# Loading Rasters
 
 Once you have downloaded a set of eBird Status and Trends products, one of the first tasks is to load one of the abundance or occurrence estimate and plot it. Each estimate is stored in a multi-band GeoTiff file and are most appropriately loaded as a `RasterStack` object. These "cubes" come with areas of predicted and assumed zeroes, such that any cells that are NA represent areas outside of the area of estimation. All cubes have 52 weeks, even if some weeks are all NA (such as those species that winter entirely outside of North America). The following code example shows how to load an estimate raster and assign names.
 
-TODO: update data access.
+**DATA ACCESS DETAILS TO BE PROVIDED VIA AWS IN THE NEXT 2-4 MONTHS**
 
 ```{r load_raster_stack}
 library(ebirdst)
@@ -133,7 +67,7 @@ date_vector <- parse_raster_dates(abunds)
 print(date_vector)
 ```
 
-# 3. Mapping Occurrence and Abundance
+# Mapping Occurrence and Abundance
 
 One of the most common tasks with eBird Status and Trends products is to make maps of occurrence and abundance. It is fast and easy to make maps with limited code, but to get ideal maps takes extra preparation. This section describes some functions in the `ebirdst` package intended to assist with mapping.
 
@@ -323,7 +257,6 @@ In addition to occurrence and abundance estimates, we also provide confidence in
 ```{r map_confidence_band}
 # load lower and upper stacks
 # load trimmed mean abundances and label dates
-load_raster("abundance_upper", path = sp_path)
 lower <- load_raster("abundance_lower", path = sp_path)
 upper <- load_raster("abundance_upper", path = sp_path)
 
@@ -338,7 +271,7 @@ plot(trim(conf_week26), col = magma(20),
      axes = FALSE, box = FALSE)
 ```
 
-# 4. Extracting Trajectories with Uncertainty
+# Extracting Trajectories with Uncertainty
 
 With `RasterStacks` for relative abundance estimates, as well as upper and lower confidence intervals, we can extract an abundance trajectory with uncertainty intervals and plot them across the year for a single location.
 
@@ -403,28 +336,6 @@ ggplot(plot_frame, aes(x, y)) +
   ylab("Expected Count (count/(km hr))") +
   xlab("Week") +
   theme_light()
-```
-
-# 5. Conversion
-
-The `raster` package has a lot of functionality and the `RasterLayer` format is useful for spatial analysis and mapping, but some users do not have GIS experience or want the data in a simpler format for their preferred method of analysis. There are multiple ways to get more basic representations of the data.
-
-```{r conversion}
-# to convert the data to a simpler geographic format and access tabularly	
-# reproject into geographic (decimal degrees) 
-abund_stack_ll <- projectRaster(abunds[[26]], crs = "+init=epsg:4326", 
-                                method = "ngb")
-
-# Convert raster object into a matrix
-p <- rasterToPoints(abund_stack_ll)
-colnames(p) <- c("longitude", "latitude", "abundance_umean")
-head(p)
-```
-
-These results can then be written to CSV.
-
-```{r conversion_write, eval = FALSE}
-write.csv(p, file = "yebsap_week26.csv", row.names = FALSE)
 ```
 
 ## References

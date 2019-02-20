@@ -41,13 +41,16 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="articles/ebirdst-intro-mapping.html">Intro Vignette</a>
+  <a href="articles/ebirdst-introduction.html">Introduction - Data Access and Structure</a>
 </li>
 <li>
-  <a href="articles/ebirdst-pipd.html">Advanced Vignette</a>
+  <a href="articles/ebirdst-intro-mapping.html">Intro Mapping</a>
 </li>
 <li>
-  <a href="articles/ebirdst-seasonal-maps.html">Seasonal Vignette</a>
+  <a href="articles/ebirdst-advanced-mapping.html">Advanced Mapping</a>
+</li>
+<li>
+  <a href="articles/ebirdst-non-raster.html">Non-Raster Data</a>
 </li>
 <li>
   <a href="reference/index.html">Function Reference</a>
@@ -91,12 +94,12 @@ devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumen
 <div id="vignettes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#vignettes" class="anchor"></a>Vignettes</h2>
-<p>For a full introduction and advanced usage, please see the package <a href="https://cornelllabofornithology.github.io/ebirdst">website</a>. An <a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html">introductory vignette</a> details the structure of the results and how to begin loading and mapping the results. The <a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-pipd.html">advanced vignette</a> details how to access additional information from the model results about predictor importance and directionality, as well as predictive performance metrics. Finally, the <a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-seasonal-maps.html">seasonal vignette</a> shows how to reproduce the seasonal maps and statistics on the <a href="https://ebird.org/science/status-and-trends">eBird Status and Trends website</a>.</p>
+<p>For a full introduction and advanced usage, please see the package <a href="https://cornelllabofornithology.github.io/ebirdst">website</a>. An <a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-introduction.html">introductory vignette</a> details the data access and structure of the results. An <a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html">intro mapping vignette</a> expands upon the quick start readme and shows the basic mapping moves. The <a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-advanced-mapping.html">advanced mapping vignette</a> shows how to reproduce the seasonal maps and statistics on the <a href="https://ebird.org/science/status-and-trends">eBird Status and Trends website</a>. Finally, the <a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-pipd.html">non-raster data vignette</a> details how to access additional information from the model results about predictor importance and directionality, as well as predictive performance metrics.</p>
 </div>
 <div id="quick-start" class="section level2">
 <h2 class="hasAnchor">
 <a href="#quick-start" class="anchor"></a>Quick Start</h2>
-<p>This quick start guide show how to download example data and plot abundance values similar to how they are plotted for the <a href="https://ebird.org/science/status-and-trends/woothr/abundance-map-weekly">eBird Status and Trends Abundance animations</a>. <strong>Important note: after downloading the results, do not change the file structure.</strong> All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package. If you use this package to analyze the results, you do not ever need to interact with the files directly, outside of R.</p>
+<p>This quick start guide shows how to download example data and plot abundance values similar to how they are plotted for the <a href="https://ebird.org/science/status-and-trends/woothr/abundance-map-weekly">eBird Status and Trends Abundance animations</a>. <strong>Important note: after downloading the results, do not change the file structure.</strong> All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package. If you use this package to analyze the results, you do not ever need to interact with the files directly, outside of R.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ebirdst)
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(viridis)
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(raster)

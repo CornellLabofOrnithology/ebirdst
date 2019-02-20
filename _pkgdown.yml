@@ -2,12 +2,14 @@ navbar:
   title: ~
   type: default
   left:
-  - text: Intro Vignette
+  - text: Introduction - Data Access and Structure
+    href: articles/ebirdst-introduction.html
+  - text: Intro Mapping
     href: articles/ebirdst-intro-mapping.html
-  - text: Advanced Vignette
-    href: articles/ebirdst-pipd.html
-  - text: Seasonal Vignette
-    href: articles/ebirdst-seasonal-maps.html
+  - text: Advanced Mapping
+    href: articles/ebirdst-advanced-mapping.html
+  - text: Non-Raster Data
+    href: articles/ebirdst-non-raster.html
   - text: Function Reference
     href: reference/index.html
   right:
