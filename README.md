@@ -18,16 +18,19 @@ Vignettes
 For a full introduction and advanced usage, please see the package
 [website](https://cornelllabofornithology.github.io/ebirdst). An
 [introductory
+vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-introduction.html)
+details the data access and structure of the results. An [intro mapping
 vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html)
-details the structure of the results and how to begin loading and
-mapping the results. The [advanced
+expands upon the quick start readme and shows the basic mapping moves.
+The [advanced mapping
+vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-advanced-mapping.html)
+shows how to reproduce the seasonal maps and statistics on the [eBird
+Status and Trends website](https://ebird.org/science/status-and-trends).
+Finally, the [non-raster data
 vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-pipd.html)
 details how to access additional information from the model results
 about predictor importance and directionality, as well as predictive
-performance metrics. Finally, the [seasonal
-vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-seasonal-maps.html)
-shows how to reproduce the seasonal maps and statistics on the [eBird
-Status and Trends website](https://ebird.org/science/status-and-trends).
+performance metrics.
 
 Quick Start
 -----------

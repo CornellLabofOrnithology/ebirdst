@@ -5,11 +5,11 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ebirdst: Introduction to loading, mapping, and plotting eBird Status and Trend products • ebirdst</title>
+<title>Introduction to loading, mapping, and plotting • ebirdst</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="ebirdst: Introduction to loading, mapping, and plotting eBird Status and Trend products">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Introduction to loading, mapping, and plotting">
 <meta property="og:description" content="">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -37,13 +37,16 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="../articles/ebirdst-intro-mapping.html">Intro Vignette</a>
+  <a href="../articles/ebirdst-introduction.html">Introduction - Data Access and Structure</a>
 </li>
 <li>
-  <a href="../articles/ebirdst-pipd.html">Advanced Vignette</a>
+  <a href="../articles/ebirdst-intro-mapping.html">Intro Mapping</a>
 </li>
 <li>
-  <a href="../articles/ebirdst-seasonal-maps.html">Seasonal Vignette</a>
+  <a href="../articles/ebirdst-advanced-mapping.html">Advanced Mapping</a>
+</li>
+<li>
+  <a href="../articles/ebirdst-non-raster.html">Non-Raster Data</a>
 </li>
 <li>
   <a href="../reference/index.html">Function Reference</a>
@@ -68,10 +71,10 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1>ebirdst: Introduction to loading, mapping, and plotting eBird Status and Trend products</h1>
+      <h1>Introduction to loading, mapping, and plotting</h1>
                         <h4 class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2019-02-15</h4>
+            <h4 class="date">2019-02-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-intro-mapping.Rmd"><code>vignettes/ebirdst-intro-mapping.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-intro-mapping.Rmd</code></div>
@@ -89,100 +92,16 @@
 <h1 class="hasAnchor">
 <a href="#outline" class="anchor"></a>Outline</h1>
 <ol style="list-style-type: decimal">
-<li>Background</li>
-<li>Projections and Loading Rasters</li>
-<li>Mapping Occurrence and Abundance</li>
-<li>Extracting Trajectories with Uncertainty</li>
-<li>Conversion</li>
+<li><a href="#loading-rasters">Loading Rasters</a></li>
+<li><a href="#mapping-occurrence-and-abundance">Mapping Occurrence and Abundance</a></li>
+<li><a href="#extracting-trajectories-with-uncertainty">Extracting Trajectories with Uncertainty</a></li>
 </ol>
 </div>
-<div id="background" class="section level1">
+<div id="loading-rasters" class="section level1">
 <h1 class="hasAnchor">
-<a href="#background" class="anchor"></a>1. Background</h1>
-<p>Many ecological and conservation problems require comprehensive, high-resolution information about the spatial and temporal distribution and abundance of species’ populations. This poses a challenge because observations of species are often sparsely and irregularly distributed, especially for widely distributed species. To address this challenge, species distribution models are used to estimate species’ distributions in unobserved locations and times. By associating local environmental characteristics with observed patterns of species occurrence and abundance statistical models provide a framework to harness available data and make estimates in unobserved areas. Additionally, these models can be used to control for known sources of biases that arise from the observation process.</p>
-<p>The relative abundance estimates described here were based on bird observation data from <a href="www.ebird.org">eBird</a>, a citizen-science program administered by Cornell Lab of Ornithology, and local land cover descriptions derived from NASA MODIS and other remote sensing data. Individual species’ distributions and abundance were modeled using a spatio-temporal ensemble of boosted regression using the Spatio-Temporal Exploratory Model (STEM) framework (see Fink et al. 2010, 2014 and Johnston et al. 2015).</p>
-<p>These models were then used to produce one daily abundance and occurrence estimate per week for all 52 weeks of the year. For each week, estimates were made across a regular grid of locations that cover terrestrial North America at a resolution of 2.8km x 2.8km. Variation in detectability associated with the search effort is controlled by standardizing the estimates to be the expected count of the species on a search conducted for one hour while traveling 1 km at the optimal time of day for detection of that species, on the given day at the given location by a skilled eBirder.</p>
-<p>Each relative abundance estimate was computed as an ensemble average of up to 100 randomized base models. Averaging across an ensemble of base model estimates, each trained on random subsample of the data, produces a smoothed bootstrap (Efron 2014) or a bagged estimator. For each abundance estimate we also computed upper and lower limits as the 10th and 90th percentiles across the ensemble. These limits are conservative estimates of the sampling variation of the smoothed bootstrap estimator, for the reasons discussed in Efron (2014), and because they are based on subsamples of the full data set.</p>
-<div id="data-access" class="section level2">
-<h2 class="hasAnchor">
-<a href="#data-access" class="anchor"></a>Data access</h2>
-<p><strong>DATA ACCESS TO BE PROVIDED VIA AWS IN THE NEXT 2-4 MONTHS</strong></p>
-</div>
-<div id="data-structure-and-types" class="section level2">
-<h2 class="hasAnchor">
-<a href="#data-structure-and-types" class="anchor"></a>Data Structure and Types</h2>
-<p><strong>IMPORTANT. AFTER DOWNLOADING THE RESULTS AND UNZIPPING THEM, DO NOT CHANGE THE FILE STRUCTURE.</strong> All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package.If you use this package to analyze the results, you do not ever need to interact with the files directly, outside of R.</p>
-<p>eBird Status and Trends abundance and occurrence estimates are currently provided in the widely used GeoTiff raster format. These are easily opened with the <code>raster</code> package in R, as well as with a variety of GIS software tools. Results are grouped by species, using a unique run name. The structure of the run name is: <six_letter_code-erd2016-ebird_science-date-uuid>. A full list of species and run names can be found in the <code>ebirdst_runs</code> <a href="https://cornelllabofornithology.github.io/ebirdst/reference/ebirdst_runs.html">data frame</a>.</six_letter_code-erd2016-ebird_science-date-uuid></p>
-<p>The results are structured in the following way, with the abundance and occurrence estimate GeoTiff files for being found under the \&lt;run_name&gt;\results\tifs\ directory.</p>
-<p>\&lt;run_name&gt;\data\ebird.abund_<run_name>_erd.test.data.csv \&lt;run_name&gt;\data\<run_name>_srd_raster_template.tif \&lt;run_name&gt;\results\abund_preds\unpeeled_folds\pd.txt \&lt;run_name&gt;\results\abund_preds\unpeeled_folds\pi.txt \&lt;run_name&gt;\results\abund_preds\unpeeled_folds\summary.txt \&lt;run_name&gt;\results\abund_preds\unpeeled_folds\test.pred.ave.txt \&lt;run_name&gt;\results\tifs\<run_name>_hr_2016_abundance_umean.tif \&lt;run_name&gt;\results\tifs\<run_name>_hr_2016_abundance_upper.tif \&lt;run_name&gt;\results\tifs\<run_name>_hr_2016_abundance_lower.tif \&lt;run_name&gt;\results\tifs\<run_name>_hr_2016_occurrence_umean.tif</run_name></run_name></run_name></run_name></run_name></run_name></p>
-<div id="raster-layer-descriptions" class="section level3">
-<h3 class="hasAnchor">
-<a href="#raster-layer-descriptions" class="anchor"></a>Raster Layer Descriptions</h3>
-<table class="table">
-<thead><tr class="header">
-<th>Type</th>
-<th>Measure</th>
-<th>File Name</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td>occurrence</td>
-<td>trimmed mean</td>
-<td>*_hr_2016_occurrence_umean.tif</td>
-</tr>
-<tr class="even">
-<td>abundance</td>
-<td>trimmed mean</td>
-<td>*_hr_2016_abundance_umean.tif</td>
-</tr>
-<tr class="odd">
-<td>abundance</td>
-<td>10th quantile</td>
-<td>*_hr_2016_abundance_lower.tif</td>
-</tr>
-<tr class="even">
-<td>abundance</td>
-<td>90th quantile</td>
-<td>*_hr_2016_abundance_upper.tif</td>
-</tr>
-</tbody>
-</table>
-<div id="occurrence_umean" class="section level4">
-<h4 class="hasAnchor">
-<a href="#occurrence_umean" class="anchor"></a>occurrence_umean</h4>
-<p>This layer represents the mean probability of occurrence, ranging from 0 to 1, for a 1-hour, 1-kilometre eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.</p>
-</div>
-<div id="abundance_umean" class="section level4">
-<h4 class="hasAnchor">
-<a href="#abundance_umean" class="anchor"></a>abundance_umean</h4>
-<p>This layer represents the mean estimated relative abundance of the species, defined as the expected number of birds encountered on a 1-hour, 1-kilometre eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.</p>
-</div>
-<div id="abundance_lower" class="section level4">
-<h4 class="hasAnchor">
-<a href="#abundance_lower" class="anchor"></a>abundance_lower</h4>
-<p>This layer represents the lower 10th quantile of the estimated relative abundance of the species, defined as the expected number of birds encountered on a 1-hour, 1-kilometre eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.</p>
-</div>
-<div id="abundance_upper" class="section level4">
-<h4 class="hasAnchor">
-<a href="#abundance_upper" class="anchor"></a>abundance_upper</h4>
-<p>This layer represents the upper 90th quantile of the estimated relative abundance of the species, defined as the expected number of birds encountered on a 1-hour, 1-kilometre eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.</p>
-</div>
-</div>
-</div>
-</div>
-<div id="projection-and-loading-rasters" class="section level1">
-<h1 class="hasAnchor">
-<a href="#projection-and-loading-rasters" class="anchor"></a>2. Projection and Loading Rasters</h1>
-<div id="projection" class="section level2">
-<h2 class="hasAnchor">
-<a href="#projection" class="anchor"></a>Projection</h2>
-<p>The GeoTiffs use the same Sinusoidal projection as NASA MODIS data. As part of this package, we provide a template raster (\&lt;run_name&gt;\data\&lt;run_name_srd_raster_template.tif), that contains the spatial extent and resolution for the full Western Hemisphere extent. Note that this year’s result cover only North America. Accessing this raster directly through the package is not necessary, but can be applied elsewhere (e.g., other GIS software).</p>
-</div>
-<div id="loading-rasters" class="section level2">
-<h2 class="hasAnchor">
-<a href="#loading-rasters" class="anchor"></a>Loading Rasters</h2>
+<a href="#loading-rasters" class="anchor"></a>Loading Rasters</h1>
 <p>Once you have downloaded a set of eBird Status and Trends products, one of the first tasks is to load one of the abundance or occurrence estimate and plot it. Each estimate is stored in a multi-band GeoTiff file and are most appropriately loaded as a <code>RasterStack</code> object. These “cubes” come with areas of predicted and assumed zeroes, such that any cells that are NA represent areas outside of the area of estimation. All cubes have 52 weeks, even if some weeks are all NA (such as those species that winter entirely outside of North America). The following code example shows how to load an estimate raster and assign names.</p>
-<p>TODO: update data access.</p>
+<p><strong>DATA ACCESS DETAILS TO BE PROVIDED VIA AWS IN THE NEXT 2-4 MONTHS</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ebirdst)
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(raster)
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(sf)
@@ -217,10 +136,9 @@ date_vector &lt;-<span class="st"> </span><span class="kw"><a href="../reference
 <span class="co">#&gt; [46] "2016-11-16" "2016-11-23" "2016-11-30" "2016-12-07" "2016-12-14"</span>
 <span class="co">#&gt; [51] "2016-12-21" "2016-12-28"</span></code></pre></div>
 </div>
-</div>
 <div id="mapping-occurrence-and-abundance" class="section level1">
 <h1 class="hasAnchor">
-<a href="#mapping-occurrence-and-abundance" class="anchor"></a>3. Mapping Occurrence and Abundance</h1>
+<a href="#mapping-occurrence-and-abundance" class="anchor"></a>Mapping Occurrence and Abundance</h1>
 <p>One of the most common tasks with eBird Status and Trends products is to make maps of occurrence and abundance. It is fast and easy to make maps with limited code, but to get ideal maps takes extra preparation. This section describes some functions in the <code>ebirdst</code> package intended to assist with mapping.</p>
 <div id="projections" class="section level2">
 <h2 class="hasAnchor">
@@ -398,15 +316,6 @@ ltq &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumen
 <p>In addition to occurrence and abundance estimates, we also provide confidence intervals at an upper value of 90% and lower value of 10%. These can be used to calculate and map a confidence band width.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load lower and upper stacks</span>
 <span class="co"># load trimmed mean abundances and label dates</span>
-<span class="kw"><a href="../reference/load_raster.html">load_raster</a></span>(<span class="st">"abundance_upper"</span>, <span class="dt">path =</span> sp_path)
-<span class="co">#&gt; class       : RasterStack </span>
-<span class="co">#&gt; dimensions  : 259, 276, 71484, 52  (nrow, ncol, ncell, nlayers)</span>
-<span class="co">#&gt; resolution  : 2779.876, 2779.876  (x, y)</span>
-<span class="co">#&gt; extent      : -7202659, -6435414, 4636834, 5356822  (xmin, xmax, ymin, ymax)</span>
-<span class="co">#&gt; coord. ref. : +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs </span>
-<span class="co">#&gt; names       : X2016.01.04, X2016.01.11, X2016.01.18, X2016.01.25, X2016.02.01, X2016.02.08, X2016.02.15, X2016.02.22, X2016.03.01, X2016.03.08, X2016.03.15, X2016.03.22, X2016.03.29, X2016.04.05, X2016.04.12, ... </span>
-<span class="co">#&gt; min values  :   0.0000000,   0.0000000,   0.0000000,   0.0000000,   0.0000000,   0.0000000,   0.0000000,   0.0000000,   0.0000000,   0.0000000,   0.0000000,   0.0000000,   0.0000000,   0.0000000,   0.6032553, ... </span>
-<span class="co">#&gt; max values  :   0.8690163,   0.9253958,   0.9785467,   0.9942065,   0.9071717,   0.8273566,   0.8801375,   0.7007977,   0.7467889,   0.7872463,   0.7528933,   0.8483694,   1.0954437,   1.8606548,   2.6308384, ...</span>
 lower &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_raster.html">load_raster</a></span>(<span class="st">"abundance_lower"</span>, <span class="dt">path =</span> sp_path)
 upper &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_raster.html">load_raster</a></span>(<span class="st">"abundance_upper"</span>, <span class="dt">path =</span> sp_path)
 
@@ -424,7 +333,7 @@ conf_week26 &lt;-<span class="st"> </span><span class="kw"><a href="https://www.
 </div>
 <div id="extracting-trajectories-with-uncertainty" class="section level1">
 <h1 class="hasAnchor">
-<a href="#extracting-trajectories-with-uncertainty" class="anchor"></a>4. Extracting Trajectories with Uncertainty</h1>
+<a href="#extracting-trajectories-with-uncertainty" class="anchor"></a>Extracting Trajectories with Uncertainty</h1>
 <p>With <code>RasterStacks</code> for relative abundance estimates, as well as upper and lower confidence intervals, we can extract an abundance trajectory with uncertainty intervals and plot them across the year for a single location.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># set a point</span>
 pt &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st">st_point</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="op">-</span><span class="fl">88.1</span>, <span class="fl">46.7</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
@@ -484,29 +393,6 @@ plot_frame &lt;-<span class="st"> </span><span class="kw"><a href="https://www.r
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span>(<span class="st">"Week"</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_light</a></span>()</code></pre></div>
 <p><img src="ebirdst-intro-mapping_files/figure-html/trajectories_region-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
-</div>
-<div id="conversion" class="section level1">
-<h1 class="hasAnchor">
-<a href="#conversion" class="anchor"></a>5. Conversion</h1>
-<p>The <code>raster</code> package has a lot of functionality and the <code>RasterLayer</code> format is useful for spatial analysis and mapping, but some users do not have GIS experience or want the data in a simpler format for their preferred method of analysis. There are multiple ways to get more basic representations of the data.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># to convert the data to a simpler geographic format and access tabularly   </span>
-<span class="co"># reproject into geographic (decimal degrees) </span>
-abund_stack_ll &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/projectRaster">projectRaster</a></span>(abunds[[<span class="dv">26</span>]], <span class="dt">crs =</span> <span class="st">"+init=epsg:4326"</span>, 
-                                <span class="dt">method =</span> <span class="st">"ngb"</span>)
-
-<span class="co"># Convert raster object into a matrix</span>
-p &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/rasterToPoints">rasterToPoints</a></span>(abund_stack_ll)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">colnames</a></span>(p) &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"longitude"</span>, <span class="st">"latitude"</span>, <span class="st">"abundance_umean"</span>)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/headtail">head</a></span>(p)
-<span class="co">#&gt;      longitude latitude abundance_umean</span>
-<span class="co">#&gt; [1,] -88.53912  48.1625       0.0000000</span>
-<span class="co">#&gt; [2,] -88.50382  48.1625       0.0000000</span>
-<span class="co">#&gt; [3,] -88.64502  48.1375       0.0000000</span>
-<span class="co">#&gt; [4,] -88.60972  48.1375       0.0000000</span>
-<span class="co">#&gt; [5,] -88.57442  48.1375       0.6022081</span>
-<span class="co">#&gt; [6,] -88.53912  48.1375       0.4725851</span></code></pre></div>
-<p>These results can then be written to CSV.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/write.table">write.csv</a></span>(p, <span class="dt">file =</span> <span class="st">"yebsap_week26.csv"</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <div id="references" class="section level2">
 <h2 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h2>
@@ -521,20 +407,9 @@ p &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumenta
 <a href="#tocnav" class="anchor"></a>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
 <li><a href="#outline">Outline</a></li>
-      <li>
-<a href="#background">1. Background</a><ul class="nav nav-pills nav-stacked">
-<li><a href="#data-access">Data access</a></li>
-      <li><a href="#data-structure-and-types">Data Structure and Types</a></li>
-      </ul>
-</li>
-      <li>
-<a href="#projection-and-loading-rasters">2. Projection and Loading Rasters</a><ul class="nav nav-pills nav-stacked">
-<li><a href="#projection">Projection</a></li>
       <li><a href="#loading-rasters">Loading Rasters</a></li>
-      </ul>
-</li>
       <li>
-<a href="#mapping-occurrence-and-abundance">3. Mapping Occurrence and Abundance</a><ul class="nav nav-pills nav-stacked">
+<a href="#mapping-occurrence-and-abundance">Mapping Occurrence and Abundance</a><ul class="nav nav-pills nav-stacked">
 <li><a href="#projections">Projections</a></li>
       <li><a href="#mapping-occurrence">Mapping Occurrence</a></li>
       <li><a href="#calculating-abundance-bins">Calculating Abundance Bins</a></li>
@@ -542,9 +417,8 @@ p &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumenta
       <li><a href="#mapping-abundance-confidence-intervals">Mapping Abundance Confidence Intervals</a></li>
       </ul>
 </li>
-      <li><a href="#extracting-trajectories-with-uncertainty">4. Extracting Trajectories with Uncertainty</a></li>
       <li>
-<a href="#conversion">5. Conversion</a><ul class="nav nav-pills nav-stacked">
+<a href="#extracting-trajectories-with-uncertainty">Extracting Trajectories with Uncertainty</a><ul class="nav nav-pills nav-stacked">
 <li><a href="#references">References</a></li>
       </ul>
 </li>
