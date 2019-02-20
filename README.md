@@ -32,7 +32,7 @@ Status and Trends website](https://ebird.org/science/status-and-trends).
 Quick Start
 -----------
 
-This quick start guide show how to download example data and plot
+This quick start guide shows how to download example data and plot
 abundance values similar to how they are plotted for the [eBird Status
 and Trends Abundance
 animations](https://ebird.org/science/status-and-trends/woothr/abundance-map-weekly).
