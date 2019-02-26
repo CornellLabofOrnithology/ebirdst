@@ -9,8 +9,8 @@ Installation
 You can install `ebirdst` from GitHub with:
 
     # install the development version from GitHub
-    # install.packages("devtools")
-    devtools::install_github("CornellLabofOrnithology/ebirdst")
+    # install.packages("remotes")
+    remotes::install_github("CornellLabofOrnithology/ebirdst")
 
 Vignettes
 ---------

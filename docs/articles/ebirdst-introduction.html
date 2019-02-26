@@ -74,7 +74,7 @@
       <h1>Background, Data Access, and Data Structure</h1>
                         <h4 class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2019-02-20</h4>
+            <h4 class="date">2019-02-26</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-introduction.Rmd"><code>vignettes/ebirdst-introduction.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-introduction.Rmd</code></div>
@@ -117,6 +117,12 @@
 <span class="co"># by default file will be stored in a persistent data directory:</span>
 <span class="co"># rappdirs::user_data_dir("ebirdst"))</span>
 sp_path &lt;-<span class="st"> </span><span class="kw"><a href="../reference/download_data.html">download_data</a></span>(<span class="dt">species =</span> <span class="st">"example_data"</span>)</code></pre></div>
+<div id="access-from-amazon-web-services" class="section level2">
+<h2 class="hasAnchor">
+<a href="#access-from-amazon-web-services" class="anchor"></a>Access from Amazon Web Services</h2>
+<p>The eBird Status and Trends data are stored in the cloud using <a href="https://aws.amazon.com/">Amazon Web Services (AWS)</a> object storage service, <a href="https://aws.amazon.com/s3/">S3</a>. AWS also provides access to flexible cloud computing resources in the form of <a href="https://aws.amazon.com/ec2/">EC2</a> instances. Users may want to considering analyzing Status and Trends data using an AWS EC2 instance because data transfer will be extremely fast between S3 and EC2 compared to downloading the data to a local machine. An additional benefit of using EC2 for analyses is access to instances with more powerful computing resources than a desktop or laptop. Working with the Status and Trends data can be extremely memory intensive, due to their high spatial and temporal resolution, so these additional resources can significantly speed up analyses.</p>
+<p>For instruction on how to set up RStudio on an AWS EC2 instance consult <a href="http://www.louisaslett.com/RStudio_AMI/">Louis Aslett’s detailed guide</a>. After following these instructions, you will be able to log in to an RStudio session in the cloud using your web browser. Within this RStudio session, run <code><a href="https://www.rdocumentation.org/packages/remotes/topics/install_github">remotes::install_github("CornellLabofOrnithology/ebirdst")</a></code> to install the <code>ebirdst</code> package. You should now be able to work with eBird Status and Trends data in the cloud on AWS.</p>
+</div>
 </div>
 <div id="data-types-and-structure" class="section level1">
 <h1 class="hasAnchor">
@@ -255,7 +261,11 @@ p &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumenta
       <ul class="nav nav-pills nav-stacked">
 <li><a href="#outline">Outline</a></li>
       <li><a href="#background">Background</a></li>
-      <li><a href="#data-access">Data Access</a></li>
+      <li>
+<a href="#data-access">Data Access</a><ul class="nav nav-pills nav-stacked">
+<li><a href="#access-from-amazon-web-services">Access from Amazon Web Services</a></li>
+      </ul>
+</li>
       <li>
 <a href="#data-types-and-structure">Data Types and Structure</a><ul class="nav nav-pills nav-stacked">
 <li><a href="#data-types">Data Types</a></li>
