@@ -64,7 +64,11 @@ library(ebirdst)
 # returns the full path of the results. Please note that the example_data is
 # for Yellow-bellied Sapsucker and has the same run code as the real data,
 # so if you download both, make sure you put the example_data somewhere else.
-sp_path <- download_data(species = "example_data")
+
+# Because the non-raster data is large, there is a parameter on the
+# download_data function that defaults to downloading only the raster data.
+# To access the non-raster data, set tifs_only = FALSE.
+sp_path <- download_data(species = "example_data", tifs_only = FALSE)
 print(sp_path)
 
 pis <- load_pis(sp_path)

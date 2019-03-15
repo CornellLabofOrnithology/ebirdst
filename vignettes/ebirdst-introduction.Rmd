@@ -132,7 +132,7 @@ This layer represents the upper 90th quantile of the estimated relative abundanc
 
 ## Non-raster Data
 
-The non-raster, tabular, text data containing information about modeled relationships between observations and the ecological covariates are best accessed through functionality provided in this package. However, in using them through the package, it is possible to export them to other tabular formats for use with other software. For information about working with these data, please reference to the [non-raster data vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-pipd.html) for details on how to access additional information from the model results about predictor importance and directionality, as well as predictive performance metrics.
+The non-raster, tabular data containing information about modeled relationships between observations and the ecological covariates are best accessed through functionality provided in this package. However, in using them through the package, it is possible to export them to other tabular formats for use with other software. For information about working with these data, please reference to the [non-raster data vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-pipd.html) for details on how to access additional information from the model results about predictor importance and directionality, as well as predictive performance metrics. Important note: to access the non-raster data, use the parameter `tifs_only = FALSE` in the `download_data()` function.
 
 # Vignettes
 
