@@ -5,10 +5,10 @@
 \title{Download eBird Status and Trends Data}
 \usage{
 download_data(species, path = rappdirs::user_data_dir("ebirdst"),
-  force = FALSE)
+  tifs_only = TRUE, force = FALSE)
 }
 \arguments{
-\item{species}{character; a single six-letter species code (e.g. rufhum).
+\item{species}{character; a single six-letter species code (e.g. woothr).
 The full list of valid codes is can be viewed in the \link{ebirdst_runs} data
 frame included in this package. To download the example dataset, use
 "example_data".}
@@ -18,6 +18,11 @@ files will be placed in a sub-directory of this directory named according
 to the unique run ID associated with this species. Defaults to a persistent
 data directory, which can be found by calling
 rappdirs::user_data_dir("ebirdst")).}
+
+\item{tifs_only}{logical; whether to only download the GeoTIFFs for
+abundance and occurrence (the default), or download the entire data
+package, including data for predictor importance, partial dependence, and
+predictive performance metrics.}
 
 \item{force}{logical; if the data have already been downloaded, should a
 fresh copy be downloaded anyway.}
@@ -34,7 +39,11 @@ than the full dataset making these data quicker to download and process.
 \examples{
 \dontrun{
 
-download_data("example_data", force = TRUE)
+# download the example data
+download_data("example_data")
+
+# download the full data package for wood thrush
+download_data("woothr")
 
 }
 }

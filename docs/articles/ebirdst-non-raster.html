@@ -74,7 +74,7 @@
       <h1>Non-raster Data: Using Predictor Importance, Predictor Directionality,and Predictive Performance Metrics</h1>
                         <h4 class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2019-02-26</h4>
+            <h4 class="date">2019-03-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-non-raster.Rmd"><code>vignettes/ebirdst-non-raster.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-non-raster.Rmd</code></div>
@@ -121,7 +121,11 @@
 <span class="co"># returns the full path of the results. Please note that the example_data is</span>
 <span class="co"># for Yellow-bellied Sapsucker and has the same run code as the real data,</span>
 <span class="co"># so if you download both, make sure you put the example_data somewhere else.</span>
-sp_path &lt;-<span class="st"> </span><span class="kw"><a href="../reference/download_data.html">download_data</a></span>(<span class="dt">species =</span> <span class="st">"example_data"</span>)
+
+<span class="co"># Because the non-raster data is large, there is a parameter on the</span>
+<span class="co"># download_data function that defaults to downloading only the raster data.</span>
+<span class="co"># To access the non-raster data, set tifs_only = FALSE.</span>
+sp_path &lt;-<span class="st"> </span><span class="kw"><a href="../reference/download_data.html">download_data</a></span>(<span class="dt">species =</span> <span class="st">"example_data"</span>, <span class="dt">tifs_only =</span> <span class="ot">FALSE</span>)
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(sp_path)
 <span class="co">#&gt; [1] "/Users/mta45/Library/Application Support/ebirdst/yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"</span>
 

@@ -123,14 +123,14 @@ than the full dataset making these data quicker to download and process.</p>
     </div>
 
     <pre class="usage"><span class='fu'>download_data</span>(<span class='no'>species</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='kw pkg'>rappdirs</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/rappdirs/topics/user_data_dir'>user_data_dir</a></span>(<span class='st'>"ebirdst"</span>),
-  <span class='kw'>force</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+  <span class='kw'>tifs_only</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>force</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>species</th>
-      <td><p>character; a single six-letter species code (e.g. rufhum).
+      <td><p>character; a single six-letter species code (e.g. woothr).
 The full list of valid codes is can be viewed in the <a href='ebirdst_runs.html'>ebirdst_runs</a> data
 frame included in this package. To download the example dataset, use
 "example_data".</p></td>
@@ -142,6 +142,13 @@ files will be placed in a sub-directory of this directory named according
 to the unique run ID associated with this species. Defaults to a persistent
 data directory, which can be found by calling
 rappdirs::user_data_dir("ebirdst")).</p></td>
+    </tr>
+    <tr>
+      <th>tifs_only</th>
+      <td><p>logical; whether to only download the GeoTIFFs for
+abundance and occurrence (the default), or download the entire data
+package, including data for predictor importance, partial dependence, and
+predictive performance metrics.</p></td>
     </tr>
     <tr>
       <th>force</th>
@@ -157,7 +164,11 @@ fresh copy be downloaded anyway.</p></td>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='fu'>download_data</span>(<span class='st'>"example_data"</span>, <span class='kw'>force</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='co'># download the example data</span>
+<span class='fu'>download_data</span>(<span class='st'>"example_data"</span>)
+
+<span class='co'># download the full data package for wood thrush</span>
+<span class='fu'>download_data</span>(<span class='st'>"woothr"</span>)
 
 <span class='co'># }</span></pre>
   </div>
