@@ -5,7 +5,7 @@
 #' results for Yellow-bellied Sapsucker subset to Michigan and are much smaller
 #' than the full dataset making these data quicker to download and process.
 #'
-#' @param species character; a single six-letter species code (e.g. rufhum).
+#' @param species character; a single six-letter species code (e.g. woothr).
 #'   The full list of valid codes is can be viewed in the [ebirdst_runs] data
 #'   frame included in this package. To download the example dataset, use
 #'   "example_data".
@@ -14,6 +14,10 @@
 #'   to the unique run ID associated with this species. Defaults to a persistent
 #'   data directory, which can be found by calling
 #'   rappdirs::user_data_dir("ebirdst")).
+#' @param tifs_only logical; whether to only download the GeoTIFFs for
+#'   abundance and occurrence (the default), or download the entire data
+#'   package, including data for predictor importance, partial dependence, and
+#'   predictive performance metrics.
 #' @param force logical; if the data have already been downloaded, should a
 #'   fresh copy be downloaded anyway.
 #'
@@ -22,14 +26,20 @@
 #' @examples
 #' \dontrun{
 #'
-#' download_data("example_data", force = TRUE)
+#' # download the example data
+#' download_data("example_data")
+#'
+#' # download the full data package for wood thrush
+#' download_data("woothr")
 #'
 #' }
 download_data <- function(species,
                           path = rappdirs::user_data_dir("ebirdst"),
+                          tifs_only = TRUE,
                           force = FALSE) {
   stopifnot(is.character(species), length(species) == 1)
   stopifnot(is.character(path), length(path) == 1)
+  stopifnot(is.logical(tifs_only), length(tifs_only) == 1)
   stopifnot(is.logical(force), length(force) == 1)
   species <- tolower(species)
 
@@ -42,13 +52,14 @@ download_data <- function(species,
     bucket_url <- "https://clo-is-da-example-data.s3.amazonaws.com/"
     run <- "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"
   } else {
-    row_id <- which(ebirdst::ebirdst_runs$SPECIES_CODE == species)
+    row_id <- which(ebirdst::ebirdst_runs$species_code == species)
     if (length(row_id) != 1) {
-      stop(sprintf("species = %s does not uniquely identify a species."))
+      stop(sprintf("species = %s does not uniquely identify a species.",
+                   species))
     }
     # presumably this url will change
-    bucket_url <- "https://clo-is-da-example-data.s3.amazonaws.com/"
-    run <- ebirdst::ebirdst_runs$RUN_NAME[row_id]
+    bucket_url <- "https://ebirdst-data.s3.amazonaws.com/"
+    run <- ebirdst::ebirdst_runs$run_name[row_id]
   }
 
   if (dir.exists(file.path(path, run))) {
@@ -70,13 +81,23 @@ download_data <- function(species,
     size = xml2::xml_text(xml2::xml_find_all(s3_contents, ".//Size")),
     stringsAsFactors = FALSE)
   s3_files$size <- as.numeric(s3_files$size)
+
   # filter to desired run/species
   s3_files[as.numeric(s3_files$size) > 0 & grepl(run, s3_files$file), ]
   if (nrow(s3_files) == 0) {
     stop(sprintf("Files not found on AWS S3 for species = %s", species))
   }
 
-  # prepare downlaod paths
+  # only dl rasters unless requested otherwise
+  if (isTRUE(tifs_only)) {
+    s3_files <- s3_files[grepl("results/tifs", s3_files$file) |
+                           grepl("tif$", s3_files$file), ]
+  }
+
+  # human readable download size if we want to add a message
+  size_human <- utils:::format.object_size(sum(s3_files$size), "auto")
+
+  # prepare download paths
   s3_files$s3_path <- paste0(bucket_url, s3_files$file)
   s3_files$local_path <- file.path(path, s3_files$file)
   # create necessary directories
