@@ -74,7 +74,7 @@
       <h1>Generating Seasonal Abundance and Range Maps and Stats</h1>
                         <h4 class="author">Matt Strimas-Mackey, Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2019-03-15</h4>
+            <h4 class="date">2019-03-18</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-advanced-mapping.Rmd"><code>vignettes/ebirdst-advanced-mapping.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-advanced-mapping.Rmd</code></div>
@@ -182,14 +182,7 @@ yebsap_dates &lt;-<span class="st"> </span><span class="kw"><a href="https://dpl
 <span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/select">select</a></span>(season, start_dt, end_dt)
 <span class="co"># did the season pass review</span>
 yebsap_dates &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(yebsap_dates, <span class="dt">pass =</span> <span class="op">!</span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/NA">is.na</a></span>(start_dt) <span class="op">|</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/NA">is.na</a></span>(end_dt)))
-yebsap_dates
-<span class="co">#&gt; # A tibble: 4 x 4</span>
-<span class="co">#&gt;   season                 start_dt   end_dt     pass </span>
-<span class="co">#&gt;   &lt;chr&gt;                  &lt;date&gt;     &lt;date&gt;     &lt;lgl&gt;</span>
-<span class="co">#&gt; 1 breeding               2016-05-24 2016-09-07 TRUE </span>
-<span class="co">#&gt; 2 nonbreeding            2016-11-23 2016-03-15 TRUE </span>
-<span class="co">#&gt; 3 postbreeding_migration 2016-09-14 2016-11-16 TRUE </span>
-<span class="co">#&gt; 4 prebreeding_migration  2016-03-22 2016-05-17 TRUE</span></code></pre></div>
+yebsap_dates</code></pre></div>
 <p>Now, we’ll use these season definitions to assign each of the weekly abundance layers to a season.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># dates for each abundance layer</span>
 weeks &lt;-<span class="st"> </span><span class="kw"><a href="../reference/parse_raster_dates.html">parse_raster_dates</a></span>(abd)
@@ -209,12 +202,7 @@ weeks_season &lt;-<span class="st"> </span><span class="kw"><a href="https://www
   }
   weeks_season[in_season] &lt;-<span class="st"> </span>s<span class="op">$</span>season
 }
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/table">table</a></span>(weeks_season)
-<span class="co">#&gt; weeks_season</span>
-<span class="co">#&gt;               breeding            nonbreeding postbreeding_migration </span>
-<span class="co">#&gt;                     16                     17                     10 </span>
-<span class="co">#&gt;  prebreeding_migration </span>
-<span class="co">#&gt;                      9</span></code></pre></div>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/table">table</a></span>(weeks_season)</code></pre></div>
 <p>Finally, let’s average all the weeks within each season to produce seasonal relative abundance rasters.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># drop weeks not assigned to season</span>
 week_pass &lt;-<span class="st"> </span><span class="op">!</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/NA">is.na</a></span>(weeks_season)
@@ -229,15 +217,7 @@ seasons &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdoc
 abd_season &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">lapply</a></span>(seasons, mean_season) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/stack">stack</a></span>() <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/setNames">setNames</a></span>(seasons)
-abd_season
-<span class="co">#&gt; class       : RasterStack </span>
-<span class="co">#&gt; dimensions  : 259, 276, 71484, 4  (nrow, ncol, ncell, nlayers)</span>
-<span class="co">#&gt; resolution  : 2779.876, 2779.876  (x, y)</span>
-<span class="co">#&gt; extent      : -7202659, -6435414, 4636834, 5356822  (xmin, xmax, ymin, ymax)</span>
-<span class="co">#&gt; coord. ref. : +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs </span>
-<span class="co">#&gt; names       : nonbreeding, prebreeding_migration,  breeding, postbreeding_migration </span>
-<span class="co">#&gt; min values  :   0.0000000,             0.1460964, 0.0000000,              0.0000000 </span>
-<span class="co">#&gt; max values  :   0.6754810,             1.6710625, 2.0053043,              0.9763988</span></code></pre></div>
+abd_season</code></pre></div>
 </div>
 <div id="abundance-maps" class="section level1">
 <h1 class="hasAnchor">
@@ -263,10 +243,7 @@ mig_seasons &lt;-<span class="st"> </span><span class="kw"><a href="https://www.
   split_migration &lt;-<span class="st"> </span><span class="ot">FALSE</span>
 }
 n_just <span class="op">/</span><span class="st"> </span>n_all
-<span class="co">#&gt;  prebreeding_migration postbreeding_migration </span>
-<span class="co">#&gt;           5.103082e-05           0.000000e+00</span>
-split_migration
-<span class="co">#&gt; [1] FALSE</span></code></pre></div>
+split_migration</code></pre></div>
 <p>In this case, there is essentially complete overlap between pre- and post-breeding migration, so we won’t split them into separate colors on the map. Next, we’ll calculate the average annual abundance, which we’ll display as a separate color if at least 1% of the range is occupied in all four seasons.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">threshold_yearround &lt;-<span class="st"> </span><span class="fl">0.01</span>
 <span class="co"># decide whether to show year-round layer</span>
@@ -284,8 +261,7 @@ split_migration
 } <span class="cf">else</span> {
   show_yearround &lt;-<span class="st"> </span><span class="ot">FALSE</span>
 }
-show_yearround
-<span class="co">#&gt; [1] TRUE</span></code></pre></div>
+show_yearround</code></pre></div>
 <p>Mapping relative abundance across the full-annual cycle requires a specialized set of color bins in order to ensure the full range of abundance values is effectively displayed. The function <code><a href="../reference/calc_bins.html">calc_bins()</a></code> calculates the optimal break points of bins for Status and Trends abundance data.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bin_breaks &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calc_bins.html">calc_bins</a></span>(abd_season)</code></pre></div>
 <p>Now that everything is in place, we can actually make the seasonal relative abundance map! Note that the Status and Trends maps distinguish between regions of zero abundance and <a href="https://ebird.org/science/status-and-trends/faq#no-prediction">regions with no prediction</a>, which are displayed in different shades of gray, and regions with non-zero abundance, shown in color. To account for this, we’ll need to generate a raster layer delineating the region within which predictions were made.</p>
@@ -389,7 +365,6 @@ lbl &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumen
 }
 <span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/title">title</a></span>(<span class="st">"Yellow-bellied Sapsucker Relative Abundance (birds per km/hr)"</span>, 
       <span class="dt">line =</span> <span class="op">-</span><span class="dv">1</span>, <span class="dt">cex.main =</span> <span class="dv">1</span>)</code></pre></div>
-<p><img src="ebirdst-advanced-mapping_files/figure-html/abd-map-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="range-maps" class="section level1">
 <h1 class="hasAnchor">
@@ -427,23 +402,7 @@ pred_area &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rd
 <span class="co"># combine the sf objects for all seasons</span>
 range &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cbind">rbind</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/do.call">do.call</a></span>(rbind, range), <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/do.call">do.call</a></span>(rbind, pred_area))
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/row.names">row.names</a></span>(range) &lt;-<span class="st"> </span><span class="ot">NULL</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(range)
-<span class="co">#&gt; Simple feature collection with 8 features and 2 fields</span>
-<span class="co">#&gt; geometry type:  MULTIPOLYGON</span>
-<span class="co">#&gt; dimension:      XY</span>
-<span class="co">#&gt; bbox:           xmin: -31011.47 ymin: 4979148 xmax: 627338.5 ymax: 5686458</span>
-<span class="co">#&gt; epsg (SRID):    NA</span>
-<span class="co">#&gt; proj4string:    +proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs</span>
-<span class="co">#&gt; precision:      1e+06 </span>
-<span class="co">#&gt;                   season           layer                       geometry</span>
-<span class="co">#&gt; 1            nonbreeding           range MULTIPOLYGON (((387938.5 49...</span>
-<span class="co">#&gt; 2  prebreeding_migration           range MULTIPOLYGON (((310988.5 53...</span>
-<span class="co">#&gt; 3               breeding           range MULTIPOLYGON (((473438.5 49...</span>
-<span class="co">#&gt; 4 postbreeding_migration           range MULTIPOLYGON (((310988.5 53...</span>
-<span class="co">#&gt; 5            nonbreeding prediction_area MULTIPOLYGON (((310988.5 53...</span>
-<span class="co">#&gt; 6  prebreeding_migration prediction_area MULTIPOLYGON (((310988.5 53...</span>
-<span class="co">#&gt; 7               breeding prediction_area MULTIPOLYGON (((310988.5 53...</span>
-<span class="co">#&gt; 8 postbreeding_migration prediction_area MULTIPOLYGON (((310988.5 53...</span></code></pre></div>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(range)</code></pre></div>
 <p>Converting from raster to polygons frequently yields tiny fragments of polygons and jagged polygon edges, which result in maps that aren’t very aesthetically pleasing. To address this, we’ll apply some algorithms from the <code>smoothr</code> package to clean up the polygons.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># clean and smooth</span>
 cell_area &lt;-<span class="st"> </span>(<span class="fl">1.5</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/prod">prod</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/resolution">res</a></span>(abd_season_agg)))
@@ -520,7 +479,6 @@ rng_legend &lt;-<span class="st"> </span><span class="kw"><a href="https://www.r
 <span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/legend">legend</a></span>(<span class="st">"bottomleft"</span>, <span class="dt">legend =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/names">names</a></span>(rng_legend), <span class="dt">fill =</span> rng_legend)
 <span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/title">title</a></span>(<span class="st">"Yellow-bellied Sapsucker Seasonal Range Map"</span>, 
       <span class="dt">line =</span> <span class="op">-</span><span class="dv">1</span>, <span class="dt">cex.main =</span> <span class="dv">1</span>)</code></pre></div>
-<p><img src="ebirdst-advanced-mapping_files/figure-html/range-map-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="regional-statistics" class="section level1">
 <h1 class="hasAnchor">
@@ -566,14 +524,7 @@ abd_mean_region &lt;-<span class="st"> </span>vx<span class="op">$</span><span c
 <span class="co"># transpose to one season per row</span>
 abd_mean_region &lt;-<span class="st"> </span>abd_mean_region <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw"><a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a></span>(season, mean_abundance, <span class="op">-</span>county_code)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/headtail">head</a></span>(abd_mean_region)
-<span class="co">#&gt;   county_code      season mean_abundance</span>
-<span class="co">#&gt; 1    US.MI.AC nonbreeding     0.00000000</span>
-<span class="co">#&gt; 2    US.MI.AG nonbreeding     0.00000000</span>
-<span class="co">#&gt; 3    US.MI.AL nonbreeding     0.01970928</span>
-<span class="co">#&gt; 4    US.MI.AP nonbreeding     0.00000000</span>
-<span class="co">#&gt; 5    US.MI.AN nonbreeding     0.00000000</span>
-<span class="co">#&gt; 6    US.MI.AR nonbreeding     0.00000000</span></code></pre></div>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/headtail">head</a></span>(abd_mean_region)</code></pre></div>
 <p>Let’s make a quick map comparing the breeding and non-breeding mean relative abundance within counties in Michigan.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># join back to county boundaries</span>
 abd_mean_proj &lt;-<span class="st"> </span>abd_mean_region <span class="op">%&gt;%</span><span class="st"> </span>
@@ -592,7 +543,6 @@ abd_mean_proj &lt;-<span class="st"> </span>abd_mean_region <span class="op">%&g
        <span class="dt">fill =</span> <span class="st">"Relative abundance"</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">legend.position =</span> <span class="st">"bottom"</span>)</code></pre></div>
-<p><img src="ebirdst-advanced-mapping_files/figure-html/mean-rel-abd-map-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="days-of-occupation" class="section level2">
 <h2 class="hasAnchor">
@@ -623,16 +573,7 @@ week_occupied &lt;-<span class="st"> </span><span class="kw"><a href="https://ww
 <span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span>() <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">days_occ =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">round</a></span>(<span class="dv">7</span> <span class="op">*</span><span class="st"> </span>weeks_occ)) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/select">select</a></span>(county_code, season, days_occ)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/headtail">head</a></span>(days_occupation)
-<span class="co">#&gt; # A tibble: 6 x 3</span>
-<span class="co">#&gt;   county_code season                 days_occ</span>
-<span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;                     &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 US.MI.AC    breeding                    112</span>
-<span class="co">#&gt; 2 US.MI.AC    nonbreeding                   0</span>
-<span class="co">#&gt; 3 US.MI.AC    postbreeding_migration       49</span>
-<span class="co">#&gt; 4 US.MI.AC    prebreeding_migration        49</span>
-<span class="co">#&gt; 5 US.MI.AG    breeding                    112</span>
-<span class="co">#&gt; 6 US.MI.AG    nonbreeding                   0</span></code></pre></div>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/headtail">head</a></span>(days_occupation)</code></pre></div>
 <p>Finally, let’s produce a map comparing days occupation in the breeding and non-breeding season.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># join back to county boundaries</span>
 days_occ_proj &lt;-<span class="st"> </span>days_occupation <span class="op">%&gt;%</span><span class="st"> </span>
@@ -651,7 +592,6 @@ days_occ_proj &lt;-<span class="st"> </span>days_occupation <span class="op">%&g
        <span class="dt">fill =</span> <span class="st">"Days of occupation"</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">legend.position =</span> <span class="st">"bottom"</span>)</code></pre></div>
-<p><img src="ebirdst-advanced-mapping_files/figure-html/day-occ-map-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 </div>
   </div>
