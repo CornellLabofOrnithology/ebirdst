@@ -74,7 +74,7 @@
       <h1>Background, Data Access, and Data Structure</h1>
                         <h4 class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2019-03-15</h4>
+            <h4 class="date">2019-03-18</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-introduction.Rmd"><code>vignettes/ebirdst-introduction.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-introduction.Rmd</code></div>
@@ -236,14 +236,7 @@ abund_stack_ll &lt;-<span class="st"> </span><span class="kw"><a href="https://w
 <span class="co"># Convert raster object into a matrix</span>
 p &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/rasterToPoints">rasterToPoints</a></span>(abund_stack_ll)
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">colnames</a></span>(p) &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"longitude"</span>, <span class="st">"latitude"</span>, <span class="st">"abundance_umean"</span>)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/headtail">head</a></span>(p)
-<span class="co">#&gt;      longitude latitude abundance_umean</span>
-<span class="co">#&gt; [1,] -88.53912  48.1625       0.0000000</span>
-<span class="co">#&gt; [2,] -88.50382  48.1625       0.0000000</span>
-<span class="co">#&gt; [3,] -88.64502  48.1375       0.0000000</span>
-<span class="co">#&gt; [4,] -88.60972  48.1375       0.0000000</span>
-<span class="co">#&gt; [5,] -88.57442  48.1375       0.6022081</span>
-<span class="co">#&gt; [6,] -88.53912  48.1375       0.4725851</span></code></pre></div>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/headtail">head</a></span>(p)</code></pre></div>
 <p>These results can then be written to CSV.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/write.table">write.csv</a></span>(p, <span class="dt">file =</span> <span class="st">"yebsap_week26.csv"</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <div id="references" class="section level2">

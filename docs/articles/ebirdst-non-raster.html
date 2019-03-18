@@ -74,7 +74,7 @@
       <h1>Non-raster Data: Using Predictor Importance, Predictor Directionality,and Predictive Performance Metrics</h1>
                         <h4 class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2019-03-15</h4>
+            <h4 class="date">2019-03-18</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-non-raster.Rmd"><code>vignettes/ebirdst-non-raster.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-non-raster.Rmd</code></div>
@@ -127,7 +127,6 @@
 <span class="co"># To access the non-raster data, set tifs_only = FALSE.</span>
 sp_path &lt;-<span class="st"> </span><span class="kw"><a href="../reference/download_data.html">download_data</a></span>(<span class="dt">species =</span> <span class="st">"example_data"</span>, <span class="dt">tifs_only =</span> <span class="ot">FALSE</span>)
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(sp_path)
-<span class="co">#&gt; [1] "/Users/mta45/Library/Application Support/ebirdst/yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"</span>
 
 pis &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_pis.html">load_pis</a></span>(sp_path)
 pds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_pds.html">load_pds</a></span>(sp_path)</code></pre></div>
@@ -139,7 +138,6 @@ pds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_pd
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lp_extent &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ebirdst_extent.html">ebirdst_extent</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dt">xmin =</span> <span class="op">-</span><span class="dv">86</span>, <span class="dt">xmax =</span> <span class="op">-</span><span class="dv">83</span>, <span class="dt">ymin =</span> <span class="dv">42</span>, <span class="dt">ymax =</span> <span class="dv">45</span>),
                             <span class="dt">t =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="fl">0.425</span>, <span class="fl">0.475</span>))
 <span class="kw"><a href="../reference/map_centroids.html">map_centroids</a></span>(sp_path, <span class="dt">ext =</span> lp_extent)</code></pre></div>
-<p><img src="ebirdst-non-raster_files/figure-html/map_centroids-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="plotting-centroids-and-extent-of-analysis" class="section level1">
 <h1 class="hasAnchor">
@@ -147,19 +145,16 @@ pds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_pd
 <p>Similarly, <code><a href="../reference/calc_effective_extent.html">calc_effective_extent()</a></code> will analyze a spatiotemporal subset of PIs or PDs and plot the selected stixel centroids, as well as a <code>RasterLayer</code> depicting where a majority of the information is coming from. The map ranges from 0 to 1, with pixels have a value of 1 meaning that 100% of the selected stixels are contributing information at that pixel. The function returns the <code>RasterLayer</code> in addition to mapping.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>, <span class="dv">1</span>), <span class="dt">mar =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">6</span>))
 <span class="kw"><a href="../reference/calc_effective_extent.html">calc_effective_extent</a></span>(sp_path, <span class="dt">ext =</span> lp_extent)</code></pre></div>
-<p><img src="ebirdst-non-raster_files/figure-html/plot_extents-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="plot-predictor-importance" class="section level1">
 <h1 class="hasAnchor">
 <a href="#plot-predictor-importance" class="anchor"></a>Plot Predictor Importance</h1>
 <p>Once predictive performance has been evaluated, exploring information about habitat association and/or avoidance can be done using the PIs and PDs. The <code><a href="../reference/plot_pis.html">plot_pis()</a></code> function generates a bar plot showing a rank of the most important predictors within a spatiotemporal subset. There is an option to show all predictors or to aggregate Fragstats by the land cover types.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># with all classes</span>
-<span class="kw"><a href="../reference/plot_pis.html">plot_pis</a></span>(pis, <span class="dt">ext =</span> lp_extent, <span class="dt">by_cover_class =</span> <span class="ot">FALSE</span>, <span class="dt">n_top_pred =</span> <span class="dv">15</span>)</code></pre></div>
-<p><img src="ebirdst-non-raster_files/figure-html/plot_pis-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="kw"><a href="../reference/plot_pis.html">plot_pis</a></span>(pis, <span class="dt">ext =</span> lp_extent, <span class="dt">by_cover_class =</span> <span class="ot">FALSE</span>, <span class="dt">n_top_pred =</span> <span class="dv">15</span>)
+
 <span class="co"># aggregating fragstats for cover classes</span>
 <span class="kw"><a href="../reference/plot_pis.html">plot_pis</a></span>(pis, <span class="dt">ext =</span> lp_extent, <span class="dt">by_cover_class =</span> <span class="ot">TRUE</span>, <span class="dt">n_top_pred =</span> <span class="dv">15</span>)</code></pre></div>
-<p><img src="ebirdst-non-raster_files/figure-html/plot_pis-2.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="plot-partial-depedencies-predictor-directionality" class="section level1">
 <h1 class="hasAnchor">
@@ -168,7 +163,6 @@ pds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_pd
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mypds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/plot_pds.html">plot_pds</a></span>(pds, <span class="dt">predictor =</span> <span class="st">"effort_hrs"</span>, 
                   <span class="dt">ext =</span> lp_extent, 
                   <span class="dt">bootstrap_smooth =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<p><img src="ebirdst-non-raster_files/figure-html/plot_pds-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="predictive-performance-metrics" class="section level1">
 <h1 class="hasAnchor">
@@ -179,14 +173,12 @@ pds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_pd
 <a href="#binary-metrics-by-time" class="anchor"></a>Binary Metrics by Time</h2>
 <p>The <code><a href="../reference/plot_binary_by_time.html">plot_binary_by_time()</a></code> function analyzes a species’ entire range of data and plots predictive performance metrics by a custom time interval (typically either 52 for weeks or 12 for months).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/plot_binary_by_time.html">plot_binary_by_time</a></span>(<span class="dt">path =</span> sp_path, <span class="dt">metric =</span> <span class="st">"kappa"</span>, <span class="dt">n_time_periods =</span> <span class="dv">12</span>)</code></pre></div>
-<p><img src="ebirdst-non-raster_files/figure-html/binary_by_time-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="all-metrics-for-spatiotemporal-extent" class="section level2">
 <h2 class="hasAnchor">
 <a href="#all-metrics-for-spatiotemporal-extent" class="anchor"></a>All Metrics for Spatiotemporal Extent</h2>
 <p>The <code><a href="../reference/plot_all_ppms.html">plot_all_ppms()</a></code> function provides all available predictive performance metrics and is important for determining predictive performance within a spatiotemporal subset region and season. This function is also useful in comparing the performance between subsets.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/plot_all_ppms.html">plot_all_ppms</a></span>(sp_path, lp_extent)</code></pre></div>
-<p><img src="ebirdst-non-raster_files/figure-html/all_ppms-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="references" class="section level2">
 <h2 class="hasAnchor">
