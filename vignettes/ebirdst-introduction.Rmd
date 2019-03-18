@@ -75,7 +75,7 @@ The data products included in the downloads contain two types of data: a) raster
 
 ## Data Structure
 
-Data are grouped by species, using a unique run name. The structure of the run name is: <six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>. A full list of species and run names can be found in the `ebirdst_runs` [data frame](https://cornelllabofornithology.github.io/ebirdst/reference/ebirdst_runs.html). 
+Data are grouped by species, using a unique run name. The structure of the run name is: <six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>. A full list of species and run names can be found in the `ebirdst_runs` [data frame](https://cornelllabofornithology.github.io/ebirdst/reference/ebirdst_runs.html). If you are not using the R package you can find a CSV equivalent at the root of the AWS s3 bucket at this [url](https://s3-us-west-2.amazonaws.com/ebirdst-data/ebirdst_run_names.csv). 
 
 For each individual species, the data are structured in the following way:
   
