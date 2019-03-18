@@ -8,7 +8,7 @@ Authors@R:
              family = "Auer",
              role = c("aut", "cre"),
              email = "mta45@cornell.edu",
-             comment = c(ORCID = "0000-0001-8619-7147 ")),
+             comment = c(ORCID = "0000-0001-8619-7147")),
       person(given = "Daniel",
              family = "Fink",
              role = "aut",
