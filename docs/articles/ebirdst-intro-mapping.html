@@ -123,7 +123,18 @@ abunds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load
 
 <span class="co"># use parse_raster_dates() to get actual date objects for each layer</span>
 date_vector &lt;-<span class="st"> </span><span class="kw"><a href="../reference/parse_raster_dates.html">parse_raster_dates</a></span>(abunds)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(date_vector)</code></pre></div>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(date_vector)
+<span class="co">#&gt;  [1] "2016-01-04" "2016-01-11" "2016-01-18" "2016-01-25" "2016-02-01"</span>
+<span class="co">#&gt;  [6] "2016-02-08" "2016-02-15" "2016-02-22" "2016-03-01" "2016-03-08"</span>
+<span class="co">#&gt; [11] "2016-03-15" "2016-03-22" "2016-03-29" "2016-04-05" "2016-04-12"</span>
+<span class="co">#&gt; [16] "2016-04-19" "2016-04-26" "2016-05-03" "2016-05-10" "2016-05-17"</span>
+<span class="co">#&gt; [21] "2016-05-24" "2016-05-31" "2016-06-07" "2016-06-14" "2016-06-21"</span>
+<span class="co">#&gt; [26] "2016-06-28" "2016-07-06" "2016-07-13" "2016-07-20" "2016-07-27"</span>
+<span class="co">#&gt; [31] "2016-08-03" "2016-08-10" "2016-08-17" "2016-08-24" "2016-08-31"</span>
+<span class="co">#&gt; [36] "2016-09-07" "2016-09-14" "2016-09-21" "2016-09-28" "2016-10-05"</span>
+<span class="co">#&gt; [41] "2016-10-12" "2016-10-19" "2016-10-26" "2016-11-02" "2016-11-09"</span>
+<span class="co">#&gt; [46] "2016-11-16" "2016-11-23" "2016-11-30" "2016-12-07" "2016-12-14"</span>
+<span class="co">#&gt; [51] "2016-12-21" "2016-12-28"</span></code></pre></div>
 </div>
 <div id="mapping-occurrence-and-abundance" class="section level1">
 <h1 class="hasAnchor">
@@ -148,6 +159,7 @@ week38_moll &lt;-<span class="st"> </span><span class="kw"><a href="https://www.
      <span class="dt">col =</span> <span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="dv">10</span>, <span class="dt">season =</span> <span class="st">"weekly"</span>), 
      <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">box =</span> <span class="ot">FALSE</span>, 
      <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(week38_moll))</code></pre></div>
+<p><img src="ebirdst-intro-mapping_files/figure-html/project_stack-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 <p>If working with a full set of data for a species, mapping the layer at the full spatial extent of the analysis area makes for a small map. The raster cube has zeroes for our prediction extent and NAs for the entire Western Hemisphere, unifying the weeks in a cube to the same extent. However, this also means that mapping defaults to the full spatial extent of NAs, the Western Hemisphere. To assist with this, project the <code>RasterStack</code> or <code>RasterLayer</code> to Mollweide, then calculate the full annual spatial extent for the species with the <code><a href="../reference/calc_full_extent.html">calc_full_extent()</a></code> function, and then map, showing an extent that works for the entire full-annual cycle of the species.</p>
 </div>
 <div id="mapping-occurrence" class="section level2">
@@ -170,6 +182,7 @@ occ_moll &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdo
      <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">box =</span> <span class="ot">FALSE</span>, 
      <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(occ_moll),
      <span class="dt">legend.width =</span> <span class="dv">2</span>, <span class="dt">legend.shrink =</span> <span class="fl">0.97</span>)</code></pre></div>
+<p><img src="ebirdst-intro-mapping_files/figure-html/map_occurrence-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="calculating-abundance-bins" class="section level2">
 <h2 class="hasAnchor">
@@ -200,6 +213,7 @@ bb &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocument
      <span class="dt">col =</span> <span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="dv">20</span>, <span class="dt">season =</span> <span class="st">"weekly"</span>), 
      <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(week14_moll),
      <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">box =</span> <span class="ot">FALSE</span>, <span class="dt">legend.shrink =</span> <span class="fl">0.97</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<p><img src="ebirdst-intro-mapping_files/figure-html/map_linear-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 <p>We can compare this with maps made using the <code><a href="../reference/calc_bins.html">calc_bins()</a></code> method.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate ideal color bins for abundance values</span>
 year_bins &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calc_bins.html">calc_bins</a></span>(abunds)
@@ -232,6 +246,7 @@ bin_labels[<span class="op">!</span>(bin_labels <span class="op">%in%</span><spa
      <span class="dt">breaks =</span> year_bins<span class="op">$</span>bins <span class="op">^</span><span class="st"> </span>year_bins<span class="op">$</span>power, <span class="dt">lab.breaks =</span> bin_labels,
      <span class="dt">legend.shrink =</span> <span class="fl">0.97</span>, <span class="dt">legend.width =</span> <span class="dv">2</span>,  
      <span class="dt">axis.args =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">cex.axis =</span> <span class="fl">0.9</span>, <span class="dt">lwd.ticks =</span> <span class="dv">0</span>))</code></pre></div>
+<p><img src="ebirdst-intro-mapping_files/figure-html/map_bins-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="mapping-abundance" class="section level2">
 <h2 class="hasAnchor">
@@ -293,6 +308,7 @@ ltq &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumen
 
 <span class="co"># add state boundaries on top</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(wh_states, <span class="dt">border =</span> <span class="st">"white"</span>, <span class="dt">lwd =</span> <span class="fl">1.5</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<p><img src="ebirdst-intro-mapping_files/figure-html/map_w_es-1.png" width="672" style="display: block; margin: auto;"></p>
 </div>
 <div id="mapping-abundance-confidence-intervals" class="section level2">
 <h2 class="hasAnchor">
@@ -312,6 +328,7 @@ conf_week26 &lt;-<span class="st"> </span><span class="kw"><a href="https://www.
 <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/trim">trim</a></span>(conf_week26), <span class="dt">col =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/viridisLite/topics/viridis">magma</a></span>(<span class="dv">20</span>), 
      <span class="dt">maxpixel =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(conf_week26),
      <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">box =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<p><img src="ebirdst-intro-mapping_files/figure-html/map_confidence_band-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div id="extracting-trajectories-with-uncertainty" class="section level1">
@@ -343,6 +360,7 @@ plot_frame &lt;-<span class="st"> </span><span class="kw"><a href="https://www.r
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"Expected Count (count/(km hr))"</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span>(<span class="st">"Week"</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_light</a></span>()</code></pre></div>
+<p><img src="ebirdst-intro-mapping_files/figure-html/trajectories-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 <p>It is also possible to extract trajectories for regions, but it takes a little more data work.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># set an extent based on polygon</span>
 mi &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/rnaturalearth/topics/ne_states">ne_states</a></span>(<span class="dt">country =</span> <span class="st">"United States of America"</span>, <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span><span class="st"> </span>
@@ -374,6 +392,7 @@ plot_frame &lt;-<span class="st"> </span><span class="kw"><a href="https://www.r
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"Expected Count (count/(km hr))"</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span>(<span class="st">"Week"</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_light</a></span>()</code></pre></div>
+<p><img src="ebirdst-intro-mapping_files/figure-html/trajectories_region-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 <div id="references" class="section level2">
 <h2 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h2>

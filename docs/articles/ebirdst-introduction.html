@@ -136,7 +136,7 @@ sp_path &lt;-<span class="st"> </span><span class="kw"><a href="../reference/dow
 <div id="data-structure" class="section level2">
 <h2 class="hasAnchor">
 <a href="#data-structure" class="anchor"></a>Data Structure</h2>
-<p>Data are grouped by species, using a unique run name. The structure of the run name is: <six_letter_code-erd2016-ebird_science-date-uuid>. A full list of species and run names can be found in the <code>ebirdst_runs</code> <a href="https://cornelllabofornithology.github.io/ebirdst/reference/ebirdst_runs.html">data frame</a>.</six_letter_code-erd2016-ebird_science-date-uuid></p>
+<p>Data are grouped by species, using a unique run name. The structure of the run name is: <six_letter_code-erd2016-ebird_science-date-uuid>. A full list of species and run names can be found in the <code>ebirdst_runs</code> <a href="https://cornelllabofornithology.github.io/ebirdst/reference/ebirdst_runs.html">data frame</a>. If you are not using the R package you can find a CSV equivalent at the root of the AWS s3 bucket at this <a href="https://s3-us-west-2.amazonaws.com/ebirdst-data/ebirdst_run_names.csv">url</a>.</six_letter_code-erd2016-ebird_science-date-uuid></p>
 <p>For each individual species, the data are structured in the following way:</p>
 <p>\&lt;run_name&gt;\data\ebird.abund_<run_name>_erd.test.data.csv \&lt;run_name&gt;\data\<run_name>_srd_raster_template.tif \&lt;run_name&gt;\results\abund_preds\unpeeled_folds\pd.txt \&lt;run_name&gt;\results\abund_preds\unpeeled_folds\pi.txt \&lt;run_name&gt;\results\abund_preds\unpeeled_folds\summary.txt \&lt;run_name&gt;\results\abund_preds\unpeeled_folds\test.pred.ave.txt \&lt;run_name&gt;\results\tifs\<run_name>_hr_2016_abundance_umean.tif \&lt;run_name&gt;\results\tifs\<run_name>_hr_2016_abundance_upper.tif \&lt;run_name&gt;\results\tifs\<run_name>_hr_2016_abundance_lower.tif \&lt;run_name&gt;\results\tifs\<run_name>_hr_2016_occurrence_umean.tif</run_name></run_name></run_name></run_name></run_name></run_name></p>
 </div>
@@ -236,7 +236,14 @@ abund_stack_ll &lt;-<span class="st"> </span><span class="kw"><a href="https://w
 <span class="co"># Convert raster object into a matrix</span>
 p &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/rasterToPoints">rasterToPoints</a></span>(abund_stack_ll)
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">colnames</a></span>(p) &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"longitude"</span>, <span class="st">"latitude"</span>, <span class="st">"abundance_umean"</span>)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/headtail">head</a></span>(p)</code></pre></div>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/headtail">head</a></span>(p)
+<span class="co">#&gt;      longitude latitude abundance_umean</span>
+<span class="co">#&gt; [1,] -88.53912  48.1625       0.0000000</span>
+<span class="co">#&gt; [2,] -88.50382  48.1625       0.0000000</span>
+<span class="co">#&gt; [3,] -88.64502  48.1375       0.0000000</span>
+<span class="co">#&gt; [4,] -88.60972  48.1375       0.0000000</span>
+<span class="co">#&gt; [5,] -88.57442  48.1375       0.6022081</span>
+<span class="co">#&gt; [6,] -88.53912  48.1375       0.4725851</span></code></pre></div>
 <p>These results can then be written to CSV.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/write.table">write.csv</a></span>(p, <span class="dt">file =</span> <span class="st">"yebsap_week26.csv"</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <div id="references" class="section level2">
