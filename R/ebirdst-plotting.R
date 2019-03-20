@@ -244,9 +244,9 @@ plot_pds <- function(pds, predictor, ext,
   rm(x_long, y_long, pds)
 
   # transform y to be relative to mean
-  stix_mean <- aggregate(pd_long["y"],
-                         list(stixel_id = pd_long$stixel_id),
-                         mean, na.rm = TRUE)
+  stix_mean <- stats::aggregate(pd_long["y"],
+                                list(stixel_id = pd_long$stixel_id),
+                                mean, na.rm = TRUE)
   names(stix_mean) <- c("stixel_id", "y_mean")
   pd_long <- dplyr::inner_join(pd_long, stix_mean, by = "stixel_id")
   pd_long$y <- pd_long$y - pd_long$y_mean

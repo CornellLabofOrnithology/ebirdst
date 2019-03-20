@@ -54,13 +54,13 @@ Imports:
     viridisLite,
     xml2
 Suggests: 
+    fields,
     knitr,
     rmarkdown,
     rnaturalearth,
     smoothr,
     testthat,
-    velox,
-    fields
+    velox
 VignetteBuilder: 
     knitr
 Encoding: UTF-8

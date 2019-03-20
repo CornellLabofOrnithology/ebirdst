@@ -8,10 +8,10 @@ download_data(species, path = rappdirs::user_data_dir("ebirdst"),
   tifs_only = TRUE, force = FALSE)
 }
 \arguments{
-\item{species}{character; a single six-letter species code (e.g. woothr).
-The full list of valid codes is can be viewed in the \link{ebirdst_runs} data
-frame included in this package. To download the example dataset, use
-"example_data".}
+\item{species}{character; a single species given as a scientific name, common
+name or six-letter species code (e.g. woothr). The full list of valid
+species is can be viewed in the \link{ebirdst_runs} data frame included in this
+package. To download the example dataset, use "example_data".}
 
 \item{path}{character; directory to download the data to. All downloaded
 files will be placed in a sub-directory of this directory named according

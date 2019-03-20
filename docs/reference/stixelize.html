@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Articles • ebirdst</title>
+<title>Generate stixel polygons from PI/PD data — stixelize • ebirdst</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -31,7 +31,14 @@
 
 
 
-<meta property="og:title" content="Articles" />
+<meta property="og:title" content="Generate stixel polygons from PI/PD data — stixelize" />
+
+<meta property="og:description" content="All predictor importance and partial dependence data are provided at the
+stixel level. In these files, the stixel is defined based on a centroid,
+width, and height. This function uses this information to define polygons for
+each stixel and attaches them to the original data in the form of an sf
+object" />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -48,7 +55,7 @@
   </head>
 
   <body>
-    <div class="container template-article-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -103,20 +110,81 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Articles</h1>
+    <h1>Generate stixel polygons from PI/PD data</h1>
+    <small class="dont-index">Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/R/stixelize.R'><code>R/stixelize.R</code></a></small>
+    <div class="hidden name"><code>stixelize.Rd</code></div>
     </div>
 
-    <div class="section ">
-      <h3>All vignettes</h3>
-      <p class="section-desc"></p>
-
-      <ul>
-        <li><a href="ebirdst-advanced-mapping.html">Generating Seasonal Abundance and Range Maps and Stats</a></li>
-        <li><a href="ebirdst-intro-mapping.html">Introduction to loading, mapping, and plotting</a></li>
-        <li><a href="ebirdst-introduction.html">Background, Data Access, and Data Structure</a></li>
-        <li><a href="ebirdst-non-raster.html">Non-raster Data: Using Predictor Importance, Predictor Directionality,and Predictive Performance Metrics</a></li>
-      </ul>
+    <div class="ref-description">
+    
+    <p>All predictor importance and partial dependence data are provided at the
+stixel level. In these files, the stixel is defined based on a centroid,
+width, and height. This function uses this information to define polygons for
+each stixel and attaches them to the original data in the form of an sf
+object</p>
+    
     </div>
+
+    <pre class="usage"><span class='fu'>stixelize</span>(<span class='no'>x</span>)
+
+<span class='co'># S3 method for data.frame</span>
+<span class='fu'>stixelize</span>(<span class='no'>x</span>)
+
+<span class='co'># S3 method for sf</span>
+<span class='fu'>stixelize</span>(<span class='no'>x</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>x</th>
+      <td><p><code>data.frame</code> or sf object; PI or PD data loaded with <code><a href='load_pis.html'>load_pis()</a></code>
+or <code><a href='load_pds.html'>load_pds()</a></code>, or any other data frame with fields <code>lon</code>, <code>lat</code>,
+<code>stixel_width</code>, and <code>stixel_hight</code>.</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>sf object with geometry column storing polygons representing the s
+tixels boundaries.</p>
+    
+    <h2 class="hasAnchor" id="methods-by-class-"><a class="anchor" href="#methods-by-class-"></a>Methods (by class)</h2>
+
+    <ul>
+<li><p><code>data.frame</code>: PI or PD data</p></li>
+<li><p><code>sf</code>: PI or PD data as <code>sf</code> object</p></li>
+</ul>
+    
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='co'># download example data</span>
+<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='download_data.html'>download_data</a></span>(<span class='st'>"example_data"</span>)
+
+<span class='co'># load predictor importance</span>
+<span class='no'>pis</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='load_pis.html'>load_pis</a></span>(<span class='no'>sp_path</span>)
+
+<span class='fu'>stixelize</span>(<span class='no'>pis</span>)
+
+<span class='co'># also works on sf objects</span>
+<span class='no'>pis_sf</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>sf</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/sf/topics/st_as_sf'>st_as_sf</a></span>(<span class='no'>pis</span>, <span class='kw'>coords</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"lon"</span>, <span class='st'>"lat"</span>), <span class='kw'>crs</span> <span class='kw'>=</span> <span class='fl'>4326</span>)
+<span class='fu'>stixelize</span>(<span class='no'>pis_sf</span>)
+
+<span class='co'># }</span></pre>
+  </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+    <h2>Contents</h2>
+    <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
+      
+      <li><a href="#value">Value</a></li>
+
+      <li><a href="#methods-by-class-">Methods (by class)</a></li>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
+
   </div>
 </div>
 
