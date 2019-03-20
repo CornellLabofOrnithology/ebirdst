@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Articles • ebirdst</title>
+<title>Download eBird Status and Trends Data — download_data • ebirdst</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -31,7 +31,13 @@
 
 
 
-<meta property="og:title" content="Articles" />
+<meta property="og:title" content="Download eBird Status and Trends Data — download_data" />
+
+<meta property="og:description" content="Download an eBird Status and Trends data package for a single species, or for
+an example species, to a specified path. The example data consist of the
+results for Yellow-bellied Sapsucker subset to Michigan and are much smaller
+than the full dataset making these data quicker to download and process." />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -48,7 +54,7 @@
   </head>
 
   <body>
-    <div class="container template-article-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -103,20 +109,80 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Articles</h1>
+    <h1>Download eBird Status and Trends Data</h1>
+    <small class="dont-index">Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/R/ebirdst-loading.R'><code>R/ebirdst-loading.R</code></a></small>
+    <div class="hidden name"><code>download_data.Rd</code></div>
     </div>
 
-    <div class="section ">
-      <h3>All vignettes</h3>
-      <p class="section-desc"></p>
-
-      <ul>
-        <li><a href="ebirdst-advanced-mapping.html">Generating Seasonal Abundance and Range Maps and Stats</a></li>
-        <li><a href="ebirdst-intro-mapping.html">Introduction to loading, mapping, and plotting</a></li>
-        <li><a href="ebirdst-introduction.html">Background, Data Access, and Data Structure</a></li>
-        <li><a href="ebirdst-non-raster.html">Non-raster Data: Using Predictor Importance, Predictor Directionality,and Predictive Performance Metrics</a></li>
-      </ul>
+    <div class="ref-description">
+    
+    <p>Download an eBird Status and Trends data package for a single species, or for
+an example species, to a specified path. The example data consist of the
+results for Yellow-bellied Sapsucker subset to Michigan and are much smaller
+than the full dataset making these data quicker to download and process.</p>
+    
     </div>
+
+    <pre class="usage"><span class='fu'>download_data</span>(<span class='no'>species</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='kw pkg'>rappdirs</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/rappdirs/topics/user_data_dir'>user_data_dir</a></span>(<span class='st'>"ebirdst"</span>),
+  <span class='kw'>tifs_only</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>force</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>species</th>
+      <td><p>character; a single species given as a scientific name, common
+name or six-letter species code (e.g. woothr). The full list of valid
+species is can be viewed in the <a href='ebirdst_runs.html'>ebirdst_runs</a> data frame included in this
+package. To download the example dataset, use "example_data".</p></td>
+    </tr>
+    <tr>
+      <th>path</th>
+      <td><p>character; directory to download the data to. All downloaded
+files will be placed in a sub-directory of this directory named according
+to the unique run ID associated with this species. Defaults to a persistent
+data directory, which can be found by calling
+rappdirs::user_data_dir("ebirdst")).</p></td>
+    </tr>
+    <tr>
+      <th>tifs_only</th>
+      <td><p>logical; whether to only download the GeoTIFFs for
+abundance and occurrence (the default), or download the entire data
+package, including data for predictor importance, partial dependence, and
+predictive performance metrics.</p></td>
+    </tr>
+    <tr>
+      <th>force</th>
+      <td><p>logical; if the data have already been downloaded, should a
+fresh copy be downloaded anyway.</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Path to the run-specific root of the downloaded files.</p>
+    
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='co'># download the example data</span>
+<span class='fu'>download_data</span>(<span class='st'>"example_data"</span>)
+
+<span class='co'># download the full data package for wood thrush</span>
+<span class='fu'>download_data</span>(<span class='st'>"woothr"</span>)
+
+<span class='co'># }</span></pre>
+  </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+    <h2>Contents</h2>
+    <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
+      
+      <li><a href="#value">Value</a></li>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
+
   </div>
 </div>
 

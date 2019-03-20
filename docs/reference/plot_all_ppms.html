@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Articles • ebirdst</title>
+<title>Plot all predictive performance metrics — plot_all_ppms • ebirdst</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -31,7 +31,12 @@
 
 
 
-<meta property="og:title" content="Articles" />
+<meta property="og:title" content="Plot all predictive performance metrics — plot_all_ppms" />
+
+<meta property="og:description" content="For a spatiotemporal extent, plots bar plots for all available predictive
+performance metrics within three categories: Binary Occurrence, Occurrence
+Probability, and Abundance." />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -48,7 +53,7 @@
   </head>
 
   <body>
-    <div class="container template-article-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -103,20 +108,64 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Articles</h1>
+    <h1>Plot all predictive performance metrics</h1>
+    <small class="dont-index">Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/R/ebirdst-ppms.R'><code>R/ebirdst-ppms.R</code></a></small>
+    <div class="hidden name"><code>plot_all_ppms.Rd</code></div>
     </div>
 
-    <div class="section ">
-      <h3>All vignettes</h3>
-      <p class="section-desc"></p>
-
-      <ul>
-        <li><a href="ebirdst-advanced-mapping.html">Generating Seasonal Abundance and Range Maps and Stats</a></li>
-        <li><a href="ebirdst-intro-mapping.html">Introduction to loading, mapping, and plotting</a></li>
-        <li><a href="ebirdst-introduction.html">Background, Data Access, and Data Structure</a></li>
-        <li><a href="ebirdst-non-raster.html">Non-raster Data: Using Predictor Importance, Predictor Directionality,and Predictive Performance Metrics</a></li>
-      </ul>
+    <div class="ref-description">
+    
+    <p>For a spatiotemporal extent, plots bar plots for all available predictive
+performance metrics within three categories: Binary Occurrence, Occurrence
+Probability, and Abundance.</p>
+    
     </div>
+
+    <pre class="usage"><span class='fu'>plot_all_ppms</span>(<span class='no'>path</span>, <span class='no'>ext</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>path</th>
+      <td><p>character; full path to directory containing the eBird Status and
+Trends products for a single species.</p></td>
+    </tr>
+    <tr>
+      <th>ext</th>
+      <td><p><a href='ebirdst_extent.html'>ebirdst_extent</a> object; the spatiotemporal extent to filter the
+data to.</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Plot of metric box plots by category</p>
+    
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='co'># download example data</span>
+<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='download_data.html'>download_data</a></span>(<span class='st'>"example_data"</span>)
+
+<span class='co'># define a spatiotemporal extent to plot data from</span>
+<span class='no'>bb_vec</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='kw'>xmin</span> <span class='kw'>=</span> -<span class='fl'>91</span>, <span class='kw'>xmax</span> <span class='kw'>=</span> -<span class='fl'>82</span>, <span class='kw'>ymin</span> <span class='kw'>=</span> <span class='fl'>41</span>, <span class='kw'>ymax</span> <span class='kw'>=</span> <span class='fl'>48</span>)
+<span class='no'>e</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_extent.html'>ebirdst_extent</a></span>(<span class='no'>bb_vec</span>, <span class='kw'>t</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"04-01"</span>, <span class='st'>"06-30"</span>))
+
+<span class='fu'>plot_all_ppms</span>(<span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>sp_path</span>, <span class='kw'>ext</span> <span class='kw'>=</span> <span class='no'>e</span>)
+
+<span class='co'># }</span></pre>
+  </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+    <h2>Contents</h2>
+    <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
+      
+      <li><a href="#value">Value</a></li>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
+
   </div>
 </div>
 

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Articles • ebirdst</title>
+<title>Converts cryptic cover class names to readable land cover names — convert_classes • ebirdst</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -31,7 +31,11 @@
 
 
 
-<meta property="og:title" content="Articles" />
+<meta property="og:title" content="Converts cryptic cover class names to readable land cover names — convert_classes" />
+
+<meta property="og:description" content="Internal function that converts the cryptic predictor class names to
+readable land cover names." />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -48,7 +52,7 @@
   </head>
 
   <body>
-    <div class="container template-article-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -103,20 +107,58 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Articles</h1>
+    <h1>Converts cryptic cover class names to readable land cover names</h1>
+    <small class="dont-index">Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/R/ebirdst-plotting.R'><code>R/ebirdst-plotting.R</code></a></small>
+    <div class="hidden name"><code>convert_classes.Rd</code></div>
     </div>
 
-    <div class="section ">
-      <h3>All vignettes</h3>
-      <p class="section-desc"></p>
-
-      <ul>
-        <li><a href="ebirdst-advanced-mapping.html">Generating Seasonal Abundance and Range Maps and Stats</a></li>
-        <li><a href="ebirdst-intro-mapping.html">Introduction to loading, mapping, and plotting</a></li>
-        <li><a href="ebirdst-introduction.html">Background, Data Access, and Data Structure</a></li>
-        <li><a href="ebirdst-non-raster.html">Non-raster Data: Using Predictor Importance, Predictor Directionality,and Predictive Performance Metrics</a></li>
-      </ul>
+    <div class="ref-description">
+    
+    <p>Internal function that converts the cryptic predictor class names to
+readable land cover names.</p>
+    
     </div>
+
+    <pre class="usage"><span class='fu'>convert_classes</span>(<span class='no'>x</span>, <span class='kw'>by_cover_class</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>pretty</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>x</th>
+      <td><p>character; vector of land cover variable names to convert.</p></td>
+    </tr>
+    <tr>
+      <th>by_cover_class</th>
+      <td><p>logical; whether to replace FRAGSTATS cover class name
+with a name for the cover class as whole.</p></td>
+    </tr>
+    <tr>
+      <th>pretty</th>
+      <td><p>logical; whether to convert from capital case to title case.</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A vector of converted names.</p>
+    
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='no'>predictors</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"UMD_FS_C1_1500_PLAND"</span>, <span class='st'>"MODISWATER_FS_C7_1500_LPI"</span>, <span class='st'>"ELEV"</span>)
+<span class='kw pkg'>ebirdst</span><span class='kw ns'>:::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/ebirdst/topics/convert_classes'>convert_classes</a></span>(<span class='no'>predictors</span>, <span class='kw'>pretty</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; [1] "Evergreen Needleleaf Forest PLAND" "Deep Ocean LPI"                   
+#&gt; [3] "Elevation"                        </div></pre>
+  </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+    <h2>Contents</h2>
+    <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
+      
+      <li><a href="#value">Value</a></li>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
+
   </div>
 </div>
 
