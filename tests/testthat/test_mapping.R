@@ -1,6 +1,6 @@
 context("Mapping functions")
 
-sp_path <- download_data("example_data")
+sp_path <- download_data("example_data", tifs_only = FALSE, force = TRUE)
 lp_extent <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 45),
                             t = c(0.5, 0.6))
 

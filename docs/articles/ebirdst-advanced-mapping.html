@@ -7,7 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Generating Seasonal Abundance and Range Maps and Stats • ebirdst</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="Generating Seasonal Abundance and Range Maps and Stats">
 <meta property="og:description" content="">
@@ -74,7 +75,7 @@
       <h1>Generating Seasonal Abundance and Range Maps and Stats</h1>
                         <h4 class="author">Matt Strimas-Mackey, Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2019-03-18</h4>
+            <h4 class="date">2019-03-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-advanced-mapping.Rmd"><code>vignettes/ebirdst-advanced-mapping.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-advanced-mapping.Rmd</code></div>
@@ -100,426 +101,426 @@
 <a href="#introduction" class="anchor"></a>Introduction</h1>
 <p>This vignette describes how to recreate the seasonal map products found on the <a href="https://ebird.org/science/status-and-trends">eBird Status and Trends pages</a>. First, the vignette will cover how to average the abundance data seasonally, then it will proceed with examples of making abundance maps, aggregating and smoothing data for range maps, and, finally, provide examples of calculating regional summary statistic. Throughout this vignette we will use the simplified example dataset available through the <code><a href="../reference/download_data.html">download_data()</a></code> function, which consists of the Yellow-bellied Sapsucker data spatially subset to the state of Michigan. However, these methods can be applied to the full datasets for any of the eBird Status and Trends species.</p>
 <p>Let’s begin by loading all the packages we’ll need for this vignette.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ebirdst)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(raster)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(velox)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(sf)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(smoothr)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(rnaturalearth)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(dplyr)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(tidyr)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(stringr)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ggplot2)
-<span class="co"># resolve namespace conflicts</span>
-select &lt;-<span class="st"> </span>dplyr<span class="op">::</span>select</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ebirdst)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(raster)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(velox)</a>
+<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(sf)</a>
+<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(smoothr)</a>
+<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(rnaturalearth)</a>
+<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(dplyr)</a>
+<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(tidyr)</a>
+<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(stringr)</a>
+<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ggplot2)</a>
+<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="co"># resolve namespace conflicts</span></a>
+<a class="sourceLine" id="cb1-12" data-line-number="12">select &lt;-<span class="st"> </span>dplyr<span class="op">::</span>select</a></code></pre></div>
 </div>
 <div id="data-download" class="section level1">
 <h1 class="hasAnchor">
 <a href="#data-download" class="anchor"></a>Data Download</h1>
 <p>Before we do anything else, we’ll need to download and load the example abundance data for Yellow-bellied Sapsucker.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># download to a temp directory for the vigette</span>
-<span class="co"># in practice, change to permanent directory the status and trends downloads</span>
-sp_path &lt;-<span class="st"> </span><span class="kw"><a href="../reference/download_data.html">download_data</a></span>(<span class="dt">species =</span> <span class="st">"example_data"</span>)
-<span class="co"># load the abundance data</span>
-<span class="co"># this automaticaaly labels layers with their dates</span>
-abd &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_raster.html">load_raster</a></span>(<span class="st">"abundance_umean"</span>, <span class="dt">path =</span> sp_path)</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="co"># download to a temp directory for the vigette</span></a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co"># in practice, change to permanent directory the status and trends downloads</span></a>
+<a class="sourceLine" id="cb2-3" data-line-number="3">sp_path &lt;-<span class="st"> </span><span class="kw"><a href="../reference/download_data.html">download_data</a></span>(<span class="dt">species =</span> <span class="st">"example_data"</span>)</a>
+<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="co"># load the abundance data</span></a>
+<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="co"># this automaticaaly labels layers with their dates</span></a>
+<a class="sourceLine" id="cb2-6" data-line-number="6">abd &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_raster.html">load_raster</a></span>(<span class="st">"abundance_umean"</span>, <span class="dt">path =</span> sp_path)</a></code></pre></div>
 <p>The abundance data now consist of a <code>RasterStack</code> object with 52 layers, each corresponding to the relative abundance for a single week.</p>
 <p>We’ll also need some additional spatial data (state and country borders, lakes, etc.) to provide context for the maps we’ll make. <a href="https://www.naturalearthdata.com/">Natural Earth</a> is the best source for free map data and there’s an associated R package (<code>rnaturalearth</code>) for accessing the data. For all the maps in this vignette, we’ll use the <a href="https://en.wikipedia.org/wiki/Mollweide_projection">Mollweide projection</a>, an excellent option for continental scale maps.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mollweide &lt;-<span class="st"> "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"</span>
-ne_scale &lt;-<span class="st"> </span><span class="dv">50</span>
-
-<span class="co"># land polygon</span>
-ne_land &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/rnaturalearth/topics/ne_countries">ne_countries</a></span>(<span class="dt">scale =</span> ne_scale, <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(continent <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"North America"</span>, <span class="st">"South America"</span>)) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_precision">st_set_precision</a></span>(<span class="fl">1e6</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/geos_combine">st_union</a></span>() <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_geometry">st_geometry</a></span>()
-<span class="co"># function to subset other features to those  within this land area</span>
-wh_subset &lt;-<span class="st"> </span><span class="cf">function</span>(x) {
-  in_wh &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/logical">as.logical</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/geos_binary_pred">st_intersects</a></span>(x, ne_land, <span class="dt">sparse =</span> <span class="ot">FALSE</span>))
-  <span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_transform">st_transform</a></span>(x[in_wh], <span class="dt">crs =</span> mollweide)
-}
-<span class="co"># country lines</span>
-ne_country_lines &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/rnaturalearth/topics/ne_download">ne_download</a></span>(<span class="dt">scale =</span> ne_scale, <span class="dt">category =</span> <span class="st">"cultural"</span>,
-                                <span class="dt">type =</span> <span class="st">"admin_0_boundary_lines_land"</span>,
-                                <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_geometry">st_geometry</a></span>() <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">wh_subset</span>()
-<span class="co"># state lines</span>
-ne_state_lines &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/rnaturalearth/topics/ne_download">ne_download</a></span>(<span class="dt">scale =</span> ne_scale, <span class="dt">category =</span> <span class="st">"cultural"</span>,
-                              <span class="dt">type =</span> <span class="st">"admin_1_states_provinces_lines"</span>,
-                              <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_geometry">st_geometry</a></span>() <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">wh_subset</span>()
-<span class="co"># rivers</span>
-ne_rivers &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/rnaturalearth/topics/ne_download">ne_download</a></span>(<span class="dt">scale =</span> ne_scale, <span class="dt">category =</span> <span class="st">"physical"</span>,
-                         <span class="dt">type =</span> <span class="st">"rivers_lake_centerlines"</span>,
-                         <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_geometry">st_geometry</a></span>() <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">wh_subset</span>()
-<span class="co"># lakes</span>
-ne_lakes &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/rnaturalearth/topics/ne_download">ne_download</a></span>(<span class="dt">scale =</span> ne_scale, <span class="dt">category =</span> <span class="st">"physical"</span>,
-                        <span class="dt">type =</span> <span class="st">"lakes"</span>,
-                        <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_geometry">st_geometry</a></span>() <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">wh_subset</span>()
-ne_land &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_transform">st_transform</a></span>(ne_land, <span class="dt">crs =</span> mollweide)</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">mollweide &lt;-<span class="st"> "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"</span></a>
+<a class="sourceLine" id="cb3-2" data-line-number="2">ne_scale &lt;-<span class="st"> </span><span class="dv">50</span></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co"># land polygon</span></a>
+<a class="sourceLine" id="cb3-5" data-line-number="5">ne_land &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/rnaturalearth/topics/ne_countries">ne_countries</a></span>(<span class="dt">scale =</span> ne_scale, <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(continent <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"North America"</span>, <span class="st">"South America"</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_precision">st_set_precision</a></span>(<span class="fl">1e6</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/geos_combine">st_union</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_geometry">st_geometry</a></span>()</a>
+<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="co"># function to subset other features to those  within this land area</span></a>
+<a class="sourceLine" id="cb3-11" data-line-number="11">wh_subset &lt;-<span class="st"> </span><span class="cf">function</span>(x) {</a>
+<a class="sourceLine" id="cb3-12" data-line-number="12">  in_wh &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/logical">as.logical</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/geos_binary_pred">st_intersects</a></span>(x, ne_land, <span class="dt">sparse =</span> <span class="ot">FALSE</span>))</a>
+<a class="sourceLine" id="cb3-13" data-line-number="13">  <span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_transform">st_transform</a></span>(x[in_wh], <span class="dt">crs =</span> mollweide)</a>
+<a class="sourceLine" id="cb3-14" data-line-number="14">}</a>
+<a class="sourceLine" id="cb3-15" data-line-number="15"><span class="co"># country lines</span></a>
+<a class="sourceLine" id="cb3-16" data-line-number="16">ne_country_lines &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/rnaturalearth/topics/ne_download">ne_download</a></span>(<span class="dt">scale =</span> ne_scale, <span class="dt">category =</span> <span class="st">"cultural"</span>,</a>
+<a class="sourceLine" id="cb3-17" data-line-number="17">                                <span class="dt">type =</span> <span class="st">"admin_0_boundary_lines_land"</span>,</a>
+<a class="sourceLine" id="cb3-18" data-line-number="18">                                <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-19" data-line-number="19"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_geometry">st_geometry</a></span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-20" data-line-number="20"><span class="st">  </span><span class="kw">wh_subset</span>()</a>
+<a class="sourceLine" id="cb3-21" data-line-number="21"><span class="co"># state lines</span></a>
+<a class="sourceLine" id="cb3-22" data-line-number="22">ne_state_lines &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/rnaturalearth/topics/ne_download">ne_download</a></span>(<span class="dt">scale =</span> ne_scale, <span class="dt">category =</span> <span class="st">"cultural"</span>,</a>
+<a class="sourceLine" id="cb3-23" data-line-number="23">                              <span class="dt">type =</span> <span class="st">"admin_1_states_provinces_lines"</span>,</a>
+<a class="sourceLine" id="cb3-24" data-line-number="24">                              <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-25" data-line-number="25"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_geometry">st_geometry</a></span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-26" data-line-number="26"><span class="st">  </span><span class="kw">wh_subset</span>()</a>
+<a class="sourceLine" id="cb3-27" data-line-number="27"><span class="co"># rivers</span></a>
+<a class="sourceLine" id="cb3-28" data-line-number="28">ne_rivers &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/rnaturalearth/topics/ne_download">ne_download</a></span>(<span class="dt">scale =</span> ne_scale, <span class="dt">category =</span> <span class="st">"physical"</span>,</a>
+<a class="sourceLine" id="cb3-29" data-line-number="29">                         <span class="dt">type =</span> <span class="st">"rivers_lake_centerlines"</span>,</a>
+<a class="sourceLine" id="cb3-30" data-line-number="30">                         <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-31" data-line-number="31"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_geometry">st_geometry</a></span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-32" data-line-number="32"><span class="st">  </span><span class="kw">wh_subset</span>()</a>
+<a class="sourceLine" id="cb3-33" data-line-number="33"><span class="co"># lakes</span></a>
+<a class="sourceLine" id="cb3-34" data-line-number="34">ne_lakes &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/rnaturalearth/topics/ne_download">ne_download</a></span>(<span class="dt">scale =</span> ne_scale, <span class="dt">category =</span> <span class="st">"physical"</span>,</a>
+<a class="sourceLine" id="cb3-35" data-line-number="35">                        <span class="dt">type =</span> <span class="st">"lakes"</span>,</a>
+<a class="sourceLine" id="cb3-36" data-line-number="36">                        <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-37" data-line-number="37"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_geometry">st_geometry</a></span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-38" data-line-number="38"><span class="st">  </span><span class="kw">wh_subset</span>()</a>
+<a class="sourceLine" id="cb3-39" data-line-number="39">ne_land &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_transform">st_transform</a></span>(ne_land, <span class="dt">crs =</span> mollweide)</a></code></pre></div>
 </div>
 <div id="seasonal-abundance" class="section level1">
 <h1 class="hasAnchor">
 <a href="#seasonal-abundance" class="anchor"></a>Seasonal Abundance</h1>
 <p>Generally, the seasons for eBird Status and Trends products are defined on a species-specific basis through expert review. For information on the details of defining seasons, please see the <a href="https://ebird.org/science/status-and-trends/faq#seasons">seasons section of the FAQ</a>. While it is certainly possible to define your own seasons when making seasonal abundance and range maps, if you want to recreate the products with the same seasons as the website, you’ll need to use the definitions included in the <code>ebirdst_runs</code> data frame included in this package.</p>
 <p>Let’s start by getting the seasonal definitions for Yellow-bellied Sapsucker and transforming the data into a more usable format. For some species, expert review may have indicated that the models are poor in certain seasons. These problematic seasons are identified by missing dates in <code>ebirdst_runs</code> for the season in question. Although all seasons passed review for Yellow-bellied Sapsucker, for generality I’ll add an additional column (<code>passed</code>) indicating whether a seasonal model passed review.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># subset to the yellow-bellied sapsucker season definitions</span>
-yebsap_dates &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(ebirdst_runs, species_code <span class="op">==</span><span class="st"> "yebsap"</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="co"># just keep the seasonal definition columns</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/select">select</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org/reference/setops.html">setdiff</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">matches</a></span>(<span class="st">"(start)|(end)"</span>), <span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">matches</a></span>(<span class="st">"year_round"</span>))) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="co"># transpose</span>
-<span class="st">  </span><span class="kw"><a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a></span>(<span class="st">"label"</span>, <span class="st">"date"</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="co"># spread data so start and end dates are in separate columns</span>
-<span class="st">  </span><span class="kw"><a href="https://tidyr.tidyverse.org/reference/separate.html">separate</a></span>(label, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"season"</span>, <span class="st">"start_end"</span>), <span class="st">"_(?=s|e)"</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://tidyr.tidyverse.org/reference/spread.html">spread</a></span>(start_end, date) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/select">select</a></span>(season, start_dt, end_dt)
-<span class="co"># did the season pass review</span>
-yebsap_dates &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(yebsap_dates, <span class="dt">pass =</span> <span class="op">!</span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/NA">is.na</a></span>(start_dt) <span class="op">|</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/NA">is.na</a></span>(end_dt)))
-yebsap_dates
-<span class="co">#&gt; # A tibble: 4 x 4</span>
-<span class="co">#&gt;   season                 start_dt   end_dt     pass </span>
-<span class="co">#&gt;   &lt;chr&gt;                  &lt;date&gt;     &lt;date&gt;     &lt;lgl&gt;</span>
-<span class="co">#&gt; 1 breeding               2016-05-24 2016-09-07 TRUE </span>
-<span class="co">#&gt; 2 nonbreeding            2016-11-23 2016-03-15 TRUE </span>
-<span class="co">#&gt; 3 postbreeding_migration 2016-09-14 2016-11-16 TRUE </span>
-<span class="co">#&gt; 4 prebreeding_migration  2016-03-22 2016-05-17 TRUE</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># subset to the yellow-bellied sapsucker season definitions</span></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">yebsap_dates &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(ebirdst_runs, species_code <span class="op">==</span><span class="st"> "yebsap"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="st">  </span><span class="co"># just keep the seasonal definition columns</span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/select">select</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org/reference/setops.html">setdiff</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">matches</a></span>(<span class="st">"(start)|(end)"</span>), <span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">matches</a></span>(<span class="st">"year_round"</span>))) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="st">  </span><span class="co"># transpose</span></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="st">  </span><span class="kw"><a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a></span>(<span class="st">"label"</span>, <span class="st">"date"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="st">  </span><span class="co"># spread data so start and end dates are in separate columns</span></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="st">  </span><span class="kw"><a href="https://tidyr.tidyverse.org/reference/separate.html">separate</a></span>(label, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"season"</span>, <span class="st">"start_end"</span>), <span class="st">"_(?=s|e)"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="st">  </span><span class="kw"><a href="https://tidyr.tidyverse.org/reference/spread.html">spread</a></span>(start_end, date) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/select">select</a></span>(season, start_dt, end_dt)</a>
+<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co"># did the season pass review</span></a>
+<a class="sourceLine" id="cb4-12" data-line-number="12">yebsap_dates &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(yebsap_dates, <span class="dt">pass =</span> <span class="op">!</span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/NA">is.na</a></span>(start_dt) <span class="op">|</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/NA">is.na</a></span>(end_dt)))</a>
+<a class="sourceLine" id="cb4-13" data-line-number="13">yebsap_dates</a>
+<a class="sourceLine" id="cb4-14" data-line-number="14"><span class="co">#&gt; # A tibble: 4 x 4</span></a>
+<a class="sourceLine" id="cb4-15" data-line-number="15"><span class="co">#&gt;   season                 start_dt   end_dt     pass </span></a>
+<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co">#&gt;   &lt;chr&gt;                  &lt;date&gt;     &lt;date&gt;     &lt;lgl&gt;</span></a>
+<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co">#&gt; 1 breeding               2016-05-24 2016-09-07 TRUE </span></a>
+<a class="sourceLine" id="cb4-18" data-line-number="18"><span class="co">#&gt; 2 nonbreeding            2016-11-23 2016-03-15 TRUE </span></a>
+<a class="sourceLine" id="cb4-19" data-line-number="19"><span class="co">#&gt; 3 postbreeding_migration 2016-09-14 2016-11-16 TRUE </span></a>
+<a class="sourceLine" id="cb4-20" data-line-number="20"><span class="co">#&gt; 4 prebreeding_migration  2016-03-22 2016-05-17 TRUE</span></a></code></pre></div>
 <p>Now, we’ll use these season definitions to assign each of the weekly abundance layers to a season.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># dates for each abundance layer</span>
-weeks &lt;-<span class="st"> </span><span class="kw"><a href="../reference/parse_raster_dates.html">parse_raster_dates</a></span>(abd)
-<span class="co"># assign to seasons</span>
-weeks_season &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="ot">NA_character_</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(weeks))
-<span class="cf">for</span> (i <span class="cf">in</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq_len</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">nrow</a></span>(yebsap_dates))) {
-  s &lt;-<span class="st"> </span>yebsap_dates[i, ]
-  <span class="co"># skip seasona assignment if season failed</span>
-  <span class="cf">if</span> (<span class="op">!</span>s<span class="op">$</span>pass) {
-    <span class="cf">next</span>()
-  }
-  <span class="co"># handle seasons cross jan 1 separately</span>
-  <span class="cf">if</span> (s<span class="op">$</span>start_dt <span class="op">&lt;=</span><span class="st"> </span>s<span class="op">$</span>end_dt) {
-    in_season &lt;-<span class="st"> </span>weeks <span class="op">&gt;=</span><span class="st"> </span>s<span class="op">$</span>start_dt <span class="op">&amp;</span><span class="st"> </span>weeks <span class="op">&lt;=</span><span class="st"> </span>s<span class="op">$</span>end_dt
-  } <span class="cf">else</span> {
-    in_season &lt;-<span class="st"> </span>weeks <span class="op">&gt;=</span><span class="st"> </span>s<span class="op">$</span>start_dt <span class="op">|</span><span class="st"> </span>weeks <span class="op">&lt;=</span><span class="st"> </span>s<span class="op">$</span>end_dt
-  }
-  weeks_season[in_season] &lt;-<span class="st"> </span>s<span class="op">$</span>season
-}
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/table">table</a></span>(weeks_season)
-<span class="co">#&gt; weeks_season</span>
-<span class="co">#&gt;               breeding            nonbreeding postbreeding_migration </span>
-<span class="co">#&gt;                     16                     17                     10 </span>
-<span class="co">#&gt;  prebreeding_migration </span>
-<span class="co">#&gt;                      9</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="co"># dates for each abundance layer</span></a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">weeks &lt;-<span class="st"> </span><span class="kw"><a href="../reference/parse_raster_dates.html">parse_raster_dates</a></span>(abd)</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co"># assign to seasons</span></a>
+<a class="sourceLine" id="cb5-4" data-line-number="4">weeks_season &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="ot">NA_character_</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(weeks))</a>
+<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="cf">for</span> (i <span class="cf">in</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq_len</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">nrow</a></span>(yebsap_dates))) {</a>
+<a class="sourceLine" id="cb5-6" data-line-number="6">  s &lt;-<span class="st"> </span>yebsap_dates[i, ]</a>
+<a class="sourceLine" id="cb5-7" data-line-number="7">  <span class="co"># skip seasona assignment if season failed</span></a>
+<a class="sourceLine" id="cb5-8" data-line-number="8">  <span class="cf">if</span> (<span class="op">!</span>s<span class="op">$</span>pass) {</a>
+<a class="sourceLine" id="cb5-9" data-line-number="9">    <span class="cf">next</span>()</a>
+<a class="sourceLine" id="cb5-10" data-line-number="10">  }</a>
+<a class="sourceLine" id="cb5-11" data-line-number="11">  <span class="co"># handle seasons cross jan 1 separately</span></a>
+<a class="sourceLine" id="cb5-12" data-line-number="12">  <span class="cf">if</span> (s<span class="op">$</span>start_dt <span class="op">&lt;=</span><span class="st"> </span>s<span class="op">$</span>end_dt) {</a>
+<a class="sourceLine" id="cb5-13" data-line-number="13">    in_season &lt;-<span class="st"> </span>weeks <span class="op">&gt;=</span><span class="st"> </span>s<span class="op">$</span>start_dt <span class="op">&amp;</span><span class="st"> </span>weeks <span class="op">&lt;=</span><span class="st"> </span>s<span class="op">$</span>end_dt</a>
+<a class="sourceLine" id="cb5-14" data-line-number="14">  } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb5-15" data-line-number="15">    in_season &lt;-<span class="st"> </span>weeks <span class="op">&gt;=</span><span class="st"> </span>s<span class="op">$</span>start_dt <span class="op">|</span><span class="st"> </span>weeks <span class="op">&lt;=</span><span class="st"> </span>s<span class="op">$</span>end_dt</a>
+<a class="sourceLine" id="cb5-16" data-line-number="16">  }</a>
+<a class="sourceLine" id="cb5-17" data-line-number="17">  weeks_season[in_season] &lt;-<span class="st"> </span>s<span class="op">$</span>season</a>
+<a class="sourceLine" id="cb5-18" data-line-number="18">}</a>
+<a class="sourceLine" id="cb5-19" data-line-number="19"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/table">table</a></span>(weeks_season)</a>
+<a class="sourceLine" id="cb5-20" data-line-number="20"><span class="co">#&gt; weeks_season</span></a>
+<a class="sourceLine" id="cb5-21" data-line-number="21"><span class="co">#&gt;               breeding            nonbreeding postbreeding_migration </span></a>
+<a class="sourceLine" id="cb5-22" data-line-number="22"><span class="co">#&gt;                     16                     17                     10 </span></a>
+<a class="sourceLine" id="cb5-23" data-line-number="23"><span class="co">#&gt;  prebreeding_migration </span></a>
+<a class="sourceLine" id="cb5-24" data-line-number="24"><span class="co">#&gt;                      9</span></a></code></pre></div>
 <p>Finally, let’s average all the weeks within each season to produce seasonal relative abundance rasters.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># drop weeks not assigned to season</span>
-week_pass &lt;-<span class="st"> </span><span class="op">!</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/NA">is.na</a></span>(weeks_season)
-abd &lt;-<span class="st"> </span>abd[[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(week_pass)]]
-weeks &lt;-<span class="st"> </span>weeks[week_pass]
-weeks_season &lt;-<span class="st"> </span>weeks_season[week_pass]
-<span class="co"># average over weeks in season</span>
-mean_season &lt;-<span class="st"> </span><span class="cf">function</span>(s) {
-  <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/calc">calc</a></span>(abd[[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(weeks_season <span class="op">==</span><span class="st"> </span>s)]], mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
-}
-seasons &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/unique">unique</a></span>(weeks_season)
-abd_season &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">lapply</a></span>(seasons, mean_season) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/stack">stack</a></span>() <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/setNames">setNames</a></span>(seasons)
-abd_season
-<span class="co">#&gt; class       : RasterStack </span>
-<span class="co">#&gt; dimensions  : 259, 276, 71484, 4  (nrow, ncol, ncell, nlayers)</span>
-<span class="co">#&gt; resolution  : 2779.876, 2779.876  (x, y)</span>
-<span class="co">#&gt; extent      : -7202659, -6435414, 4636834, 5356822  (xmin, xmax, ymin, ymax)</span>
-<span class="co">#&gt; coord. ref. : +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs </span>
-<span class="co">#&gt; names       : nonbreeding, prebreeding_migration,  breeding, postbreeding_migration </span>
-<span class="co">#&gt; min values  :   0.0000000,             0.1460964, 0.0000000,              0.0000000 </span>
-<span class="co">#&gt; max values  :   0.6754810,             1.6710625, 2.0053043,              0.9763988</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="co"># drop weeks not assigned to season</span></a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">week_pass &lt;-<span class="st"> </span><span class="op">!</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/NA">is.na</a></span>(weeks_season)</a>
+<a class="sourceLine" id="cb6-3" data-line-number="3">abd &lt;-<span class="st"> </span>abd[[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(week_pass)]]</a>
+<a class="sourceLine" id="cb6-4" data-line-number="4">weeks &lt;-<span class="st"> </span>weeks[week_pass]</a>
+<a class="sourceLine" id="cb6-5" data-line-number="5">weeks_season &lt;-<span class="st"> </span>weeks_season[week_pass]</a>
+<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="co"># average over weeks in season</span></a>
+<a class="sourceLine" id="cb6-7" data-line-number="7">mean_season &lt;-<span class="st"> </span><span class="cf">function</span>(s) {</a>
+<a class="sourceLine" id="cb6-8" data-line-number="8">  <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/calc">calc</a></span>(abd[[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(weeks_season <span class="op">==</span><span class="st"> </span>s)]], mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb6-9" data-line-number="9">}</a>
+<a class="sourceLine" id="cb6-10" data-line-number="10">seasons &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/unique">unique</a></span>(weeks_season)</a>
+<a class="sourceLine" id="cb6-11" data-line-number="11">abd_season &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">lapply</a></span>(seasons, mean_season) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb6-12" data-line-number="12"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/stack">stack</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb6-13" data-line-number="13"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/setNames">setNames</a></span>(seasons)</a>
+<a class="sourceLine" id="cb6-14" data-line-number="14">abd_season</a>
+<a class="sourceLine" id="cb6-15" data-line-number="15"><span class="co">#&gt; class       : RasterStack </span></a>
+<a class="sourceLine" id="cb6-16" data-line-number="16"><span class="co">#&gt; dimensions  : 259, 276, 71484, 4  (nrow, ncol, ncell, nlayers)</span></a>
+<a class="sourceLine" id="cb6-17" data-line-number="17"><span class="co">#&gt; resolution  : 2779.876, 2779.876  (x, y)</span></a>
+<a class="sourceLine" id="cb6-18" data-line-number="18"><span class="co">#&gt; extent      : -7202659, -6435414, 4636834, 5356822  (xmin, xmax, ymin, ymax)</span></a>
+<a class="sourceLine" id="cb6-19" data-line-number="19"><span class="co">#&gt; coord. ref. : +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs </span></a>
+<a class="sourceLine" id="cb6-20" data-line-number="20"><span class="co">#&gt; names       : nonbreeding, prebreeding_migration,  breeding, postbreeding_migration </span></a>
+<a class="sourceLine" id="cb6-21" data-line-number="21"><span class="co">#&gt; min values  :   0.0000000,             0.1460964, 0.0000000,              0.0000000 </span></a>
+<a class="sourceLine" id="cb6-22" data-line-number="22"><span class="co">#&gt; max values  :   0.6754810,             1.6710625, 2.0053043,              0.9763988</span></a></code></pre></div>
 </div>
 <div id="abundance-maps" class="section level1">
 <h1 class="hasAnchor">
 <a href="#abundance-maps" class="anchor"></a>Abundance Maps</h1>
 <p>Before we create maps of seasonal relative abundance we need to account for two addition considerations that the online maps make: whether to split pre- and post-breeding migration and whether to explicitly show the year-round distribution as a separate color. For species that use different paths for their two migrations (less than 40% overlap) we show pre-breeding migration (green) and post-breeding migration (yellow) separately.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">migration_threshold &lt;-<span class="st"> </span><span class="fl">0.4</span>
-mig_seasons &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"prebreeding_migration"</span>, <span class="st">"postbreeding_migration"</span>)
-<span class="cf">if</span> (<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/all">all</a></span>(mig_seasons <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/names">names</a></span>(abd_season))) {
-  <span class="co"># identify areas with abundance in only one season</span>
-  abd_nz &lt;-<span class="st"> </span>abd_season[[mig_seasons]] <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>
-  just_pre &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/mask">mask</a></span>(abd_nz[[<span class="st">"prebreeding_migration"</span>]],
-                   abd_nz[[<span class="st">"postbreeding_migration"</span>]], 
-                   <span class="dt">maskvalue =</span> <span class="dv">1</span>)
-  just_post &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/mask">mask</a></span>(abd_nz[[<span class="st">"postbreeding_migration"</span>]],
-                   abd_nz[[<span class="st">"prebreeding_migration"</span>]], 
-                   <span class="dt">maskvalue =</span> <span class="dv">1</span>)
-  <span class="co"># count the number of cells with abundance in only one season</span>
-  n_just &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/cellStats">cellStats</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/stack">stack</a></span>(just_pre, just_post), sum)
-  n_all &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/cellStats">cellStats</a></span>(abd_nz, sum)
-  <span class="co"># is the proportion of one season cells above the 40% threshold</span>
-  split_migration &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">max</a></span>(n_just <span class="op">/</span><span class="st"> </span>n_all, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) <span class="op">&gt;=</span><span class="st"> </span>migration_threshold
-} <span class="cf">else</span> {
-  split_migration &lt;-<span class="st"> </span><span class="ot">FALSE</span>
-}
-n_just <span class="op">/</span><span class="st"> </span>n_all
-<span class="co">#&gt;  prebreeding_migration postbreeding_migration </span>
-<span class="co">#&gt;           5.103082e-05           0.000000e+00</span>
-split_migration
-<span class="co">#&gt; [1] FALSE</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">migration_threshold &lt;-<span class="st"> </span><span class="fl">0.4</span></a>
+<a class="sourceLine" id="cb7-2" data-line-number="2">mig_seasons &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"prebreeding_migration"</span>, <span class="st">"postbreeding_migration"</span>)</a>
+<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="cf">if</span> (<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/all">all</a></span>(mig_seasons <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/names">names</a></span>(abd_season))) {</a>
+<a class="sourceLine" id="cb7-4" data-line-number="4">  <span class="co"># identify areas with abundance in only one season</span></a>
+<a class="sourceLine" id="cb7-5" data-line-number="5">  abd_nz &lt;-<span class="st"> </span>abd_season[[mig_seasons]] <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6">  just_pre &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/mask">mask</a></span>(abd_nz[[<span class="st">"prebreeding_migration"</span>]],</a>
+<a class="sourceLine" id="cb7-7" data-line-number="7">                   abd_nz[[<span class="st">"postbreeding_migration"</span>]], </a>
+<a class="sourceLine" id="cb7-8" data-line-number="8">                   <span class="dt">maskvalue =</span> <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb7-9" data-line-number="9">  just_post &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/mask">mask</a></span>(abd_nz[[<span class="st">"postbreeding_migration"</span>]],</a>
+<a class="sourceLine" id="cb7-10" data-line-number="10">                   abd_nz[[<span class="st">"prebreeding_migration"</span>]], </a>
+<a class="sourceLine" id="cb7-11" data-line-number="11">                   <span class="dt">maskvalue =</span> <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb7-12" data-line-number="12">  <span class="co"># count the number of cells with abundance in only one season</span></a>
+<a class="sourceLine" id="cb7-13" data-line-number="13">  n_just &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/cellStats">cellStats</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/stack">stack</a></span>(just_pre, just_post), sum)</a>
+<a class="sourceLine" id="cb7-14" data-line-number="14">  n_all &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/cellStats">cellStats</a></span>(abd_nz, sum)</a>
+<a class="sourceLine" id="cb7-15" data-line-number="15">  <span class="co"># is the proportion of one season cells above the 40% threshold</span></a>
+<a class="sourceLine" id="cb7-16" data-line-number="16">  split_migration &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">max</a></span>(n_just <span class="op">/</span><span class="st"> </span>n_all, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) <span class="op">&gt;=</span><span class="st"> </span>migration_threshold</a>
+<a class="sourceLine" id="cb7-17" data-line-number="17">} <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb7-18" data-line-number="18">  split_migration &lt;-<span class="st"> </span><span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb7-19" data-line-number="19">}</a>
+<a class="sourceLine" id="cb7-20" data-line-number="20">n_just <span class="op">/</span><span class="st"> </span>n_all</a>
+<a class="sourceLine" id="cb7-21" data-line-number="21"><span class="co">#&gt;  prebreeding_migration postbreeding_migration </span></a>
+<a class="sourceLine" id="cb7-22" data-line-number="22"><span class="co">#&gt;           5.103082e-05           0.000000e+00</span></a>
+<a class="sourceLine" id="cb7-23" data-line-number="23">split_migration</a>
+<a class="sourceLine" id="cb7-24" data-line-number="24"><span class="co">#&gt; [1] FALSE</span></a></code></pre></div>
 <p>In this case, there is essentially complete overlap between pre- and post-breeding migration, so we won’t split them into separate colors on the map. Next, we’ll calculate the average annual abundance, which we’ll display as a separate color if at least 1% of the range is occupied in all four seasons.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">threshold_yearround &lt;-<span class="st"> </span><span class="fl">0.01</span>
-<span class="co"># decide whether to show year-round layer</span>
-<span class="cf">if</span> (<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/nlayers">nlayers</a></span>(abd_season) <span class="op">==</span><span class="st"> </span><span class="dv">4</span>) {
-  <span class="co"># annual abundance</span>
-  abd_yr &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/calc">calc</a></span>(abd, <span class="dt">fun =</span> mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
-  <span class="co"># mask out cells that aren't occupied year-round</span>
-  year_round &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/calc">calc</a></span>(abd_season <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, <span class="dt">fun =</span> sum, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) <span class="op">==</span><span class="st"> </span><span class="dv">4</span>
-  abd_yr_mask &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/mask">mask</a></span>(abd_yr, year_round, <span class="dt">maskvalue =</span> <span class="dv">0</span>)
-  <span class="co"># determine proportion of celss that are occupied year round</span>
-  n_yr &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/cellStats">cellStats</a></span>(abd_yr_mask <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, sum)
-  n_an &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/cellStats">cellStats</a></span>(abd_yr <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, sum)
-  <span class="co"># only show year round abundance if it's above 1% of range threshold</span>
-  show_yearround &lt;-<span class="st"> </span>((n_yr <span class="op">/</span><span class="st"> </span>n_an) <span class="op">&gt;=</span><span class="st"> </span>threshold_yearround)
-} <span class="cf">else</span> {
-  show_yearround &lt;-<span class="st"> </span><span class="ot">FALSE</span>
-}
-show_yearround
-<span class="co">#&gt; [1] TRUE</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">threshold_yearround &lt;-<span class="st"> </span><span class="fl">0.01</span></a>
+<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co"># decide whether to show year-round layer</span></a>
+<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="cf">if</span> (<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/nlayers">nlayers</a></span>(abd_season) <span class="op">==</span><span class="st"> </span><span class="dv">4</span>) {</a>
+<a class="sourceLine" id="cb8-4" data-line-number="4">  <span class="co"># annual abundance</span></a>
+<a class="sourceLine" id="cb8-5" data-line-number="5">  abd_yr &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/calc">calc</a></span>(abd, <span class="dt">fun =</span> mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb8-6" data-line-number="6">  <span class="co"># mask out cells that aren't occupied year-round</span></a>
+<a class="sourceLine" id="cb8-7" data-line-number="7">  year_round &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/calc">calc</a></span>(abd_season <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, <span class="dt">fun =</span> sum, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) <span class="op">==</span><span class="st"> </span><span class="dv">4</span></a>
+<a class="sourceLine" id="cb8-8" data-line-number="8">  abd_yr_mask &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/mask">mask</a></span>(abd_yr, year_round, <span class="dt">maskvalue =</span> <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb8-9" data-line-number="9">  <span class="co"># determine proportion of celss that are occupied year round</span></a>
+<a class="sourceLine" id="cb8-10" data-line-number="10">  n_yr &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/cellStats">cellStats</a></span>(abd_yr_mask <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, sum)</a>
+<a class="sourceLine" id="cb8-11" data-line-number="11">  n_an &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/cellStats">cellStats</a></span>(abd_yr <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, sum)</a>
+<a class="sourceLine" id="cb8-12" data-line-number="12">  <span class="co"># only show year round abundance if it's above 1% of range threshold</span></a>
+<a class="sourceLine" id="cb8-13" data-line-number="13">  show_yearround &lt;-<span class="st"> </span>((n_yr <span class="op">/</span><span class="st"> </span>n_an) <span class="op">&gt;=</span><span class="st"> </span>threshold_yearround)</a>
+<a class="sourceLine" id="cb8-14" data-line-number="14">} <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb8-15" data-line-number="15">  show_yearround &lt;-<span class="st"> </span><span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb8-16" data-line-number="16">}</a>
+<a class="sourceLine" id="cb8-17" data-line-number="17">show_yearround</a>
+<a class="sourceLine" id="cb8-18" data-line-number="18"><span class="co">#&gt; [1] TRUE</span></a></code></pre></div>
 <p>Mapping relative abundance across the full-annual cycle requires a specialized set of color bins in order to ensure the full range of abundance values is effectively displayed. The function <code><a href="../reference/calc_bins.html">calc_bins()</a></code> calculates the optimal break points of bins for Status and Trends abundance data.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bin_breaks &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calc_bins.html">calc_bins</a></span>(abd_season)</code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">bin_breaks &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calc_bins.html">calc_bins</a></span>(abd_season)</a></code></pre></div>
 <p>Now that everything is in place, we can actually make the seasonal relative abundance map! Note that the Status and Trends maps distinguish between regions of zero abundance and <a href="https://ebird.org/science/status-and-trends/faq#no-prediction">regions with no prediction</a>, which are displayed in different shades of gray, and regions with non-zero abundance, shown in color. To account for this, we’ll need to generate a raster layer delineating the region within which predictions were made.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># project the abundance data to mollweide</span>
-<span class="co"># use nearest neighbour resampling to preserve true zeros</span>
-abd_season_proj &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/projectRaster">projectRaster</a></span>(abd_season, <span class="dt">crs =</span> mollweide, <span class="dt">method =</span> <span class="st">"ngb"</span>)
-<span class="co"># determine spatial extent for plotting</span>
-ext &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calc_full_extent.html">calc_full_extent</a></span>(abd_season_proj)
-<span class="co"># set the plotting order of the seasons</span>
-season_order &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"postbreeding_migration"</span>, <span class="st">"prebreeding_migration"</span>, 
-                  <span class="st">"nonbreeding"</span>, <span class="st">"breeding"</span>)
-
-<span class="co"># prediction region, cells with predicted value in at least one week</span>
-pred_region &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/calc">calc</a></span>(abd_season_proj, mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
-<span class="co"># mask to land area</span>
-ne_land_buffer &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/geos_unary">st_buffer</a></span>(ne_land, <span class="dt">dist =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">max</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/resolution">res</a></span>(pred_region)) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>)
-pred_region &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/mask">mask</a></span>(pred_region, <span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/coerce-methods">as_Spatial</a></span>(ne_land_buffer))
-
-<span class="co"># remove zeros from abundnace layers</span>
-abd_no_zero &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/substitute">subs</a></span>(abd_season_proj, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">from =</span> <span class="dv">0</span>, <span class="dt">to =</span> <span class="ot">NA</span>), 
-                    <span class="dt">subsWithNA =</span> <span class="ot">FALSE</span>)
-
-<span class="co"># set up plot area</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span> , <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>))
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_land, <span class="dt">col =</span> <span class="st">"#eeeeee"</span>, <span class="dt">border =</span> <span class="ot">NA</span>, 
-     <span class="dt">xlim =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(ext<span class="op">@</span>xmin, ext<span class="op">@</span>xmax),
-     <span class="dt">ylim =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(ext<span class="op">@</span>ymin, ext<span class="op">@</span>ymax))
-<span class="co"># prediction region and explicit zeros</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(pred_region, <span class="dt">col =</span> <span class="st">"#dddddd"</span>, <span class="dt">maxpixels =</span> raster<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(pred_region),
-     <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-<span class="co"># lakes</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_lakes, <span class="dt">col =</span> <span class="st">"#ffffff"</span>, <span class="dt">border =</span>  <span class="st">"#444444"</span>, <span class="dt">lwd =</span> <span class="fl">0.5</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-<span class="co"># land border</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_land, <span class="dt">col =</span> <span class="ot">NA</span>, <span class="dt">border =</span> <span class="st">"#444444"</span>, <span class="dt">lwd =</span> <span class="fl">0.5</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-<span class="co"># seasonal layer</span>
-plot_seasons &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/intersect">intersect</a></span>(season_order, <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/names">names</a></span>(abd_no_zero))
-<span class="cf">for</span> (s <span class="cf">in</span> plot_seasons) {
-  <span class="co"># handle splitting of migration seasons into different colors</span>
-  <span class="cf">if</span> (<span class="op">!</span>split_migration <span class="op">&amp;&amp;</span><span class="st"> </span>s <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"prebreeding_migration"</span>, 
-                                   <span class="st">"postbreeding_migration"</span>)) {
-    pal_season &lt;-<span class="st"> "migration"</span>
-    
-  } <span class="cf">else</span> {
-    pal_season &lt;-<span class="st"> </span>s
-  }
-  pal &lt;-<span class="st"> </span><span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(bin_breaks<span class="op">$</span>bins) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, pal_season)
-  <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(abd_no_zero[[s]], <span class="dt">col =</span> pal, <span class="dt">breaks =</span> bin_breaks<span class="op">$</span>bins,
-       <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(abd_no_zero[[s]]),
-       <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-}
-<span class="co"># year round</span>
-<span class="cf">if</span> (show_yearround) {
-  year_round_proj &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/projectRaster">projectRaster</a></span>(year_round, <span class="dt">crs =</span> mollweide, <span class="dt">method =</span> <span class="st">"ngb"</span>)
-  <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(year_round_proj, 
-       <span class="dt">col =</span> <span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(bin_breaks<span class="op">$</span>bins) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="st">"year_round"</span>), 
-       <span class="dt">breaks =</span> bin_breaks<span class="op">$</span>bins,
-       <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(year_round_proj),
-       <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-}
-<span class="co"># linework</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_rivers, <span class="dt">col =</span> <span class="st">"#ffffff"</span>, <span class="dt">lwd =</span> <span class="fl">0.75</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_state_lines, <span class="dt">col =</span> <span class="st">"#ffffff"</span>, <span class="dt">lwd =</span> <span class="fl">1.5</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_country_lines, <span class="dt">col =</span> <span class="st">"#ffffff"</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-
-<span class="co"># legends</span>
-legend_seasons &lt;-<span class="st"> </span>plot_seasons
-<span class="cf">if</span> (split_migration) {
-  legend_seasons[legend_seasons <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"prebreeding_migration"</span>, 
-                                       <span class="st">"postbreeding_migration"</span>)] &lt;-<span class="st"> "migration"</span>
-  legend_seasons &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/unique">unique</a></span>(legend_seasons)
-}
-<span class="cf">if</span> (show_yearround) {
-  legend_seasons &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(legend_seasons, <span class="st">"year_round"</span>)
-}
-<span class="co"># thin out labels</span>
-lbl_at &lt;-<span class="st"> </span>bin_breaks<span class="op">$</span>bins<span class="op">^</span>bin_breaks<span class="op">$</span>power
-lbl_at &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">min</a></span>(lbl_at), <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/median">median</a></span>(lbl_at), <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">max</a></span>(lbl_at))
-lbl &lt;-<span class="st"> </span>lbl_at<span class="op">^</span>(<span class="dv">1</span> <span class="op">/</span><span class="st"> </span>bin_breaks<span class="op">$</span>power)
-lbl &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/format">format</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">round</a></span>(lbl, <span class="dv">2</span>), <span class="dt">nsmall =</span> <span class="dv">2</span>)
-<span class="co"># plot legends</span>
-<span class="cf">for</span> (i <span class="cf">in</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq_along</a></span>(legend_seasons)) {
-  pal &lt;-<span class="st"> </span><span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(bin_breaks<span class="op">$</span>bins) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, legend_seasons[i])
-  <span class="cf">if</span> (i <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) {
-    axis_args &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">at =</span> lbl_at, <span class="dt">labels =</span> lbl, <span class="dt">line =</span> <span class="op">-</span><span class="dv">1</span>,
-                      <span class="dt">cex.axis =</span> <span class="fl">0.75</span>, <span class="dt">lwd =</span> <span class="dv">0</span>)
-  } <span class="cf">else</span> {
-    axis_args &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">at =</span> lbl_at, <span class="dt">labels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">""</span>, <span class="dv">3</span>),
-                      <span class="dt">cex.axis =</span> <span class="fl">0.75</span>, <span class="dt">lwd =</span> <span class="dv">0</span>)
-  }
-  legend_title &lt;-<span class="st"> </span>legend_seasons[i] <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="kw"><a href="https://stringr.tidyverse.org/reference/str_replace.html">str_replace_all</a></span>(<span class="st">"_"</span>, <span class="st">" "</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="kw"><a href="https://stringr.tidyverse.org/reference/case.html">str_to_title</a></span>()
-  fields<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/fields/topics/image.plot">image.plot</a></span>(<span class="dt">zlim =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/range">range</a></span>(bin_breaks<span class="op">$</span>bins<span class="op">^</span>bin_breaks<span class="op">$</span>power), 
-                   <span class="dt">legend.only =</span> <span class="ot">TRUE</span>, 
-                   <span class="dt">breaks =</span> bin_breaks<span class="op">$</span>bins<span class="op">^</span>bin_breaks<span class="op">$</span>power, <span class="dt">col =</span> pal,
-                   <span class="dt">smallplot =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="fl">0.05</span>, <span class="fl">0.35</span>, <span class="fl">0.01</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.06</span> <span class="op">*</span><span class="st"> </span>i, <span class="fl">0.03</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.06</span> <span class="op">*</span><span class="st"> </span>i),
-                   <span class="dt">horizontal =</span> <span class="ot">TRUE</span>,
-                   <span class="dt">axis.args =</span> axis_args,
-                   <span class="dt">legend.args =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">text =</span> legend_title, <span class="dt">side =</span> <span class="dv">3</span>, 
-                                      <span class="dt">cex =</span> <span class="fl">0.9</span>, <span class="dt">col =</span> <span class="st">"black"</span>, <span class="dt">line =</span> <span class="fl">0.1</span>))
-}
-<span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/title">title</a></span>(<span class="st">"Yellow-bellied Sapsucker Relative Abundance (birds per km/hr)"</span>, 
-      <span class="dt">line =</span> <span class="op">-</span><span class="dv">1</span>, <span class="dt">cex.main =</span> <span class="dv">1</span>)</code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="co"># project the abundance data to mollweide</span></a>
+<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="co"># use nearest neighbour resampling to preserve true zeros</span></a>
+<a class="sourceLine" id="cb10-3" data-line-number="3">abd_season_proj &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/projectRaster">projectRaster</a></span>(abd_season, <span class="dt">crs =</span> mollweide, <span class="dt">method =</span> <span class="st">"ngb"</span>)</a>
+<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="co"># determine spatial extent for plotting</span></a>
+<a class="sourceLine" id="cb10-5" data-line-number="5">ext &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calc_full_extent.html">calc_full_extent</a></span>(abd_season_proj)</a>
+<a class="sourceLine" id="cb10-6" data-line-number="6"><span class="co"># set the plotting order of the seasons</span></a>
+<a class="sourceLine" id="cb10-7" data-line-number="7">season_order &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"postbreeding_migration"</span>, <span class="st">"prebreeding_migration"</span>, </a>
+<a class="sourceLine" id="cb10-8" data-line-number="8">                  <span class="st">"nonbreeding"</span>, <span class="st">"breeding"</span>)</a>
+<a class="sourceLine" id="cb10-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb10-10" data-line-number="10"><span class="co"># prediction region, cells with predicted value in at least one week</span></a>
+<a class="sourceLine" id="cb10-11" data-line-number="11">pred_region &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/calc">calc</a></span>(abd_season_proj, mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb10-12" data-line-number="12"><span class="co"># mask to land area</span></a>
+<a class="sourceLine" id="cb10-13" data-line-number="13">ne_land_buffer &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/geos_unary">st_buffer</a></span>(ne_land, <span class="dt">dist =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">max</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/resolution">res</a></span>(pred_region)) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb10-14" data-line-number="14">pred_region &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/mask">mask</a></span>(pred_region, <span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/coerce-methods">as_Spatial</a></span>(ne_land_buffer))</a>
+<a class="sourceLine" id="cb10-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb10-16" data-line-number="16"><span class="co"># remove zeros from abundnace layers</span></a>
+<a class="sourceLine" id="cb10-17" data-line-number="17">abd_no_zero &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/substitute">subs</a></span>(abd_season_proj, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">from =</span> <span class="dv">0</span>, <span class="dt">to =</span> <span class="ot">NA</span>), </a>
+<a class="sourceLine" id="cb10-18" data-line-number="18">                    <span class="dt">subsWithNA =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb10-19" data-line-number="19"></a>
+<a class="sourceLine" id="cb10-20" data-line-number="20"><span class="co"># set up plot area</span></a>
+<a class="sourceLine" id="cb10-21" data-line-number="21"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span> , <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>))</a>
+<a class="sourceLine" id="cb10-22" data-line-number="22"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_land, <span class="dt">col =</span> <span class="st">"#eeeeee"</span>, <span class="dt">border =</span> <span class="ot">NA</span>, </a>
+<a class="sourceLine" id="cb10-23" data-line-number="23">     <span class="dt">xlim =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(ext<span class="op">@</span>xmin, ext<span class="op">@</span>xmax),</a>
+<a class="sourceLine" id="cb10-24" data-line-number="24">     <span class="dt">ylim =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(ext<span class="op">@</span>ymin, ext<span class="op">@</span>ymax))</a>
+<a class="sourceLine" id="cb10-25" data-line-number="25"><span class="co"># prediction region and explicit zeros</span></a>
+<a class="sourceLine" id="cb10-26" data-line-number="26"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(pred_region, <span class="dt">col =</span> <span class="st">"#dddddd"</span>, <span class="dt">maxpixels =</span> raster<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(pred_region),</a>
+<a class="sourceLine" id="cb10-27" data-line-number="27">     <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb10-28" data-line-number="28"><span class="co"># lakes</span></a>
+<a class="sourceLine" id="cb10-29" data-line-number="29"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_lakes, <span class="dt">col =</span> <span class="st">"#ffffff"</span>, <span class="dt">border =</span>  <span class="st">"#444444"</span>, <span class="dt">lwd =</span> <span class="fl">0.5</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb10-30" data-line-number="30"><span class="co"># land border</span></a>
+<a class="sourceLine" id="cb10-31" data-line-number="31"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_land, <span class="dt">col =</span> <span class="ot">NA</span>, <span class="dt">border =</span> <span class="st">"#444444"</span>, <span class="dt">lwd =</span> <span class="fl">0.5</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb10-32" data-line-number="32"><span class="co"># seasonal layer</span></a>
+<a class="sourceLine" id="cb10-33" data-line-number="33">plot_seasons &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/intersect">intersect</a></span>(season_order, <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/names">names</a></span>(abd_no_zero))</a>
+<a class="sourceLine" id="cb10-34" data-line-number="34"><span class="cf">for</span> (s <span class="cf">in</span> plot_seasons) {</a>
+<a class="sourceLine" id="cb10-35" data-line-number="35">  <span class="co"># handle splitting of migration seasons into different colors</span></a>
+<a class="sourceLine" id="cb10-36" data-line-number="36">  <span class="cf">if</span> (<span class="op">!</span>split_migration <span class="op">&amp;&amp;</span><span class="st"> </span>s <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"prebreeding_migration"</span>, </a>
+<a class="sourceLine" id="cb10-37" data-line-number="37">                                   <span class="st">"postbreeding_migration"</span>)) {</a>
+<a class="sourceLine" id="cb10-38" data-line-number="38">    pal_season &lt;-<span class="st"> "migration"</span></a>
+<a class="sourceLine" id="cb10-39" data-line-number="39">    </a>
+<a class="sourceLine" id="cb10-40" data-line-number="40">  } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb10-41" data-line-number="41">    pal_season &lt;-<span class="st"> </span>s</a>
+<a class="sourceLine" id="cb10-42" data-line-number="42">  }</a>
+<a class="sourceLine" id="cb10-43" data-line-number="43">  pal &lt;-<span class="st"> </span><span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(bin_breaks<span class="op">$</span>bins) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, pal_season)</a>
+<a class="sourceLine" id="cb10-44" data-line-number="44">  <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(abd_no_zero[[s]], <span class="dt">col =</span> pal, <span class="dt">breaks =</span> bin_breaks<span class="op">$</span>bins,</a>
+<a class="sourceLine" id="cb10-45" data-line-number="45">       <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(abd_no_zero[[s]]),</a>
+<a class="sourceLine" id="cb10-46" data-line-number="46">       <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb10-47" data-line-number="47">}</a>
+<a class="sourceLine" id="cb10-48" data-line-number="48"><span class="co"># year round</span></a>
+<a class="sourceLine" id="cb10-49" data-line-number="49"><span class="cf">if</span> (show_yearround) {</a>
+<a class="sourceLine" id="cb10-50" data-line-number="50">  year_round_proj &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/projectRaster">projectRaster</a></span>(year_round, <span class="dt">crs =</span> mollweide, <span class="dt">method =</span> <span class="st">"ngb"</span>)</a>
+<a class="sourceLine" id="cb10-51" data-line-number="51">  <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(year_round_proj, </a>
+<a class="sourceLine" id="cb10-52" data-line-number="52">       <span class="dt">col =</span> <span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(bin_breaks<span class="op">$</span>bins) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="st">"year_round"</span>), </a>
+<a class="sourceLine" id="cb10-53" data-line-number="53">       <span class="dt">breaks =</span> bin_breaks<span class="op">$</span>bins,</a>
+<a class="sourceLine" id="cb10-54" data-line-number="54">       <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(year_round_proj),</a>
+<a class="sourceLine" id="cb10-55" data-line-number="55">       <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb10-56" data-line-number="56">}</a>
+<a class="sourceLine" id="cb10-57" data-line-number="57"><span class="co"># linework</span></a>
+<a class="sourceLine" id="cb10-58" data-line-number="58"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_rivers, <span class="dt">col =</span> <span class="st">"#ffffff"</span>, <span class="dt">lwd =</span> <span class="fl">0.75</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb10-59" data-line-number="59"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_state_lines, <span class="dt">col =</span> <span class="st">"#ffffff"</span>, <span class="dt">lwd =</span> <span class="fl">1.5</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb10-60" data-line-number="60"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_country_lines, <span class="dt">col =</span> <span class="st">"#ffffff"</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb10-61" data-line-number="61"></a>
+<a class="sourceLine" id="cb10-62" data-line-number="62"><span class="co"># legends</span></a>
+<a class="sourceLine" id="cb10-63" data-line-number="63">legend_seasons &lt;-<span class="st"> </span>plot_seasons</a>
+<a class="sourceLine" id="cb10-64" data-line-number="64"><span class="cf">if</span> (split_migration) {</a>
+<a class="sourceLine" id="cb10-65" data-line-number="65">  legend_seasons[legend_seasons <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"prebreeding_migration"</span>, </a>
+<a class="sourceLine" id="cb10-66" data-line-number="66">                                       <span class="st">"postbreeding_migration"</span>)] &lt;-<span class="st"> "migration"</span></a>
+<a class="sourceLine" id="cb10-67" data-line-number="67">  legend_seasons &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/unique">unique</a></span>(legend_seasons)</a>
+<a class="sourceLine" id="cb10-68" data-line-number="68">}</a>
+<a class="sourceLine" id="cb10-69" data-line-number="69"><span class="cf">if</span> (show_yearround) {</a>
+<a class="sourceLine" id="cb10-70" data-line-number="70">  legend_seasons &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(legend_seasons, <span class="st">"year_round"</span>)</a>
+<a class="sourceLine" id="cb10-71" data-line-number="71">}</a>
+<a class="sourceLine" id="cb10-72" data-line-number="72"><span class="co"># thin out labels</span></a>
+<a class="sourceLine" id="cb10-73" data-line-number="73">lbl_at &lt;-<span class="st"> </span>bin_breaks<span class="op">$</span>bins<span class="op">^</span>bin_breaks<span class="op">$</span>power</a>
+<a class="sourceLine" id="cb10-74" data-line-number="74">lbl_at &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">min</a></span>(lbl_at), <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/median">median</a></span>(lbl_at), <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">max</a></span>(lbl_at))</a>
+<a class="sourceLine" id="cb10-75" data-line-number="75">lbl &lt;-<span class="st"> </span>lbl_at<span class="op">^</span>(<span class="dv">1</span> <span class="op">/</span><span class="st"> </span>bin_breaks<span class="op">$</span>power)</a>
+<a class="sourceLine" id="cb10-76" data-line-number="76">lbl &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/format">format</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">round</a></span>(lbl, <span class="dv">2</span>), <span class="dt">nsmall =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb10-77" data-line-number="77"><span class="co"># plot legends</span></a>
+<a class="sourceLine" id="cb10-78" data-line-number="78"><span class="cf">for</span> (i <span class="cf">in</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq_along</a></span>(legend_seasons)) {</a>
+<a class="sourceLine" id="cb10-79" data-line-number="79">  pal &lt;-<span class="st"> </span><span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(bin_breaks<span class="op">$</span>bins) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, legend_seasons[i])</a>
+<a class="sourceLine" id="cb10-80" data-line-number="80">  <span class="cf">if</span> (i <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) {</a>
+<a class="sourceLine" id="cb10-81" data-line-number="81">    axis_args &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">at =</span> lbl_at, <span class="dt">labels =</span> lbl, <span class="dt">line =</span> <span class="dv">-1</span>,</a>
+<a class="sourceLine" id="cb10-82" data-line-number="82">                      <span class="dt">cex.axis =</span> <span class="fl">0.75</span>, <span class="dt">lwd =</span> <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb10-83" data-line-number="83">  } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb10-84" data-line-number="84">    axis_args &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">at =</span> lbl_at, <span class="dt">labels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">""</span>, <span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb10-85" data-line-number="85">                      <span class="dt">cex.axis =</span> <span class="fl">0.75</span>, <span class="dt">lwd =</span> <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb10-86" data-line-number="86">  }</a>
+<a class="sourceLine" id="cb10-87" data-line-number="87">  legend_title &lt;-<span class="st"> </span>legend_seasons[i] <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb10-88" data-line-number="88"><span class="st">    </span><span class="kw"><a href="https://stringr.tidyverse.org/reference/str_replace.html">str_replace_all</a></span>(<span class="st">"_"</span>, <span class="st">" "</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb10-89" data-line-number="89"><span class="st">    </span><span class="kw"><a href="https://stringr.tidyverse.org/reference/case.html">str_to_title</a></span>()</a>
+<a class="sourceLine" id="cb10-90" data-line-number="90">  fields<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/fields/topics/image.plot">image.plot</a></span>(<span class="dt">zlim =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/range">range</a></span>(bin_breaks<span class="op">$</span>bins<span class="op">^</span>bin_breaks<span class="op">$</span>power), </a>
+<a class="sourceLine" id="cb10-91" data-line-number="91">                   <span class="dt">legend.only =</span> <span class="ot">TRUE</span>, </a>
+<a class="sourceLine" id="cb10-92" data-line-number="92">                   <span class="dt">breaks =</span> bin_breaks<span class="op">$</span>bins<span class="op">^</span>bin_breaks<span class="op">$</span>power, <span class="dt">col =</span> pal,</a>
+<a class="sourceLine" id="cb10-93" data-line-number="93">                   <span class="dt">smallplot =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="fl">0.05</span>, <span class="fl">0.35</span>, <span class="fl">0.01</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.06</span> <span class="op">*</span><span class="st"> </span>i, <span class="fl">0.03</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.06</span> <span class="op">*</span><span class="st"> </span>i),</a>
+<a class="sourceLine" id="cb10-94" data-line-number="94">                   <span class="dt">horizontal =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb10-95" data-line-number="95">                   <span class="dt">axis.args =</span> axis_args,</a>
+<a class="sourceLine" id="cb10-96" data-line-number="96">                   <span class="dt">legend.args =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">text =</span> legend_title, <span class="dt">side =</span> <span class="dv">3</span>, </a>
+<a class="sourceLine" id="cb10-97" data-line-number="97">                                      <span class="dt">cex =</span> <span class="fl">0.9</span>, <span class="dt">col =</span> <span class="st">"black"</span>, <span class="dt">line =</span> <span class="fl">0.1</span>))</a>
+<a class="sourceLine" id="cb10-98" data-line-number="98">}</a>
+<a class="sourceLine" id="cb10-99" data-line-number="99"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/title">title</a></span>(<span class="st">"Yellow-bellied Sapsucker Relative Abundance (birds per km/hr)"</span>, </a>
+<a class="sourceLine" id="cb10-100" data-line-number="100">      <span class="dt">line =</span> <span class="dv">-1</span>, <span class="dt">cex.main =</span> <span class="dv">1</span>)</a></code></pre></div>
 <p><img src="ebirdst-advanced-mapping_files/figure-html/abd-map-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="range-maps" class="section level1">
 <h1 class="hasAnchor">
 <a href="#range-maps" class="anchor"></a>Range Maps</h1>
 <p>The eBird Status and Trends range maps delineate the boundary of regions with non-zero relative abundance for a given species. We’ll start by aggregating the raster layers to a coarser resolution to speed up processing, then convert the boundaries of non-zero abundance regions to polygons. We’ll also convert the prediction areas to polygons so we can distinguish where the species is predicted to not occur from where it was not modeled.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># aggregate</span>
-abd_season_agg &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/aggregate">aggregate</a></span>(abd_season_proj, <span class="dt">fact =</span> <span class="dv">3</span>)
-<span class="co"># raster to polygon, one season at a time</span>
-range &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>()
-pred_area &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>()
-<span class="cf">for</span> (s <span class="cf">in</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/names">names</a></span>(abd_season_agg)) {
-  <span class="co"># range</span>
-  range[[s]] &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/rasterToPolygons">rasterToPolygons</a></span>(abd_season_agg[[s]], 
-                                 <span class="dt">fun =</span> <span class="cf">function</span>(y) {y <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>}, 
-                                 <span class="dt">digits =</span> <span class="dv">6</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_as_sfc">st_as_sfc</a></span>() <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="co"># combine polygon pieces into a single multipolygon</span>
-<span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_precision">st_set_precision</a></span>(<span class="fl">1e6</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/geos_combine">st_union</a></span>() <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/sf">st_sf</a></span>() <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="co"># tag layers with season</span>
-<span class="st">    </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">season =</span> s, <span class="dt">layer =</span> <span class="st">"range"</span>)
-  <span class="co"># prediction area</span>
-  pred_area[[s]] &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/rasterToPolygons">rasterToPolygons</a></span>(abd_season_agg[[s]], 
-                                     <span class="dt">fun =</span> <span class="cf">function</span>(y) {<span class="op">!</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/NA">is.na</a></span>(y)}, 
-                                     <span class="dt">digits =</span> <span class="dv">6</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_as_sfc">st_as_sfc</a></span>() <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="co"># combine polygon pieces into a single multipolygon</span>
-<span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_precision">st_set_precision</a></span>(<span class="fl">1e6</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/geos_combine">st_union</a></span>() <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/sf">st_sf</a></span>() <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="co"># tag layers with season</span>
-<span class="st">    </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">season =</span> s, <span class="dt">layer =</span> <span class="st">"prediction_area"</span>)
-}
-<span class="co"># combine the sf objects for all seasons</span>
-range &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cbind">rbind</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/do.call">do.call</a></span>(rbind, range), <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/do.call">do.call</a></span>(rbind, pred_area))
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/row.names">row.names</a></span>(range) &lt;-<span class="st"> </span><span class="ot">NULL</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(range)
-<span class="co">#&gt; Simple feature collection with 8 features and 2 fields</span>
-<span class="co">#&gt; geometry type:  MULTIPOLYGON</span>
-<span class="co">#&gt; dimension:      XY</span>
-<span class="co">#&gt; bbox:           xmin: -31011.47 ymin: 4979148 xmax: 627338.5 ymax: 5686458</span>
-<span class="co">#&gt; epsg (SRID):    NA</span>
-<span class="co">#&gt; proj4string:    +proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs</span>
-<span class="co">#&gt; precision:      1e+06 </span>
-<span class="co">#&gt;                   season           layer                       geometry</span>
-<span class="co">#&gt; 1            nonbreeding           range MULTIPOLYGON (((387938.5 49...</span>
-<span class="co">#&gt; 2  prebreeding_migration           range MULTIPOLYGON (((310988.5 53...</span>
-<span class="co">#&gt; 3               breeding           range MULTIPOLYGON (((473438.5 49...</span>
-<span class="co">#&gt; 4 postbreeding_migration           range MULTIPOLYGON (((310988.5 53...</span>
-<span class="co">#&gt; 5            nonbreeding prediction_area MULTIPOLYGON (((310988.5 53...</span>
-<span class="co">#&gt; 6  prebreeding_migration prediction_area MULTIPOLYGON (((310988.5 53...</span>
-<span class="co">#&gt; 7               breeding prediction_area MULTIPOLYGON (((310988.5 53...</span>
-<span class="co">#&gt; 8 postbreeding_migration prediction_area MULTIPOLYGON (((310988.5 53...</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="co"># aggregate</span></a>
+<a class="sourceLine" id="cb11-2" data-line-number="2">abd_season_agg &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/aggregate">aggregate</a></span>(abd_season_proj, <span class="dt">fact =</span> <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="co"># raster to polygon, one season at a time</span></a>
+<a class="sourceLine" id="cb11-4" data-line-number="4">range &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>()</a>
+<a class="sourceLine" id="cb11-5" data-line-number="5">pred_area &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>()</a>
+<a class="sourceLine" id="cb11-6" data-line-number="6"><span class="cf">for</span> (s <span class="cf">in</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/names">names</a></span>(abd_season_agg)) {</a>
+<a class="sourceLine" id="cb11-7" data-line-number="7">  <span class="co"># range</span></a>
+<a class="sourceLine" id="cb11-8" data-line-number="8">  range[[s]] &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/rasterToPolygons">rasterToPolygons</a></span>(abd_season_agg[[s]], </a>
+<a class="sourceLine" id="cb11-9" data-line-number="9">                                 <span class="dt">fun =</span> <span class="cf">function</span>(y) {y <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>}, </a>
+<a class="sourceLine" id="cb11-10" data-line-number="10">                                 <span class="dt">digits =</span> <span class="dv">6</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-11" data-line-number="11"><span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_as_sfc">st_as_sfc</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-12" data-line-number="12"><span class="st">    </span><span class="co"># combine polygon pieces into a single multipolygon</span></a>
+<a class="sourceLine" id="cb11-13" data-line-number="13"><span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_precision">st_set_precision</a></span>(<span class="fl">1e6</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-14" data-line-number="14"><span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/geos_combine">st_union</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-15" data-line-number="15"><span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/sf">st_sf</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-16" data-line-number="16"><span class="st">    </span><span class="co"># tag layers with season</span></a>
+<a class="sourceLine" id="cb11-17" data-line-number="17"><span class="st">    </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">season =</span> s, <span class="dt">layer =</span> <span class="st">"range"</span>)</a>
+<a class="sourceLine" id="cb11-18" data-line-number="18">  <span class="co"># prediction area</span></a>
+<a class="sourceLine" id="cb11-19" data-line-number="19">  pred_area[[s]] &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/rasterToPolygons">rasterToPolygons</a></span>(abd_season_agg[[s]], </a>
+<a class="sourceLine" id="cb11-20" data-line-number="20">                                     <span class="dt">fun =</span> <span class="cf">function</span>(y) {<span class="op">!</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/NA">is.na</a></span>(y)}, </a>
+<a class="sourceLine" id="cb11-21" data-line-number="21">                                     <span class="dt">digits =</span> <span class="dv">6</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-22" data-line-number="22"><span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_as_sfc">st_as_sfc</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-23" data-line-number="23"><span class="st">    </span><span class="co"># combine polygon pieces into a single multipolygon</span></a>
+<a class="sourceLine" id="cb11-24" data-line-number="24"><span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_precision">st_set_precision</a></span>(<span class="fl">1e6</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-25" data-line-number="25"><span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/geos_combine">st_union</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-26" data-line-number="26"><span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/sf">st_sf</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-27" data-line-number="27"><span class="st">    </span><span class="co"># tag layers with season</span></a>
+<a class="sourceLine" id="cb11-28" data-line-number="28"><span class="st">    </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">season =</span> s, <span class="dt">layer =</span> <span class="st">"prediction_area"</span>)</a>
+<a class="sourceLine" id="cb11-29" data-line-number="29">}</a>
+<a class="sourceLine" id="cb11-30" data-line-number="30"><span class="co"># combine the sf objects for all seasons</span></a>
+<a class="sourceLine" id="cb11-31" data-line-number="31">range &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cbind">rbind</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/do.call">do.call</a></span>(rbind, range), <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/do.call">do.call</a></span>(rbind, pred_area))</a>
+<a class="sourceLine" id="cb11-32" data-line-number="32"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/row.names">row.names</a></span>(range) &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb11-33" data-line-number="33"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(range)</a>
+<a class="sourceLine" id="cb11-34" data-line-number="34"><span class="co">#&gt; Simple feature collection with 8 features and 2 fields</span></a>
+<a class="sourceLine" id="cb11-35" data-line-number="35"><span class="co">#&gt; geometry type:  MULTIPOLYGON</span></a>
+<a class="sourceLine" id="cb11-36" data-line-number="36"><span class="co">#&gt; dimension:      XY</span></a>
+<a class="sourceLine" id="cb11-37" data-line-number="37"><span class="co">#&gt; bbox:           xmin: -31011.47 ymin: 4979148 xmax: 627338.5 ymax: 5686458</span></a>
+<a class="sourceLine" id="cb11-38" data-line-number="38"><span class="co">#&gt; epsg (SRID):    NA</span></a>
+<a class="sourceLine" id="cb11-39" data-line-number="39"><span class="co">#&gt; proj4string:    +proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs</span></a>
+<a class="sourceLine" id="cb11-40" data-line-number="40"><span class="co">#&gt; precision:      1e+06 </span></a>
+<a class="sourceLine" id="cb11-41" data-line-number="41"><span class="co">#&gt;                   season           layer                       geometry</span></a>
+<a class="sourceLine" id="cb11-42" data-line-number="42"><span class="co">#&gt; 1            nonbreeding           range MULTIPOLYGON (((456338.5 49...</span></a>
+<a class="sourceLine" id="cb11-43" data-line-number="43"><span class="co">#&gt; 2  prebreeding_migration           range MULTIPOLYGON (((550388.5 52...</span></a>
+<a class="sourceLine" id="cb11-44" data-line-number="44"><span class="co">#&gt; 3               breeding           range MULTIPOLYGON (((413588.5 50...</span></a>
+<a class="sourceLine" id="cb11-45" data-line-number="45"><span class="co">#&gt; 4 postbreeding_migration           range MULTIPOLYGON (((550388.5 49...</span></a>
+<a class="sourceLine" id="cb11-46" data-line-number="46"><span class="co">#&gt; 5            nonbreeding prediction_area MULTIPOLYGON (((550388.5 52...</span></a>
+<a class="sourceLine" id="cb11-47" data-line-number="47"><span class="co">#&gt; 6  prebreeding_migration prediction_area MULTIPOLYGON (((550388.5 52...</span></a>
+<a class="sourceLine" id="cb11-48" data-line-number="48"><span class="co">#&gt; 7               breeding prediction_area MULTIPOLYGON (((550388.5 52...</span></a>
+<a class="sourceLine" id="cb11-49" data-line-number="49"><span class="co">#&gt; 8 postbreeding_migration prediction_area MULTIPOLYGON (((550388.5 52...</span></a></code></pre></div>
 <p>Converting from raster to polygons frequently yields tiny fragments of polygons and jagged polygon edges, which result in maps that aren’t very aesthetically pleasing. To address this, we’ll apply some algorithms from the <code>smoothr</code> package to clean up the polygons.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># clean and smooth</span>
-cell_area &lt;-<span class="st"> </span>(<span class="fl">1.5</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/prod">prod</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/resolution">res</a></span>(abd_season_agg)))
-range_smooth &lt;-<span class="st"> </span>range <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="co"># drop fragment polygons smaller than 1.5 times the aggregated cell size</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/smoothr/topics/drop_crumbs">drop_crumbs</a></span>(<span class="dt">threshold =</span> cell_area) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="co"># drop holes in polygons smaller than 1.5 times the aggregated cell size</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/smoothr/topics/fill_holes">fill_holes</a></span>(<span class="dt">threshold =</span> cell_area) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="co"># smooth the polygon edges</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/smoothr/topics/smooth">smooth</a></span>(<span class="dt">method =</span> <span class="st">"ksmooth"</span>, <span class="dt">smoothness =</span> <span class="dv">2</span>)
-<span class="co"># clip zeros to land border, range to buffered land to handle coastal species</span>
-range_split &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/split">split</a></span>(range_smooth, range_smooth<span class="op">$</span>layer)
-range_smooth &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cbind">rbind</a></span>(
-  <span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/geos_binary_ops">st_intersection</a></span>(range_split<span class="op">$</span>range, ne_land_buffer),
-  <span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/geos_binary_ops">st_intersection</a></span>(range_split<span class="op">$</span>prediction_area, ne_land))</code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="co"># clean and smooth</span></a>
+<a class="sourceLine" id="cb12-2" data-line-number="2">cell_area &lt;-<span class="st"> </span>(<span class="fl">1.5</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/prod">prod</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/resolution">res</a></span>(abd_season_agg)))</a>
+<a class="sourceLine" id="cb12-3" data-line-number="3">range_smooth &lt;-<span class="st"> </span>range <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="st">  </span><span class="co"># drop fragment polygons smaller than 1.5 times the aggregated cell size</span></a>
+<a class="sourceLine" id="cb12-5" data-line-number="5"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/smoothr/topics/drop_crumbs">drop_crumbs</a></span>(<span class="dt">threshold =</span> cell_area) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="st">  </span><span class="co"># drop holes in polygons smaller than 1.5 times the aggregated cell size</span></a>
+<a class="sourceLine" id="cb12-7" data-line-number="7"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/smoothr/topics/fill_holes">fill_holes</a></span>(<span class="dt">threshold =</span> cell_area) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb12-8" data-line-number="8"><span class="st">  </span><span class="co"># smooth the polygon edges</span></a>
+<a class="sourceLine" id="cb12-9" data-line-number="9"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/smoothr/topics/smooth">smooth</a></span>(<span class="dt">method =</span> <span class="st">"ksmooth"</span>, <span class="dt">smoothness =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb12-10" data-line-number="10"><span class="co"># clip zeros to land border, range to buffered land to handle coastal species</span></a>
+<a class="sourceLine" id="cb12-11" data-line-number="11">range_split &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/split">split</a></span>(range_smooth, range_smooth<span class="op">$</span>layer)</a>
+<a class="sourceLine" id="cb12-12" data-line-number="12">range_smooth &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cbind">rbind</a></span>(</a>
+<a class="sourceLine" id="cb12-13" data-line-number="13">  <span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/geos_binary_ops">st_intersection</a></span>(range_split<span class="op">$</span>range, ne_land_buffer),</a>
+<a class="sourceLine" id="cb12-14" data-line-number="14">  <span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/geos_binary_ops">st_intersection</a></span>(range_split<span class="op">$</span>prediction_area, ne_land))</a></code></pre></div>
 <p>Finally, we can produce a seasonal range map in a similar fashion to the abundance map above.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># range map color palette</span>
-range_palette &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dt">nonbreeding =</span> <span class="st">"#1d6996"</span>,
-                   <span class="dt">prebreeding_migration =</span> <span class="st">"#73af48"</span>,
-                   <span class="dt">breeding =</span> <span class="st">"#cc503e"</span>,
-                   <span class="dt">postbreeding_migration =</span> <span class="st">"#edad08"</span>,
-                   <span class="dt">migration =</span> <span class="st">"#edad08"</span>,
-                   <span class="dt">year_round =</span> <span class="st">"#6f4070"</span>)
-
-<span class="co"># set up plot area</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span> , <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>))
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_land, <span class="dt">col =</span> <span class="st">"#eeeeee"</span>, <span class="dt">border =</span> <span class="ot">NA</span>, 
-     <span class="dt">xlim =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(ext<span class="op">@</span>xmin, ext<span class="op">@</span>xmax),
-     <span class="dt">ylim =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(ext<span class="op">@</span>ymin, ext<span class="op">@</span>ymax))
-<span class="co"># prediction region and explicit zeros</span>
-annual_pred_area &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(range_smooth, layer <span class="op">==</span><span class="st"> "prediction_area"</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/geos_combine">st_union</a></span>()
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(annual_pred_area, <span class="dt">col =</span> <span class="st">"#dddddd"</span>, <span class="dt">border =</span> <span class="ot">NA</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-<span class="co"># lakes</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_lakes, <span class="dt">col =</span> <span class="st">"#ffffff"</span>, <span class="dt">border =</span>  <span class="st">"#444444"</span>, <span class="dt">lwd =</span> <span class="fl">0.5</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-<span class="co"># land border</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_land, <span class="dt">col =</span> <span class="ot">NA</span>, <span class="dt">border =</span> <span class="st">"#444444"</span>, <span class="dt">lwd =</span> <span class="fl">0.5</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-<span class="co"># seasonal layer</span>
-<span class="cf">for</span> (s <span class="cf">in</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/intersect">intersect</a></span>(season_order, <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/unique">unique</a></span>(range_smooth<span class="op">$</span>season))) {
-  <span class="co"># handle splitting of migration seasons into different colors</span>
-  <span class="cf">if</span> (<span class="op">!</span>split_migration <span class="op">&amp;&amp;</span><span class="st"> </span>s <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"prebreeding_migration"</span>, 
-                                   <span class="st">"postbreeding_migration"</span>)) {
-    col_season &lt;-<span class="st"> "migration"</span>
-  } <span class="cf">else</span> {
-    col_season &lt;-<span class="st"> </span>s
-  }
-  rng_season &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(range_smooth, season <span class="op">==</span><span class="st"> </span>s, layer <span class="op">==</span><span class="st"> "range"</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_geometry">st_geometry</a></span>()
-  <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(rng_season, <span class="dt">col =</span> range_palette[col_season], <span class="dt">border =</span> <span class="ot">NA</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-}
-<span class="co"># year round</span>
-<span class="cf">if</span> (show_yearround) {
-  <span class="co"># find common area between all seasons</span>
-  range_combined &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(range_smooth, layer <span class="op">==</span><span class="st"> "range"</span>)
-  range_yearround &lt;-<span class="st"> </span>range_combined[<span class="dv">1</span>, ]
-  range_combined &lt;-<span class="st"> </span>sf<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_geometry">st_geometry</a></span>(range_combined)
-  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(range_combined)) {
-    range_yearround &lt;-<span class="st"> </span>sf<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/geos_binary_ops">st_intersection</a></span>(range_yearround, range_combined[i])
-  }
-  <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_geometry">st_geometry</a></span>(range_yearround), 
-       <span class="dt">col =</span> range_palette[<span class="st">"year_round"</span>], <span class="dt">border =</span> <span class="ot">NA</span>, 
-       <span class="dt">add =</span> <span class="ot">TRUE</span>)
-}
-<span class="co"># linework</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_rivers, <span class="dt">col =</span> <span class="st">"#ffffff"</span>, <span class="dt">lwd =</span> <span class="fl">0.75</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_state_lines, <span class="dt">col =</span> <span class="st">"#ffffff"</span>, <span class="dt">lwd =</span> <span class="fl">1.5</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_country_lines, <span class="dt">col =</span> <span class="st">"#ffffff"</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-
-<span class="co"># legend</span>
-rng_legend &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rev">rev</a></span>(range_palette[legend_seasons])
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/names">names</a></span>(rng_legend) &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/names">names</a></span>(rng_legend) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="kw"><a href="https://stringr.tidyverse.org/reference/str_replace.html">str_replace_all</a></span>(<span class="st">"_"</span>, <span class="st">" "</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="kw"><a href="https://stringr.tidyverse.org/reference/case.html">str_to_title</a></span>()
-<span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/legend">legend</a></span>(<span class="st">"bottomleft"</span>, <span class="dt">legend =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/names">names</a></span>(rng_legend), <span class="dt">fill =</span> rng_legend)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/title">title</a></span>(<span class="st">"Yellow-bellied Sapsucker Seasonal Range Map"</span>, 
-      <span class="dt">line =</span> <span class="op">-</span><span class="dv">1</span>, <span class="dt">cex.main =</span> <span class="dv">1</span>)</code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="co"># range map color palette</span></a>
+<a class="sourceLine" id="cb13-2" data-line-number="2">range_palette &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dt">nonbreeding =</span> <span class="st">"#1d6996"</span>,</a>
+<a class="sourceLine" id="cb13-3" data-line-number="3">                   <span class="dt">prebreeding_migration =</span> <span class="st">"#73af48"</span>,</a>
+<a class="sourceLine" id="cb13-4" data-line-number="4">                   <span class="dt">breeding =</span> <span class="st">"#cc503e"</span>,</a>
+<a class="sourceLine" id="cb13-5" data-line-number="5">                   <span class="dt">postbreeding_migration =</span> <span class="st">"#edad08"</span>,</a>
+<a class="sourceLine" id="cb13-6" data-line-number="6">                   <span class="dt">migration =</span> <span class="st">"#edad08"</span>,</a>
+<a class="sourceLine" id="cb13-7" data-line-number="7">                   <span class="dt">year_round =</span> <span class="st">"#6f4070"</span>)</a>
+<a class="sourceLine" id="cb13-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb13-9" data-line-number="9"><span class="co"># set up plot area</span></a>
+<a class="sourceLine" id="cb13-10" data-line-number="10"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span> , <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>))</a>
+<a class="sourceLine" id="cb13-11" data-line-number="11"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_land, <span class="dt">col =</span> <span class="st">"#eeeeee"</span>, <span class="dt">border =</span> <span class="ot">NA</span>, </a>
+<a class="sourceLine" id="cb13-12" data-line-number="12">     <span class="dt">xlim =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(ext<span class="op">@</span>xmin, ext<span class="op">@</span>xmax),</a>
+<a class="sourceLine" id="cb13-13" data-line-number="13">     <span class="dt">ylim =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(ext<span class="op">@</span>ymin, ext<span class="op">@</span>ymax))</a>
+<a class="sourceLine" id="cb13-14" data-line-number="14"><span class="co"># prediction region and explicit zeros</span></a>
+<a class="sourceLine" id="cb13-15" data-line-number="15">annual_pred_area &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(range_smooth, layer <span class="op">==</span><span class="st"> "prediction_area"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb13-16" data-line-number="16"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/geos_combine">st_union</a></span>()</a>
+<a class="sourceLine" id="cb13-17" data-line-number="17"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(annual_pred_area, <span class="dt">col =</span> <span class="st">"#dddddd"</span>, <span class="dt">border =</span> <span class="ot">NA</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb13-18" data-line-number="18"><span class="co"># lakes</span></a>
+<a class="sourceLine" id="cb13-19" data-line-number="19"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_lakes, <span class="dt">col =</span> <span class="st">"#ffffff"</span>, <span class="dt">border =</span>  <span class="st">"#444444"</span>, <span class="dt">lwd =</span> <span class="fl">0.5</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb13-20" data-line-number="20"><span class="co"># land border</span></a>
+<a class="sourceLine" id="cb13-21" data-line-number="21"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_land, <span class="dt">col =</span> <span class="ot">NA</span>, <span class="dt">border =</span> <span class="st">"#444444"</span>, <span class="dt">lwd =</span> <span class="fl">0.5</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb13-22" data-line-number="22"><span class="co"># seasonal layer</span></a>
+<a class="sourceLine" id="cb13-23" data-line-number="23"><span class="cf">for</span> (s <span class="cf">in</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/intersect">intersect</a></span>(season_order, <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/unique">unique</a></span>(range_smooth<span class="op">$</span>season))) {</a>
+<a class="sourceLine" id="cb13-24" data-line-number="24">  <span class="co"># handle splitting of migration seasons into different colors</span></a>
+<a class="sourceLine" id="cb13-25" data-line-number="25">  <span class="cf">if</span> (<span class="op">!</span>split_migration <span class="op">&amp;&amp;</span><span class="st"> </span>s <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"prebreeding_migration"</span>, </a>
+<a class="sourceLine" id="cb13-26" data-line-number="26">                                   <span class="st">"postbreeding_migration"</span>)) {</a>
+<a class="sourceLine" id="cb13-27" data-line-number="27">    col_season &lt;-<span class="st"> "migration"</span></a>
+<a class="sourceLine" id="cb13-28" data-line-number="28">  } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb13-29" data-line-number="29">    col_season &lt;-<span class="st"> </span>s</a>
+<a class="sourceLine" id="cb13-30" data-line-number="30">  }</a>
+<a class="sourceLine" id="cb13-31" data-line-number="31">  rng_season &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(range_smooth, season <span class="op">==</span><span class="st"> </span>s, layer <span class="op">==</span><span class="st"> "range"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb13-32" data-line-number="32"><span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_geometry">st_geometry</a></span>()</a>
+<a class="sourceLine" id="cb13-33" data-line-number="33">  <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(rng_season, <span class="dt">col =</span> range_palette[col_season], <span class="dt">border =</span> <span class="ot">NA</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb13-34" data-line-number="34">}</a>
+<a class="sourceLine" id="cb13-35" data-line-number="35"><span class="co"># year round</span></a>
+<a class="sourceLine" id="cb13-36" data-line-number="36"><span class="cf">if</span> (show_yearround) {</a>
+<a class="sourceLine" id="cb13-37" data-line-number="37">  <span class="co"># find common area between all seasons</span></a>
+<a class="sourceLine" id="cb13-38" data-line-number="38">  range_combined &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(range_smooth, layer <span class="op">==</span><span class="st"> "range"</span>)</a>
+<a class="sourceLine" id="cb13-39" data-line-number="39">  range_yearround &lt;-<span class="st"> </span>range_combined[<span class="dv">1</span>, ]</a>
+<a class="sourceLine" id="cb13-40" data-line-number="40">  range_combined &lt;-<span class="st"> </span>sf<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_geometry">st_geometry</a></span>(range_combined)</a>
+<a class="sourceLine" id="cb13-41" data-line-number="41">  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(range_combined)) {</a>
+<a class="sourceLine" id="cb13-42" data-line-number="42">    range_yearround &lt;-<span class="st"> </span>sf<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/geos_binary_ops">st_intersection</a></span>(range_yearround, range_combined[i])</a>
+<a class="sourceLine" id="cb13-43" data-line-number="43">  }</a>
+<a class="sourceLine" id="cb13-44" data-line-number="44">  <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_geometry">st_geometry</a></span>(range_yearround), </a>
+<a class="sourceLine" id="cb13-45" data-line-number="45">       <span class="dt">col =</span> range_palette[<span class="st">"year_round"</span>], <span class="dt">border =</span> <span class="ot">NA</span>, </a>
+<a class="sourceLine" id="cb13-46" data-line-number="46">       <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb13-47" data-line-number="47">}</a>
+<a class="sourceLine" id="cb13-48" data-line-number="48"><span class="co"># linework</span></a>
+<a class="sourceLine" id="cb13-49" data-line-number="49"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_rivers, <span class="dt">col =</span> <span class="st">"#ffffff"</span>, <span class="dt">lwd =</span> <span class="fl">0.75</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb13-50" data-line-number="50"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_state_lines, <span class="dt">col =</span> <span class="st">"#ffffff"</span>, <span class="dt">lwd =</span> <span class="fl">1.5</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb13-51" data-line-number="51"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(ne_country_lines, <span class="dt">col =</span> <span class="st">"#ffffff"</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb13-52" data-line-number="52"></a>
+<a class="sourceLine" id="cb13-53" data-line-number="53"><span class="co"># legend</span></a>
+<a class="sourceLine" id="cb13-54" data-line-number="54">rng_legend &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rev">rev</a></span>(range_palette[legend_seasons])</a>
+<a class="sourceLine" id="cb13-55" data-line-number="55"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/names">names</a></span>(rng_legend) &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/names">names</a></span>(rng_legend) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb13-56" data-line-number="56"><span class="st">    </span><span class="kw"><a href="https://stringr.tidyverse.org/reference/str_replace.html">str_replace_all</a></span>(<span class="st">"_"</span>, <span class="st">" "</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb13-57" data-line-number="57"><span class="st">    </span><span class="kw"><a href="https://stringr.tidyverse.org/reference/case.html">str_to_title</a></span>()</a>
+<a class="sourceLine" id="cb13-58" data-line-number="58"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/legend">legend</a></span>(<span class="st">"bottomleft"</span>, <span class="dt">legend =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/names">names</a></span>(rng_legend), <span class="dt">fill =</span> rng_legend)</a>
+<a class="sourceLine" id="cb13-59" data-line-number="59"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/title">title</a></span>(<span class="st">"Yellow-bellied Sapsucker Seasonal Range Map"</span>, </a>
+<a class="sourceLine" id="cb13-60" data-line-number="60">      <span class="dt">line =</span> <span class="dv">-1</span>, <span class="dt">cex.main =</span> <span class="dv">1</span>)</a></code></pre></div>
 <p><img src="ebirdst-advanced-mapping_files/figure-html/range-map-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="regional-statistics" class="section level1">
@@ -540,117 +541,117 @@ rng_legend &lt;-<span class="st"> </span><span class="kw"><a href="https://www.r
 </ol>
 <p>These statistics can be <a href="https://ebird.org/science/status-and-trends/download-data">downloaded from the Status and Trends website</a> for all regions and species; however, there may be situations where you want to calculate them over different regions than those provided. With that in mind, this vignette will cover how to calculate a couple of these statistics: mean relative abundance and days of occupation. The remaining 3 statistics can be calculated following the same approach with minor modifications.</p>
 <p>Since the example data used in this vignette is restricted to Michigan, we’ll calculate the statistics over the counties in Michigan; however, this approach can easily be extended to any set of regions. Let’s start by downloading county boundaries for Michigan.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mi_counties &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/getData">getData</a></span>(<span class="st">"GADM"</span>, <span class="dt">country =</span> <span class="st">"USA"</span>, <span class="dt">level =</span> <span class="dv">2</span>, <span class="dt">path =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/tempfile">tempdir</a></span>()) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_as_sf">st_as_sf</a></span>() <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(NAME_<span class="dv">1</span> <span class="op">==</span><span class="st"> "Michigan"</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/select">select</a></span>(<span class="dt">county =</span> NAME_<span class="dv">2</span>, <span class="dt">county_code =</span> HASC_<span class="dv">2</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_transform">st_transform</a></span>(<span class="dt">crs =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/projection">projection</a></span>(abd)) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="co"># remove lakes which aren't true counties</span>
-<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(county_code <span class="op">!=</span><span class="st"> "US.MI.WB"</span>)</code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">mi_counties &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/getData">getData</a></span>(<span class="st">"GADM"</span>, <span class="dt">country =</span> <span class="st">"USA"</span>, <span class="dt">level =</span> <span class="dv">2</span>, <span class="dt">path =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/tempfile">tempdir</a></span>()) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_as_sf">st_as_sf</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(NAME_<span class="dv">1</span> <span class="op">==</span><span class="st"> "Michigan"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-4" data-line-number="4"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/select">select</a></span>(<span class="dt">county =</span> NAME_<span class="dv">2</span>, <span class="dt">county_code =</span> HASC_<span class="dv">2</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-5" data-line-number="5"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_transform">st_transform</a></span>(<span class="dt">crs =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/projection">projection</a></span>(abd)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-6" data-line-number="6"><span class="st">  </span><span class="co"># remove lakes which aren't true counties</span></a>
+<a class="sourceLine" id="cb14-7" data-line-number="7"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(county_code <span class="op">!=</span><span class="st"> "US.MI.WB"</span>)</a></code></pre></div>
 <p>We’ll also aggregate the data to coarser resolution to perform these calculations. This isn’t necessary for the example dataset, but when this is extended to the full dataset it will become critical for making these calculations efficiently.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">abd_season_agg &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/aggregate">aggregate</a></span>(abd_season, <span class="dt">fact =</span> <span class="dv">3</span>, <span class="dt">fun =</span> mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
-abd_agg &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/aggregate">aggregate</a></span>(abd, <span class="dt">fact =</span> <span class="dv">3</span>, <span class="dt">fun =</span> mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">abd_season_agg &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/aggregate">aggregate</a></span>(abd_season, <span class="dt">fact =</span> <span class="dv">3</span>, <span class="dt">fun =</span> mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb15-2" data-line-number="2">abd_agg &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/aggregate">aggregate</a></span>(abd, <span class="dt">fact =</span> <span class="dv">3</span>, <span class="dt">fun =</span> mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <div id="mean-relative-abundance" class="section level2">
 <h2 class="hasAnchor">
 <a href="#mean-relative-abundance" class="anchor"></a>Mean Relative Abundance</h2>
 <p>Mean relative abundance is the easiest statistics to calculate: we simply average all the raster cells within each region polygon. This could be done with the <code>raster</code> function <code><a href="https://www.rdocumentation.org/packages/raster/topics/extract">extract()</a></code>; however, we’ll <code><a href="https://www.rdocumentation.org/packages/raster/topics/extract">extract()</a></code> from the <code>velox</code> package instead, which is orders of magnitude faster.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vx &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/velox/topics/velox">velox</a></span>(abd_season_agg)
-abd_mean_region &lt;-<span class="st"> </span>vx<span class="op">$</span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/extract">extract</a></span>(mi_counties, 
-                              <span class="dt">fun =</span> <span class="cf">function</span>(x) {<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)}, 
-                              <span class="dt">df =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="co"># assign season names</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/setNames">setNames</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"id"</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/names">names</a></span>(abd_season_agg))) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="co"># attach county attributes</span>
-<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">county_code =</span> mi_counties<span class="op">$</span>county_code) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/select">select</a></span>(<span class="op">-</span>id)
-<span class="co"># transpose to one season per row</span>
-abd_mean_region &lt;-<span class="st"> </span>abd_mean_region <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a></span>(season, mean_abundance, <span class="op">-</span>county_code)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/headtail">head</a></span>(abd_mean_region)
-<span class="co">#&gt;   county_code      season mean_abundance</span>
-<span class="co">#&gt; 1    US.MI.AC nonbreeding     0.00000000</span>
-<span class="co">#&gt; 2    US.MI.AG nonbreeding     0.00000000</span>
-<span class="co">#&gt; 3    US.MI.AL nonbreeding     0.01970928</span>
-<span class="co">#&gt; 4    US.MI.AP nonbreeding     0.00000000</span>
-<span class="co">#&gt; 5    US.MI.AN nonbreeding     0.00000000</span>
-<span class="co">#&gt; 6    US.MI.AR nonbreeding     0.00000000</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">vx &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/velox/topics/velox">velox</a></span>(abd_season_agg)</a>
+<a class="sourceLine" id="cb16-2" data-line-number="2">abd_mean_region &lt;-<span class="st"> </span>vx<span class="op">$</span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/extract">extract</a></span>(mi_counties, </a>
+<a class="sourceLine" id="cb16-3" data-line-number="3">                              <span class="dt">fun =</span> <span class="cf">function</span>(x) {<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)}, </a>
+<a class="sourceLine" id="cb16-4" data-line-number="4">                              <span class="dt">df =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-5" data-line-number="5"><span class="st">  </span><span class="co"># assign season names</span></a>
+<a class="sourceLine" id="cb16-6" data-line-number="6"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/setNames">setNames</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"id"</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/names">names</a></span>(abd_season_agg))) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-7" data-line-number="7"><span class="st">  </span><span class="co"># attach county attributes</span></a>
+<a class="sourceLine" id="cb16-8" data-line-number="8"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">county_code =</span> mi_counties<span class="op">$</span>county_code) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-9" data-line-number="9"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/select">select</a></span>(<span class="op">-</span>id)</a>
+<a class="sourceLine" id="cb16-10" data-line-number="10"><span class="co"># transpose to one season per row</span></a>
+<a class="sourceLine" id="cb16-11" data-line-number="11">abd_mean_region &lt;-<span class="st"> </span>abd_mean_region <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-12" data-line-number="12"><span class="st">  </span><span class="kw"><a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a></span>(season, mean_abundance, <span class="op">-</span>county_code)</a>
+<a class="sourceLine" id="cb16-13" data-line-number="13"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/headtail">head</a></span>(abd_mean_region)</a>
+<a class="sourceLine" id="cb16-14" data-line-number="14"><span class="co">#&gt;   county_code      season mean_abundance</span></a>
+<a class="sourceLine" id="cb16-15" data-line-number="15"><span class="co">#&gt; 1    US.MI.AC nonbreeding     0.00000000</span></a>
+<a class="sourceLine" id="cb16-16" data-line-number="16"><span class="co">#&gt; 2    US.MI.AG nonbreeding     0.00000000</span></a>
+<a class="sourceLine" id="cb16-17" data-line-number="17"><span class="co">#&gt; 3    US.MI.AL nonbreeding     0.01970928</span></a>
+<a class="sourceLine" id="cb16-18" data-line-number="18"><span class="co">#&gt; 4    US.MI.AP nonbreeding     0.00000000</span></a>
+<a class="sourceLine" id="cb16-19" data-line-number="19"><span class="co">#&gt; 5    US.MI.AN nonbreeding     0.00000000</span></a>
+<a class="sourceLine" id="cb16-20" data-line-number="20"><span class="co">#&gt; 6    US.MI.AR nonbreeding     0.00000000</span></a></code></pre></div>
 <p>Let’s make a quick map comparing the breeding and non-breeding mean relative abundance within counties in Michigan.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># join back to county boundaries</span>
-abd_mean_proj &lt;-<span class="st"> </span>abd_mean_region <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/join.html">inner_join</a></span>(mi_counties, ., <span class="dt">by =</span> <span class="st">"county_code"</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="co"># transform to mollweide for plotting</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_transform">st_transform</a></span>(<span class="dt">crs =</span> mollweide)
-
-<span class="co"># plot</span>
-<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(abd_mean_proj <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(season <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"breeding"</span>, <span class="st">"nonbreeding"</span>))) <span class="op">+</span>
-<span class="st">  </span><span class="co"># abundance data</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">fill =</span> mean_abundance)) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html">scale_fill_viridis_c</a></span>(<span class="dt">trans =</span> <span class="st">"sqrt"</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span>(<span class="dt">fill =</span> <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/guide_colourbar.html">guide_colorbar</a></span>(<span class="dt">title.position =</span> <span class="st">"top"</span>, <span class="dt">barwidth =</span> <span class="dv">15</span>)) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(<span class="op">~</span><span class="st"> </span>season, <span class="dt">ncol =</span> <span class="dv">2</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">title =</span> <span class="st">"Seasonal mean relative abundance in MI counties"</span>,
-       <span class="dt">fill =</span> <span class="st">"Relative abundance"</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">legend.position =</span> <span class="st">"bottom"</span>)</code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="co"># join back to county boundaries</span></a>
+<a class="sourceLine" id="cb17-2" data-line-number="2">abd_mean_proj &lt;-<span class="st"> </span>abd_mean_region <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/join.html">inner_join</a></span>(mi_counties, ., <span class="dt">by =</span> <span class="st">"county_code"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-4" data-line-number="4"><span class="st">  </span><span class="co"># transform to mollweide for plotting</span></a>
+<a class="sourceLine" id="cb17-5" data-line-number="5"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_transform">st_transform</a></span>(<span class="dt">crs =</span> mollweide)</a>
+<a class="sourceLine" id="cb17-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb17-7" data-line-number="7"><span class="co"># plot</span></a>
+<a class="sourceLine" id="cb17-8" data-line-number="8"><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/ggplot">ggplot</a></span>(abd_mean_proj <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(season <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"breeding"</span>, <span class="st">"nonbreeding"</span>))) <span class="op">+</span></a>
+<a class="sourceLine" id="cb17-9" data-line-number="9"><span class="st">  </span><span class="co"># abundance data</span></a>
+<a class="sourceLine" id="cb17-10" data-line-number="10"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/ggsf">geom_sf</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(<span class="dt">fill =</span> mean_abundance)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb17-11" data-line-number="11"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/scale_viridis">scale_fill_viridis_c</a></span>(<span class="dt">trans =</span> <span class="st">"sqrt"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb17-12" data-line-number="12"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/guides">guides</a></span>(<span class="dt">fill =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/guide_colourbar">guide_colorbar</a></span>(<span class="dt">title.position =</span> <span class="st">"top"</span>, <span class="dt">barwidth =</span> <span class="dv">15</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb17-13" data-line-number="13"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/facet_wrap">facet_wrap</a></span>(<span class="op">~</span><span class="st"> </span>season, <span class="dt">ncol =</span> <span class="dv">2</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb17-14" data-line-number="14"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/labs">labs</a></span>(<span class="dt">title =</span> <span class="st">"Seasonal mean relative abundance in MI counties"</span>,</a>
+<a class="sourceLine" id="cb17-15" data-line-number="15">       <span class="dt">fill =</span> <span class="st">"Relative abundance"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb17-16" data-line-number="16"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/ggtheme">theme_bw</a></span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb17-17" data-line-number="17"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/theme">theme</a></span>(<span class="dt">legend.position =</span> <span class="st">"bottom"</span>)</a></code></pre></div>
 <p><img src="ebirdst-advanced-mapping_files/figure-html/mean-rel-abd-map-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="days-of-occupation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#days-of-occupation" class="anchor"></a>Days of Occupation</h2>
 <p>Days of occupation is the most challenging statistic to calculate because it involves several steps. First, for each week, we need to determine if a region (i.e. a county) is “occupied”. We define occupied as at least 5% of the cells within the region having a non-zero abundance.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">threshold_occupied &lt;-<span class="st"> </span><span class="fl">0.05</span>
-
-<span class="co"># weekly percent occupied</span>
-calc_week_occupied &lt;-<span class="st"> </span><span class="cf">function</span>(wk) {
-  vx &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/velox/topics/velox">velox</a></span>(abd_agg[[wk]])
-  vx<span class="op">$</span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/extract">extract</a></span>(mi_counties, 
-             <span class="dt">fun =</span> <span class="cf">function</span>(x) {<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sum">sum</a></span>(x <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) <span class="op">/</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(x)}, 
-             <span class="dt">df =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="co"># assign week, season, and county</span>
-<span class="st">    </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">transmute</a></span>(<span class="dt">week_date =</span> weeks[wk],
-              <span class="dt">season =</span> weeks_season[wk],
-              <span class="dt">county_code =</span> mi_counties<span class="op">$</span>county_code,
-              <span class="dt">pct_occupied =</span> <span class="kw"><a href="https://dplyr.tidyverse.org/reference/coalesce.html">coalesce</a></span>(out, <span class="dv">0</span>))
-}
-<span class="co"># process weeks independently otherwise we'll run into memory issues</span>
-week_occupied &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">lapply</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq_len</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/nlayers">nlayers</a></span>(abd_agg)), calc_week_occupied) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/bind.html">bind_rows</a></span>() <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">occupied =</span> (pct_occupied <span class="op">&gt;</span><span class="st"> </span>threshold_occupied))</code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">threshold_occupied &lt;-<span class="st"> </span><span class="fl">0.05</span></a>
+<a class="sourceLine" id="cb18-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb18-3" data-line-number="3"><span class="co"># weekly percent occupied</span></a>
+<a class="sourceLine" id="cb18-4" data-line-number="4">calc_week_occupied &lt;-<span class="st"> </span><span class="cf">function</span>(wk) {</a>
+<a class="sourceLine" id="cb18-5" data-line-number="5">  vx &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/velox/topics/velox">velox</a></span>(abd_agg[[wk]])</a>
+<a class="sourceLine" id="cb18-6" data-line-number="6">  vx<span class="op">$</span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/extract">extract</a></span>(mi_counties, </a>
+<a class="sourceLine" id="cb18-7" data-line-number="7">             <span class="dt">fun =</span> <span class="cf">function</span>(x) {<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sum">sum</a></span>(x <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) <span class="op">/</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(x)}, </a>
+<a class="sourceLine" id="cb18-8" data-line-number="8">             <span class="dt">df =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb18-9" data-line-number="9"><span class="st">    </span><span class="co"># assign week, season, and county</span></a>
+<a class="sourceLine" id="cb18-10" data-line-number="10"><span class="st">    </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">transmute</a></span>(<span class="dt">week_date =</span> weeks[wk],</a>
+<a class="sourceLine" id="cb18-11" data-line-number="11">              <span class="dt">season =</span> weeks_season[wk],</a>
+<a class="sourceLine" id="cb18-12" data-line-number="12">              <span class="dt">county_code =</span> mi_counties<span class="op">$</span>county_code,</a>
+<a class="sourceLine" id="cb18-13" data-line-number="13">              <span class="dt">pct_occupied =</span> <span class="kw"><a href="https://dplyr.tidyverse.org/reference/coalesce.html">coalesce</a></span>(out, <span class="dv">0</span>))</a>
+<a class="sourceLine" id="cb18-14" data-line-number="14">}</a>
+<a class="sourceLine" id="cb18-15" data-line-number="15"><span class="co"># process weeks independently otherwise we'll run into memory issues</span></a>
+<a class="sourceLine" id="cb18-16" data-line-number="16">week_occupied &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">lapply</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq_len</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/nlayers">nlayers</a></span>(abd_agg)), calc_week_occupied) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb18-17" data-line-number="17"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/bind.html">bind_rows</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb18-18" data-line-number="18"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">occupied =</span> (pct_occupied <span class="op">&gt;</span><span class="st"> </span>threshold_occupied))</a></code></pre></div>
 <p>Next, we tally up the number of weeks each region is occupied, then convert to days by multiplying by 7.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">days_occupation &lt;-<span class="st"> </span>week_occupied <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(county_code, season) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/tidyverse">summarise</a></span>(<span class="dt">weeks_occ =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sum">sum</a></span>(occupied)) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span>() <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">days_occ =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">round</a></span>(<span class="dv">7</span> <span class="op">*</span><span class="st"> </span>weeks_occ)) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/select">select</a></span>(county_code, season, days_occ)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/headtail">head</a></span>(days_occupation)
-<span class="co">#&gt; # A tibble: 6 x 3</span>
-<span class="co">#&gt;   county_code season                 days_occ</span>
-<span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;                     &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 US.MI.AC    breeding                    112</span>
-<span class="co">#&gt; 2 US.MI.AC    nonbreeding                   0</span>
-<span class="co">#&gt; 3 US.MI.AC    postbreeding_migration       49</span>
-<span class="co">#&gt; 4 US.MI.AC    prebreeding_migration        49</span>
-<span class="co">#&gt; 5 US.MI.AG    breeding                    112</span>
-<span class="co">#&gt; 6 US.MI.AG    nonbreeding                   0</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1">days_occupation &lt;-<span class="st"> </span>week_occupied <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb19-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(county_code, season) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb19-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/tidyverse">summarise</a></span>(<span class="dt">weeks_occ =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sum">sum</a></span>(occupied)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb19-4" data-line-number="4"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb19-5" data-line-number="5"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">days_occ =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">round</a></span>(<span class="dv">7</span> <span class="op">*</span><span class="st"> </span>weeks_occ)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-6" data-line-number="6"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/select">select</a></span>(county_code, season, days_occ)</a>
+<a class="sourceLine" id="cb19-7" data-line-number="7"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/headtail">head</a></span>(days_occupation)</a>
+<a class="sourceLine" id="cb19-8" data-line-number="8"><span class="co">#&gt; # A tibble: 6 x 3</span></a>
+<a class="sourceLine" id="cb19-9" data-line-number="9"><span class="co">#&gt;   county_code season                 days_occ</span></a>
+<a class="sourceLine" id="cb19-10" data-line-number="10"><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;                     &lt;dbl&gt;</span></a>
+<a class="sourceLine" id="cb19-11" data-line-number="11"><span class="co">#&gt; 1 US.MI.AC    breeding                    112</span></a>
+<a class="sourceLine" id="cb19-12" data-line-number="12"><span class="co">#&gt; 2 US.MI.AC    nonbreeding                   0</span></a>
+<a class="sourceLine" id="cb19-13" data-line-number="13"><span class="co">#&gt; 3 US.MI.AC    postbreeding_migration       49</span></a>
+<a class="sourceLine" id="cb19-14" data-line-number="14"><span class="co">#&gt; 4 US.MI.AC    prebreeding_migration        49</span></a>
+<a class="sourceLine" id="cb19-15" data-line-number="15"><span class="co">#&gt; 5 US.MI.AG    breeding                    112</span></a>
+<a class="sourceLine" id="cb19-16" data-line-number="16"><span class="co">#&gt; 6 US.MI.AG    nonbreeding                   0</span></a></code></pre></div>
 <p>Finally, let’s produce a map comparing days occupation in the breeding and non-breeding season.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># join back to county boundaries</span>
-days_occ_proj &lt;-<span class="st"> </span>days_occupation <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/join.html">inner_join</a></span>(mi_counties, ., <span class="dt">by =</span> <span class="st">"county_code"</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="co"># transform to mollweide for plotting</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_transform">st_transform</a></span>(<span class="dt">crs =</span> mollweide)
-
-<span class="co"># plot</span>
-<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(days_occ_proj <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(season <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"breeding"</span>, <span class="st">"nonbreeding"</span>))) <span class="op">+</span>
-<span class="st">  </span><span class="co"># abundance data</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">fill =</span> days_occ)) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html">scale_fill_viridis_c</a></span>() <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span>(<span class="dt">fill =</span> <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/guide_colourbar.html">guide_colorbar</a></span>(<span class="dt">title.position =</span> <span class="st">"top"</span>, <span class="dt">barwidth =</span> <span class="dv">15</span>)) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(<span class="op">~</span><span class="st"> </span>season, <span class="dt">ncol =</span> <span class="dv">2</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">title =</span> <span class="st">"Seasonal days of occupation in MI counties"</span>,
-       <span class="dt">fill =</span> <span class="st">"Days of occupation"</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">legend.position =</span> <span class="st">"bottom"</span>)</code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="co"># join back to county boundaries</span></a>
+<a class="sourceLine" id="cb20-2" data-line-number="2">days_occ_proj &lt;-<span class="st"> </span>days_occupation <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb20-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/join.html">inner_join</a></span>(mi_counties, ., <span class="dt">by =</span> <span class="st">"county_code"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb20-4" data-line-number="4"><span class="st">  </span><span class="co"># transform to mollweide for plotting</span></a>
+<a class="sourceLine" id="cb20-5" data-line-number="5"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_transform">st_transform</a></span>(<span class="dt">crs =</span> mollweide)</a>
+<a class="sourceLine" id="cb20-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb20-7" data-line-number="7"><span class="co"># plot</span></a>
+<a class="sourceLine" id="cb20-8" data-line-number="8"><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/ggplot">ggplot</a></span>(days_occ_proj <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(season <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"breeding"</span>, <span class="st">"nonbreeding"</span>))) <span class="op">+</span></a>
+<a class="sourceLine" id="cb20-9" data-line-number="9"><span class="st">  </span><span class="co"># abundance data</span></a>
+<a class="sourceLine" id="cb20-10" data-line-number="10"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/ggsf">geom_sf</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(<span class="dt">fill =</span> days_occ)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb20-11" data-line-number="11"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/scale_viridis">scale_fill_viridis_c</a></span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb20-12" data-line-number="12"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/guides">guides</a></span>(<span class="dt">fill =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/guide_colourbar">guide_colorbar</a></span>(<span class="dt">title.position =</span> <span class="st">"top"</span>, <span class="dt">barwidth =</span> <span class="dv">15</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb20-13" data-line-number="13"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/facet_wrap">facet_wrap</a></span>(<span class="op">~</span><span class="st"> </span>season, <span class="dt">ncol =</span> <span class="dv">2</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb20-14" data-line-number="14"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/labs">labs</a></span>(<span class="dt">title =</span> <span class="st">"Seasonal days of occupation in MI counties"</span>,</a>
+<a class="sourceLine" id="cb20-15" data-line-number="15">       <span class="dt">fill =</span> <span class="st">"Days of occupation"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb20-16" data-line-number="16"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/ggtheme">theme_bw</a></span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb20-17" data-line-number="17"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/theme">theme</a></span>(<span class="dt">legend.position =</span> <span class="st">"bottom"</span>)</a></code></pre></div>
 <p><img src="ebirdst-advanced-mapping_files/figure-html/day-occ-map-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 </div>
@@ -685,7 +686,7 @@ days_occ_proj &lt;-<span class="st"> </span>days_occupation <span class="op">%&g
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.9000.</p>
 </div>
       </footer>
 </div>

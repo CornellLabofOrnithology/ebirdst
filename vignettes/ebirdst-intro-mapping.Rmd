@@ -49,6 +49,8 @@ library(sf)
 library(rnaturalearth)
 library(ggplot2)
 library(viridisLite)
+# handle namespace conflicts
+extract <- raster::extract
 
 # DOWNLOAD DATA
 # Currently, example data is available on a public s3 bucket. The following 

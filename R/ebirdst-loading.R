@@ -5,10 +5,10 @@
 #' results for Yellow-bellied Sapsucker subset to Michigan and are much smaller
 #' than the full dataset making these data quicker to download and process.
 #'
-#' @param species character; a single six-letter species code (e.g. woothr).
-#'   The full list of valid codes is can be viewed in the [ebirdst_runs] data
-#'   frame included in this package. To download the example dataset, use
-#'   "example_data".
+#' @param species character; a single species given as a scientific name, common
+#'   name or six-letter species code (e.g. woothr). The full list of valid
+#'   species is can be viewed in the [ebirdst_runs] data frame included in this
+#'   package. To download the example dataset, use "example_data".
 #' @param path character; directory to download the data to. All downloaded
 #'   files will be placed in a sub-directory of this directory named according
 #'   to the unique run ID associated with this species. Defaults to a persistent
@@ -52,12 +52,12 @@ download_data <- function(species,
     bucket_url <- "https://clo-is-da-example-data.s3.amazonaws.com/"
     run <- "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"
   } else {
+    species <- get_species(species)
     row_id <- which(ebirdst::ebirdst_runs$species_code == species)
     if (length(row_id) != 1) {
       stop(sprintf("species = %s does not uniquely identify a species.",
                    species))
     }
-    # presumably this url will change
     bucket_url <- "https://ebirdst-data.s3.amazonaws.com/"
     run <- ebirdst::ebirdst_runs$run_name[row_id]
   }
@@ -83,7 +83,8 @@ download_data <- function(species,
   s3_files$size <- as.numeric(s3_files$size)
 
   # filter to desired run/species
-  s3_files[as.numeric(s3_files$size) > 0 & grepl(run, s3_files$file), ]
+  s3_files <- s3_files[as.numeric(s3_files$size) > 0 &
+                         grepl(run, s3_files$file), ]
   if (nrow(s3_files) == 0) {
     stop(sprintf("Files not found on AWS S3 for species = %s", species))
   }
@@ -95,7 +96,7 @@ download_data <- function(species,
   }
 
   # human readable download size if we want to add a message
-  size_human <- utils:::format.object_size(sum(s3_files$size), "auto")
+  #size_human <- utils:::format.object_size(sum(s3_files$size), "auto")
 
   # prepare download paths
   s3_files$s3_path <- paste0(bucket_url, s3_files$file)
@@ -577,4 +578,19 @@ load_test_data <- function(path, return_sf = FALSE) {
     td_df <- sf::st_as_sf(td_df, coords = c("lon", "lat"), crs = 4326)
   }
   return(td_df)
+}
+
+get_species <- function(x) {
+  stopifnot(is.character(x), all(!is.na(x)))
+  r <- ebirdst::ebirdst_runs
+  x <- tolower(trimws(x))
+
+  # species code
+  code <- match(x, tolower(r$species_code))
+  # scientific name
+  sci <- match(x, tolower(r$scientific_name))
+  # common names
+  com <- match(x, tolower(r$common_name))
+  # combine
+  r$species_code[dplyr::coalesce(code, sci, com)]
 }
