@@ -4,8 +4,8 @@ author: "Tom Auer, Daniel Fink"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Non-raster Data: Using Predictor Importance, Predictor Directionality, and Predictive Performance Metrics}
   %\VignetteEncoding{UTF-8}
+  %\VignetteIndexEntry{Non-raster Data: Using Predictor Importance, Predictor Directionality, and Predictive Performance Metrics}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   chunk_output_type: console
@@ -68,7 +68,8 @@ library(ebirdst)
 # Because the non-raster data is large, there is a parameter on the
 # download_data function that defaults to downloading only the raster data.
 # To access the non-raster data, set tifs_only = FALSE.
-sp_path <- download_data(species = "example_data", tifs_only = FALSE)
+sp_path <- download_data(species = "example_data", tifs_only = FALSE, 
+                         force = TRUE)
 print(sp_path)
 
 pis <- load_pis(sp_path)
