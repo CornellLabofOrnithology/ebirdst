@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Articles • ebirdst</title>
+<title>eBird Status and Trends predictors — ebirdst_predictors • ebirdst</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -31,7 +31,16 @@
 
 
 
-<meta property="og:title" content="Articles" />
+<meta property="og:title" content="eBird Status and Trends predictors — ebirdst_predictors" />
+
+<meta property="og:description" content="A data frame of the predictors used in the eBird Status and Trends models.
+These include effort variables (e.g. distance travelled, number of observers,
+etc.) in addition to land and water cover variables. These landcover
+variables are derived from the MODIS MCD12Q1 500 m landcover product, and for
+each land cover class four FRAGSTATS metrics are calculated within a 1.5 km
+buffer around each checklist: 
+patch index (LPI), and patch density (PD)." />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -48,7 +57,7 @@
   </head>
 
   <body>
-    <div class="container template-article-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -103,20 +112,52 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Articles</h1>
+    <h1>eBird Status and Trends predictors</h1>
+    <small class="dont-index">Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/R/data.R'><code>R/data.R</code></a></small>
+    <div class="hidden name"><code>ebirdst_predictors.Rd</code></div>
     </div>
 
-    <div class="section ">
-      <h3>All vignettes</h3>
-      <p class="section-desc"></p>
-
-      <ul>
-        <li><a href="ebirdst-advanced-mapping.html">Generating Seasonal Abundance and Range Maps and Stats</a></li>
-        <li><a href="ebirdst-intro-mapping.html">Introduction to loading, mapping, and plotting</a></li>
-        <li><a href="ebirdst-introduction.html">Background, Data Access, and Data Structure</a></li>
-        <li><a href="ebirdst-non-raster.html">Non-raster Data: Using Predictor Importance, Predictor Directionality,and Predictive Performance Metrics</a></li>
-      </ul>
+    <div class="ref-description">
+    
+    <p>A data frame of the predictors used in the eBird Status and Trends models.
+These include effort variables (e.g. distance travelled, number of observers,
+etc.) in addition to land and water cover variables. These landcover
+variables are derived from the MODIS MCD12Q1 500 m landcover product, and for
+each land cover class four FRAGSTATS metrics are calculated within a 1.5 km
+buffer around each checklist: <!-- % landcover (PLAND), edge density (ED), largest -->
+patch index (LPI), and patch density (PD).</p>
+    
     </div>
+
+    <pre class="usage"><span class='no'>ebirdst_predictors</span></pre>
+        
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
+
+    <p>A data frame with 87 rows and 5 columns:</p><dl class='dl-horizontal'>
+<dt>predictor</dt><dd><p>Predictor variable name.</p></dd>
+<dt>predictor_tidy</dt><dd><p>Predictor variable name, tidied to only contain
+lowercase letters and underscores.</p></dd>
+<dt>predictor_label</dt><dd><p>Descriptive labels for predictors for plotting and
+translating the cryptic variables names (e.g. <code>umd_fs_c1</code> is
+Evergreen Needleleaf Forest.</p></dd>
+<dt>lc_class</dt><dd><p>For the land and water cover FRAGSTATS variables, this
+gives the associated landcover class. It can be used for grouping
+and summarizing the four FRAGSTATS metrics to the level of the
+landcover class.</p></dd>
+<dt>lc_class_label</dt><dd><p>Similar to <code>predictor_label</code>; however, this variable
+gives the four FRAGSTATS metrics a single name for the landcover
+class.</p></dd>
+</dl>
+    
+
+  </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+    <h2>Contents</h2>
+    <ul class="nav nav-pills nav-stacked">
+      
+      <li><a href="#format">Format</a></li>
+          </ul>
+
   </div>
 </div>
 

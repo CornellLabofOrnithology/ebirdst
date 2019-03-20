@@ -7,7 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Introduction to loading, mapping, and plotting • ebirdst</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="Introduction to loading, mapping, and plotting">
 <meta property="og:description" content="">
@@ -74,7 +75,7 @@
       <h1>Introduction to loading, mapping, and plotting</h1>
                         <h4 class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2019-03-18</h4>
+            <h4 class="date">2019-03-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-intro-mapping.Rmd"><code>vignettes/ebirdst-intro-mapping.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-intro-mapping.Rmd</code></div>
@@ -102,39 +103,41 @@
 <a href="#loading-rasters" class="anchor"></a>Loading Rasters</h1>
 <p>Once you have downloaded a set of eBird Status and Trends products, one of the first tasks is to load one of the abundance or occurrence estimate and plot it. Each estimate is stored in a multi-band GeoTiff file and are most appropriately loaded as a <code>RasterStack</code> object. These “cubes” come with areas of predicted and assumed zeroes, such that any cells that are NA represent areas outside of the area of estimation. All cubes have 52 weeks, even if some weeks are all NA (such as those species that winter entirely outside of North America). The following code example shows how to load an estimate raster and assign names.</p>
 <p><strong>DATA ACCESS DETAILS TO BE PROVIDED VIA AWS IN THE NEXT 2-4 MONTHS</strong></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ebirdst)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(raster)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(sf)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(rnaturalearth)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ggplot2)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(viridisLite)
-
-<span class="co"># DOWNLOAD DATA</span>
-<span class="co"># Currently, example data is available on a public s3 bucket. The following </span>
-<span class="co"># download_data() function copies the species results to a selected path and </span>
-<span class="co"># returns the full path of the results. Please note that the example_data is</span>
-<span class="co"># for Yellow-bellied Sapsucker and has the same run code as the real data,</span>
-<span class="co"># so if you download both, make sure you put the example_data somewhere else.</span>
-sp_path &lt;-<span class="st"> </span><span class="kw"><a href="../reference/download_data.html">download_data</a></span>(<span class="dt">species =</span> <span class="st">"example_data"</span>)
-
-
-<span class="co"># load trimmed mean abundances and label dates</span>
-abunds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_raster.html">load_raster</a></span>(<span class="st">"abundance_umean"</span>, <span class="dt">path =</span> sp_path)
-
-<span class="co"># use parse_raster_dates() to get actual date objects for each layer</span>
-date_vector &lt;-<span class="st"> </span><span class="kw"><a href="../reference/parse_raster_dates.html">parse_raster_dates</a></span>(abunds)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(date_vector)
-<span class="co">#&gt;  [1] "2016-01-04" "2016-01-11" "2016-01-18" "2016-01-25" "2016-02-01"</span>
-<span class="co">#&gt;  [6] "2016-02-08" "2016-02-15" "2016-02-22" "2016-03-01" "2016-03-08"</span>
-<span class="co">#&gt; [11] "2016-03-15" "2016-03-22" "2016-03-29" "2016-04-05" "2016-04-12"</span>
-<span class="co">#&gt; [16] "2016-04-19" "2016-04-26" "2016-05-03" "2016-05-10" "2016-05-17"</span>
-<span class="co">#&gt; [21] "2016-05-24" "2016-05-31" "2016-06-07" "2016-06-14" "2016-06-21"</span>
-<span class="co">#&gt; [26] "2016-06-28" "2016-07-06" "2016-07-13" "2016-07-20" "2016-07-27"</span>
-<span class="co">#&gt; [31] "2016-08-03" "2016-08-10" "2016-08-17" "2016-08-24" "2016-08-31"</span>
-<span class="co">#&gt; [36] "2016-09-07" "2016-09-14" "2016-09-21" "2016-09-28" "2016-10-05"</span>
-<span class="co">#&gt; [41] "2016-10-12" "2016-10-19" "2016-10-26" "2016-11-02" "2016-11-09"</span>
-<span class="co">#&gt; [46] "2016-11-16" "2016-11-23" "2016-11-30" "2016-12-07" "2016-12-14"</span>
-<span class="co">#&gt; [51] "2016-12-21" "2016-12-28"</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ebirdst)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(raster)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(sf)</a>
+<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(rnaturalearth)</a>
+<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ggplot2)</a>
+<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(viridisLite)</a>
+<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="co"># handle namespace conflicts</span></a>
+<a class="sourceLine" id="cb1-8" data-line-number="8">extract &lt;-<span class="st"> </span>raster<span class="op">::</span>extract</a>
+<a class="sourceLine" id="cb1-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co"># DOWNLOAD DATA</span></a>
+<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="co"># Currently, example data is available on a public s3 bucket. The following </span></a>
+<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="co"># download_data() function copies the species results to a selected path and </span></a>
+<a class="sourceLine" id="cb1-13" data-line-number="13"><span class="co"># returns the full path of the results. Please note that the example_data is</span></a>
+<a class="sourceLine" id="cb1-14" data-line-number="14"><span class="co"># for Yellow-bellied Sapsucker and has the same run code as the real data,</span></a>
+<a class="sourceLine" id="cb1-15" data-line-number="15"><span class="co"># so if you download both, make sure you put the example_data somewhere else.</span></a>
+<a class="sourceLine" id="cb1-16" data-line-number="16">sp_path &lt;-<span class="st"> </span><span class="kw"><a href="../reference/download_data.html">download_data</a></span>(<span class="dt">species =</span> <span class="st">"example_data"</span>)</a>
+<a class="sourceLine" id="cb1-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb1-18" data-line-number="18"></a>
+<a class="sourceLine" id="cb1-19" data-line-number="19"><span class="co"># load trimmed mean abundances and label dates</span></a>
+<a class="sourceLine" id="cb1-20" data-line-number="20">abunds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_raster.html">load_raster</a></span>(<span class="st">"abundance_umean"</span>, <span class="dt">path =</span> sp_path)</a>
+<a class="sourceLine" id="cb1-21" data-line-number="21"></a>
+<a class="sourceLine" id="cb1-22" data-line-number="22"><span class="co"># use parse_raster_dates() to get actual date objects for each layer</span></a>
+<a class="sourceLine" id="cb1-23" data-line-number="23">date_vector &lt;-<span class="st"> </span><span class="kw"><a href="../reference/parse_raster_dates.html">parse_raster_dates</a></span>(abunds)</a>
+<a class="sourceLine" id="cb1-24" data-line-number="24"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(date_vector)</a>
+<a class="sourceLine" id="cb1-25" data-line-number="25"><span class="co">#&gt;  [1] "2016-01-04" "2016-01-11" "2016-01-18" "2016-01-25" "2016-02-01"</span></a>
+<a class="sourceLine" id="cb1-26" data-line-number="26"><span class="co">#&gt;  [6] "2016-02-08" "2016-02-15" "2016-02-22" "2016-03-01" "2016-03-08"</span></a>
+<a class="sourceLine" id="cb1-27" data-line-number="27"><span class="co">#&gt; [11] "2016-03-15" "2016-03-22" "2016-03-29" "2016-04-05" "2016-04-12"</span></a>
+<a class="sourceLine" id="cb1-28" data-line-number="28"><span class="co">#&gt; [16] "2016-04-19" "2016-04-26" "2016-05-03" "2016-05-10" "2016-05-17"</span></a>
+<a class="sourceLine" id="cb1-29" data-line-number="29"><span class="co">#&gt; [21] "2016-05-24" "2016-05-31" "2016-06-07" "2016-06-14" "2016-06-21"</span></a>
+<a class="sourceLine" id="cb1-30" data-line-number="30"><span class="co">#&gt; [26] "2016-06-28" "2016-07-06" "2016-07-13" "2016-07-20" "2016-07-27"</span></a>
+<a class="sourceLine" id="cb1-31" data-line-number="31"><span class="co">#&gt; [31] "2016-08-03" "2016-08-10" "2016-08-17" "2016-08-24" "2016-08-31"</span></a>
+<a class="sourceLine" id="cb1-32" data-line-number="32"><span class="co">#&gt; [36] "2016-09-07" "2016-09-14" "2016-09-21" "2016-09-28" "2016-10-05"</span></a>
+<a class="sourceLine" id="cb1-33" data-line-number="33"><span class="co">#&gt; [41] "2016-10-12" "2016-10-19" "2016-10-26" "2016-11-02" "2016-11-09"</span></a>
+<a class="sourceLine" id="cb1-34" data-line-number="34"><span class="co">#&gt; [46] "2016-11-16" "2016-11-23" "2016-11-30" "2016-12-07" "2016-12-14"</span></a>
+<a class="sourceLine" id="cb1-35" data-line-number="35"><span class="co">#&gt; [51] "2016-12-21" "2016-12-28"</span></a></code></pre></div>
 </div>
 <div id="mapping-occurrence-and-abundance" class="section level1">
 <h1 class="hasAnchor">
@@ -144,21 +147,21 @@ date_vector &lt;-<span class="st"> </span><span class="kw"><a href="../reference
 <h2 class="hasAnchor">
 <a href="#projections" class="anchor"></a>Projections</h2>
 <p>The sinusoidal projection that NASA provides MODIS data in, while functional because of its equal-area property, is not good for mapping because of the significant distortion of land masses across the globe. In general, there are few global equal-area projections, including, but not limited to, Lambert Azimuthal Equal Area, Goode Homolosine, Mollweide, and Equal Area Cylindrical. Of these, we have selected Mollweide, used in the remainder of this section, for its pleasing conformal properties across the globe, ease of projection configuration within R and its proj4string construction, and the ease of setting central meridians that best display the Western Hemisphere. It is worth noting that while projecting to a more visually appealing projection is ideal for mapping, it is not necessary for quantitative analysis of eBird Status and Trends products, for which purposes the results can be left in the original Sinusoidal projection.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># define mollweide projection</span>
-mollweide &lt;-<span class="st"> "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"</span>
-
-<span class="co"># project single layer from stack to mollweide</span>
-week38_moll &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/projectRaster">projectRaster</a></span>(abunds[[<span class="dv">38</span>]], <span class="dt">crs =</span> mollweide, <span class="dt">method =</span> <span class="st">"ngb"</span>)
-
-<span class="co"># optionally, you can project an entire stack, but it takes much longer</span>
-<span class="co"># abund_moll &lt;- projectRaster(abund, crs = mollweide, method = "ngb")</span>
-
-<span class="co"># map single layer with full annual extent</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">2</span>))
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(week38_moll, 
-     <span class="dt">col =</span> <span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="dv">10</span>, <span class="dt">season =</span> <span class="st">"weekly"</span>), 
-     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">box =</span> <span class="ot">FALSE</span>, 
-     <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(week38_moll))</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="co"># define mollweide projection</span></a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">mollweide &lt;-<span class="st"> "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"</span></a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="co"># project single layer from stack to mollweide</span></a>
+<a class="sourceLine" id="cb2-5" data-line-number="5">week38_moll &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/projectRaster">projectRaster</a></span>(abunds[[<span class="dv">38</span>]], <span class="dt">crs =</span> mollweide, <span class="dt">method =</span> <span class="st">"ngb"</span>)</a>
+<a class="sourceLine" id="cb2-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="co"># optionally, you can project an entire stack, but it takes much longer</span></a>
+<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="co"># abund_moll &lt;- projectRaster(abund, crs = mollweide, method = "ngb")</span></a>
+<a class="sourceLine" id="cb2-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="co"># map single layer with full annual extent</span></a>
+<a class="sourceLine" id="cb2-11" data-line-number="11"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb2-12" data-line-number="12"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(week38_moll, </a>
+<a class="sourceLine" id="cb2-13" data-line-number="13">     <span class="dt">col =</span> <span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="dv">10</span>, <span class="dt">season =</span> <span class="st">"weekly"</span>), </a>
+<a class="sourceLine" id="cb2-14" data-line-number="14">     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">box =</span> <span class="ot">FALSE</span>, </a>
+<a class="sourceLine" id="cb2-15" data-line-number="15">     <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(week38_moll))</a></code></pre></div>
 <p><img src="ebirdst-intro-mapping_files/figure-html/project_stack-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 <p>If working with a full set of data for a species, mapping the layer at the full spatial extent of the analysis area makes for a small map. The raster cube has zeroes for our prediction extent and NAs for the entire Western Hemisphere, unifying the weeks in a cube to the same extent. However, this also means that mapping defaults to the full spatial extent of NAs, the Western Hemisphere. To assist with this, project the <code>RasterStack</code> or <code>RasterLayer</code> to Mollweide, then calculate the full annual spatial extent for the species with the <code><a href="../reference/calc_full_extent.html">calc_full_extent()</a></code> function, and then map, showing an extent that works for the entire full-annual cycle of the species.</p>
 </div>
@@ -166,168 +169,168 @@ week38_moll &lt;-<span class="st"> </span><span class="kw"><a href="https://www.
 <h2 class="hasAnchor">
 <a href="#mapping-occurrence" class="anchor"></a>Mapping Occurrence</h2>
 <p>Most examples in this vignette focus primarily on relative abundance estimates, as they’re the most novel and informative. However, we also provide estimates for the probability of occurrence. These are much simpler to map than abundance in terms of color scales and binning, as values range between 0 and 1 throughout the year.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">occs &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_raster.html">load_raster</a></span>(<span class="st">"occurrence_umean"</span>, <span class="dt">path =</span> sp_path)
-
-<span class="co"># select a week in the summer</span>
-occ &lt;-<span class="st"> </span>occs[[<span class="dv">26</span>]]
-
-<span class="co"># create breaks every 0.05 from 0 to 1</span>
-occ_bins &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">by =</span> <span class="fl">0.05</span>)
-occ_moll &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/projectRaster">projectRaster</a></span>(occ, <span class="dt">crs =</span> mollweide, <span class="dt">method =</span> <span class="st">"ngb"</span>)
-
-<span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">2</span>), <span class="dt">cex =</span> <span class="fl">0.9</span>)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(occ_moll, 
-     <span class="dt">breaks =</span> occ_bins, 
-     <span class="dt">col =</span> <span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(occ_bins) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">season =</span> <span class="st">"weekly"</span>),
-     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">box =</span> <span class="ot">FALSE</span>, 
-     <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(occ_moll),
-     <span class="dt">legend.width =</span> <span class="dv">2</span>, <span class="dt">legend.shrink =</span> <span class="fl">0.97</span>)</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">occs &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_raster.html">load_raster</a></span>(<span class="st">"occurrence_umean"</span>, <span class="dt">path =</span> sp_path)</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co"># select a week in the summer</span></a>
+<a class="sourceLine" id="cb3-4" data-line-number="4">occ &lt;-<span class="st"> </span>occs[[<span class="dv">26</span>]]</a>
+<a class="sourceLine" id="cb3-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co"># create breaks every 0.05 from 0 to 1</span></a>
+<a class="sourceLine" id="cb3-7" data-line-number="7">occ_bins &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">by =</span> <span class="fl">0.05</span>)</a>
+<a class="sourceLine" id="cb3-8" data-line-number="8">occ_moll &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/projectRaster">projectRaster</a></span>(occ, <span class="dt">crs =</span> mollweide, <span class="dt">method =</span> <span class="st">"ngb"</span>)</a>
+<a class="sourceLine" id="cb3-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">2</span>), <span class="dt">cex =</span> <span class="fl">0.9</span>)</a>
+<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(occ_moll, </a>
+<a class="sourceLine" id="cb3-12" data-line-number="12">     <span class="dt">breaks =</span> occ_bins, </a>
+<a class="sourceLine" id="cb3-13" data-line-number="13">     <span class="dt">col =</span> <span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(occ_bins) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">season =</span> <span class="st">"weekly"</span>),</a>
+<a class="sourceLine" id="cb3-14" data-line-number="14">     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">box =</span> <span class="ot">FALSE</span>, </a>
+<a class="sourceLine" id="cb3-15" data-line-number="15">     <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(occ_moll),</a>
+<a class="sourceLine" id="cb3-16" data-line-number="16">     <span class="dt">legend.width =</span> <span class="dv">2</span>, <span class="dt">legend.shrink =</span> <span class="fl">0.97</span>)</a></code></pre></div>
 <p><img src="ebirdst-intro-mapping_files/figure-html/map_occurrence-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="calculating-abundance-bins" class="section level2">
 <h2 class="hasAnchor">
 <a href="#calculating-abundance-bins" class="anchor"></a>Calculating Abundance Bins</h2>
-<p>Mapping relative abundance estimates across the full-annual cycle presents a challenge, in that patterns of concentration and dispersal in abundance change throughout the year, making it difficult to define color bins that suit all seasons and accurately reflect the detail of abundance predictions. To address this, we selected a method (described by Maciejewski et al. 2013) that does a Box-Cox power transformation of the entire year of data, constructs bins with the transformed data using standard deviations, and then un-transforms the bins.</p>
+<p>Mapping relative abundance estimates across the full-annual cycle presents a challenge, in that patterns of concentration and dispersal in abundance change throughout the year, making it difficult to define color bins that suit all seasons and accurately reflect the detail of abundance predictions. To address this, we selected a method (described by Maciejewski et al. 2013) that does a Box-Cox power transformation of the entire year of data, constructs bins with the transformed data using standard deviations, and then un-transforms the bins.</p>
 <p>To compare, we first scale the colors linearly, based on the maximum from the entire year. Since the max is quite high, times of the year with low concentration appear flat.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">year_max &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">max</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/extremeValues">maxValue</a></span>(abunds), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
-
-week14_moll &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/projectRaster">projectRaster</a></span>(abunds[[<span class="dv">14</span>]], <span class="dt">crs =</span> mollweide, <span class="dt">method =</span> <span class="st">"ngb"</span>)
-
-<span class="co"># set graphical params</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">mar =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">4</span>))
-
-<span class="co"># use raster bounding box to set the spatial extent for the plot</span>
-bb &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_as_sfc">st_as_sfc</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_bbox">st_bbox</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/trim">trim</a></span>(week14_moll)))
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(bb, <span class="dt">col =</span> <span class="st">"white"</span>, <span class="dt">border =</span> <span class="st">"white"</span>)
-<span class="co"># plot the abundance</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(week38_moll, <span class="dt">zlim =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, year_max), 
-     <span class="dt">col =</span> <span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="dv">20</span>, <span class="dt">season =</span> <span class="st">"weekly"</span>), 
-     <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(week38_moll),
-     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">box =</span> <span class="ot">FALSE</span>, <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-
-<span class="co"># do the same for week 14</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">4</span>))
-bb &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_as_sfc">st_as_sfc</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_bbox">st_bbox</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/trim">trim</a></span>(week14_moll)))
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(bb, <span class="dt">col =</span> <span class="st">"white"</span>, <span class="dt">border =</span> <span class="st">"white"</span>)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(week14_moll, <span class="dt">zlim =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, year_max),
-     <span class="dt">col =</span> <span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="dv">20</span>, <span class="dt">season =</span> <span class="st">"weekly"</span>), 
-     <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(week14_moll),
-     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">box =</span> <span class="ot">FALSE</span>, <span class="dt">legend.shrink =</span> <span class="fl">0.97</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">year_max &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">max</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/extremeValues">maxValue</a></span>(abunds), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3">week14_moll &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/projectRaster">projectRaster</a></span>(abunds[[<span class="dv">14</span>]], <span class="dt">crs =</span> mollweide, <span class="dt">method =</span> <span class="st">"ngb"</span>)</a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co"># set graphical params</span></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">mar =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">4</span>))</a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co"># use raster bounding box to set the spatial extent for the plot</span></a>
+<a class="sourceLine" id="cb4-9" data-line-number="9">bb &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_as_sfc">st_as_sfc</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_bbox">st_bbox</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/trim">trim</a></span>(week14_moll)))</a>
+<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(bb, <span class="dt">col =</span> <span class="st">"white"</span>, <span class="dt">border =</span> <span class="st">"white"</span>)</a>
+<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co"># plot the abundance</span></a>
+<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(week38_moll, <span class="dt">zlim =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, year_max), </a>
+<a class="sourceLine" id="cb4-13" data-line-number="13">     <span class="dt">col =</span> <span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="dv">20</span>, <span class="dt">season =</span> <span class="st">"weekly"</span>), </a>
+<a class="sourceLine" id="cb4-14" data-line-number="14">     <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(week38_moll),</a>
+<a class="sourceLine" id="cb4-15" data-line-number="15">     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">box =</span> <span class="ot">FALSE</span>, <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb4-16" data-line-number="16"></a>
+<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co"># do the same for week 14</span></a>
+<a class="sourceLine" id="cb4-18" data-line-number="18"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">4</span>))</a>
+<a class="sourceLine" id="cb4-19" data-line-number="19">bb &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_as_sfc">st_as_sfc</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_bbox">st_bbox</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/trim">trim</a></span>(week14_moll)))</a>
+<a class="sourceLine" id="cb4-20" data-line-number="20"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(bb, <span class="dt">col =</span> <span class="st">"white"</span>, <span class="dt">border =</span> <span class="st">"white"</span>)</a>
+<a class="sourceLine" id="cb4-21" data-line-number="21"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(week14_moll, <span class="dt">zlim =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, year_max),</a>
+<a class="sourceLine" id="cb4-22" data-line-number="22">     <span class="dt">col =</span> <span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="dv">20</span>, <span class="dt">season =</span> <span class="st">"weekly"</span>), </a>
+<a class="sourceLine" id="cb4-23" data-line-number="23">     <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(week14_moll),</a>
+<a class="sourceLine" id="cb4-24" data-line-number="24">     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">box =</span> <span class="ot">FALSE</span>, <span class="dt">legend.shrink =</span> <span class="fl">0.97</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <p><img src="ebirdst-intro-mapping_files/figure-html/map_linear-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 <p>We can compare this with maps made using the <code><a href="../reference/calc_bins.html">calc_bins()</a></code> method.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate ideal color bins for abundance values</span>
-year_bins &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calc_bins.html">calc_bins</a></span>(abunds)
-
-<span class="co"># plot</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">mar =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">6</span>))
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_as_sfc">st_as_sfc</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_bbox">st_bbox</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/trim">trim</a></span>(week38_moll))), <span class="dt">col =</span> <span class="st">"white"</span>, <span class="dt">border =</span> <span class="st">"white"</span>)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(week38_moll, 
-     <span class="dt">breaks =</span> year_bins<span class="op">$</span>bins, 
-     <span class="dt">col =</span> <span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(year_bins<span class="op">$</span>bins) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">season =</span> <span class="st">"weekly"</span>), 
-     <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(week38_moll), 
-     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">box =</span> <span class="ot">FALSE</span>, <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">6</span>))
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_as_sfc">st_as_sfc</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_bbox">st_bbox</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/trim">trim</a></span>(week14_moll))), <span class="dt">col =</span> <span class="st">"white"</span>, <span class="dt">border =</span> <span class="st">"white"</span>)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(week14_moll, 
-     <span class="dt">breaks =</span> year_bins<span class="op">$</span>bins, 
-     <span class="dt">col =</span> <span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(year_bins<span class="op">$</span>bins) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">season =</span> <span class="st">"weekly"</span>), 
-     <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(week14_moll), 
-     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">box =</span> <span class="ot">FALSE</span>, <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-
-<span class="co"># create a thinner set of labels</span>
-bin_labels &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/format">format</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">round</a></span>(year_bins<span class="op">$</span>bins, <span class="dv">2</span>), <span class="dt">nsmall =</span> <span class="dv">2</span>)
-bin_labels[<span class="op">!</span>(bin_labels <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(bin_labels[<span class="dv">1</span>],
-                               bin_labels[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">round</a></span>((<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(bin_labels) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>)) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>],
-                               bin_labels[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(bin_labels)]))] &lt;-<span class="st"> ""</span>
-
-<span class="co"># plot legend</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(week38_moll<span class="op">^</span>year_bins<span class="op">$</span>power, <span class="dt">legend.only =</span> <span class="ot">TRUE</span>, 
-     <span class="dt">col =</span> <span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(year_bins<span class="op">$</span>bins) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">season =</span> <span class="st">"weekly"</span>), 
-     <span class="dt">breaks =</span> year_bins<span class="op">$</span>bins <span class="op">^</span><span class="st"> </span>year_bins<span class="op">$</span>power, <span class="dt">lab.breaks =</span> bin_labels,
-     <span class="dt">legend.shrink =</span> <span class="fl">0.97</span>, <span class="dt">legend.width =</span> <span class="dv">2</span>,  
-     <span class="dt">axis.args =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">cex.axis =</span> <span class="fl">0.9</span>, <span class="dt">lwd.ticks =</span> <span class="dv">0</span>))</code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="co"># calculate ideal color bins for abundance values</span></a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">year_bins &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calc_bins.html">calc_bins</a></span>(abunds)</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co"># plot</span></a>
+<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">mar =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">6</span>))</a>
+<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_as_sfc">st_as_sfc</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_bbox">st_bbox</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/trim">trim</a></span>(week38_moll))), <span class="dt">col =</span> <span class="st">"white"</span>, <span class="dt">border =</span> <span class="st">"white"</span>)</a>
+<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(week38_moll, </a>
+<a class="sourceLine" id="cb5-8" data-line-number="8">     <span class="dt">breaks =</span> year_bins<span class="op">$</span>bins, </a>
+<a class="sourceLine" id="cb5-9" data-line-number="9">     <span class="dt">col =</span> <span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(year_bins<span class="op">$</span>bins) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">season =</span> <span class="st">"weekly"</span>), </a>
+<a class="sourceLine" id="cb5-10" data-line-number="10">     <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(week38_moll), </a>
+<a class="sourceLine" id="cb5-11" data-line-number="11">     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">box =</span> <span class="ot">FALSE</span>, <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb5-12" data-line-number="12"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">6</span>))</a>
+<a class="sourceLine" id="cb5-13" data-line-number="13"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_as_sfc">st_as_sfc</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_bbox">st_bbox</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/trim">trim</a></span>(week14_moll))), <span class="dt">col =</span> <span class="st">"white"</span>, <span class="dt">border =</span> <span class="st">"white"</span>)</a>
+<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(week14_moll, </a>
+<a class="sourceLine" id="cb5-15" data-line-number="15">     <span class="dt">breaks =</span> year_bins<span class="op">$</span>bins, </a>
+<a class="sourceLine" id="cb5-16" data-line-number="16">     <span class="dt">col =</span> <span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(year_bins<span class="op">$</span>bins) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">season =</span> <span class="st">"weekly"</span>), </a>
+<a class="sourceLine" id="cb5-17" data-line-number="17">     <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(week14_moll), </a>
+<a class="sourceLine" id="cb5-18" data-line-number="18">     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">box =</span> <span class="ot">FALSE</span>, <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb5-19" data-line-number="19"></a>
+<a class="sourceLine" id="cb5-20" data-line-number="20"><span class="co"># create a thinner set of labels</span></a>
+<a class="sourceLine" id="cb5-21" data-line-number="21">bin_labels &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/format">format</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">round</a></span>(year_bins<span class="op">$</span>bins, <span class="dv">2</span>), <span class="dt">nsmall =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb5-22" data-line-number="22">bin_labels[<span class="op">!</span>(bin_labels <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(bin_labels[<span class="dv">1</span>],</a>
+<a class="sourceLine" id="cb5-23" data-line-number="23">                               bin_labels[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">round</a></span>((<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(bin_labels) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>)) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>],</a>
+<a class="sourceLine" id="cb5-24" data-line-number="24">                               bin_labels[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(bin_labels)]))] &lt;-<span class="st"> ""</span></a>
+<a class="sourceLine" id="cb5-25" data-line-number="25"></a>
+<a class="sourceLine" id="cb5-26" data-line-number="26"><span class="co"># plot legend</span></a>
+<a class="sourceLine" id="cb5-27" data-line-number="27"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(week38_moll<span class="op">^</span>year_bins<span class="op">$</span>power, <span class="dt">legend.only =</span> <span class="ot">TRUE</span>, </a>
+<a class="sourceLine" id="cb5-28" data-line-number="28">     <span class="dt">col =</span> <span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(year_bins<span class="op">$</span>bins) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">season =</span> <span class="st">"weekly"</span>), </a>
+<a class="sourceLine" id="cb5-29" data-line-number="29">     <span class="dt">breaks =</span> year_bins<span class="op">$</span>bins <span class="op">^</span><span class="st"> </span>year_bins<span class="op">$</span>power, <span class="dt">lab.breaks =</span> bin_labels,</a>
+<a class="sourceLine" id="cb5-30" data-line-number="30">     <span class="dt">legend.shrink =</span> <span class="fl">0.97</span>, <span class="dt">legend.width =</span> <span class="dv">2</span>,  </a>
+<a class="sourceLine" id="cb5-31" data-line-number="31">     <span class="dt">axis.args =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">cex.axis =</span> <span class="fl">0.9</span>, <span class="dt">lwd.ticks =</span> <span class="dv">0</span>))</a></code></pre></div>
 <p><img src="ebirdst-intro-mapping_files/figure-html/map_bins-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="mapping-abundance" class="section level2">
 <h2 class="hasAnchor">
 <a href="#mapping-abundance" class="anchor"></a>Mapping Abundance</h2>
 <p>As seen in the map above, the <code>calc_bins</code> method excludes zeroes. However, with color bins that accurately represent the data distribution, we can add in details about zeroes, tweak the legend, and add some reference data to make a complete map. Like the quick start guide, this will show you how to download example data and plot abundance values similar to how they are plotted for the <a href="https://ebird.org/science/status-and-trends/woothr/abundance-map-weekly">eBird Status and Trends Abundance animations</a>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># to add context, let's pull in some reference data to add</span>
-wh_states &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/rnaturalearth/topics/ne_states">ne_states</a></span>(<span class="dt">country =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"United States of America"</span>, <span class="st">"Canada"</span>),
-                    <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_transform">st_transform</a></span>(<span class="dt">crs =</span> mollweide) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_geometry">st_geometry</a></span>()
-
-<span class="co"># well plot a week in the middle of summer</span>
-week26_moll &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/projectRaster">projectRaster</a></span>(abunds[[<span class="dv">26</span>]], <span class="dt">crs =</span> mollweide, <span class="dt">method =</span> <span class="st">"ngb"</span>)
-
-<span class="co"># set graphics params</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>, <span class="dv">1</span>), <span class="dt">mar =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">6</span>))
-
-<span class="co"># use the extent object to set the spatial extent for the plot</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_as_sfc">st_as_sfc</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_bbox">st_bbox</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/trim">trim</a></span>(week26_moll))), <span class="dt">col =</span> <span class="st">"white"</span>, <span class="dt">border =</span> <span class="st">"white"</span>)
-
-<span class="co"># add background spatial context</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(wh_states, <span class="dt">col =</span> <span class="st">"#eeeeee"</span>, <span class="dt">border =</span> <span class="ot">NA</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-
-<span class="co"># plot zeroes as gray</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(week26_moll <span class="op">==</span><span class="st"> </span><span class="dv">0</span>, <span class="dt">col =</span> <span class="st">"#dddddd"</span>, 
-     <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(week26_moll),
-     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-
-<span class="co"># define color bins</span>
-qcol &lt;-<span class="st"> </span><span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(year_bins<span class="op">$</span>bins) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="st">"weekly"</span>)
-
-<span class="co"># plot abundances</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(week26_moll, <span class="dt">breaks =</span> year_bins<span class="op">$</span>bins, <span class="dt">col =</span> qcol, 
-     <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(week26_moll),
-     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-
-<span class="co"># for legend, create a smaller set of bin labels</span>
-bin_labels &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/format">format</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">round</a></span>(year_bins<span class="op">$</span>bins, <span class="dv">2</span>), <span class="dt">nsmall =</span> <span class="dv">2</span>)
-bin_labels[<span class="op">!</span>(bin_labels <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(bin_labels[<span class="dv">1</span>],
-                               bin_labels[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">round</a></span>((<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(bin_labels) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>)) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>],
-                               bin_labels[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(bin_labels)]))] &lt;-<span class="st"> ""</span>
-bin_labels &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"0"</span>, bin_labels)
-
-<span class="co"># create colors that include gray for 0</span>
-lcol &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"#dddddd"</span>, qcol)
-
-<span class="co"># set legend such that color ramp appears linearly</span>
-ltq &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="dt">from =</span> year_bins<span class="op">$</span>bins[<span class="dv">1</span>], 
-           <span class="dt">to =</span> year_bins<span class="op">$</span>bins[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(year_bins<span class="op">$</span>bins)],
-           <span class="dt">length.out =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(year_bins<span class="op">$</span>bins))
-ltq &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, ltq)
-
-<span class="co"># plot legend</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(week26_moll<span class="op">^</span>year_bins<span class="op">$</span>power, <span class="dt">legend.only =</span> <span class="ot">TRUE</span>,
-     <span class="dt">col =</span> lcol, <span class="dt">breaks =</span> ltq<span class="op">^</span>year_bins<span class="op">$</span>power, 
-     <span class="dt">lab.breaks =</span> bin_labels, 
-     <span class="dt">legend.shrink =</span> <span class="fl">0.97</span>, <span class="dt">legend.width =</span> <span class="dv">2</span>, 
-     <span class="dt">axis.args =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">cex.axis =</span> <span class="fl">0.9</span>, <span class="dt">lwd.ticks =</span> <span class="dv">0</span>))
-
-<span class="co"># add state boundaries on top</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(wh_states, <span class="dt">border =</span> <span class="st">"white"</span>, <span class="dt">lwd =</span> <span class="fl">1.5</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="co"># to add context, let's pull in some reference data to add</span></a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">wh_states &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/rnaturalearth/topics/ne_states">ne_states</a></span>(<span class="dt">country =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"United States of America"</span>, <span class="st">"Canada"</span>),</a>
+<a class="sourceLine" id="cb6-3" data-line-number="3">                    <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_transform">st_transform</a></span>(<span class="dt">crs =</span> mollweide) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_geometry">st_geometry</a></span>()</a>
+<a class="sourceLine" id="cb6-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co"># well plot a week in the middle of summer</span></a>
+<a class="sourceLine" id="cb6-8" data-line-number="8">week26_moll &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/projectRaster">projectRaster</a></span>(abunds[[<span class="dv">26</span>]], <span class="dt">crs =</span> mollweide, <span class="dt">method =</span> <span class="st">"ngb"</span>)</a>
+<a class="sourceLine" id="cb6-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb6-10" data-line-number="10"><span class="co"># set graphics params</span></a>
+<a class="sourceLine" id="cb6-11" data-line-number="11"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>, <span class="dv">1</span>), <span class="dt">mar =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">6</span>))</a>
+<a class="sourceLine" id="cb6-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb6-13" data-line-number="13"><span class="co"># use the extent object to set the spatial extent for the plot</span></a>
+<a class="sourceLine" id="cb6-14" data-line-number="14"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_as_sfc">st_as_sfc</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_bbox">st_bbox</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/trim">trim</a></span>(week26_moll))), <span class="dt">col =</span> <span class="st">"white"</span>, <span class="dt">border =</span> <span class="st">"white"</span>)</a>
+<a class="sourceLine" id="cb6-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb6-16" data-line-number="16"><span class="co"># add background spatial context</span></a>
+<a class="sourceLine" id="cb6-17" data-line-number="17"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(wh_states, <span class="dt">col =</span> <span class="st">"#eeeeee"</span>, <span class="dt">border =</span> <span class="ot">NA</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb6-18" data-line-number="18"></a>
+<a class="sourceLine" id="cb6-19" data-line-number="19"><span class="co"># plot zeroes as gray</span></a>
+<a class="sourceLine" id="cb6-20" data-line-number="20"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(week26_moll <span class="op">==</span><span class="st"> </span><span class="dv">0</span>, <span class="dt">col =</span> <span class="st">"#dddddd"</span>, </a>
+<a class="sourceLine" id="cb6-21" data-line-number="21">     <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(week26_moll),</a>
+<a class="sourceLine" id="cb6-22" data-line-number="22">     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb6-23" data-line-number="23"></a>
+<a class="sourceLine" id="cb6-24" data-line-number="24"><span class="co"># define color bins</span></a>
+<a class="sourceLine" id="cb6-25" data-line-number="25">qcol &lt;-<span class="st"> </span><span class="kw"><a href="../reference/abundance_palette.html">abundance_palette</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(year_bins<span class="op">$</span>bins) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="st">"weekly"</span>)</a>
+<a class="sourceLine" id="cb6-26" data-line-number="26"></a>
+<a class="sourceLine" id="cb6-27" data-line-number="27"><span class="co"># plot abundances</span></a>
+<a class="sourceLine" id="cb6-28" data-line-number="28"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(week26_moll, <span class="dt">breaks =</span> year_bins<span class="op">$</span>bins, <span class="dt">col =</span> qcol, </a>
+<a class="sourceLine" id="cb6-29" data-line-number="29">     <span class="dt">maxpixels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(week26_moll),</a>
+<a class="sourceLine" id="cb6-30" data-line-number="30">     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb6-31" data-line-number="31"></a>
+<a class="sourceLine" id="cb6-32" data-line-number="32"><span class="co"># for legend, create a smaller set of bin labels</span></a>
+<a class="sourceLine" id="cb6-33" data-line-number="33">bin_labels &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/format">format</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">round</a></span>(year_bins<span class="op">$</span>bins, <span class="dv">2</span>), <span class="dt">nsmall =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb6-34" data-line-number="34">bin_labels[<span class="op">!</span>(bin_labels <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(bin_labels[<span class="dv">1</span>],</a>
+<a class="sourceLine" id="cb6-35" data-line-number="35">                               bin_labels[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">round</a></span>((<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(bin_labels) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>)) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>],</a>
+<a class="sourceLine" id="cb6-36" data-line-number="36">                               bin_labels[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(bin_labels)]))] &lt;-<span class="st"> ""</span></a>
+<a class="sourceLine" id="cb6-37" data-line-number="37">bin_labels &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"0"</span>, bin_labels)</a>
+<a class="sourceLine" id="cb6-38" data-line-number="38"></a>
+<a class="sourceLine" id="cb6-39" data-line-number="39"><span class="co"># create colors that include gray for 0</span></a>
+<a class="sourceLine" id="cb6-40" data-line-number="40">lcol &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"#dddddd"</span>, qcol)</a>
+<a class="sourceLine" id="cb6-41" data-line-number="41"></a>
+<a class="sourceLine" id="cb6-42" data-line-number="42"><span class="co"># set legend such that color ramp appears linearly</span></a>
+<a class="sourceLine" id="cb6-43" data-line-number="43">ltq &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="dt">from =</span> year_bins<span class="op">$</span>bins[<span class="dv">1</span>], </a>
+<a class="sourceLine" id="cb6-44" data-line-number="44">           <span class="dt">to =</span> year_bins<span class="op">$</span>bins[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(year_bins<span class="op">$</span>bins)],</a>
+<a class="sourceLine" id="cb6-45" data-line-number="45">           <span class="dt">length.out =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(year_bins<span class="op">$</span>bins))</a>
+<a class="sourceLine" id="cb6-46" data-line-number="46">ltq &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, ltq)</a>
+<a class="sourceLine" id="cb6-47" data-line-number="47"></a>
+<a class="sourceLine" id="cb6-48" data-line-number="48"><span class="co"># plot legend</span></a>
+<a class="sourceLine" id="cb6-49" data-line-number="49"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(week26_moll<span class="op">^</span>year_bins<span class="op">$</span>power, <span class="dt">legend.only =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb6-50" data-line-number="50">     <span class="dt">col =</span> lcol, <span class="dt">breaks =</span> ltq<span class="op">^</span>year_bins<span class="op">$</span>power, </a>
+<a class="sourceLine" id="cb6-51" data-line-number="51">     <span class="dt">lab.breaks =</span> bin_labels, </a>
+<a class="sourceLine" id="cb6-52" data-line-number="52">     <span class="dt">legend.shrink =</span> <span class="fl">0.97</span>, <span class="dt">legend.width =</span> <span class="dv">2</span>, </a>
+<a class="sourceLine" id="cb6-53" data-line-number="53">     <span class="dt">axis.args =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">cex.axis =</span> <span class="fl">0.9</span>, <span class="dt">lwd.ticks =</span> <span class="dv">0</span>))</a>
+<a class="sourceLine" id="cb6-54" data-line-number="54"></a>
+<a class="sourceLine" id="cb6-55" data-line-number="55"><span class="co"># add state boundaries on top</span></a>
+<a class="sourceLine" id="cb6-56" data-line-number="56"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(wh_states, <span class="dt">border =</span> <span class="st">"white"</span>, <span class="dt">lwd =</span> <span class="fl">1.5</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <p><img src="ebirdst-intro-mapping_files/figure-html/map_w_es-1.png" width="672" style="display: block; margin: auto;"></p>
 </div>
 <div id="mapping-abundance-confidence-intervals" class="section level2">
 <h2 class="hasAnchor">
 <a href="#mapping-abundance-confidence-intervals" class="anchor"></a>Mapping Abundance Confidence Intervals</h2>
 <p>In addition to occurrence and abundance estimates, we also provide confidence intervals at an upper value of 90% and lower value of 10%. These can be used to calculate and map a confidence band width.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load lower and upper stacks</span>
-<span class="co"># load trimmed mean abundances and label dates</span>
-lower &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_raster.html">load_raster</a></span>(<span class="st">"abundance_lower"</span>, <span class="dt">path =</span> sp_path)
-upper &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_raster.html">load_raster</a></span>(<span class="st">"abundance_upper"</span>, <span class="dt">path =</span> sp_path)
-
-<span class="co"># calculate band width</span>
-conf_band &lt;-<span class="st"> </span>upper[[<span class="dv">26</span>]] <span class="op">-</span><span class="st"> </span>lower[[<span class="dv">26</span>]]
-
-conf_week26 &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/projectRaster">projectRaster</a></span>(conf_band, <span class="dt">crs =</span> mollweide, <span class="dt">method =</span> <span class="st">"ngb"</span>)
-
-<span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">2</span>))
-<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/trim">trim</a></span>(conf_week26), <span class="dt">col =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/viridisLite/topics/viridis">magma</a></span>(<span class="dv">20</span>), 
-     <span class="dt">maxpixel =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(conf_week26),
-     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">box =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="co"># load lower and upper stacks</span></a>
+<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="co"># load trimmed mean abundances and label dates</span></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3">lower &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_raster.html">load_raster</a></span>(<span class="st">"abundance_lower"</span>, <span class="dt">path =</span> sp_path)</a>
+<a class="sourceLine" id="cb7-4" data-line-number="4">upper &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_raster.html">load_raster</a></span>(<span class="st">"abundance_upper"</span>, <span class="dt">path =</span> sp_path)</a>
+<a class="sourceLine" id="cb7-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co"># calculate band width</span></a>
+<a class="sourceLine" id="cb7-7" data-line-number="7">conf_band &lt;-<span class="st"> </span>upper[[<span class="dv">26</span>]] <span class="op">-</span><span class="st"> </span>lower[[<span class="dv">26</span>]]</a>
+<a class="sourceLine" id="cb7-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb7-9" data-line-number="9">conf_week26 &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/projectRaster">projectRaster</a></span>(conf_band, <span class="dt">crs =</span> mollweide, <span class="dt">method =</span> <span class="st">"ngb"</span>)</a>
+<a class="sourceLine" id="cb7-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb7-12" data-line-number="12"><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/plot">plot</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/trim">trim</a></span>(conf_week26), <span class="dt">col =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/viridisLite/topics/viridis">magma</a></span>(<span class="dv">20</span>), </a>
+<a class="sourceLine" id="cb7-13" data-line-number="13">     <span class="dt">maxpixel =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/ncell">ncell</a></span>(conf_week26),</a>
+<a class="sourceLine" id="cb7-14" data-line-number="14">     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">box =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <p><img src="ebirdst-intro-mapping_files/figure-html/map_confidence_band-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 </div>
@@ -335,63 +338,63 @@ conf_week26 &lt;-<span class="st"> </span><span class="kw"><a href="https://www.
 <h1 class="hasAnchor">
 <a href="#extracting-trajectories-with-uncertainty" class="anchor"></a>Extracting Trajectories with Uncertainty</h1>
 <p>With <code>RasterStacks</code> for relative abundance estimates, as well as upper and lower confidence intervals, we can extract an abundance trajectory with uncertainty intervals and plot them across the year for a single location.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># set a point</span>
-pt &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st">st_point</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="op">-</span><span class="fl">88.1</span>, <span class="fl">46.7</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/sfc">st_sfc</a></span>(<span class="dt">crs =</span> <span class="dv">4326</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_transform">st_transform</a></span>(<span class="dt">crs =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/projection">projection</a></span>(abunds)) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_coordinates">st_coordinates</a></span>()
-
-<span class="co"># extract</span>
-abund_traj &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/extract">extract</a></span>(abunds, pt, <span class="dt">fun =</span> mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)[<span class="dv">1</span>, ]
-upper_traj &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/extract">extract</a></span>(upper, pt, <span class="dt">fun =</span> mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)[<span class="dv">1</span>, ]
-lower_traj &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/extract">extract</a></span>(lower, pt, <span class="dt">fun =</span> mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)[<span class="dv">1</span>, ]
-
-<span class="co"># plot trajectories</span>
-plot_frame &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">x =</span> <span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(abund_traj),
-                         <span class="dt">y =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unname">unname</a></span>(abund_traj),
-                         <span class="dt">upper =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unname">unname</a></span>(upper_traj),
-                         <span class="dt">lower =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unname">unname</a></span>(lower_traj))
-
-<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(plot_frame, <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(x, y)) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>(<span class="dt">data =</span> plot_frame) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_ribbon</a></span>(<span class="dt">data =</span> plot_frame, 
-              <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">ymin =</span> lower, <span class="dt">ymax =</span> upper), 
-              <span class="dt">alpha =</span> <span class="fl">0.3</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"Expected Count (count/(km hr))"</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span>(<span class="st">"Week"</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_light</a></span>()</code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="co"># set a point</span></a>
+<a class="sourceLine" id="cb8-2" data-line-number="2">pt &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st">st_point</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="op">-</span><span class="fl">88.1</span>, <span class="fl">46.7</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/sfc">st_sfc</a></span>(<span class="dt">crs =</span> <span class="dv">4326</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_transform">st_transform</a></span>(<span class="dt">crs =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/projection">projection</a></span>(abunds)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb8-5" data-line-number="5"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_coordinates">st_coordinates</a></span>()</a>
+<a class="sourceLine" id="cb8-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb8-7" data-line-number="7"><span class="co"># extract</span></a>
+<a class="sourceLine" id="cb8-8" data-line-number="8">abund_traj &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/extract">extract</a></span>(abunds, pt, <span class="dt">fun =</span> mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)[<span class="dv">1</span>, ]</a>
+<a class="sourceLine" id="cb8-9" data-line-number="9">upper_traj &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/extract">extract</a></span>(upper, pt, <span class="dt">fun =</span> mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)[<span class="dv">1</span>, ]</a>
+<a class="sourceLine" id="cb8-10" data-line-number="10">lower_traj &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/extract">extract</a></span>(lower, pt, <span class="dt">fun =</span> mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)[<span class="dv">1</span>, ]</a>
+<a class="sourceLine" id="cb8-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb8-12" data-line-number="12"><span class="co"># plot trajectories</span></a>
+<a class="sourceLine" id="cb8-13" data-line-number="13">plot_frame &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">x =</span> <span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(abund_traj),</a>
+<a class="sourceLine" id="cb8-14" data-line-number="14">                         <span class="dt">y =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unname">unname</a></span>(abund_traj),</a>
+<a class="sourceLine" id="cb8-15" data-line-number="15">                         <span class="dt">upper =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unname">unname</a></span>(upper_traj),</a>
+<a class="sourceLine" id="cb8-16" data-line-number="16">                         <span class="dt">lower =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unname">unname</a></span>(lower_traj))</a>
+<a class="sourceLine" id="cb8-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb8-18" data-line-number="18"><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/ggplot">ggplot</a></span>(plot_frame, <span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(x, y)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-19" data-line-number="19"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/geom_path">geom_line</a></span>(<span class="dt">data =</span> plot_frame) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-20" data-line-number="20"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/geom_ribbon">geom_ribbon</a></span>(<span class="dt">data =</span> plot_frame, </a>
+<a class="sourceLine" id="cb8-21" data-line-number="21">              <span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(<span class="dt">ymin =</span> lower, <span class="dt">ymax =</span> upper), </a>
+<a class="sourceLine" id="cb8-22" data-line-number="22">              <span class="dt">alpha =</span> <span class="fl">0.3</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-23" data-line-number="23"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/labs">ylab</a></span>(<span class="st">"Expected Count (count/(km hr))"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-24" data-line-number="24"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/labs">xlab</a></span>(<span class="st">"Week"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-25" data-line-number="25"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/ggtheme">theme_light</a></span>()</a></code></pre></div>
 <p><img src="ebirdst-intro-mapping_files/figure-html/trajectories-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 <p>It is also possible to extract trajectories for regions, but it takes a little more data work.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># set an extent based on polygon</span>
-mi &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/rnaturalearth/topics/ne_states">ne_states</a></span>(<span class="dt">country =</span> <span class="st">"United States of America"</span>, <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_transform">st_transform</a></span>(<span class="dt">crs =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/projection">projection</a></span>(abunds))
-mi &lt;-<span class="st"> </span>mi[mi<span class="op">$</span>name <span class="op">==</span><span class="st"> "Michigan"</span>]
-
-<span class="co"># extract</span>
-<span class="co"># because we're using a region, we get lots of values that we need to average</span>
-abund_traj &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/extract">extract</a></span>(abunds, mi, <span class="dt">fun =</span> mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
-abund_traj &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/apply">apply</a></span>(abund_traj, <span class="dv">2</span>, mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
-
-upper_traj &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/extract">extract</a></span>(upper, mi, <span class="dt">fun =</span> mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
-upper_traj &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/apply">apply</a></span>(upper_traj, <span class="dv">2</span>, mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
-
-lower_traj &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/extract">extract</a></span>(lower, mi, <span class="dt">fun =</span> mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
-lower_traj &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/apply">apply</a></span>(lower_traj, <span class="dv">2</span>, mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
-
-<span class="co"># plot trajectories</span>
-plot_frame &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">x =</span> <span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(abund_traj),
-                         <span class="dt">y =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unname">unname</a></span>(abund_traj),
-                         <span class="dt">upper =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unname">unname</a></span>(upper_traj),
-                         <span class="dt">lower =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unname">unname</a></span>(lower_traj))
-
-<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(plot_frame, <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(x, y)) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>(<span class="dt">data =</span> plot_frame) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_ribbon</a></span>(<span class="dt">data =</span> plot_frame, 
-              <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">ymin =</span> lower, <span class="dt">ymax =</span>upper), 
-              <span class="dt">alpha =</span> <span class="fl">0.3</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"Expected Count (count/(km hr))"</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span>(<span class="st">"Week"</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_light</a></span>()</code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="co"># set an extent based on polygon</span></a>
+<a class="sourceLine" id="cb9-2" data-line-number="2">mi &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/rnaturalearth/topics/ne_states">ne_states</a></span>(<span class="dt">country =</span> <span class="st">"United States of America"</span>, <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/sf/topics/st_transform">st_transform</a></span>(<span class="dt">crs =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/projection">projection</a></span>(abunds))</a>
+<a class="sourceLine" id="cb9-4" data-line-number="4">mi &lt;-<span class="st"> </span>mi[mi<span class="op">$</span>name <span class="op">==</span><span class="st"> "Michigan"</span>]</a>
+<a class="sourceLine" id="cb9-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="co"># extract</span></a>
+<a class="sourceLine" id="cb9-7" data-line-number="7"><span class="co"># because we're using a region, we get lots of values that we need to average</span></a>
+<a class="sourceLine" id="cb9-8" data-line-number="8">abund_traj &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/extract">extract</a></span>(abunds, mi, <span class="dt">fun =</span> mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb9-9" data-line-number="9">abund_traj &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/apply">apply</a></span>(abund_traj, <span class="dv">2</span>, mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb9-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb9-11" data-line-number="11">upper_traj &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/extract">extract</a></span>(upper, mi, <span class="dt">fun =</span> mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb9-12" data-line-number="12">upper_traj &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/apply">apply</a></span>(upper_traj, <span class="dv">2</span>, mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb9-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb9-14" data-line-number="14">lower_traj &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/raster/topics/extract">extract</a></span>(lower, mi, <span class="dt">fun =</span> mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb9-15" data-line-number="15">lower_traj &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/apply">apply</a></span>(lower_traj, <span class="dv">2</span>, mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb9-16" data-line-number="16"></a>
+<a class="sourceLine" id="cb9-17" data-line-number="17"><span class="co"># plot trajectories</span></a>
+<a class="sourceLine" id="cb9-18" data-line-number="18">plot_frame &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">x =</span> <span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(abund_traj),</a>
+<a class="sourceLine" id="cb9-19" data-line-number="19">                         <span class="dt">y =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unname">unname</a></span>(abund_traj),</a>
+<a class="sourceLine" id="cb9-20" data-line-number="20">                         <span class="dt">upper =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unname">unname</a></span>(upper_traj),</a>
+<a class="sourceLine" id="cb9-21" data-line-number="21">                         <span class="dt">lower =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unname">unname</a></span>(lower_traj))</a>
+<a class="sourceLine" id="cb9-22" data-line-number="22"></a>
+<a class="sourceLine" id="cb9-23" data-line-number="23"><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/ggplot">ggplot</a></span>(plot_frame, <span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(x, y)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb9-24" data-line-number="24"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/geom_path">geom_line</a></span>(<span class="dt">data =</span> plot_frame) <span class="op">+</span></a>
+<a class="sourceLine" id="cb9-25" data-line-number="25"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/geom_ribbon">geom_ribbon</a></span>(<span class="dt">data =</span> plot_frame, </a>
+<a class="sourceLine" id="cb9-26" data-line-number="26">              <span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(<span class="dt">ymin =</span> lower, <span class="dt">ymax =</span>upper), </a>
+<a class="sourceLine" id="cb9-27" data-line-number="27">              <span class="dt">alpha =</span> <span class="fl">0.3</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb9-28" data-line-number="28"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/labs">ylab</a></span>(<span class="st">"Expected Count (count/(km hr))"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb9-29" data-line-number="29"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/labs">xlab</a></span>(<span class="st">"Week"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb9-30" data-line-number="30"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/ggtheme">theme_light</a></span>()</a></code></pre></div>
 <p><img src="ebirdst-intro-mapping_files/figure-html/trajectories_region-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 <div id="references" class="section level2">
 <h2 class="hasAnchor">
@@ -434,7 +437,7 @@ plot_frame &lt;-<span class="st"> </span><span class="kw"><a href="https://www.r
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.9000.</p>
 </div>
       </footer>
 </div>

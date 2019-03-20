@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Articles • ebirdst</title>
+<title>Data frame of available eBird Status and Trends species — ebirdst_runs • ebirdst</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -31,7 +31,16 @@
 
 
 
-<meta property="og:title" content="Articles" />
+<meta property="og:title" content="Data frame of available eBird Status and Trends species — ebirdst_runs" />
+
+<meta property="og:description" content="A dataset containing the species for which eBird Status and Trends data are
+avialable. In addition, the dates defining the boundaries of the seasons are
+provided. These seasons are defined on a species-specific basis through
+expert review. For information on the details of defining seasons, please see
+the seasons section of the FAQ. Note that
+missing dates imply that a season failed expert review for that species
+within that season." />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -48,7 +57,7 @@
   </head>
 
   <body>
-    <div class="container template-article-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -103,20 +112,54 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Articles</h1>
+    <h1>Data frame of available eBird Status and Trends species</h1>
+    <small class="dont-index">Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/R/data.R'><code>R/data.R</code></a></small>
+    <div class="hidden name"><code>ebirdst_runs.Rd</code></div>
     </div>
 
-    <div class="section ">
-      <h3>All vignettes</h3>
-      <p class="section-desc"></p>
-
-      <ul>
-        <li><a href="ebirdst-advanced-mapping.html">Generating Seasonal Abundance and Range Maps and Stats</a></li>
-        <li><a href="ebirdst-intro-mapping.html">Introduction to loading, mapping, and plotting</a></li>
-        <li><a href="ebirdst-introduction.html">Background, Data Access, and Data Structure</a></li>
-        <li><a href="ebirdst-non-raster.html">Non-raster Data: Using Predictor Importance, Predictor Directionality,and Predictive Performance Metrics</a></li>
-      </ul>
+    <div class="ref-description">
+    
+    <p>A dataset containing the species for which eBird Status and Trends data are
+avialable. In addition, the dates defining the boundaries of the seasons are
+provided. These seasons are defined on a species-specific basis through
+expert review. For information on the details of defining seasons, please see
+the <a href='https://ebird.org/science/status-and-trends/faq#seasons'>seasons section of the FAQ</a>. Note that
+missing dates imply that a season failed expert review for that species
+within that season.</p>
+    
     </div>
+
+    <pre class="usage"><span class='no'>ebirdst_runs</span></pre>
+        
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
+
+    <p>A data frame with 107 rows and 14 variables:</p><dl class='dl-horizontal'>
+<dt>species_code</dt><dd><p>Six letter eBird code in eBird Taxonomy v2016</p></dd>
+<dt>run_name</dt><dd><p>Unique analysis identifier and the top level folder name
+for all results</p></dd>
+<dt>scientific_name</dt><dd><p>Scientific name from eBird Taxonomy v2016</p></dd>
+<dt>common_name</dt><dd><p>English common name from eBird Taxonomy v2016</p></dd>
+<dt>breeding_start_dt</dt><dd><p>Breeding season start date</p></dd>
+<dt>breeding_end_dt</dt><dd><p>Breeding season start date</p></dd>
+<dt>nonbreeding_start_dt</dt><dd><p>Non-breeding season start date</p></dd>
+<dt>nonbreeding_end_dt</dt><dd><p>Non-breeding season start date</p></dd>
+<dt>postbreeding_migration_start_dt</dt><dd><p>Post-breeding season start date</p></dd>
+<dt>postbreeding_migration_end_dt</dt><dd><p>Post-breeding season start date</p></dd>
+<dt>prebreeding_migration_start_dt</dt><dd><p>Pre-breeding season start date</p></dd>
+<dt>prebreeding_migration_end_dt</dt><dd><p>Pre-breeding season start date</p></dd>
+<dt>year_round_start_dt</dt><dd><p>For resident species, the year-round start date</p></dd>
+<dt>year_round_end_dt</dt><dd><p>For resident species, the year-round end date</p></dd>
+</dl>
+    
+
+  </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+    <h2>Contents</h2>
+    <ul class="nav nav-pills nav-stacked">
+      
+      <li><a href="#format">Format</a></li>
+          </ul>
+
   </div>
 </div>
 
