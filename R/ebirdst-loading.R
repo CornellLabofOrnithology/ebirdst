@@ -58,7 +58,6 @@ download_data <- function(species,
       stop(sprintf("species = %s does not uniquely identify a species.",
                    species))
     }
-    # presumably this url will change
     bucket_url <- "https://ebirdst-data.s3.amazonaws.com/"
     run <- ebirdst::ebirdst_runs$run_name[row_id]
   }
@@ -84,7 +83,8 @@ download_data <- function(species,
   s3_files$size <- as.numeric(s3_files$size)
 
   # filter to desired run/species
-  s3_files[as.numeric(s3_files$size) > 0 & grepl(run, s3_files$file), ]
+  s3_files <- s3_files[as.numeric(s3_files$size) > 0 &
+                         grepl(run, s3_files$file), ]
   if (nrow(s3_files) == 0) {
     stop(sprintf("Files not found on AWS S3 for species = %s", species))
   }
