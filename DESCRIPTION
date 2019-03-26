@@ -2,7 +2,7 @@ Type: Package
 Package: ebirdst
 Title: Tools to Load, Map, Plot, and Analyze eBird Status and
     Trends Data Products
-Version: 0.1
+Version: 0.1.0
 Authors@R: 
     c(person(given = "Tom",
              family = "Auer",
@@ -54,6 +54,7 @@ Imports:
     viridisLite,
     xml2
 Suggests: 
+    covr,
     fields,
     knitr,
     rmarkdown,
