@@ -1,5 +1,3 @@
-skip_on_cran()
-
 context("Loading and subsetting functions")
 
 sp_path <- download_data("example_data", tifs_only = FALSE)
@@ -7,6 +5,7 @@ lp_extent <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 45),
                             t = c(0.5, 0.6))
 
 test_that("subset raster", {
+  expect_true(requireNamespace("rgdal"))
   abunds <- load_raster("abundance_umean", sp_path)
   expect_is(abunds, "RasterStack")
 
