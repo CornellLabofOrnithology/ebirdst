@@ -8,8 +8,13 @@ warnings_are_errors: true
 
 addons:
   apt:
+    sources:
+      - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
     packages:
       - libudunits2-dev
+      - libproj-dev
+      - libgeos-dev
+      - libgdal-dev
 
 matrix:
   include:
