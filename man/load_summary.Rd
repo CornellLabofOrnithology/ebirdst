@@ -25,7 +25,7 @@ summary information (from summary.txt).
 \dontrun{
 
 # download example data
-sp_path <- download_data("example_data")
+sp_path <- download_data("example_data", tifs_only = FALSE)
 
 # stixel summaries
 summaries <- ebirdst:::load_summary(sp_path)

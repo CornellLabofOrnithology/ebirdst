@@ -23,9 +23,9 @@
 #' @rdname ebirdst_sample
 #'
 #' @examples
-#'
+#' \dontrun{
 #' # download example data
-#' sp_path <- download_data("example_data")
+#' sp_path <- download_data("example_data", tifs_only = FALSE)
 #'
 #' # test data to sample
 #' test_data <- load_test_data(sp_path, return_sf = TRUE)
@@ -50,6 +50,7 @@
 #' table(td_grid$obs > 0) / nrow(td_grid)
 #' # while case control sampling increases the prevelance of presences
 #' table(td_cc$obs > 0) / nrow(td_cc)
+#' }
 sample_grid <- function(x, res, t_res, n = 1, replace = FALSE,
                         jitter = TRUE) {
   UseMethod("sample_grid")

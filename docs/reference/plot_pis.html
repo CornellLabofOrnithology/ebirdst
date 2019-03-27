@@ -67,7 +67,7 @@ customized plots." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -171,7 +171,7 @@ the <code>n_top_pred</code> param.</p>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
 <span class='co'># download and load example data</span>
-<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='download_data.html'>download_data</a></span>(<span class='st'>"example_data"</span>)
+<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='download_data.html'>download_data</a></span>(<span class='st'>"example_data"</span>, <span class='kw'>tifs_only</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 <span class='no'>pis</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='load_pis.html'>load_pis</a></span>(<span class='no'>sp_path</span>)
 
 <span class='co'># define a spatiotemporal extent to plot data from</span>

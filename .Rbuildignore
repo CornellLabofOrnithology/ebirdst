@@ -7,10 +7,12 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^README\.Rmd$
+^README\.md$
 ^README-.*\.png$
 ^docs$
 ^_pkgdown\.yml$
 ^data-raw$
 ^CODE_OF_CONDUCT\.md$
 ^CONTRIBUTING\.md$
+^LICENSE\.md$
 ^makefile.r$

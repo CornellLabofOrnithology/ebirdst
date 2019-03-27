@@ -32,7 +32,7 @@ multiple GB).
 \dontrun{
 
 # download example data
-sp_path <- download_data("example_data")
+sp_path <- download_data("example_data", tifs_only = FALSE)
 
 # load partial dependence
 pds <- load_pds(sp_path)

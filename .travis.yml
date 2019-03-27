@@ -3,3 +3,26 @@
 language: R
 sudo: false
 cache: packages
+latex: false
+warnings_are_errors: true
+
+addons:
+  apt:
+    packages:
+      - libudunits2-dev
+
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+      r_build_args: '--no-build-vignettes'
+      r_check_args: '--ignore-vignettes'
+    - os: osx
+      latex: false
+      r_build_args: '--no-build-vignettes'
+      r_check_args: '--ignore-vignettes --no-examples'
+
+after_success:
+  - Rscript -e 'covr::codecov()'
+

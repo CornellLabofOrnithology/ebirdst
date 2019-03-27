@@ -38,9 +38,9 @@ the given number of points from each cell. \code{\link[=sample_case_control]{sam
 additionally samples presence and absence independently.
 }
 \examples{
-
+\dontrun{
 # download example data
-sp_path <- download_data("example_data")
+sp_path <- download_data("example_data", tifs_only = FALSE)
 
 # test data to sample
 test_data <- load_test_data(sp_path, return_sf = TRUE)
@@ -65,4 +65,5 @@ table(test_data$obs > 0) / nrow(test_data)
 table(td_grid$obs > 0) / nrow(td_grid)
 # while case control sampling increases the prevelance of presences
 table(td_cc$obs > 0) / nrow(td_cc)
+}
 }
