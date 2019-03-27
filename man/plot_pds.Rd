@@ -72,7 +72,7 @@ dependency (PD), with two options for smoothing.
 \dontrun{
 
 # download and load example data
-sp_path <- download_data("example_data")
+sp_path <- download_data("example_data", tifs_only = FALSE)
 pds <- load_pds(sp_path)
 
 # define a spatiotemporal extent to plot data from

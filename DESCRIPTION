@@ -7,7 +7,7 @@ Authors@R:
     c(person(given = "Tom",
              family = "Auer",
              role = c("aut", "cre"),
-             email = "mta45@cornell.edu",
+             email = "mes335@cornell.edu",
              comment = c(ORCID = "0000-0001-8619-7147")),
       person(given = "Daniel",
              family = "Fink",
@@ -24,7 +24,7 @@ Authors@R:
 Description: Tools to load, map, plot, and analyze eBird Status
     and Trends data products
     (<https://ebird.org/science/status-and-trends>).
-License: GPL-3 + file LICENSE
+License: GPL-3
 URL: https://github.com/CornellLabofOrnithology/ebirdst
 BugReports: 
     https://github.com/CornellLabofOrnithology/ebirdst/issues

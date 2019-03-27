@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -75,7 +75,7 @@
       <h1>Non-raster Data: Using Predictor Importance, Predictor Directionality,and Predictive Performance Metrics</h1>
                         <h4 class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2019-03-20</h4>
+            <h4 class="date">2019-03-26</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-non-raster.Rmd"><code>vignettes/ebirdst-non-raster.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-non-raster.Rmd</code></div>
@@ -126,13 +126,12 @@
 <a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co"># Because the non-raster data is large, there is a parameter on the</span></a>
 <a class="sourceLine" id="cb1-11" data-line-number="11"><span class="co"># download_data function that defaults to downloading only the raster data.</span></a>
 <a class="sourceLine" id="cb1-12" data-line-number="12"><span class="co"># To access the non-raster data, set tifs_only = FALSE.</span></a>
-<a class="sourceLine" id="cb1-13" data-line-number="13">sp_path &lt;-<span class="st"> </span><span class="kw"><a href="../reference/download_data.html">download_data</a></span>(<span class="dt">species =</span> <span class="st">"example_data"</span>, <span class="dt">tifs_only =</span> <span class="ot">FALSE</span>, </a>
-<a class="sourceLine" id="cb1-14" data-line-number="14">                         <span class="dt">force =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb1-15" data-line-number="15"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(sp_path)</a>
-<a class="sourceLine" id="cb1-16" data-line-number="16"><span class="co">#&gt; [1] "/Users/mes335/Library/Application Support/ebirdst/yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"</span></a>
-<a class="sourceLine" id="cb1-17" data-line-number="17"></a>
-<a class="sourceLine" id="cb1-18" data-line-number="18">pis &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_pis.html">load_pis</a></span>(sp_path)</a>
-<a class="sourceLine" id="cb1-19" data-line-number="19">pds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_pds.html">load_pds</a></span>(sp_path)</a></code></pre></div>
+<a class="sourceLine" id="cb1-13" data-line-number="13">sp_path &lt;-<span class="st"> </span><span class="kw"><a href="../reference/download_data.html">download_data</a></span>(<span class="dt">species =</span> <span class="st">"example_data"</span>, <span class="dt">tifs_only =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb1-14" data-line-number="14"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(sp_path)</a>
+<a class="sourceLine" id="cb1-15" data-line-number="15"><span class="co">#&gt; [1] "/Users/mes335/Library/Application Support/ebirdst/yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"</span></a>
+<a class="sourceLine" id="cb1-16" data-line-number="16"></a>
+<a class="sourceLine" id="cb1-17" data-line-number="17">pis &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_pis.html">load_pis</a></span>(sp_path)</a>
+<a class="sourceLine" id="cb1-18" data-line-number="18">pds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_pds.html">load_pds</a></span>(sp_path)</a></code></pre></div>
 </div>
 <div id="selecting-region-and-season" class="section level1">
 <h1 class="hasAnchor">

@@ -491,7 +491,7 @@ calc_effective_extent <- function(path, ext, pi_pd = c("pi", "pd"),
 #' Generate the color palettes used in the eBird Status and Trends relative
 #' abundance maps.
 #'
-#' @param n integer; the number of colors (≥ 1) to be in the palette.
+#' @param n integer; the number of colors to be in the palette.
 #' @param season character; the season to generate colors for or "weekly" to
 #'   get the color palette used in the weekly abundance animations.
 #'

@@ -28,7 +28,7 @@
 #' \dontrun{
 #'
 #' # download and load example data
-#' sp_path <- download_data("example_data")
+#' sp_path <- download_data("example_data", tifs_only = FALSE)
 #'
 #' # define a spatiotemporal extent to plot
 #' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
@@ -262,7 +262,7 @@ compute_ppms <- function(path, ext) {
 #' \dontrun{
 #'
 #' # download and load example data
-#' sp_path <- download_data("example_data")
+#' sp_path <- download_data("example_data", tifs_only = FALSE)
 #'
 #' # plot monthly kappa
 #' plot_binary_by_time(path = sp_path, metric = "kappa", n_time_periods = 12)
@@ -345,7 +345,7 @@ plot_binary_by_time <- function(path,
 #' \dontrun{
 #'
 #' # download example data
-#' sp_path <- download_data("example_data")
+#' sp_path <- download_data("example_data", tifs_only = FALSE)
 #'
 #' # define a spatiotemporal extent to plot data from
 #' bb_vec <- c(xmin = -91, xmax = -82, ymin = 41, ymax = 48)

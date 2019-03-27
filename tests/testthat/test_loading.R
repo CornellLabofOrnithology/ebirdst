@@ -1,6 +1,8 @@
+skip_on_cran()
+
 context("Loading and subsetting functions")
 
-sp_path <- download_data("example_data", tifs_only = FALSE, force = TRUE)
+sp_path <- download_data("example_data", tifs_only = FALSE)
 lp_extent <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 45),
                             t = c(0.5, 0.6))
 
@@ -33,11 +35,11 @@ test_that("subset raster", {
   abund_sub <- ebirdst_subset(abunds, poly_extent)
   expect_gt(raster::ncell(abund_sub), 1)
   expect_equal(raster::nlayers(abund_sub), 5)
-  expect_is(abund_sub, "RasterBrick")
 
+  expect_is(abund_sub, "RasterBrick")
   ### error tests
-  # broken path
   expect_error(load_raster("abundance_umean", "/bad/path"))
+  # broken path
 
   # reversed min max
   expect_error(ebirdst_extent(c(xmin = -83, xmax = -86, ymin = 42, ymax = 45)))

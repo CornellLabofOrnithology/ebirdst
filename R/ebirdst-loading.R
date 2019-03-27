@@ -62,19 +62,13 @@ download_data <- function(species,
     run <- ebirdst::ebirdst_runs$run_name[row_id]
   }
 
-  if (dir.exists(file.path(path, run))) {
-    if (!force) {
-      message("Data already exists, use force = TRUE to re-download.")
-      return(invisible(normalizePath(file.path(path, run))))
-    }
-  }
-
   # get bucket contents
   s3_contents <- xml2::xml_ns_strip(xml2::read_xml(bucket_url))
   s3_contents <- xml2::xml_find_all(s3_contents, ".//Contents")
   if (length(s3_contents) == 0) {
     stop(sprintf("Files not found on AWS S3 for species = %s", species))
   }
+
   # store filename and size
   s3_files <- data.frame(
     file = xml2::xml_text(xml2::xml_find_all(s3_contents, ".//Key")),
@@ -101,11 +95,27 @@ download_data <- function(species,
   # prepare download paths
   s3_files$s3_path <- paste0(bucket_url, s3_files$file)
   s3_files$local_path <- file.path(path, s3_files$file)
+  s3_files$exists <- file.exists(s3_files$local_path)
   # create necessary directories
   dirs <- unique(dirname(s3_files$local_path))
   for (d in dirs) {
     dir.create(d, showWarnings = FALSE, recursive = TRUE)
   }
+
+  # check if already exists
+  if (all(s3_files$exists)) {
+    if (!force) {
+      message("Data already exists, use force = TRUE to re-download.")
+      return(invisible(normalizePath(file.path(path, run))))
+    }
+  } else if (any(s3_files$exists)) {
+    if (!force) {
+      message(paste("Some files already exist, only downloading new files.",
+                    "\nUse force = TRUE to re-download all files."))
+      s3_files <- s3_files[s3_files$exists, ]
+    }
+  }
+
   # download
   for(f in 1:nrow(s3_files)) {
     dl_response <- utils::download.file(s3_files[f, ]$s3_path,
@@ -292,7 +302,7 @@ parse_raster_dates <- function(x) {
 #' \dontrun{
 #'
 #' # download example data
-#' sp_path <- download_data("example_data")
+#' sp_path <- download_data("example_data", tifs_only = FALSE)
 #'
 #' # stixel summaries
 #' summaries <- ebirdst:::load_summary(sp_path)
@@ -346,7 +356,7 @@ load_summary <- function(path, return_sf = FALSE) {
 #' \dontrun{
 #'
 #' # download example data
-#' sp_path <- download_data("example_data")
+#' sp_path <- download_data("example_data", tifs_only = FALSE)
 #'
 #' # load predictor importance
 #' pis <- load_pis(sp_path)
@@ -419,7 +429,7 @@ load_pis <- function(path, return_sf = FALSE) {
 #' \dontrun{
 #'
 #' # download example data
-#' sp_path <- download_data("example_data")
+#' sp_path <- download_data("example_data", tifs_only = FALSE)
 #'
 #' # load partial dependence
 #' pds <- load_pds(sp_path)
@@ -487,7 +497,7 @@ load_pds <- function(path, return_sf = FALSE) {
 #' \dontrun{
 #'
 #' # download example data
-#' sp_path <- download_data("example_data")
+#' sp_path <- download_data("example_data", tifs_only = FALSE)
 #'
 #' # test data
 #' test_data <- ebirdst:::load_test_data_raw(sp_path)
@@ -547,7 +557,7 @@ load_test_data_raw <- function(path, return_sf = FALSE) {
 #' \dontrun{
 #'
 #' # download example data
-#' sp_path <- download_data("example_data")
+#' sp_path <- download_data("example_data", tifs_only = FALSE)
 #'
 #' # test data
 #' test_data <- load_test_data(sp_path)
