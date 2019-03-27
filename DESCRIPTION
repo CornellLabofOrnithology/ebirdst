@@ -52,7 +52,8 @@ Imports:
     tools,
     utils,
     viridisLite,
-    xml2
+    xml2,
+    rgdal
 Suggests: 
     covr,
     fields,

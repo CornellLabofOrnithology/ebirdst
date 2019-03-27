@@ -20,5 +20,6 @@ file.copy(list.files(".", "README.*png$", full.names = TRUE), "docs/")
 Sys.unsetenv("BUILD_VIGNETTES")
 
 chk <- rhub::check_for_cran(platforms = c("windows-x86_64-devel",
+                                          "debian-gcc-devel",
                                           "fedora-clang-devel"))
 chk

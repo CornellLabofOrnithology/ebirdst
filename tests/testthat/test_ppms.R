@@ -1,5 +1,3 @@
-skip_on_cran()
-
 context("PPM functions")
 
 sp_path <- download_data("example_data", tifs_only = FALSE)
