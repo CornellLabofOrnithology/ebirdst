@@ -6,7 +6,7 @@ First CRAN release
 
 - local OS X install, R 3.5.2
 - OS X (travis-ci), R 3.5.2
-- ubuntu 14.04 (travis-ci), R 3.5.2
+- ubuntu 16.04 (travis-ci), R 3.5.2
 - Windows (appveyor), R 3.5.2
 - Rhub
   - Fedora Linux, R-devel, clang, gfortran
