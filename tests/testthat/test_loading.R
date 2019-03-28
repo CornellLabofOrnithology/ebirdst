@@ -4,9 +4,20 @@ sp_path <- download_data("example_data", tifs_only = FALSE)
 lp_extent <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 45),
                             t = c(0.5, 0.6))
 
+f <- "https://clo-is-da-example-data.s3.amazonaws.com/yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83/results/tifs/yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83_hr_2016_abundance_umean.tif"
+f_tif <- basename(f)
+ad <- rappdirs::user_data_dir("ebirdst")
+if (!dir.exists(ad)) {
+  dir.create(ad, recursive = TRUE)
+}
+f_dl <- file.path(ad, f_tif)
+download.file(f, f_dl, quiet = TRUE, mode = "wb")
+
+
 test_that("subset raster", {
-  expect_true(requireNamespace("rgdal"))
+  #skip_on_cran()
   abunds <- load_raster("abundance_umean", sp_path)
+  abunds <- raster::stack(f_dl)
   expect_is(abunds, "RasterStack")
 
   abund_sub <- ebirdst_subset(abunds, lp_extent)
@@ -51,6 +62,7 @@ test_that("subset raster", {
 context("label_raster_stack and parse_raster_dates")
 
 test_that("ebirdst label_raster_stack", {
+  skip_on_cran()
   abunds <- load_raster("abundance_umean", sp_path)
 
   # expected
