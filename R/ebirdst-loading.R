@@ -79,6 +79,8 @@ download_data <- function(species,
   # filter to desired run/species
   s3_files <- s3_files[as.numeric(s3_files$size) > 0 &
                          grepl(run, s3_files$file), ]
+  # don't need rdata file
+  s3_files <- s3_files[!grepl("RData$", s3_files$file), ]
   if (nrow(s3_files) == 0) {
     stop(sprintf("Files not found on AWS S3 for species = %s", species))
   }
@@ -112,21 +114,22 @@ download_data <- function(species,
     if (!force) {
       message(paste("Some files already exist, only downloading new files.",
                     "\nUse force = TRUE to re-download all files."))
-      s3_files <- s3_files[s3_files$exists, ]
+      s3_files <- s3_files[!s3_files$exists, ]
     }
   }
 
   # download
-  for(f in 1:nrow(s3_files)) {
-    dl_response <- utils::download.file(s3_files[f, ]$s3_path,
-                                        s3_files[f, ]$local_path,
-                                        quiet = TRUE)
+  for(i in seq_len(nrow(s3_files))) {
+    dl_response <- utils::download.file(s3_files$s3_path[i],
+                                        s3_files$local_path[i],
+                                        quiet = TRUE,
+                                        mode = "wb")
     if (dl_response != 0) {
       stop("Error downloading files from AWS S3")
     }
   }
 
-  return(invisible(normalizePath(file.path(path, run))))
+  return(invisible(normalizePath(file.path(path, run), winslash = "/")))
 }
 
 
