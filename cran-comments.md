@@ -18,4 +18,4 @@ First CRAN release
 0 errors | 0 warnings | 2 note
 
 - This is a new release
-- "eBird" detected as a possibly mis-spelled word in DESCRIPTION, but this it is spelled correctly
+- "eBird" detected as a possibly mis-spelled word in DESCRIPTION, but it is spelled correctly
