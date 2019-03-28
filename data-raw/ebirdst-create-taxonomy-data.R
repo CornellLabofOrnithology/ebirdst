@@ -16,6 +16,8 @@ names(ebirdst_runs) <- names(ebirdst_runs) %>%
   str_replace_all("\\.", "_")
 
 # add season definitions
+# download regionSummaries-2018.csv from website manually
+# https://ebird.org/science/status-and-trends/download-data/download?package=all-stats-regional
 all_stats <- read_csv("data-raw/regionSummaries-2018.csv",
                       col_types = cols(.default = col_character())) %>%
   select(species_code, season_name, start_dt, end_dt) %>%

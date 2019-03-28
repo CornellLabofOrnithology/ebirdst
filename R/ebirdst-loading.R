@@ -129,7 +129,7 @@ download_data <- function(species,
     }
   }
 
-  return(invisible(normalizePath(file.path(path, run), winslash = "/")))
+  return(invisible(normalizePath(file.path(path, run))))
 }
 
 

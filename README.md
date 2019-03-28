@@ -5,7 +5,7 @@ ebirdst: Tools to Load, Map, Plot, and Analyze eBird Status and Trends Data Prod
 [![License: GPL
 v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 [![AppVeyor build
-status](https://ci.appveyor.com/api/projects/status/github/CornellLabofOrnithology/ebirdst?branch=master&svg=true)](https://ci.appveyor.com/project/CornellLabofOrnithology/ebirdst)
+status](https://ci.appveyor.com/api/projects/status/github/mstrimas/ebirdst?branch=master&svg=true)](https://ci.appveyor.com/project/mstrimas/ebirdst)
 [![Travis build
 status](https://travis-ci.org/CornellLabofOrnithology/ebirdst.svg?branch=master)](https://travis-ci.org/CornellLabofOrnithology/ebirdst)
 [![Coverage
