@@ -9,7 +9,7 @@ calc_bins(x)
 }
 \arguments{
 \item{x}{RasterStack or RasterBrick; original eBird Status and Trends product
-raster GeoTiff with 52 bands, one for each week.}
+raster GeoTIFF with 52 bands, one for each week.}
 }
 \value{
 A list with two elements: \code{bins} is a vector containing the break

@@ -4,7 +4,7 @@
 #' spatially and temporally. This function constructs these o
 #'
 #' @param x the spatial extent; either a rectangular bounding box (defined as a
-#'   vector of numnbers representing the coordinates of the boundaries or an
+#'   vector of numbers representing the coordinates of the boundaries or an
 #'   [sf::st_bbox()] object) or a polygon (an [sf::sf()] object). See Details
 #'   for further explanation of the format of x.
 #' @param t the temporal extent; a 2-element vector of the start and end dates
@@ -28,14 +28,14 @@
 #'   this latter case, a coordinate reference system must be provided explicitly
 #'   via the `crs` argument (`crs = 4326` is the default and is a short form for
 #'   unprojected lat/long coordinates). For a polygon spatial extent, `x` should
-#'   be either an `sf` or `sfc` object (with featuer type `POLYGON` or
+#'   be either an `sf` or `sfc` object (with feature type `POLYGON` or
 #'   `MULTIPOLYGON`) from the `sf` package. To import data from a Shapefile or
 #'   GeoPackage into this format, use `sf::read_sf()`.
 #'
 #'   The temporal extent defines the start and end dates of the time period.
 #'   These are most easily provided as Date objects or date strings in ISO
 #'   format ("YYYY-MM-DD"). If dates are defined as strings, the year can be
-#'   ommitted (e.g. "MM-DD"). Alternativley, dates can be defined in terms of
+#'   omitted (e.g. "MM-DD"). Alternatively, dates can be defined in terms of
 #'   fractions of the year, e.g. `t = c(0.25, 0.5) ` would subset to data within
 #'   the second quarter of the year. In all cases, dates can wrap around the
 #'   year, e.g. c("2016-12-01", "2016-01-31") would subset to data in December
@@ -135,7 +135,7 @@ ebirdst_extent.sf <- function(x, t, ...) {
 
 #' Transform a spatiotemporal extent to a different CRS
 #'
-#' Transform an eBird Status and Trends exent object to a different
+#' Transform an eBird Status and Trends extent object to a different
 #' coordinate reference system. This is most commonly required to transform the
 #' extent to the sinusoidal CRS used by the eBird Status and Trends rasters.
 #'

@@ -205,13 +205,13 @@ load_raster <- function(product = c("abundance_umean",
 #' Labels 52 week RasterStack with the dates for each band
 #'
 #' The `raster` package does not allow layer names to be saved with the bands of
-#' a multi-band GeoTiff. Accordingly, all eBird Status and Trends products
+#' a multi-band GeoTIFF. Accordingly, all eBird Status and Trends products
 #' raster results cover the entire 52 week temporal extent of analysis. For
 #' convenience, this function labels the RasterStack once it has been loaded
 #' with the dates for each band.
 #'
 #' @param x `RasterStack` or `RasterBrick`; original eBird Status and Trends
-#'   product raster GeoTiff with 52 bands, one for each week.
+#'   product raster GeoTIFF with 52 bands, one for each week.
 #'
 #' @return A `RasterStack` or `RasterBrick` with names assigned for the dates in
 #'   the format of "XYYYY.MM.DD" per raster package constraints. The Raster*
@@ -264,11 +264,11 @@ label_raster_stack <- function(x) {
 #'
 #' The [label_raster_stack()] function labels the dates of the estimate rasters
 #' in the format of "XYYYY.MM.DD", because of constraints in the `raster`
-#' packge. This function converts that character vector into an ISO compliant
+#' package. This function converts that character vector into an ISO compliant
 #' Date vector.
 #'
 #' @param x `Raster` object; full or subset of original eBird Status and
-#'   Trends product raster GeoTiff.
+#'   Trends product raster GeoTIFF.
 #'
 #' @return Date vector.
 #'

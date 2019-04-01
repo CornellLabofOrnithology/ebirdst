@@ -139,7 +139,7 @@ spatially and temporally. This function constructs these o</p>
     <tr>
       <th>x</th>
       <td><p>the spatial extent; either a rectangular bounding box (defined as a
-vector of numnbers representing the coordinates of the boundaries or an
+vector of numbers representing the coordinates of the boundaries or an
 <code><a href='https://www.rdocumentation.org/packages/sf/topics/st_bbox'>sf::st_bbox()</a></code> object) or a polygon (an <code><a href='https://www.rdocumentation.org/packages/sf/topics/sf'>sf::sf()</a></code> object). See Details
 for further explanation of the format of x.</p></td>
     </tr>
@@ -182,13 +182,13 @@ edges directly as a named vector with elements xmin, xmax, ymin, and ymax
 this latter case, a coordinate reference system must be provided explicitly
 via the <code>crs</code> argument (<code>crs = 4326</code> is the default and is a short form for
 unprojected lat/long coordinates). For a polygon spatial extent, <code>x</code> should
-be either an <code>sf</code> or <code>sfc</code> object (with featuer type <code>POLYGON</code> or
+be either an <code>sf</code> or <code>sfc</code> object (with feature type <code>POLYGON</code> or
 <code>MULTIPOLYGON</code>) from the <code>sf</code> package. To import data from a Shapefile or
 GeoPackage into this format, use <code><a href='https://www.rdocumentation.org/packages/sf/topics/st_read'>sf::read_sf()</a></code>.</p>
 <p>The temporal extent defines the start and end dates of the time period.
 These are most easily provided as Date objects or date strings in ISO
 format ("YYYY-MM-DD"). If dates are defined as strings, the year can be
-ommitted (e.g. "MM-DD"). Alternativley, dates can be defined in terms of
+omitted (e.g. "MM-DD"). Alternatively, dates can be defined in terms of
 fractions of the year, e.g. <code>t = c(0.25, 0.5) </code> would subset to data within
 the second quarter of the year. In all cases, dates can wrap around the
 year, e.g. c("2016-12-01", "2016-01-31") would subset to data in December

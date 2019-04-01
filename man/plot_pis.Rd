@@ -8,7 +8,7 @@ plot_pis(pis, ext, by_cover_class = FALSE, n_top_pred = 50,
   pretty_names = TRUE, plot = TRUE)
 }
 \arguments{
-\item{pis}{data.frame; predictor importance data rom \code{\link[=load_pis]{load_pis()}}.}
+\item{pis}{data.frame; predictor importance data from \code{\link[=load_pis]{load_pis()}}.}
 
 \item{ext}{\link{ebirdst_extent} object; the spatiotemporal extent to
 filter the data to. Required, since results are less meaningful over large
@@ -29,7 +29,7 @@ predictors.}
 \value{
 Plots a boxplot of predictor importance and invisibly returns a named
 vector of top predictors, and their median predictor importance, based on
-the \code{n_top_pred} param.
+the \code{n_top_pred} parameter.
 }
 \description{
 For all of the available predictors in a single set of species eBird

@@ -8,7 +8,7 @@ label_raster_stack(x)
 }
 \arguments{
 \item{x}{\code{RasterStack} or \code{RasterBrick}; original eBird Status and Trends
-product raster GeoTiff with 52 bands, one for each week.}
+product raster GeoTIFF with 52 bands, one for each week.}
 }
 \value{
 A \code{RasterStack} or \code{RasterBrick} with names assigned for the dates in
@@ -19,7 +19,7 @@ format.
 }
 \description{
 The \code{raster} package does not allow layer names to be saved with the bands of
-a multi-band GeoTiff. Accordingly, all eBird Status and Trends products
+a multi-band GeoTIFF. Accordingly, all eBird Status and Trends products
 raster results cover the entire 52 week temporal extent of analysis. For
 convenience, this function labels the RasterStack once it has been loaded
 with the dates for each band.
