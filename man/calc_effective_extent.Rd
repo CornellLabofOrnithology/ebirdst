@@ -41,7 +41,7 @@ selected stixels are contributing information, ranging from 0 to 1.
 \dontrun{
 
 # download and load example data
-sp_path <- download_data("example_data")
+sp_path <- ebirdst_download("example_data")
 
 # define a spatioremporal extent
 bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)

@@ -16,7 +16,7 @@
 #' \dontrun{
 #'
 #' # download and load example abundance data
-#' sp_path <- download_data("example_data")
+#' sp_path <- ebirdst_download("example_data")
 #' abd <- load_raster("abundance_umean", sp_path)
 #'
 #' # calculate full extent
@@ -90,7 +90,7 @@ calc_full_extent <- function(x) {
 #' \dontrun{
 #'
 #' # download and load example abundance data
-#' sp_path <- download_data("example_data")
+#' sp_path <- ebirdst_download("example_data")
 #' abd <- load_raster("abundance_umean", sp_path)
 #'
 #' # calculate bins
@@ -202,7 +202,7 @@ calc_bins <- function(x) {
 #' \dontrun{
 #'
 #' # download and load example data
-#' sp_path <- download_data("example_data")
+#' sp_path <- ebirdst_download("example_data")
 #'
 #' # define a spatiotemporal extent to plot
 #' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
@@ -397,7 +397,7 @@ map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
 #' \dontrun{
 #'
 #' # download and load example data
-#' sp_path <- download_data("example_data")
+#' sp_path <- ebirdst_download("example_data")
 #'
 #' # define a spatioremporal extent
 #' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)

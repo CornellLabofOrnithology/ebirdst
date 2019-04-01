@@ -27,7 +27,7 @@ counts and model predicted relative occurrence and abundance values.
 \dontrun{
 
 # download example data
-sp_path <- download_data("example_data", tifs_only = FALSE)
+sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
 # test data
 test_data <- ebirdst:::load_test_data_raw(sp_path)

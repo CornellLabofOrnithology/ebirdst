@@ -25,7 +25,7 @@ Probability, and Abundance.
 \dontrun{
 
 # download example data
-sp_path <- download_data("example_data", tifs_only = FALSE)
+sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
 # define a spatiotemporal extent to plot data from
 bb_vec <- c(xmin = -91, xmax = -82, ymin = 41, ymax = 48)

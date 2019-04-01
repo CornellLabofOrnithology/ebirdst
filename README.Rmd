@@ -54,7 +54,7 @@ library(rnaturalearth)
 # example data are for yellow-bellied sapsucker in michigan
 # fby default ile will be stored in a persistent data directory:
 # rappdirs::user_data_dir("ebirdst"))
-sp_path <- download_data(species = "example_data")
+sp_path <- ebirdst_download(species = "example_data")
 
 # load estimated relative abundance and label with dates
 # this raster stack has 52 layers, one for each week of the year

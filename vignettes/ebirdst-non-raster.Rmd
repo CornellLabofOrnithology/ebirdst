@@ -60,15 +60,15 @@ library(ebirdst)
 
 # DOWNLOAD DATA
 # Currently, example data is available on a public s3 bucket. The following 
-# download_data() function copies the species results to a selected path and 
+# ebirdst_download() function copies the species results to a selected path and 
 # returns the full path of the results. Please note that the example_data is
 # for Yellow-bellied Sapsucker and has the same run code as the real data,
 # so if you download both, make sure you put the example_data somewhere else.
 
 # Because the non-raster data is large, there is a parameter on the
-# download_data function that defaults to downloading only the raster data.
+# ebirdst_download function that defaults to downloading only the raster data.
 # To access the non-raster data, set tifs_only = FALSE.
-sp_path <- download_data(species = "example_data", tifs_only = FALSE)
+sp_path <- ebirdst_download(species = "example_data", tifs_only = FALSE)
 print(sp_path)
 
 pis <- load_pis(sp_path)

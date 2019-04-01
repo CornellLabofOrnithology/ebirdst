@@ -133,7 +133,7 @@ ebirdst_download <- function(species,
   return(invisible(normalizePath(file.path(path, run))))
 }
 
-#' @describeIn ebirdst_download Deprecated, use ebirdst_download
+#' @describeIn ebirdst_download deprecated, use `ebirdst_download()`
 download_data <- function(species,
                           path = rappdirs::user_data_dir("ebirdst"),
                           tifs_only = TRUE,
@@ -164,7 +164,7 @@ download_data <- function(species,
 #' \dontrun{
 #'
 #' # download example data
-#' sp_path <- download_data("example_data")
+#' sp_path <- ebirdst_download("example_data")
 #'
 #' # load data
 #' load_raster("abundance_umean", sp_path)
@@ -225,7 +225,7 @@ load_raster <- function(product = c("abundance_umean",
 #' \dontrun{
 #'
 #' # download and load example abundance data
-#' sp_path <- download_data("example_data")
+#' sp_path <- ebirdst_download("example_data")
 #' abd <- load_raster("abundance_umean", sp_path)
 #'
 #' # label
@@ -278,7 +278,7 @@ label_raster_stack <- function(x) {
 #' \dontrun{
 #'
 #' # download and load example abundance data
-#' sp_path <- download_data("example_data")
+#' sp_path <- ebirdst_download("example_data")
 #' abd <- load_raster("abundance_umean", sp_path)
 #'
 #' # label
@@ -317,7 +317,7 @@ parse_raster_dates <- function(x) {
 #' \dontrun{
 #'
 #' # download example data
-#' sp_path <- download_data("example_data", tifs_only = FALSE)
+#' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
 #' # stixel summaries
 #' summaries <- ebirdst:::load_summary(sp_path)
@@ -371,7 +371,7 @@ load_summary <- function(path, return_sf = FALSE) {
 #' \dontrun{
 #'
 #' # download example data
-#' sp_path <- download_data("example_data", tifs_only = FALSE)
+#' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
 #' # load predictor importance
 #' pis <- load_pis(sp_path)
@@ -444,7 +444,7 @@ load_pis <- function(path, return_sf = FALSE) {
 #' \dontrun{
 #'
 #' # download example data
-#' sp_path <- download_data("example_data", tifs_only = FALSE)
+#' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
 #' # load partial dependence
 #' pds <- load_pds(sp_path)
@@ -512,7 +512,7 @@ load_pds <- function(path, return_sf = FALSE) {
 #' \dontrun{
 #'
 #' # download example data
-#' sp_path <- download_data("example_data", tifs_only = FALSE)
+#' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
 #' # test data
 #' test_data <- ebirdst:::load_test_data_raw(sp_path)
@@ -572,7 +572,7 @@ load_test_data_raw <- function(path, return_sf = FALSE) {
 #' \dontrun{
 #'
 #' # download example data
-#' sp_path <- download_data("example_data", tifs_only = FALSE)
+#' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
 #' # test data
 #' test_data <- load_test_data(sp_path)
