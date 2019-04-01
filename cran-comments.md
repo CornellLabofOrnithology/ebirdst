@@ -4,10 +4,10 @@ First CRAN release
 
 ## Test environments
 
-- local OS X install, R 3.5.2
-- OS X (travis-ci), R 3.5.2
+- local OS X install, R 3.5.3
+- OS X (travis-ci), R 3.5.3
 - ubuntu 16.04 (travis-ci), R 3.5.2
-- Windows (appveyor), R 3.5.2
+- Windows (appveyor), R 3.5.3
 - Rhub
   - Fedora Linux, R-devel, clang, gfortran
   - Windows Server 2008 R2 SP1, R-devel, 32/64 bit
