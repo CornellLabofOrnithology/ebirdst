@@ -25,7 +25,7 @@
 #' @examples
 #' \dontrun{
 #' # download example data
-#' sp_path <- download_data("example_data", tifs_only = FALSE)
+#' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
 #' # test data to sample
 #' test_data <- load_test_data(sp_path, return_sf = TRUE)

@@ -36,7 +36,7 @@ otherwise rangewide performance will be shown.
 \dontrun{
 
 # download and load example data
-sp_path <- download_data("example_data", tifs_only = FALSE)
+sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
 # plot monthly kappa
 plot_binary_by_time(path = sp_path, metric = "kappa", n_time_periods = 12)

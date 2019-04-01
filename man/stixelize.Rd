@@ -39,7 +39,7 @@ object
 \dontrun{
 
 # download example data
-sp_path <- download_data("example_data", tifs_only = FALSE)
+sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
 # load predictor importance
 pis <- load_pis(sp_path)

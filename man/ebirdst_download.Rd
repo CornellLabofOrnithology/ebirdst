@@ -42,7 +42,7 @@ than the full dataset making these data quicker to download and process.
 }
 \section{Functions}{
 \itemize{
-\item \code{download_data}: Deprecated, use ebirdst_download
+\item \code{download_data}: deprecated, use \code{ebirdst_download()}
 }}
 
 \examples{

@@ -23,7 +23,7 @@ Date vector.
 \dontrun{
 
 # download and load example abundance data
-sp_path <- download_data("example_data")
+sp_path <- ebirdst_download("example_data")
 abd <- load_raster("abundance_umean", sp_path)
 
 # label

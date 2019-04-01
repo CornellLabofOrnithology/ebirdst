@@ -36,7 +36,7 @@ metrics.
 \dontrun{
 
 # download and load example data
-sp_path <- download_data("example_data", tifs_only = FALSE)
+sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
 # define a spatiotemporal extent to plot
 bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)

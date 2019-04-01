@@ -4,8 +4,8 @@ ebirdst: Tools to Load, Map, Plot, and Analyze eBird Status and Trends Data Prod
 
 [![License: GPL
 v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
-[![AppVeyor build
-status](https://ci.appveyor.com/api/projects/status/github/mstrimas/ebirdst?branch=master&svg=true)](https://ci.appveyor.com/project/mstrimas/ebirdst)
+[![AppVeyor Build
+status](https://ci.appveyor.com/api/projects/status/v7cyxwquwrxxa5l6/branch/master?svg=true)](https://ci.appveyor.com/project/mstrimas/ebirdst/branch/master)
 [![Travis build
 status](https://travis-ci.org/CornellLabofOrnithology/ebirdst.svg?branch=master)](https://travis-ci.org/CornellLabofOrnithology/ebirdst)
 [![Coverage
@@ -65,7 +65,7 @@ directly, outside of R.
     # example data are for yellow-bellied sapsucker in michigan
     # fby default ile will be stored in a persistent data directory:
     # rappdirs::user_data_dir("ebirdst"))
-    sp_path <- download_data(species = "example_data")
+    sp_path <- ebirdst_download(species = "example_data")
 
     # load estimated relative abundance and label with dates
     # this raster stack has 52 layers, one for each week of the year

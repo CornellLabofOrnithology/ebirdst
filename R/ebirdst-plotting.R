@@ -28,7 +28,7 @@
 #' \dontrun{
 #'
 #' # download and load example data
-#' sp_path <- download_data("example_data", tifs_only = FALSE)
+#' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #' pis <- load_pis(sp_path)
 #'
 #' # define a spatiotemporal extent to plot data from
@@ -172,7 +172,7 @@ plot_pis <- function(pis, ext,
 #' \dontrun{
 #'
 #' # download and load example data
-#' sp_path <- download_data("example_data", tifs_only = FALSE)
+#' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #' pds <- load_pds(sp_path)
 #'
 #' # define a spatiotemporal extent to plot data from

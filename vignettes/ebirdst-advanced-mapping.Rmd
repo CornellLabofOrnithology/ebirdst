@@ -35,7 +35,7 @@ knitr::opts_chunk$set(eval = nzchar(Sys.getenv("BUILD_VIGNETTES")))
 
 # Introduction
 
-This vignette describes how to recreate the seasonal map products found on the [eBird Status and Trends pages](https://ebird.org/science/status-and-trends). First, the vignette will cover how to average the abundance data seasonally, then it will proceed with examples of making abundance maps, aggregating and smoothing data for range maps, and, finally, provide examples of calculating regional summary statistic. Throughout this vignette we will use the simplified example dataset available through the `download_data()` function, which consists of the Yellow-bellied Sapsucker data spatially subset to the state of Michigan. However, these methods can be applied to the full datasets for any of the eBird Status and Trends species.
+This vignette describes how to recreate the seasonal map products found on the [eBird Status and Trends pages](https://ebird.org/science/status-and-trends). First, the vignette will cover how to average the abundance data seasonally, then it will proceed with examples of making abundance maps, aggregating and smoothing data for range maps, and, finally, provide examples of calculating regional summary statistic. Throughout this vignette we will use the simplified example dataset available through the `ebirdst_download()` function, which consists of the Yellow-bellied Sapsucker data spatially subset to the state of Michigan. However, these methods can be applied to the full datasets for any of the eBird Status and Trends species.
 
 Let's begin by loading all the packages we'll need for this vignette.
 
@@ -61,7 +61,7 @@ Before we do anything else, we'll need to download and load the example abundanc
 ```{r st-download}
 # download to a temp directory for the vigette
 # in practice, change to permanent directory the status and trends downloads
-sp_path <- download_data(species = "example_data")
+sp_path <- ebirdst_download(species = "example_data")
 # load the abundance data
 # this automaticaaly labels layers with their dates
 abd <- load_raster("abundance_umean", path = sp_path)

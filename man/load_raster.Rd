@@ -27,7 +27,7 @@ for a given product and species as a \code{RasterStack} object.
 \dontrun{
 
 # download example data
-sp_path <- download_data("example_data")
+sp_path <- ebirdst_download("example_data")
 
 # load data
 load_raster("abundance_umean", sp_path)
