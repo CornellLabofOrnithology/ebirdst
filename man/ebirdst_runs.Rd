@@ -27,7 +27,7 @@ ebirdst_runs
 }
 \description{
 A dataset containing the species for which eBird Status and Trends data are
-avialable. In addition, the dates defining the boundaries of the seasons are
+available In addition, the dates defining the boundaries of the seasons are
 provided. These seasons are defined on a species-specific basis through
 expert review. For information on the details of defining seasons, please see
 the \href{https://ebird.org/science/status-and-trends/faq#seasons}{seasons section of the FAQ}. Note that

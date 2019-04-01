@@ -16,7 +16,7 @@ integer EPSG code, or a \code{crs} object generated with \code{\link[sf:st_crs]{
 An \link{ebirdst_extent} object in the new CRS.
 }
 \description{
-Transform an eBird Status and Trends exent object to a different
+Transform an eBird Status and Trends extent object to a different
 coordinate reference system. This is most commonly required to transform the
 extent to the sinusoidal CRS used by the eBird Status and Trends rasters.
 }

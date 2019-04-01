@@ -23,7 +23,7 @@ spatiotemporal extents.}
 \item{bootstrap_smooth}{logical; the ideal visualization of the PD data is a
 pointwise GAM smoothing of the individual stixel PD values. This argument
 specifies whether this should be done directly on the full PD dataset
-(\code{bootstrap_smooth = FALSE}) or by subsampling abd bootstrapping. The
+(\code{bootstrap_smooth = FALSE}) or by subsampling and bootstrapping. The
 latter approach deals with the randomness in the data and can be more
 efficient for large datasets. Defaults to TRUE.}
 

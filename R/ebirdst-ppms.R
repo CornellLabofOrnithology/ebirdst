@@ -239,7 +239,7 @@ compute_ppms <- function(path, ext) {
 #'
 #' For a specified number of time periods (ideally weeks or months), plots one
 #' of four (Kappa, AUC, Sensitivity, Specificity) box plots. Provide an
-#' `ebirdst_extent` onject to see performance within a spatiotemporal extent,
+#' `ebirdst_extent` object to see performance within a spatiotemporal extent,
 #' otherwise rangewide performance will be shown.
 #'
 #' @param path character; full path to directory containing the eBird Status and

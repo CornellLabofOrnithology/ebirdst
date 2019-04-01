@@ -8,7 +8,7 @@ parse_raster_dates(x)
 }
 \arguments{
 \item{x}{\code{Raster} object; full or subset of original eBird Status and
-Trends product raster GeoTiff.}
+Trends product raster GeoTIFF.}
 }
 \value{
 Date vector.
@@ -16,7 +16,7 @@ Date vector.
 \description{
 The \code{\link[=label_raster_stack]{label_raster_stack()}} function labels the dates of the estimate rasters
 in the format of "XYYYY.MM.DD", because of constraints in the \code{raster}
-packge. This function converts that character vector into an ISO compliant
+package. This function converts that character vector into an ISO compliant
 Date vector.
 }
 \examples{

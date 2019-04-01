@@ -20,7 +20,7 @@ ebirdst_extent(x, t, ...)
 }
 \arguments{
 \item{x}{the spatial extent; either a rectangular bounding box (defined as a
-vector of numnbers representing the coordinates of the boundaries or an
+vector of numbers representing the coordinates of the boundaries or an
 \code{\link[sf:st_bbox]{sf::st_bbox()}} object) or a polygon (an \code{\link[sf:sf]{sf::sf()}} object). See Details
 for further explanation of the format of x.}
 
@@ -57,14 +57,14 @@ edges directly as a named vector with elements xmin, xmax, ymin, and ymax
 this latter case, a coordinate reference system must be provided explicitly
 via the \code{crs} argument (\code{crs = 4326} is the default and is a short form for
 unprojected lat/long coordinates). For a polygon spatial extent, \code{x} should
-be either an \code{sf} or \code{sfc} object (with featuer type \code{POLYGON} or
+be either an \code{sf} or \code{sfc} object (with feature type \code{POLYGON} or
 \code{MULTIPOLYGON}) from the \code{sf} package. To import data from a Shapefile or
 GeoPackage into this format, use \code{sf::read_sf()}.
 
 The temporal extent defines the start and end dates of the time period.
 These are most easily provided as Date objects or date strings in ISO
 format ("YYYY-MM-DD"). If dates are defined as strings, the year can be
-ommitted (e.g. "MM-DD"). Alternativley, dates can be defined in terms of
+omitted (e.g. "MM-DD"). Alternatively, dates can be defined in terms of
 fractions of the year, e.g. \code{t = c(0.25, 0.5) } would subset to data within
 the second quarter of the year. In all cases, dates can wrap around the
 year, e.g. c("2016-12-01", "2016-01-31") would subset to data in December

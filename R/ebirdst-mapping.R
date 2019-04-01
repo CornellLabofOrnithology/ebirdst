@@ -73,7 +73,7 @@ calc_full_extent <- function(x) {
 #' un-transforms the bins.
 #'
 #' @param x RasterStack or RasterBrick; original eBird Status and Trends product
-#'   raster GeoTiff with 52 bands, one for each week.
+#'   raster GeoTIFF with 52 bands, one for each week.
 #'
 #' @return A list with two elements: `bins` is a vector containing the break
 #'   points of the bins and `power` is the optimal power used to transform data

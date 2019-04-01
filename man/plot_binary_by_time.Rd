@@ -29,7 +29,7 @@ Boxplot of PPM over time.
 \description{
 For a specified number of time periods (ideally weeks or months), plots one
 of four (Kappa, AUC, Sensitivity, Specificity) box plots. Provide an
-\code{ebirdst_extent} onject to see performance within a spatiotemporal extent,
+\code{ebirdst_extent} object to see performance within a spatiotemporal extent,
 otherwise rangewide performance will be shown.
 }
 \examples{

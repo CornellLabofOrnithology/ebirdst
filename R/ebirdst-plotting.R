@@ -5,7 +5,7 @@
 #' importances, from highest to lowest. Many function parameters allow for
 #' customized plots.
 #'
-#' @param pis data.frame; predictor importance data rom [load_pis()].
+#' @param pis data.frame; predictor importance data from [load_pis()].
 #' @param ext [ebirdst_extent] object; the spatiotemporal extent to
 #'   filter the data to. Required, since results are less meaningful over large
 #'   spatiotemporal extents.
@@ -20,7 +20,7 @@
 #'
 #' @return Plots a boxplot of predictor importance and invisibly returns a named
 #'   vector of top predictors, and their median predictor importance, based on
-#'   the `n_top_pred` param.
+#'   the `n_top_pred` parameter.
 #'
 #' @export
 #'
@@ -136,7 +136,7 @@ plot_pis <- function(pis, ext,
 #' @param bootstrap_smooth logical; the ideal visualization of the PD data is a
 #'   pointwise GAM smoothing of the individual stixel PD values. This argument
 #'   specifies whether this should be done directly on the full PD dataset
-#'   (`bootstrap_smooth = FALSE`) or by subsampling abd bootstrapping. The
+#'   (`bootstrap_smooth = FALSE`) or by subsampling and bootstrapping. The
 #'   latter approach deals with the randomness in the data and can be more
 #'   efficient for large datasets. Defaults to TRUE.
 #' @param show_stixel_pds logical; whether to plot the individual stixel PD

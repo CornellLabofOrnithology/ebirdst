@@ -92,7 +92,7 @@ For each individual species, the data are structured in the following way:
 
 ## Raster Data
 
-eBird Status and Trends abundance and occurrence estimates are currently provided in the widely used GeoTiff raster format. These are easily opened with the `raster` package in R, as well as with a variety of GIS software tools. Each estimate is stored in a multi-band GeoTiff file. These "cubes" come with areas of predicted and assumed zeroes, such that any cells that are NA represent areas outside of the area of estimation. All cubes have 52 weeks, even if some weeks are all NA (such as those species that winter entirely outside of North America). The two vignettes that are relevant to the raster data are the [intro mapping vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html) and the [advanced mapping  vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-advanced-mapping.html).
+eBird Status and Trends abundance and occurrence estimates are currently provided in the widely used GeoTIFF raster format. These are easily opened with the `raster` package in R, as well as with a variety of GIS software tools. Each estimate is stored in a multi-band GeoTIFF file. These "cubes" come with areas of predicted and assumed zeroes, such that any cells that are NA represent areas outside of the area of estimation. All cubes have 52 weeks, even if some weeks are all NA (such as those species that winter entirely outside of North America). The two vignettes that are relevant to the raster data are the [intro mapping vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html) and the [advanced mapping  vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-advanced-mapping.html).
 
 The relevant abundance and occurrence estimate GeoTiff files are found under the \\\<run_name>\\results\\tifs\\ directory and contain the following files.
 
@@ -103,7 +103,7 @@ The relevant abundance and occurrence estimate GeoTiff files are found under the
 
 ### Projection
 
-The GeoTiffs use the same Sinusoidal projection as NASA MODIS data. As part of this package, we provide a template raster (\\\<run_name>\\data\\<run_name_srd_raster_template.tif), that contains the spatial extent and resolution for the full Western Hemisphere. Note that 2018's results cover only North America. Accessing this raster directly through the package is not necessary, and can be applied elsewhere (e.g., other GIS software). Note that this projection is ideal for analysis, as it is an equal are projection, but is not ideal for mapping. See the [intro mapping vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html) for details on using a more suitable projection for mapping.
+The GeoTIFFs use the same Sinusoidal projection as NASA MODIS data. As part of this package, we provide a template raster (\\\<run_name>\\data\\<run_name_srd_raster_template.tif), that contains the spatial extent and resolution for the full Western Hemisphere. Note that 2018's results cover only North America. Accessing this raster directly through the package is not necessary, and can be applied elsewhere (e.g., other GIS software). Note that this projection is ideal for analysis, as it is an equal are projection, but is not ideal for mapping. See the [intro mapping vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html) for details on using a more suitable projection for mapping.
     
 ### Raster Layer Descriptions
 
@@ -116,19 +116,19 @@ The GeoTiffs use the same Sinusoidal projection as NASA MODIS data. As part of t
     
 #### occurrence_umean
 
-This layer represents the mean probability of occurrence, ranging from 0 to 1, for a 1-hour, 1-kilometre eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.
+This layer represents the mean probability of occurrence, ranging from 0 to 1, for a 1-hour, 1-kilometer eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.
 
 #### abundance_umean
 
-This layer represents the mean estimated relative abundance of the species, defined as the expected number of birds encountered on a 1-hour, 1-kilometre eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.
+This layer represents the mean estimated relative abundance of the species, defined as the expected number of birds encountered on a 1-hour, 1-kilometer eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.
 
 #### abundance_lower
 
-This layer represents the lower 10th quantile of the estimated relative abundance of the species, defined as the expected number of birds encountered on a 1-hour, 1-kilometre eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.
+This layer represents the lower 10th quantile of the estimated relative abundance of the species, defined as the expected number of birds encountered on a 1-hour, 1-kilometer eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.
 
 #### abundance_upper
 
-This layer represents the upper 90th quantile of the estimated relative abundance of the species, defined as the expected number of birds encountered on a 1-hour, 1-kilometre eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.
+This layer represents the upper 90th quantile of the estimated relative abundance of the species, defined as the expected number of birds encountered on a 1-hour, 1-kilometer eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.
 
 ## Non-raster Data
 
