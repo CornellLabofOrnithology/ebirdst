@@ -27,13 +27,13 @@
 #' \dontrun{
 #'
 #' # download the example data
-#' download_data("example_data")
+#' ebirdst_download("example_data")
 #'
 #' # download the full data package for wood thrush
-#' download_data("woothr")
+#' ebirdst_download("woothr")
 #'
 #' }
-download_data <- function(species,
+ebirdst_download <- function(species,
                           path = rappdirs::user_data_dir("ebirdst"),
                           tifs_only = TRUE,
                           force = FALSE) {
@@ -61,9 +61,10 @@ download_data <- function(species,
     bucket_url <- "https://ebirdst-data.s3.amazonaws.com/"
     run <- ebirdst::ebirdst_runs$run_name[row_id]
   }
+  bucket_url_sp <- paste0(bucket_url, "?prefix=", run)
 
   # get bucket contents
-  s3_contents <- xml2::xml_ns_strip(xml2::read_xml(bucket_url))
+  s3_contents <- xml2::xml_ns_strip(xml2::read_xml(bucket_url_sp))
   s3_contents <- xml2::xml_find_all(s3_contents, ".//Contents")
   if (length(s3_contents) == 0) {
     stop(sprintf("Files not found on AWS S3 for species = %s", species))
@@ -132,6 +133,17 @@ download_data <- function(species,
   return(invisible(normalizePath(file.path(path, run))))
 }
 
+#' @describeIn ebirdst_download Deprecated, use ebirdst_download
+download_data <- function(species,
+                          path = rappdirs::user_data_dir("ebirdst"),
+                          tifs_only = TRUE,
+                          force = FALSE) {
+  .Deprecated("ebirdst_download")
+  ebirdst_download(species = species,
+                   path = path,
+                   tifs_only = tifs_only,
+                   force = force)
+}
 
 #' Load eBird Status and Trends raster data
 #'
