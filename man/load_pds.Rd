@@ -34,8 +34,7 @@ sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
 # load partial dependence
 pds <- load_pds(sp_path)
-
-\dontrun{
+\donttest{
 # plot partial dependence for effort hours
 # define a spatiotemporal extent to plot data from
 bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)

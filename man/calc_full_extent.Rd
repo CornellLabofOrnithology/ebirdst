@@ -20,15 +20,14 @@ NA values and checks to make sure it returns a reasonable extent for
 plotting. The returned Extent object can then be used for plotting.
 }
 \examples{
-
+\dontshow{
 # simple toy example
 r <- raster::raster(nrow = 100, ncol = 100)
 r[5025:5075] <- 1
 raster::extent(r)
 calc_full_extent(r)
-
-\dontrun{
-
+}
+\donttest{
 # download and load example abundance data
 sp_path <- ebirdst_download("example_data")
 abd <- load_raster("abundance_umean", sp_path)
@@ -38,6 +37,5 @@ plot_extent <- calc_full_extent(abd)
 
 # plot
 raster::plot(abd[[1]], axes = FALSE, ext = plot_extent)
-
 }
 }

@@ -31,20 +31,16 @@ un-transforms the bins.
 # download and load example abundance data
 sp_path <- ebirdst_download("example_data")
 abd <- load_raster("abundance_umean", sp_path)
+\dontshow{
+# crop to speed up cran tests
+e <-  raster::extent(abd)
+e[2] <- e[1] + (e[2] - e[1]) / 4
+e[4] <- e[3] + (e[4] - e[3]) / 4
+abd <- raster::crop(abd[[30]], e)
+}
 
 # calculate bins for a single week for this example
-year_bins <- calc_bins(abd[[30]])
-raster::plot(abd[[30]], axes = FALSE,
-             breaks = year_bins$bins,
-             lab.breaks = round(year_bins$bins, 2),
-             col = viridisLite::viridis(length(year_bins$bins) - 1))
-
-\dontrun{
-
-# in practice, calculate bins based on all weeks
 year_bins <- calc_bins(abd)
-
-}
 }
 \references{
 Ross Maciejewski, Avin Pattah, Sungahn Ko, Ryan Hafen, William S.

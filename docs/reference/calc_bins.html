@@ -164,19 +164,9 @@ Visual Encoding. IEEE Transactions on Visualization and Computer Graphics,
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># download and load example abundance data</span>
-<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span>(<span class='st'>"example_data"</span>)</div><div class='output co'>#&gt; <span class='message'>Data already exists, use force = TRUE to re-download.</span></div><div class='input'><span class='no'>abd</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='load_raster.html'>load_raster</a></span>(<span class='st'>"abundance_umean"</span>, <span class='no'>sp_path</span>)
-
+<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span>(<span class='st'>"example_data"</span>)</div><div class='output co'>#&gt; <span class='message'>Data already exists, use force = TRUE to re-download.</span></div><div class='input'><span class='no'>abd</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='load_raster.html'>load_raster</a></span>(<span class='st'>"abundance_umean"</span>, <span class='no'>sp_path</span>)</div><div class='input'>
 <span class='co'># calculate bins for a single week for this example</span>
-<span class='no'>year_bins</span> <span class='kw'>&lt;-</span> <span class='fu'>calc_bins</span>(<span class='no'>abd</span><span class='kw'>[[</span><span class='fl'>30</span>]])
-<span class='kw pkg'>raster</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/raster/topics/plot'>plot</a></span>(<span class='no'>abd</span><span class='kw'>[[</span><span class='fl'>30</span>]], <span class='kw'>axes</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-             <span class='kw'>breaks</span> <span class='kw'>=</span> <span class='no'>year_bins</span>$<span class='no'>bins</span>,
-             <span class='kw'>lab.breaks</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Round'>round</a></span>(<span class='no'>year_bins</span>$<span class='no'>bins</span>, <span class='fl'>2</span>),
-             <span class='kw'>col</span> <span class='kw'>=</span> <span class='kw pkg'>viridisLite</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/viridisLite/topics/viridis'>viridis</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='no'>year_bins</span>$<span class='no'>bins</span>) - <span class='fl'>1</span>))</div><div class='img'><img src='calc_bins-1.png' alt='' width='700' height='433' /></div><div class='input'>
-</div><span class='co'># NOT RUN {</span>
-<span class='co'># in practice, calculate bins based on all weeks</span>
-<span class='no'>year_bins</span> <span class='kw'>&lt;-</span> <span class='fu'>calc_bins</span>(<span class='no'>abd</span>)
-
-<span class='co'># }</span></pre>
+<span class='no'>year_bins</span> <span class='kw'>&lt;-</span> <span class='fu'>calc_bins</span>(<span class='no'>abd</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

@@ -13,15 +13,14 @@
 #' @export
 #'
 #' @examples
-#'
+#' \dontshow{
 #' # simple toy example
 #' r <- raster::raster(nrow = 100, ncol = 100)
 #' r[5025:5075] <- 1
 #' raster::extent(r)
 #' calc_full_extent(r)
-#'
-#' \dontrun{
-#'
+#' }
+#' \donttest{
 #' # download and load example abundance data
 #' sp_path <- ebirdst_download("example_data")
 #' abd <- load_raster("abundance_umean", sp_path)
@@ -31,7 +30,6 @@
 #'
 #' # plot
 #' raster::plot(abd[[1]], axes = FALSE, ext = plot_extent)
-#'
 #' }
 calc_full_extent <- function(x) {
   stopifnot(inherits(x, "Raster"))
@@ -97,20 +95,16 @@ calc_full_extent <- function(x) {
 #' # download and load example abundance data
 #' sp_path <- ebirdst_download("example_data")
 #' abd <- load_raster("abundance_umean", sp_path)
+#' \dontshow{
+#' # crop to speed up cran tests
+#' e <-  raster::extent(abd)
+#' e[2] <- e[1] + (e[2] - e[1]) / 4
+#' e[4] <- e[3] + (e[4] - e[3]) / 4
+#' abd <- raster::crop(abd[[30]], e)
+#' }
 #'
 #' # calculate bins for a single week for this example
-#' year_bins <- calc_bins(abd[[30]])
-#' raster::plot(abd[[30]], axes = FALSE,
-#'              breaks = year_bins$bins,
-#'              lab.breaks = round(year_bins$bins, 2),
-#'              col = viridisLite::viridis(length(year_bins$bins) - 1))
-#'
-#' \dontrun{
-#'
-#' # in practice, calculate bins based on all weeks
 #' year_bins <- calc_bins(abd)
-#'
-#' }
 calc_bins <- function(x) {
   stopifnot(inherits(x, "Raster"))
 
@@ -210,7 +204,7 @@ calc_bins <- function(x) {
 #'
 #' @examples
 #' # download and load example data
-#' sp_path <- ebirdst_download("example_data")
+#' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
 #' # define a spatiotemporal extent to plot
 #' bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
@@ -407,13 +401,15 @@ map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
 #'
 #' @examples
 #' # download and load example data
-#' sp_path <- ebirdst_download("example_data")
+#' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
 #' # define a spatioremporal extent
-#' bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
+#' bb_vec <- c(xmin = -86, xmax = -84, ymin = 41.5, ymax = 43.5)
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
-#'
+#' \donttest{
+#' # calculate effective extent map
 #' eff <- calc_effective_extent(path = sp_path, ext = e, pi_pd = "pi")
+#' }
 calc_effective_extent <- function(path, ext, pi_pd = c("pi", "pd"),
                                   plot = TRUE) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))

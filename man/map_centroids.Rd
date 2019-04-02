@@ -26,7 +26,7 @@ an optional spatiotemporal subset using an \link{ebirdst_extent} object
 }
 \examples{
 # download and load example data
-sp_path <- ebirdst_download("example_data")
+sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
 # define a spatiotemporal extent to plot
 bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)

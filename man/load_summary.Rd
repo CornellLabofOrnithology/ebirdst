@@ -22,15 +22,13 @@ Internal function used by \code{\link[=load_pis]{load_pis()}} and \code{\link[=l
 summary information (from summary.txt).
 }
 \examples{
-\dontrun{
-
+\donttest{
 # download example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
 # stixel summaries
 summaries <- ebirdst:::load_summary(sp_path)
 dplyr::glimpse(summaries)
-
 }
 }
 \keyword{internal}
