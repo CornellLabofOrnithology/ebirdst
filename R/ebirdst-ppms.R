@@ -33,11 +33,9 @@
 #' # define a spatiotemporal extent to plot
 #' bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
-#'
-#' \dontrun{
-#'
+#' \donttest{
+#' # compute predictive performance metrics
 #' ppms <- compute_ppms(path = sp_path, ext = e)
-#'
 #' }
 compute_ppms <- function(path, ext) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
@@ -263,12 +261,9 @@ compute_ppms <- function(path, ext) {
 #' @examples
 #' # download and load example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
-#'
-#' \dontrun{
-#'
+#' \donttest{
 #' # plot monthly kappa
-#' plot_binary_by_time(path = sp_path, metric = "kappa", ext = e)
-#'
+#' plot_binary_by_time(path = sp_path, metric = "kappa", n_time_periods = 12)
 #' }
 plot_binary_by_time <- function(path,
                                 metric = c("kappa", "auc", "sensitivity",
@@ -350,11 +345,9 @@ plot_binary_by_time <- function(path,
 #' # define a spatiotemporal extent to plot data from
 #' bb_vec <- c(xmin = -83, xmax = -82, ymin = 41, ymax = 48)
 #' e <- ebirdst_extent(bb_vec, t = c("04-01", "06-30"))
-#'
-#' \dontrun{
-#'
+#' \donttest{
+#' # plot ppms within extent
 #' plot_all_ppms(path = sp_path, ext = e)
-#'
 #' }
 plot_all_ppms <- function(path, ext) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))

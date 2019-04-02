@@ -303,15 +303,13 @@ parse_raster_dates <- function(x) {
 #' @keywords internal
 #'
 #' @examples
-#' \dontrun{
-#'
+#' \donttest{
 #' # download example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
 #' # stixel summaries
 #' summaries <- ebirdst:::load_summary(sp_path)
 #' dplyr::glimpse(summaries)
-#'
 #' }
 load_summary <- function(path, return_sf = FALSE) {
   stopifnot(dir.exists(path))
@@ -433,8 +431,7 @@ load_pis <- function(path, return_sf = FALSE) {
 #'
 #' # load partial dependence
 #' pds <- load_pds(sp_path)
-#'
-#' \dontrun{
+#' \donttest{
 #' # plot partial dependence for effort hours
 #' # define a spatiotemporal extent to plot data from
 #' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
@@ -494,15 +491,13 @@ load_pds <- function(path, return_sf = FALSE) {
 #' @keywords internal
 #'
 #' @examples
-#' \dontrun{
-#'
+#' \donttest{
 #' # download example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
 #' # test data
 #' test_data <- ebirdst:::load_test_data_raw(sp_path)
 #' dplyr::glimpse(test_data)
-#'
 #' }
 load_test_data_raw <- function(path, return_sf = FALSE) {
   stopifnot(dir.exists(path))

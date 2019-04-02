@@ -39,11 +39,13 @@ selected stixels are contributing information, ranging from 0 to 1.
 }
 \examples{
 # download and load example data
-sp_path <- ebirdst_download("example_data")
+sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
 # define a spatioremporal extent
-bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
+bb_vec <- c(xmin = -86, xmax = -84, ymin = 41.5, ymax = 43.5)
 e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
-
+\donttest{
+# calculate effective extent map
 eff <- calc_effective_extent(path = sp_path, ext = e, pi_pd = "pi")
+}
 }

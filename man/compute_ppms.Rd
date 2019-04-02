@@ -40,10 +40,8 @@ sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 # define a spatiotemporal extent to plot
 bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
 e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
-
-\dontrun{
-
+\donttest{
+# compute predictive performance metrics
 ppms <- compute_ppms(path = sp_path, ext = e)
-
 }
 }

@@ -28,10 +28,8 @@ sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 # define a spatiotemporal extent to plot data from
 bb_vec <- c(xmin = -83, xmax = -82, ymin = 41, ymax = 48)
 e <- ebirdst_extent(bb_vec, t = c("04-01", "06-30"))
-
-\dontrun{
-
+\donttest{
+# plot ppms within extent
 plot_all_ppms(path = sp_path, ext = e)
-
 }
 }

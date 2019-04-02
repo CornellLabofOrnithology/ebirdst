@@ -148,10 +148,8 @@ data to.</p></td>
 <span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span>(<span class='st'>"example_data"</span>, <span class='kw'>tifs_only</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; <span class='message'>Data already exists, use force = TRUE to re-download.</span></div><div class='input'>
 <span class='co'># define a spatiotemporal extent to plot data from</span>
 <span class='no'>bb_vec</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='kw'>xmin</span> <span class='kw'>=</span> -<span class='fl'>83</span>, <span class='kw'>xmax</span> <span class='kw'>=</span> -<span class='fl'>82</span>, <span class='kw'>ymin</span> <span class='kw'>=</span> <span class='fl'>41</span>, <span class='kw'>ymax</span> <span class='kw'>=</span> <span class='fl'>48</span>)
-<span class='no'>e</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_extent.html'>ebirdst_extent</a></span>(<span class='no'>bb_vec</span>, <span class='kw'>t</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"04-01"</span>, <span class='st'>"06-30"</span>))</div><span class='co'># NOT RUN {</span>
-<span class='fu'>plot_all_ppms</span>(<span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>sp_path</span>, <span class='kw'>ext</span> <span class='kw'>=</span> <span class='no'>e</span>)
-
-<span class='co'># }</span></pre>
+<span class='no'>e</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_extent.html'>ebirdst_extent</a></span>(<span class='no'>bb_vec</span>, <span class='kw'>t</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"04-01"</span>, <span class='st'>"06-30"</span>))</div><div class='input'><span class='co'># plot ppms within extent</span>
+<span class='fu'>plot_all_ppms</span>(<span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>sp_path</span>, <span class='kw'>ext</span> <span class='kw'>=</span> <span class='no'>e</span>)</div><div class='img'><img src='plot_all_ppms-1.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
