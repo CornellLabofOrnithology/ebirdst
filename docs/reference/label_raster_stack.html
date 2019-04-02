@@ -147,16 +147,22 @@ format.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='co'># download and load example abundance data</span>
-<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span>(<span class='st'>"example_data"</span>)
-<span class='no'>abd</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='load_raster.html'>load_raster</a></span>(<span class='st'>"abundance_umean"</span>, <span class='no'>sp_path</span>)
+    <pre class="examples"><div class='input'><span class='co'># download and load example abundance data</span>
+<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span>(<span class='st'>"example_data"</span>)</div><div class='output co'>#&gt; <span class='message'>Data already exists, use force = TRUE to re-download.</span></div><div class='input'><span class='no'>abd</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='load_raster.html'>load_raster</a></span>(<span class='st'>"abundance_umean"</span>, <span class='no'>sp_path</span>)
 
 <span class='co'># label</span>
 <span class='no'>abd</span> <span class='kw'>&lt;-</span> <span class='fu'>label_raster_stack</span>(<span class='no'>abd</span>)
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/names'>names</a></span>(<span class='no'>abd</span>)
-
-<span class='co'># }</span></pre>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/names'>names</a></span>(<span class='no'>abd</span>)</div><div class='output co'>#&gt;  [1] "X2016.01.04" "X2016.01.11" "X2016.01.18" "X2016.01.25" "X2016.02.01"
+#&gt;  [6] "X2016.02.08" "X2016.02.15" "X2016.02.22" "X2016.03.01" "X2016.03.08"
+#&gt; [11] "X2016.03.15" "X2016.03.22" "X2016.03.29" "X2016.04.05" "X2016.04.12"
+#&gt; [16] "X2016.04.19" "X2016.04.26" "X2016.05.03" "X2016.05.10" "X2016.05.17"
+#&gt; [21] "X2016.05.24" "X2016.05.31" "X2016.06.07" "X2016.06.14" "X2016.06.21"
+#&gt; [26] "X2016.06.28" "X2016.07.06" "X2016.07.13" "X2016.07.20" "X2016.07.27"
+#&gt; [31] "X2016.08.03" "X2016.08.10" "X2016.08.17" "X2016.08.24" "X2016.08.31"
+#&gt; [36] "X2016.09.07" "X2016.09.14" "X2016.09.21" "X2016.09.28" "X2016.10.05"
+#&gt; [41] "X2016.10.12" "X2016.10.19" "X2016.10.26" "X2016.11.02" "X2016.11.09"
+#&gt; [46] "X2016.11.16" "X2016.11.23" "X2016.11.30" "X2016.12.07" "X2016.12.14"
+#&gt; [51] "X2016.12.21" "X2016.12.28"</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

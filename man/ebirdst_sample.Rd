@@ -38,7 +38,6 @@ the given number of points from each cell. \code{\link[=sample_case_control]{sam
 additionally samples presence and absence independently.
 }
 \examples{
-\dontrun{
 # download example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
@@ -49,13 +48,6 @@ test_data <- load_test_data(sp_path, return_sf = TRUE)
 s <- sample_grid(test_data, res = 100000, t_res = 1 / 12)
 td_grid <- test_data[s, ]
 
-# plot
-library(sf)
-p <- par(mar = c(0, 0, 0, 0))
-plot(st_geometry(test_data), col = "black", pch = 19, cex = 0.2)
-plot(st_geometry(td_grid), col = "red", pch = 19, cex = 0.5, add = TRUE)
-par(p)
-
 # case control sampling independently samples presence and absence
 s <- sample_case_control(test_data, res = 100000, t_res = 1 / 12)
 td_cc <- test_data[s, ]
@@ -65,5 +57,15 @@ table(test_data$obs > 0) / nrow(test_data)
 table(td_grid$obs > 0) / nrow(td_grid)
 # while case control sampling increases the prevelance of presences
 table(td_cc$obs > 0) / nrow(td_cc)
+
+\dontrun{
+
+# plot
+library(sf)
+p <- par(mar = c(0, 0, 0, 0))
+plot(st_geometry(test_data), col = "black", pch = 19, cex = 0.2)
+plot(st_geometry(td_cc), col = "red", pch = 19, cex = 0.5, add = TRUE)
+par(p)
+
 }
 }

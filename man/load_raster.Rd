@@ -24,13 +24,9 @@ with 52 bands, one for each week of the year. This function loads the data
 for a given product and species as a \code{RasterStack} object.
 }
 \examples{
-\dontrun{
-
 # download example data
 sp_path <- ebirdst_download("example_data")
 
 # load data
 load_raster("abundance_umean", sp_path)
-
-}
 }

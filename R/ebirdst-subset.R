@@ -12,10 +12,8 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#'
 #' # bbox for southern michigan in may
-#' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
+#' bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #'
 #' # download and load example data
@@ -26,8 +24,6 @@
 #' # subset
 #' abd_ss <- ebirdst_subset(abd, ext = e)
 #' pis_ss <- ebirdst_subset(pis, ext = e)
-#'
-#' }
 ebirdst_subset <- function(x, ext) {
   UseMethod("ebirdst_subset")
 }

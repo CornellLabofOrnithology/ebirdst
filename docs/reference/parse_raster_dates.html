@@ -141,18 +141,24 @@ Trends product raster GeoTIFF.</p></td>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='co'># download and load example abundance data</span>
-<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span>(<span class='st'>"example_data"</span>)
-<span class='no'>abd</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='load_raster.html'>load_raster</a></span>(<span class='st'>"abundance_umean"</span>, <span class='no'>sp_path</span>)
+    <pre class="examples"><div class='input'><span class='co'># download and load example abundance data</span>
+<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span>(<span class='st'>"example_data"</span>)</div><div class='output co'>#&gt; <span class='message'>Data already exists, use force = TRUE to re-download.</span></div><div class='input'><span class='no'>abd</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='load_raster.html'>load_raster</a></span>(<span class='st'>"abundance_umean"</span>, <span class='no'>sp_path</span>)
 
 <span class='co'># label</span>
 <span class='no'>abd</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='label_raster_stack.html'>label_raster_stack</a></span>(<span class='no'>abd</span>)
 
 <span class='co'># parse dates</span>
-<span class='fu'>parse_raster_dates</span>(<span class='no'>abd</span>)
-
-<span class='co'># }</span></pre>
+<span class='fu'>parse_raster_dates</span>(<span class='no'>abd</span>)</div><div class='output co'>#&gt;  [1] "2016-01-04" "2016-01-11" "2016-01-18" "2016-01-25" "2016-02-01"
+#&gt;  [6] "2016-02-08" "2016-02-15" "2016-02-22" "2016-03-01" "2016-03-08"
+#&gt; [11] "2016-03-15" "2016-03-22" "2016-03-29" "2016-04-05" "2016-04-12"
+#&gt; [16] "2016-04-19" "2016-04-26" "2016-05-03" "2016-05-10" "2016-05-17"
+#&gt; [21] "2016-05-24" "2016-05-31" "2016-06-07" "2016-06-14" "2016-06-21"
+#&gt; [26] "2016-06-28" "2016-07-06" "2016-07-13" "2016-07-20" "2016-07-27"
+#&gt; [31] "2016-08-03" "2016-08-10" "2016-08-17" "2016-08-24" "2016-08-31"
+#&gt; [36] "2016-09-07" "2016-09-14" "2016-09-21" "2016-09-28" "2016-10-05"
+#&gt; [41] "2016-10-12" "2016-10-19" "2016-10-26" "2016-11-02" "2016-11-09"
+#&gt; [46] "2016-11-16" "2016-11-23" "2016-11-30" "2016-12-07" "2016-12-14"
+#&gt; [51] "2016-12-21" "2016-12-28"</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

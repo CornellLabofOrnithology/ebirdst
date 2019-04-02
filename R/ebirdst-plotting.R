@@ -25,20 +25,16 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#'
 #' # download and load example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #' pis <- load_pis(sp_path)
 #'
 #' # define a spatiotemporal extent to plot data from
-#' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
+#' bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #'
-#' top_pred <- plot_pis(pis, ext = e, by_cover_class = TRUE)
+#' top_pred <- plot_pis(pis, ext = e, by_cover_class = TRUE, n_top_pred = 10)
 #' top_pred
-#'
-#' }
 plot_pis <- function(pis, ext,
                      by_cover_class = FALSE,
                      n_top_pred = 50,
@@ -169,18 +165,22 @@ plot_pis <- function(pis, ext,
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#'
 #' # download and load example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #' pds <- load_pds(sp_path)
 #'
 #' # define a spatiotemporal extent to plot data from
-#' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
+#' bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #'
-#' pd_smooth <- plot_pds(pds, predictor = "time", ext = e)
+#' # for this example, run with 5 bootstrap iterations for speed
+#' pd_smooth <- plot_pds(pds, "time", ext = e, n_bs = 5)
 #' dplyr::glimpse(pd_smooth)
+#'
+#' \dontrun{
+#'
+#' # in practice, it's best to run with the default number of iterations (100)
+#' plot_pds(pds, predictor = "time", ext = e)
 #'
 #' }
 plot_pds <- function(pds, predictor, ext,
@@ -251,18 +251,16 @@ plot_pds <- function(pds, predictor, ext,
   pd_long <- dplyr::inner_join(pd_long, stix_mean, by = "stixel_id")
   pd_long$y <- pd_long$y - pd_long$y_mean
   pd_long[["y_mean"]] <- NULL
-  # pd_long <- dplyr::group_by(pd_long, .data$stixel_id)
-  # pd_long <- dplyr::mutate(pd_long, y =  y - mean(y, na.rm = TRUE))
-  # pd_long <- dplyr::ungroup(pd_long)
+
+  # values to predict at for bootstrap iterations
+  trimmed <- stats::quantile(pd_long$x,
+                             probs = c(x_tail_level, 1 - x_tail_level),
+                             na.rm = TRUE)
+  nd <- data.frame(x = seq(from = trimmed[1], to = trimmed[2],
+                           length = n_preds))
 
   # gam pointwise ci for conditional mean estimate via bootstrapping
   if (bootstrap_smooth) {
-    # values to predict at for bootstrap iterations
-    trimmed <- stats::quantile(pd_long$x,
-                               probs = c(x_tail_level, 1 - x_tail_level),
-                               na.rm = TRUE)
-    nd <- data.frame(x = seq(from = trimmed[1], to = trimmed[2],
-                             length = n_preds))
     bs_gam_pred <- matrix(NA, n_preds, n_bs)
 
     for (i in seq_len(n_bs)) {
@@ -271,7 +269,7 @@ plot_pds <- function(pds, predictor, ext,
       # these ci's represent the sampling variation of an ensemble estimate
       # based on a given number of stixel pd estimates
 
-      sample_freq <- ss_equivalent * n_preds / nrow(pd_long)
+      sample_freq <- min(ss_equivalent * n_preds / nrow(pd_long), 1)
       pd_sample <- dplyr::sample_frac(pd_long, size = sample_freq)
       s <- mgcv::s
       pd_gam <- mgcv::gam(y ~ s(x, k = k, bs = "ds", m = 1),
@@ -296,12 +294,12 @@ plot_pds <- function(pds, predictor, ext,
 
     # calculate median and ci's
     pd_ci <- stats::predict(pd_gam, newdata = nd, se = TRUE)
-    pd_ci <- data.frame(pd_median = pd_ci$fit, pd_se = pd_ci$se.fit)
+    pd_ci <- data.frame(pd_median = as.numeric(pd_ci$fit),
+                        pd_se = as.numeric(pd_ci$se.fit))
     pd_ci$pd_lower <- pd_ci$pd_median - 2 * pd_ci$pd_se
     pd_ci$pd_upper <- pd_ci$pd_median + 2 * pd_ci$pd_se
     pd_ci <- cbind(nd, pd_ci)
-
-    rm(pd_gam, bs_gam_pred)
+    rm(pd_gam)
   }
 
   # gbm quantiles

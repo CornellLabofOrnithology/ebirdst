@@ -13,6 +13,13 @@
 #' @export
 #'
 #' @examples
+#'
+#' # simple toy example
+#' r <- raster::raster(nrow = 100, ncol = 100)
+#' r[5025:5075] <- 1
+#' raster::extent(r)
+#' calc_full_extent(r)
+#'
 #' \dontrun{
 #'
 #' # download and load example abundance data
@@ -87,18 +94,21 @@ calc_full_extent <- function(x) {
 #' 19(1): 130-140, 2013.
 #'
 #' @examples
-#' \dontrun{
-#'
 #' # download and load example abundance data
 #' sp_path <- ebirdst_download("example_data")
 #' abd <- load_raster("abundance_umean", sp_path)
 #'
-#' # calculate bins
-#' year_bins <- calc_bins(abd)
-#'
-#' # plot
-#' raster::plot(abd[[30]], axes = FALSE, breaks = year_bins$bins,
+#' # calculate bins for a single week for this example
+#' year_bins <- calc_bins(abd[[30]])
+#' raster::plot(abd[[30]], axes = FALSE,
+#'              breaks = year_bins$bins,
+#'              lab.breaks = round(year_bins$bins, 2),
 #'              col = viridisLite::viridis(length(year_bins$bins) - 1))
+#'
+#' \dontrun{
+#'
+#' # in practice, calculate bins based on all weeks
+#' year_bins <- calc_bins(abd)
 #'
 #' }
 calc_bins <- function(x) {
@@ -199,18 +209,14 @@ calc_bins <- function(x) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#'
 #' # download and load example data
 #' sp_path <- ebirdst_download("example_data")
 #'
 #' # define a spatiotemporal extent to plot
-#' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
+#' bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #'
 #' map_centroids(path = sp_path, ext = e)
-#'
-#' }
 map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
   stopifnot(is.logical(plot_pis), length(plot_pis) == 1)
@@ -223,6 +229,12 @@ map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
   } else {
     stopifnot(inherits(ext, "ebirdst_extent"))
   }
+
+  # colors
+  pal <- list(pd_a = "#1b9377", pd_s = "#b3e2cd",
+              pi_a = "#d95f02", pi_s = "#fdcdac")
+  pal <- list(pd_a = "#31a354", pd_s = "#a1d99b",
+              pi_a = "#d95f0e", pi_s = "#feb24c")
 
   # convert data to spatial, find bounding box
   # pds
@@ -252,7 +264,7 @@ map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
   # plot base map
   graphics::plot(bb, col = NA, border = NA)
   graphics::plot(sf::st_geometry(ned_wh_co_moll),
-                 col = "#5a5a5a", border = "#000000", lwd = 1, add = TRUE)
+                 col = "#5a5a5a", border = "#222222", lwd = 1, add = TRUE)
   # label setup
   usr <- graphics::par("usr")
   xwidth <- usr[2] - usr[1]
@@ -261,62 +273,62 @@ map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
   # plotting pds
   if (isTRUE(plot_pds)) {
     # first plot all possible pds
-    graphics::plot(sf::st_geometry(pds), col = "#1b9377", cex = 0.4, pch = 16,
+    graphics::plot(sf::st_geometry(pds), col = pal$pd_a, cex = 0.4, pch = 16,
                    add = TRUE)
     graphics::text(x = usr[1] + 0.05 * xwidth,
                    y = usr[3] + 0.2 * yheight,
                    adj = 0,
                    paste("Available PDs: ", nrow(pds), sep = ""),
                    cex = 1,
-                   col = "#1b9377")
+                   col = pal$pd_a)
 
     # plot pds within extent
     if (!missing(ext)) {
       pds_sub <- ebirdst_subset(pds, ext)
       graphics::plot(sf::st_geometry(pds_sub),
-                     col = "#b3e2cd", cex = 0.4, pch = 16,
+                     col = pal$pd_s, cex = 0.4, pch = 16,
                      add = TRUE)
       graphics::text(x = usr[1] + 0.05 * xwidth,
                      y = usr[3] + 0.16 * yheight,
                      adj = 0,
                      paste("Selected PDs: ", nrow(pds_sub), sep = ""),
                      cex = 1,
-                     col = "#b3e2cd")
+                     col = pal$pd_s)
     }
   }
 
   # plotting pis
   if (isTRUE(plot_pis)) {
     # first plot all possible pis
-    graphics::plot(sf::st_geometry(pis), col = "#d95f02", cex = 0.4, pch = 16,
+    graphics::plot(sf::st_geometry(pis), col = pal$pi_a, cex = 0.4, pch = 16,
                    add = TRUE)
     graphics::text(x = usr[1] + 0.05 * xwidth,
                    y = usr[3] + 0.12 * yheight,
                    adj = 0,
                    paste("Available PIs: ", nrow(pis), sep = ""),
                    cex = 1,
-                   col = "#d95f02")
+                   col = pal$pi_a)
 
-    # plot pds within extent
+    # plot pis within extent
     if (!missing(ext)) {
       pis_sub <- ebirdst_subset(pis, ext)
       graphics::plot(sf::st_geometry(pis_sub),
-                     col = "#fdcdac", cex = 0.4, pch = 16,
+                     col = pal$pi_s, cex = 0.4, pch = 16,
                      add = TRUE)
       graphics::text(x = usr[1] + 0.05 * xwidth,
                      y = usr[3] + 0.08 * yheight,
                      adj = 0,
                      paste("Selected PIs: ", nrow(pis_sub), sep = ""),
                      cex = 1,
-                     col = "#fdcdac")
+                     col = pal$pi_s)
     }
   }
 
   # plot reference data
   graphics::plot(sf::st_geometry(ned_wh_co_moll),
-                 col = NA, border = "#000000", lwd = 1, add = TRUE)
+                 col = NA, border = "#222222", lwd = 1, add = TRUE)
   graphics::plot(sf::st_geometry(ned_wh_st_moll),
-                 col = NA, border = "#000000", lwd = 0.75, add = TRUE)
+                 col = NA, border = "#222222", lwd = 0.75, add = TRUE)
 
   # label
   usr <- graphics::par("usr")
@@ -330,14 +342,14 @@ map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
                    adj = 0,
                    paste("Available PDs: ", nrow(pds), sep = ""),
                    cex = 1,
-                   col = "#1b9377")
+                   col = pal$pd_a)
     if (!missing(ext)) {
       graphics::text(x = usr[1] + 0.05 * xwidth,
                      y = usr[3] + 0.16 * yheight,
                      adj = 0,
                      paste("Selected PDs: ", nrow(pds_sub), sep = ""),
                      cex = 1,
-                     col = "#b3e2cd")
+                     col = pal$pd_s)
     }
   }
 
@@ -348,14 +360,14 @@ map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
                    adj = 0,
                    paste("Available PIs: ", nrow(pis), sep = ""),
                    cex = 1,
-                   col = "#d95f02")
+                   col = pal$pi_a)
     if (!missing(ext)) {
       graphics::text(x = usr[1] + 0.05 * xwidth,
                      y = usr[3] + 0.08 * yheight,
                      adj = 0,
                      paste("Selected PIs: ", nrow(pis_sub), sep = ""),
                      cex = 1,
-                     col = "#fdcdac")
+                     col = pal$pi_s)
     }
   }
 
@@ -394,18 +406,14 @@ map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#'
 #' # download and load example data
 #' sp_path <- ebirdst_download("example_data")
 #'
 #' # define a spatioremporal extent
-#' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
+#' bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #'
 #' eff <- calc_effective_extent(path = sp_path, ext = e, pi_pd = "pi")
-#'
-#' }
 calc_effective_extent <- function(path, ext, pi_pd = c("pi", "pd"),
                                   plot = TRUE) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))

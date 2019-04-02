@@ -28,18 +28,21 @@ bins with the power-transformed data using standard-deviations, and then
 un-transforms the bins.
 }
 \examples{
-\dontrun{
-
 # download and load example abundance data
 sp_path <- ebirdst_download("example_data")
 abd <- load_raster("abundance_umean", sp_path)
 
-# calculate bins
-year_bins <- calc_bins(abd)
-
-# plot
-raster::plot(abd[[30]], axes = FALSE, breaks = year_bins$bins,
+# calculate bins for a single week for this example
+year_bins <- calc_bins(abd[[30]])
+raster::plot(abd[[30]], axes = FALSE,
+             breaks = year_bins$bins,
+             lab.breaks = round(year_bins$bins, 2),
              col = viridisLite::viridis(length(year_bins$bins) - 1))
+
+\dontrun{
+
+# in practice, calculate bins based on all weeks
+year_bins <- calc_bins(abd)
 
 }
 }

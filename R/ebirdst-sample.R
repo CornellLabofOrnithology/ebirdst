@@ -23,7 +23,6 @@
 #' @rdname ebirdst_sample
 #'
 #' @examples
-#' \dontrun{
 #' # download example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
@@ -34,13 +33,6 @@
 #' s <- sample_grid(test_data, res = 100000, t_res = 1 / 12)
 #' td_grid <- test_data[s, ]
 #'
-#' # plot
-#' library(sf)
-#' p <- par(mar = c(0, 0, 0, 0))
-#' plot(st_geometry(test_data), col = "black", pch = 19, cex = 0.2)
-#' plot(st_geometry(td_grid), col = "red", pch = 19, cex = 0.5, add = TRUE)
-#' par(p)
-#'
 #' # case control sampling independently samples presence and absence
 #' s <- sample_case_control(test_data, res = 100000, t_res = 1 / 12)
 #' td_cc <- test_data[s, ]
@@ -50,6 +42,16 @@
 #' table(td_grid$obs > 0) / nrow(td_grid)
 #' # while case control sampling increases the prevelance of presences
 #' table(td_cc$obs > 0) / nrow(td_cc)
+#'
+#' \dontrun{
+#'
+#' # plot
+#' library(sf)
+#' p <- par(mar = c(0, 0, 0, 0))
+#' plot(st_geometry(test_data), col = "black", pch = 19, cex = 0.2)
+#' plot(st_geometry(td_cc), col = "red", pch = 19, cex = 0.5, add = TRUE)
+#' par(p)
+#'
 #' }
 sample_grid <- function(x, res, t_res, n = 1, replace = FALSE,
                         jitter = TRUE) {

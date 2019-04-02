@@ -213,17 +213,23 @@ frame of the smoothed curve with confidence intervals.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='co'># download and load example data</span>
-<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span>(<span class='st'>"example_data"</span>, <span class='kw'>tifs_only</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-<span class='no'>pds</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='load_pds.html'>load_pds</a></span>(<span class='no'>sp_path</span>)
+    <pre class="examples"><div class='input'><span class='co'># download and load example data</span>
+<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span>(<span class='st'>"example_data"</span>, <span class='kw'>tifs_only</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; <span class='message'>Data already exists, use force = TRUE to re-download.</span></div><div class='input'><span class='no'>pds</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='load_pds.html'>load_pds</a></span>(<span class='no'>sp_path</span>)
 
 <span class='co'># define a spatiotemporal extent to plot data from</span>
-<span class='no'>bb_vec</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='kw'>xmin</span> <span class='kw'>=</span> -<span class='fl'>86.6</span>, <span class='kw'>xmax</span> <span class='kw'>=</span> -<span class='fl'>82.2</span>, <span class='kw'>ymin</span> <span class='kw'>=</span> <span class='fl'>41.5</span>, <span class='kw'>ymax</span> <span class='kw'>=</span> <span class='fl'>43.5</span>)
+<span class='no'>bb_vec</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='kw'>xmin</span> <span class='kw'>=</span> -<span class='fl'>86</span>, <span class='kw'>xmax</span> <span class='kw'>=</span> -<span class='fl'>83</span>, <span class='kw'>ymin</span> <span class='kw'>=</span> <span class='fl'>41.5</span>, <span class='kw'>ymax</span> <span class='kw'>=</span> <span class='fl'>43.5</span>)
 <span class='no'>e</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_extent.html'>ebirdst_extent</a></span>(<span class='no'>bb_vec</span>, <span class='kw'>t</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"05-01"</span>, <span class='st'>"05-31"</span>))
 
-<span class='no'>pd_smooth</span> <span class='kw'>&lt;-</span> <span class='fu'>plot_pds</span>(<span class='no'>pds</span>, <span class='kw'>predictor</span> <span class='kw'>=</span> <span class='st'>"time"</span>, <span class='kw'>ext</span> <span class='kw'>=</span> <span class='no'>e</span>)
-<span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>glimpse</a></span>(<span class='no'>pd_smooth</span>)
+<span class='co'># for this example, run with 5 bootstrap iterations for speed</span>
+<span class='no'>pd_smooth</span> <span class='kw'>&lt;-</span> <span class='fu'>plot_pds</span>(<span class='no'>pds</span>, <span class='st'>"time"</span>, <span class='kw'>ext</span> <span class='kw'>=</span> <span class='no'>e</span>, <span class='kw'>n_bs</span> <span class='kw'>=</span> <span class='fl'>5</span>)</div><div class='img'><img src='plot_pds-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>glimpse</a></span>(<span class='no'>pd_smooth</span>)</div><div class='output co'>#&gt; Observations: 50
+#&gt; Variables: 4
+#&gt; $ x         <span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 0.0000000, 0.4881633, 0.9763265, 1.4644898, 1.9526531, 2.44…
+#&gt; $ pd_median </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 0.179545979, 0.186017085, 0.197009072, 0.193291167, 0.18688…
+#&gt; $ pd_lower  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 0.109222682, 0.112691786, 0.130088199, 0.150828938, 0.17894…
+#&gt; $ pd_upper  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 0.28660803, 0.28679200, 0.29413404, 0.30776640, 0.31283373,…</div><div class='input'>
+</div></span><span class='co'># NOT RUN {</span>
+<span class='co'># in practice, it's best to run with the default number of iterations (100)</span>
+<span class='fu'>plot_pds</span>(<span class='no'>pds</span>, <span class='kw'>predictor</span> <span class='kw'>=</span> <span class='st'>"time"</span>, <span class='kw'>ext</span> <span class='kw'>=</span> <span class='no'>e</span>)
 
 <span class='co'># }</span></pre>
   </div>

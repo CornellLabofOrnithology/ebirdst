@@ -1,7 +1,6 @@
 Type: Package
 Package: ebirdst
-Title: Tools to Load, Map, Plot and Analyze eBird Status and
-    Trends Data Products
+Title: Access and Analyze eBird Status and Trends Data
 Version: 0.1.0
 Authors@R: 
     c(person(given = "Tom",
