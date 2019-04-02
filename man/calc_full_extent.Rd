@@ -20,6 +20,13 @@ NA values and checks to make sure it returns a reasonable extent for
 plotting. The returned Extent object can then be used for plotting.
 }
 \examples{
+
+# simple toy example
+r <- raster::raster(nrow = 100, ncol = 100)
+r[5025:5075] <- 1
+raster::extent(r)
+calc_full_extent(r)
+
 \dontrun{
 
 # download and load example abundance data

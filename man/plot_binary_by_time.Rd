@@ -33,13 +33,13 @@ of four (Kappa, AUC, Sensitivity, Specificity) box plots. Provide an
 otherwise rangewide performance will be shown.
 }
 \examples{
-\dontrun{
-
 # download and load example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
+\dontrun{
+
 # plot monthly kappa
-plot_binary_by_time(path = sp_path, metric = "kappa", n_time_periods = 12)
+plot_binary_by_time(path = sp_path, metric = "kappa", ext = e)
 
 }
 }

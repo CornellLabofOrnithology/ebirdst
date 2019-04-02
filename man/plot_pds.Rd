@@ -69,18 +69,22 @@ and Trends products, this function makes a line plot of a single partial
 dependency (PD), with two options for smoothing.
 }
 \examples{
-\dontrun{
-
 # download and load example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 pds <- load_pds(sp_path)
 
 # define a spatiotemporal extent to plot data from
-bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
+bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
 e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 
-pd_smooth <- plot_pds(pds, predictor = "time", ext = e)
+# for this example, run with 5 bootstrap iterations for speed
+pd_smooth <- plot_pds(pds, "time", ext = e, n_bs = 5)
 dplyr::glimpse(pd_smooth)
+
+\dontrun{
+
+# in practice, it's best to run with the default number of iterations (100)
+plot_pds(pds, predictor = "time", ext = e)
 
 }
 }

@@ -46,13 +46,11 @@ than the full dataset making these data quicker to download and process.
 }}
 
 \examples{
-\dontrun{
-
 # download the example data
 ebirdst_download("example_data")
 
+\dontrun{
 # download the full data package for wood thrush
 ebirdst_download("woothr")
-
 }
 }

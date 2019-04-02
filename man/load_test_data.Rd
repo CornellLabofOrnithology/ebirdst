@@ -24,14 +24,10 @@ calculating predictive performance metrics. This file contains the observed
 counts and model predicted relative occurrence and abundance values.
 }
 \examples{
-\dontrun{
-
 # download example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
 # test data
 test_data <- load_test_data(sp_path)
 dplyr::glimpse(test_data)
-
-}
 }

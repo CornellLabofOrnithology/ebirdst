@@ -38,18 +38,14 @@ importances, from highest to lowest. Many function parameters allow for
 customized plots.
 }
 \examples{
-\dontrun{
-
 # download and load example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 pis <- load_pis(sp_path)
 
 # define a spatiotemporal extent to plot data from
-bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
+bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
 e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 
-top_pred <- plot_pis(pis, ext = e, by_cover_class = TRUE)
+top_pred <- plot_pis(pis, ext = e, by_cover_class = TRUE, n_top_pred = 10)
 top_pred
-
-}
 }

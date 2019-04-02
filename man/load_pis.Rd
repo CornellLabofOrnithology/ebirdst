@@ -22,8 +22,6 @@ Loads the predictor importance data (from pi.txt), joins with stixel summary
 data, sets column names, and cleans up the data.frame.
 }
 \examples{
-\dontrun{
-
 # download example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
@@ -35,6 +33,4 @@ pis <- load_pis(sp_path)
 bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
 e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 plot_pis(pis, ext = e, n_top_pred = 15, by_cover_class = TRUE)
-
-}
 }

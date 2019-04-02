@@ -20,8 +20,6 @@ package. This function converts that character vector into an ISO compliant
 Date vector.
 }
 \examples{
-\dontrun{
-
 # download and load example abundance data
 sp_path <- ebirdst_download("example_data")
 abd <- load_raster("abundance_umean", sp_path)
@@ -31,6 +29,4 @@ abd <- label_raster_stack(abd)
 
 # parse dates
 parse_raster_dates(abd)
-
-}
 }

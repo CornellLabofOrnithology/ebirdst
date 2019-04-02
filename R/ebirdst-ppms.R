@@ -25,14 +25,16 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
+
 #'
 #' # download and load example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
 #' # define a spatiotemporal extent to plot
-#' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
+#' bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
+#'
+#' \dontrun{
 #'
 #' ppms <- compute_ppms(path = sp_path, ext = e)
 #'
@@ -259,13 +261,13 @@ compute_ppms <- function(path, ext) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#'
 #' # download and load example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
+#' \dontrun{
+#'
 #' # plot monthly kappa
-#' plot_binary_by_time(path = sp_path, metric = "kappa", n_time_periods = 12)
+#' plot_binary_by_time(path = sp_path, metric = "kappa", ext = e)
 #'
 #' }
 plot_binary_by_time <- function(path,
@@ -342,14 +344,14 @@ plot_binary_by_time <- function(path,
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#'
 #' # download example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
 #' # define a spatiotemporal extent to plot data from
-#' bb_vec <- c(xmin = -91, xmax = -82, ymin = 41, ymax = 48)
+#' bb_vec <- c(xmin = -83, xmax = -82, ymin = 41, ymax = 48)
 #' e <- ebirdst_extent(bb_vec, t = c("04-01", "06-30"))
+#'
+#' \dontrun{
 #'
 #' plot_all_ppms(path = sp_path, ext = e)
 #'
@@ -419,7 +421,7 @@ plot_all_ppms <- function(path, ext) {
     ggplot2::theme_light() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
   # if the median bernoulli deviance value is below 0, put a red x
-  if (medbde < 0) {
+  if (is.finite(medbde) && medbde < 0) {
     g_occ <- g_occ +
       ggplot2::geom_point(data = bderep,
                           shape = 4, size = 10, color = "red")
@@ -445,7 +447,7 @@ plot_all_ppms <- function(path, ext) {
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
 
   # if the median poisson deviance value is below 0, put a red x
-  if (medpde < 0) {
+  if (is.finite(medpde) && medpde < 0) {
     g_abd <- g_abd +
       ggplot2::geom_point(data = pderep,
                           shape = 4, size = 10, color = "red")

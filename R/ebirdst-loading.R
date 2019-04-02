@@ -22,16 +22,16 @@
 #'   fresh copy be downloaded anyway.
 #'
 #' @return Path to the run-specific root of the downloaded files.
-#' @export
-#' @examples
-#' \dontrun{
 #'
+#' @export
+#'
+#' @examples
 #' # download the example data
 #' ebirdst_download("example_data")
 #'
+#' \dontrun{
 #' # download the full data package for wood thrush
 #' ebirdst_download("woothr")
-#'
 #' }
 ebirdst_download <- function(species,
                           path = rappdirs::user_data_dir("ebirdst"),
@@ -158,18 +158,15 @@ download_data <- function(species,
 #'   eBird Status and Trends products.
 #'
 #' @return A `RasterStack` of data for the given product.
+#'
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#'
 #' # download example data
 #' sp_path <- ebirdst_download("example_data")
 #'
 #' # load data
 #' load_raster("abundance_umean", sp_path)
-#'
-#' }
 load_raster <- function(product = c("abundance_umean",
                                     "occurrence_umean",
                                     "abundance_lower",
@@ -222,8 +219,6 @@ load_raster <- function(product = c("abundance_umean",
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#'
 #' # download and load example abundance data
 #' sp_path <- ebirdst_download("example_data")
 #' abd <- load_raster("abundance_umean", sp_path)
@@ -231,8 +226,6 @@ load_raster <- function(product = c("abundance_umean",
 #' # label
 #' abd <- label_raster_stack(abd)
 #' names(abd)
-#'
-#' }
 label_raster_stack <- function(x) {
   stopifnot(inherits(x, "Raster"))
 
@@ -275,8 +268,6 @@ label_raster_stack <- function(x) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#'
 #' # download and load example abundance data
 #' sp_path <- ebirdst_download("example_data")
 #' abd <- load_raster("abundance_umean", sp_path)
@@ -286,8 +277,6 @@ label_raster_stack <- function(x) {
 #'
 #' # parse dates
 #' parse_raster_dates(abd)
-#'
-#' }
 parse_raster_dates <- function(x) {
   stopifnot(inherits(x, "Raster"))
   if(length(grep("X2016.", names(x)[1])) == 0) {
@@ -365,11 +354,10 @@ load_summary <- function(path, return_sf = FALSE) {
 #'   well as stixel summary information.
 #'
 #' @import data.table
+#'
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#'
 #' # download example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
@@ -381,8 +369,6 @@ load_summary <- function(path, return_sf = FALSE) {
 #' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #' plot_pis(pis, ext = e, n_top_pred = 15, by_cover_class = TRUE)
-#'
-#' }
 load_pis <- function(path, return_sf = FALSE) {
   stopifnot(dir.exists(path))
   stopifnot(is.logical(return_sf), length(return_sf) == 1)
@@ -438,23 +424,22 @@ load_pis <- function(path, return_sf = FALSE) {
 #'   logit scale.
 #'
 #' @import data.table
+#'
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#'
 #' # download example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
 #' # load partial dependence
 #' pds <- load_pds(sp_path)
 #'
+#' \dontrun{
 #' # plot partial dependence for effort hours
 #' # define a spatiotemporal extent to plot data from
 #' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #' plot_pds(pds, "effort_hrs", ext = e)
-#'
 #' }
 load_pds <- function(path, return_sf = FALSE) {
   stopifnot(dir.exists(path))
@@ -569,16 +554,12 @@ load_test_data_raw <- function(path, return_sf = FALSE) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#'
 #' # download example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
 #' # test data
 #' test_data <- load_test_data(sp_path)
 #' dplyr::glimpse(test_data)
-#'
-#' }
 load_test_data <- function(path, return_sf = FALSE) {
   stopifnot(dir.exists(path))
   stopifnot(is.logical(return_sf), length(return_sf) == 1)

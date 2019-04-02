@@ -1,6 +1,7 @@
 # ebirdst 0.1.0
 
-First CRAN release
+- First CRAN release
+- Resubmission addressing feedback from CRAN reviewer: examples now run in under 5s and DESCRIPTION improved
 
 ## Test environments
 

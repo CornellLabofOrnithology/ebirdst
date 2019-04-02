@@ -146,14 +146,18 @@ eBird Status and Trends products.</p></td>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='co'># download example data</span>
-<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span>(<span class='st'>"example_data"</span>)
-
+    <pre class="examples"><div class='input'><span class='co'># download example data</span>
+<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span>(<span class='st'>"example_data"</span>)</div><div class='output co'>#&gt; <span class='message'>Data already exists, use force = TRUE to re-download.</span></div><div class='input'>
 <span class='co'># load data</span>
-<span class='fu'>load_raster</span>(<span class='st'>"abundance_umean"</span>, <span class='no'>sp_path</span>)
-
-<span class='co'># }</span></pre>
+<span class='fu'>load_raster</span>(<span class='st'>"abundance_umean"</span>, <span class='no'>sp_path</span>)</div><div class='output co'>#&gt; class       : RasterStack 
+#&gt; dimensions  : 259, 276, 71484, 52  (nrow, ncol, ncell, nlayers)
+#&gt; resolution  : 2779.876, 2779.876  (x, y)
+#&gt; extent      : -7202659, -6435414, 4636834, 5356822  (xmin, xmax, ymin, ymax)
+#&gt; coord. ref. : +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs 
+#&gt; names       : X2016.01.04, X2016.01.11, X2016.01.18, X2016.01.25, X2016.02.01, X2016.02.08, X2016.02.15, X2016.02.22, X2016.03.01, X2016.03.08, X2016.03.15, X2016.03.22, X2016.03.29, X2016.04.05, X2016.04.12, ... 
+#&gt; min values  :   0.0000000,   0.0000000,   0.0000000,   0.0000000,   0.0000000,   0.0000000,   0.0000000,   0.0000000,   0.0000000,   0.0000000,   0.0000000,   0.0000000,   0.0000000,   0.0000000,   0.5802106, ... 
+#&gt; max values  :   0.8549717,   0.8846672,   0.9409274,   0.9427117,   0.8812727,   0.8041122,   0.8244059,   0.6452407,   0.6917557,   0.7189543,   0.6893005,   0.7716944,   0.9601365,   1.7183727,   2.5218585, ... 
+#&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

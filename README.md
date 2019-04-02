@@ -1,6 +1,6 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-ebirdst: Tools to Load, Map, Plot, and Analyze eBird Status and Trends Data Products
-====================================================================================
+ebirdst: Access and Analyze eBird Status and Trends Data
+========================================================
 
 [![License: GPL
 v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
