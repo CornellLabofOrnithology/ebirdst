@@ -10,13 +10,18 @@ status](https://ci.appveyor.com/api/projects/status/v7cyxwquwrxxa5l6/branch/mast
 status](https://travis-ci.org/CornellLabofOrnithology/ebirdst.svg?branch=master)](https://travis-ci.org/CornellLabofOrnithology/ebirdst)
 [![Coverage
 status](https://codecov.io/gh/CornellLabofOrnithology/ebirdst/branch/master/graph/badge.svg)](https://codecov.io/github/CornellLabofOrnithology/ebirdst?branch=master)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/ebirdst)](https://cran.r-project.org/package=ebirdst)
 
 Installation
 ------------
 
-You can install `ebirdst` from GitHub with:
+Install `ebirdst` from CRAN with:
 
-    # install the development version from GitHub
+    install.packages("ebirdst")
+
+Alternatively, you can install the development version from GitHub with:
+
     # install.packages("remotes")
     remotes::install_github("CornellLabofOrnithology/ebirdst")
 
