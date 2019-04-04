@@ -48,10 +48,10 @@ compute_ppms <- function(path, ext) {
   ppm_data_raw <- load_test_data_raw(path = path)
 
   # add aditional rows from raw data file
-  ppm_data_raw <- ppm_data_raw[c("row_id", "lon", "lat", "dates", "y")]
-  names(ppm_data_raw) <- c("row_id", "lon", "lat", "date", "obs")
-  ppm_data_raw$date <- ppm_data_raw$date - floor(ppm_data_raw$date)
-  ppm_data_raw <- ppm_data_raw[!(ppm_data_raw$row_id %in% ppm_data$row_id), ]
+  ppm_data_raw <- ppm_data_raw[c("sampling_event_id", "lon", "lat", "day", "obs")]
+  ppm_data_raw$date <- ppm_data_raw$day / 366
+  ppm_data_raw$day <- NULL
+  ppm_data_raw <- ppm_data_raw[!(ppm_data_raw$sampling_event_id %in% ppm_data$sampling_event_id), ]
 
   ppm_data <- dplyr::bind_rows(ppm_data, ppm_data_raw)
   rm(ppm_data_raw)
@@ -61,7 +61,8 @@ compute_ppms <- function(path, ext) {
     ppm_data <- ebirdst_subset(ppm_data, ext = ext)
   }
   if (nrow(ppm_data) == 0) {
-    stop("No test data within spatiotemporal extent.")
+    #stop("No test data within spatiotemporal extent.")
+    return(return(list(binary_ppms = NULL, occ_ppms = NULL, abd_ppms = NULL)))
   }
 
   # static variables
@@ -91,10 +92,15 @@ compute_ppms <- function(path, ext) {
 
   # compute monte carlo sample of ppms for spatiotemporal subset
   # split data into within range and out of range
-  ppm_data_zeroes <- ppm_data[ppm_data$pi_es < 75 | is.na(ppm_data$pi_es), ]
-  ppm_data <- ppm_data[ppm_data$pi_es >= 75, ]
+  # TODO for production release, remove use of load_config()
+  e <- load_config(path)
+
+  ppm_data_zeroes <- ppm_data[ppm_data$pi_es < floor(e$FOLD_N * 0.75) |
+                                is.na(ppm_data$pi_es), ]
+  ppm_data <- ppm_data[ppm_data$pi_es >= floor(e$FOLD_N * 0.75), ]
 
   if (nrow(ppm_data) == 0) {
+    return(return(list(binary_ppms = NULL, occ_ppms = NULL, abd_ppms = NULL)))
     warning("No predicted occurrences within spatiotemporal extent.")
     invisible(NULL)
   }
