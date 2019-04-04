@@ -46,7 +46,7 @@ This data set provides estimates of the year-round distribution, abundances, and
 
 # Data Access
 
-**DATA ACCESS DETAILS TO BE PROVIDED VIA AWS IN THE NEXT 2-4 MONTHS**
+eBird Status and Trends data are stored in the cloud on [Amazon Web Services](https://registry.opendata.aws/ebirdst/) and accessible for download using the function `ebirdst_download()`.
 
 ```{r quick_start}
 library(ebirdst)
@@ -63,7 +63,7 @@ sp_path <- ebirdst_download(species = "example_data")
 
 The eBird Status and Trends data are stored in the cloud using [Amazon Web Services (AWS)](https://aws.amazon.com/) object storage service, [S3](https://aws.amazon.com/s3/). AWS also provides access to flexible cloud computing resources in the form of [EC2](https://aws.amazon.com/ec2/) instances. Users may want to considering analyzing Status and Trends data using an AWS EC2 instance because data transfer will be extremely fast between S3 and EC2 compared to downloading the data to a local machine. An additional benefit of using EC2 for analyses is access to instances with more powerful computing resources than a desktop or laptop. Working with the Status and Trends data can be extremely memory intensive, due to their high spatial and temporal resolution, so these additional resources can significantly speed up analyses.
 
-For instruction on how to set up RStudio on an AWS EC2 instance consult [Louis Aslett's detailed guide](http://www.louisaslett.com/RStudio_AMI/). After following these instructions, you will be able to log in to an RStudio session in the cloud using your web browser. Within this RStudio session, run `remotes::install_github("CornellLabofOrnithology/ebirdst")` to install the `ebirdst` package. You should now be able to work with eBird Status and Trends data in the cloud on AWS.
+For instruction on how to set up RStudio on an AWS EC2 instance consult [Louis Aslett's detailed guide](http://www.louisaslett.com/RStudio_AMI/). After following these instructions, you will be able to log in to an RStudio session in the cloud using your web browser. Within this RStudio session, run `install.packages("ebirdst")` to install the `ebirdst` package. You should now be able to work with eBird Status and Trends data in the cloud on AWS.
 
 # Data Types and Structure
 
@@ -75,44 +75,44 @@ The data products included in the downloads contain two types of data: a) raster
 
 ## Data Structure
 
-Data are grouped by species, using a unique run name. The structure of the run name is: <six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid>. A full list of species and run names can be found in the `ebirdst_runs` [data frame](https://cornelllabofornithology.github.io/ebirdst/reference/ebirdst_runs.html). If you are not using the R package you can find a CSV equivalent at the root of the AWS s3 bucket at this [url](https://s3-us-west-2.amazonaws.com/ebirdst-data/ebirdst_run_names.csv). 
+Data are grouped by species, using a unique run name. The structure of the run name is: `six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid`. A full list of species and run names can be found in the `ebirdst_runs` [data frame](https://cornelllabofornithology.github.io/ebirdst/reference/ebirdst_runs.html). If you are not using the R package you can find a CSV equivalent at the root of the AWS s3 bucket at this [url](https://s3-us-west-2.amazonaws.com/ebirdst-data/ebirdst_run_names.csv). 
 
 For each individual species, the data are structured in the following way:
   
-\\\<run_name>\\data\\ebird.abund_<run_name>_erd.test.data.csv
-\\\<run_name>\\data\\<run_name>_srd_raster_template.tif
-\\\<run_name>\\results\\abund_preds\\unpeeled_folds\\pd.txt
-\\\<run_name>\\results\\abund_preds\\unpeeled_folds\\pi.txt 
-\\\<run_name>\\results\\abund_preds\\unpeeled_folds\\summary.txt 
-\\\<run_name>\\results\\abund_preds\\unpeeled_folds\\test.pred.ave.txt 
-\\\<run_name>\\results\\tifs\\<run_name>_hr_2016_abundance_umean.tif
-\\\<run_name>\\results\\tifs\\<run_name>_hr_2016_abundance_upper.tif
-\\\<run_name>\\results\\tifs\\<run_name>_hr_2016_abundance_lower.tif
-\\\<run_name>\\results\\tifs\\<run_name>_hr_2016_occurrence_umean.tif
+`/<run_name>/data/ebird.abund_<run_name>_erd.test.data.csv`
+`/<run_name>/data/<run_name>_srd_raster_template.tif`
+`/<run_name>/results/abund_preds/unpeeled_folds/pd.txt`
+`/<run_name>/results/abund_preds/unpeeled_folds/pi.txt`
+`/<run_name>/results/abund_preds/unpeeled_folds/summary.txt`
+`/<run_name>/results/abund_preds/unpeeled_folds/test.pred.ave.txt`
+`/<run_name>/results/tifs/<run_name>_hr_2016_abundance_umean.tif`
+`/<run_name>/results/tifs/<run_name>_hr_2016_abundance_upper.tif`
+`/<run_name>/results/tifs/<run_name>_hr_2016_abundance_lower.tif`
+`/<run_name>/results/tifs/<run_name>_hr_2016_occurrence_umean.tif`
 
 ## Raster Data
 
 eBird Status and Trends abundance and occurrence estimates are currently provided in the widely used GeoTIFF raster format. These are easily opened with the `raster` package in R, as well as with a variety of GIS software tools. Each estimate is stored in a multi-band GeoTIFF file. These "cubes" come with areas of predicted and assumed zeroes, such that any cells that are NA represent areas outside of the area of estimation. All cubes have 52 weeks, even if some weeks are all NA (such as those species that winter entirely outside of North America). The two vignettes that are relevant to the raster data are the [intro mapping vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html) and the [advanced mapping  vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-advanced-mapping.html).
 
-The relevant abundance and occurrence estimate GeoTiff files are found under the \\\<run_name>\\results\\tifs\\ directory and contain the following files.
+The relevant abundance and occurrence estimate GeoTiff files are found under the `/<run_name>/results/tifs/` directory and contain the following files.
 
-\\\<run_name>\\results\\tifs\\<run_name>_hr_2016_abundance_umean.tif
-\\\<run_name>\\results\\tifs\\<run_name>_hr_2016_abundance_upper.tif
-\\\<run_name>\\results\\tifs\\<run_name>_hr_2016_abundance_lower.tif
-\\\<run_name>\\results\\tifs\\<run_name>_hr_2016_occurrence_umean.tif
+`/<run_name>/results/tifs/<run_name>_hr_2016_abundance_umean.tif`
+`/<run_name>/results/tifs/<run_name>_hr_2016_abundance_upper.tif`
+`/<run_name>/results/tifs/<run_name>_hr_2016_abundance_lower.tif`
+`/<run_name>/results/tifs/<run_name>_hr_2016_occurrence_umean.tif`
 
 ### Projection
 
-The GeoTIFFs use the same Sinusoidal projection as NASA MODIS data. As part of this package, we provide a template raster (\\\<run_name>\\data\\<run_name_srd_raster_template.tif), that contains the spatial extent and resolution for the full Western Hemisphere. Note that 2018's results cover only North America. Accessing this raster directly through the package is not necessary, and can be applied elsewhere (e.g., other GIS software). Note that this projection is ideal for analysis, as it is an equal are projection, but is not ideal for mapping. See the [intro mapping vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html) for details on using a more suitable projection for mapping.
+The GeoTIFFs use the same Sinusoidal projection as NASA MODIS data. As part of this package, we provide a template raster (`/<run_name>/data/<run_name_srd_raster_template.tif`), that contains the spatial extent and resolution for the full Western Hemisphere. Note that 2018's results cover only North America. Accessing this raster directly through the package is not necessary, and can be applied elsewhere (e.g., other GIS software). Note that this projection is ideal for analysis, as it is an equal are projection, but is not ideal for mapping. See the [intro mapping vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html) for details on using a more suitable projection for mapping.
     
 ### Raster Layer Descriptions
 
 | Type | Measure | File Name |
 | ---------- | ---------- |  ---------- |
-| occurrence | trimmed mean | \*\_hr\_2016\_occurrence\_umean.tif  |
-| abundance  | trimmed mean | \*\_hr\_2016\_abundance\_umean.tif |
-| abundance  | 10th quantile | \*\_hr\_2016\_abundance\_lower.tif  |
-| abundance  | 90th quantile | \*\_hr\_2016\_abundance\_upper.tif  |
+| occurrence | trimmed mean | `<run_name>_hr_2016_occurrence_umean.tif`  |
+| abundance  | trimmed mean | `<run_name>_hr_2016_abundance_umean.tif` |
+| abundance  | 10th quantile | `<run_name>_hr_2016_abundance_lower.tif`  |
+| abundance  | 90th quantile | `<run_name>_hr_2016_abundance_upper.tif`  |
     
 #### occurrence_umean
 
