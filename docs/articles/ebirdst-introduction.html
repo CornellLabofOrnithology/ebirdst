@@ -75,7 +75,7 @@
       <h1>Background, Data Access, and Data Structure</h1>
                         <h4 class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2019-04-03</h4>
+            <h4 class="date">2019-04-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-introduction.Rmd"><code>vignettes/ebirdst-introduction.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-introduction.Rmd</code></div>
@@ -109,7 +109,7 @@
 <div id="data-access" class="section level1">
 <h1 class="hasAnchor">
 <a href="#data-access" class="anchor"></a>Data Access</h1>
-<p><strong>DATA ACCESS DETAILS TO BE PROVIDED VIA AWS IN THE NEXT 2-4 MONTHS</strong></p>
+<p>eBird Status and Trends data are stored in the cloud on <a href="https://registry.opendata.aws/ebirdst/">Amazon Web Services</a> and accessible for download using the function <code><a href="../reference/ebirdst_download.html">ebirdst_download()</a></code>.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ebirdst)</a>
 <a class="sourceLine" id="cb1-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb1-3" data-line-number="3"><span class="co"># download data</span></a>
@@ -122,7 +122,7 @@
 <h2 class="hasAnchor">
 <a href="#access-from-amazon-web-services" class="anchor"></a>Access from Amazon Web Services</h2>
 <p>The eBird Status and Trends data are stored in the cloud using <a href="https://aws.amazon.com/">Amazon Web Services (AWS)</a> object storage service, <a href="https://aws.amazon.com/s3/">S3</a>. AWS also provides access to flexible cloud computing resources in the form of <a href="https://aws.amazon.com/ec2/">EC2</a> instances. Users may want to considering analyzing Status and Trends data using an AWS EC2 instance because data transfer will be extremely fast between S3 and EC2 compared to downloading the data to a local machine. An additional benefit of using EC2 for analyses is access to instances with more powerful computing resources than a desktop or laptop. Working with the Status and Trends data can be extremely memory intensive, due to their high spatial and temporal resolution, so these additional resources can significantly speed up analyses.</p>
-<p>For instruction on how to set up RStudio on an AWS EC2 instance consult <a href="http://www.louisaslett.com/RStudio_AMI/">Louis Aslett’s detailed guide</a>. After following these instructions, you will be able to log in to an RStudio session in the cloud using your web browser. Within this RStudio session, run <code><a href="https://www.rdocumentation.org/packages/remotes/topics/install_github">remotes::install_github("CornellLabofOrnithology/ebirdst")</a></code> to install the <code>ebirdst</code> package. You should now be able to work with eBird Status and Trends data in the cloud on AWS.</p>
+<p>For instruction on how to set up RStudio on an AWS EC2 instance consult <a href="http://www.louisaslett.com/RStudio_AMI/">Louis Aslett’s detailed guide</a>. After following these instructions, you will be able to log in to an RStudio session in the cloud using your web browser. Within this RStudio session, run <code><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages("ebirdst")</a></code> to install the <code>ebirdst</code> package. You should now be able to work with eBird Status and Trends data in the cloud on AWS.</p>
 </div>
 </div>
 <div id="data-types-and-structure" class="section level1">
@@ -137,20 +137,20 @@
 <div id="data-structure" class="section level2">
 <h2 class="hasAnchor">
 <a href="#data-structure" class="anchor"></a>Data Structure</h2>
-<p>Data are grouped by species, using a unique run name. The structure of the run name is: <six_letter_code-erd2016-ebird_science-date-uuid>. A full list of species and run names can be found in the <code>ebirdst_runs</code> <a href="https://cornelllabofornithology.github.io/ebirdst/reference/ebirdst_runs.html">data frame</a>. If you are not using the R package you can find a CSV equivalent at the root of the AWS s3 bucket at this <a href="https://s3-us-west-2.amazonaws.com/ebirdst-data/ebirdst_run_names.csv">url</a>.</six_letter_code-erd2016-ebird_science-date-uuid></p>
+<p>Data are grouped by species, using a unique run name. The structure of the run name is: <code>six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid</code>. A full list of species and run names can be found in the <code>ebirdst_runs</code> <a href="https://cornelllabofornithology.github.io/ebirdst/reference/ebirdst_runs.html">data frame</a>. If you are not using the R package you can find a CSV equivalent at the root of the AWS s3 bucket at this <a href="https://s3-us-west-2.amazonaws.com/ebirdst-data/ebirdst_run_names.csv">url</a>.</p>
 <p>For each individual species, the data are structured in the following way:</p>
-<p>\&lt;run_name&gt;\data\ebird.abund_<run_name>_erd.test.data.csv \&lt;run_name&gt;\data\<run_name>_srd_raster_template.tif \&lt;run_name&gt;\results\abund_preds\unpeeled_folds\pd.txt \&lt;run_name&gt;\results\abund_preds\unpeeled_folds\pi.txt \&lt;run_name&gt;\results\abund_preds\unpeeled_folds\summary.txt \&lt;run_name&gt;\results\abund_preds\unpeeled_folds\test.pred.ave.txt \&lt;run_name&gt;\results\tifs\<run_name>_hr_2016_abundance_umean.tif \&lt;run_name&gt;\results\tifs\<run_name>_hr_2016_abundance_upper.tif \&lt;run_name&gt;\results\tifs\<run_name>_hr_2016_abundance_lower.tif \&lt;run_name&gt;\results\tifs\<run_name>_hr_2016_occurrence_umean.tif</run_name></run_name></run_name></run_name></run_name></run_name></p>
+<p><code>/&lt;run_name&gt;/data/ebird.abund_&lt;run_name&gt;_erd.test.data.csv</code> <code>/&lt;run_name&gt;/data/&lt;run_name&gt;_srd_raster_template.tif</code> <code>/&lt;run_name&gt;/results/abund_preds/unpeeled_folds/pd.txt</code> <code>/&lt;run_name&gt;/results/abund_preds/unpeeled_folds/pi.txt</code> <code>/&lt;run_name&gt;/results/abund_preds/unpeeled_folds/summary.txt</code> <code>/&lt;run_name&gt;/results/abund_preds/unpeeled_folds/test.pred.ave.txt</code> <code>/&lt;run_name&gt;/results/tifs/&lt;run_name&gt;_hr_2016_abundance_umean.tif</code> <code>/&lt;run_name&gt;/results/tifs/&lt;run_name&gt;_hr_2016_abundance_upper.tif</code> <code>/&lt;run_name&gt;/results/tifs/&lt;run_name&gt;_hr_2016_abundance_lower.tif</code> <code>/&lt;run_name&gt;/results/tifs/&lt;run_name&gt;_hr_2016_occurrence_umean.tif</code></p>
 </div>
 <div id="raster-data" class="section level2">
 <h2 class="hasAnchor">
 <a href="#raster-data" class="anchor"></a>Raster Data</h2>
 <p>eBird Status and Trends abundance and occurrence estimates are currently provided in the widely used GeoTIFF raster format. These are easily opened with the <code>raster</code> package in R, as well as with a variety of GIS software tools. Each estimate is stored in a multi-band GeoTIFF file. These “cubes” come with areas of predicted and assumed zeroes, such that any cells that are NA represent areas outside of the area of estimation. All cubes have 52 weeks, even if some weeks are all NA (such as those species that winter entirely outside of North America). The two vignettes that are relevant to the raster data are the <a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html">intro mapping vignette</a> and the <a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-advanced-mapping.html">advanced mapping vignette</a>.</p>
-<p>The relevant abundance and occurrence estimate GeoTiff files are found under the \&lt;run_name&gt;\results\tifs\ directory and contain the following files.</p>
-<p>\&lt;run_name&gt;\results\tifs\<run_name>_hr_2016_abundance_umean.tif \&lt;run_name&gt;\results\tifs\<run_name>_hr_2016_abundance_upper.tif \&lt;run_name&gt;\results\tifs\<run_name>_hr_2016_abundance_lower.tif \&lt;run_name&gt;\results\tifs\<run_name>_hr_2016_occurrence_umean.tif</run_name></run_name></run_name></run_name></p>
+<p>The relevant abundance and occurrence estimate GeoTiff files are found under the <code>/&lt;run_name&gt;/results/tifs/</code> directory and contain the following files.</p>
+<p><code>/&lt;run_name&gt;/results/tifs/&lt;run_name&gt;_hr_2016_abundance_umean.tif</code> <code>/&lt;run_name&gt;/results/tifs/&lt;run_name&gt;_hr_2016_abundance_upper.tif</code> <code>/&lt;run_name&gt;/results/tifs/&lt;run_name&gt;_hr_2016_abundance_lower.tif</code> <code>/&lt;run_name&gt;/results/tifs/&lt;run_name&gt;_hr_2016_occurrence_umean.tif</code></p>
 <div id="projection" class="section level3">
 <h3 class="hasAnchor">
 <a href="#projection" class="anchor"></a>Projection</h3>
-<p>The GeoTIFFs use the same Sinusoidal projection as NASA MODIS data. As part of this package, we provide a template raster (\&lt;run_name&gt;\data\&lt;run_name_srd_raster_template.tif), that contains the spatial extent and resolution for the full Western Hemisphere. Note that 2018’s results cover only North America. Accessing this raster directly through the package is not necessary, and can be applied elsewhere (e.g., other GIS software). Note that this projection is ideal for analysis, as it is an equal are projection, but is not ideal for mapping. See the <a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html">intro mapping vignette</a> for details on using a more suitable projection for mapping.</p>
+<p>The GeoTIFFs use the same Sinusoidal projection as NASA MODIS data. As part of this package, we provide a template raster (<code>/&lt;run_name&gt;/data/&lt;run_name_srd_raster_template.tif</code>), that contains the spatial extent and resolution for the full Western Hemisphere. Note that 2018’s results cover only North America. Accessing this raster directly through the package is not necessary, and can be applied elsewhere (e.g., other GIS software). Note that this projection is ideal for analysis, as it is an equal are projection, but is not ideal for mapping. See the <a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html">intro mapping vignette</a> for details on using a more suitable projection for mapping.</p>
 </div>
 <div id="raster-layer-descriptions" class="section level3">
 <h3 class="hasAnchor">
@@ -165,22 +165,22 @@
 <tr class="odd">
 <td>occurrence</td>
 <td>trimmed mean</td>
-<td>*_hr_2016_occurrence_umean.tif</td>
+<td><code>&lt;run_name&gt;_hr_2016_occurrence_umean.tif</code></td>
 </tr>
 <tr class="even">
 <td>abundance</td>
 <td>trimmed mean</td>
-<td>*_hr_2016_abundance_umean.tif</td>
+<td><code>&lt;run_name&gt;_hr_2016_abundance_umean.tif</code></td>
 </tr>
 <tr class="odd">
 <td>abundance</td>
 <td>10th quantile</td>
-<td>*_hr_2016_abundance_lower.tif</td>
+<td><code>&lt;run_name&gt;_hr_2016_abundance_lower.tif</code></td>
 </tr>
 <tr class="even">
 <td>abundance</td>
 <td>90th quantile</td>
-<td>*_hr_2016_abundance_upper.tif</td>
+<td><code>&lt;run_name&gt;_hr_2016_abundance_upper.tif</code></td>
 </tr>
 </tbody>
 </table>
