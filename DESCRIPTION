@@ -1,7 +1,7 @@
 Type: Package
 Package: ebirdst
 Title: Access and Analyze eBird Status and Trends Data
-Version: 0.1.0
+Version: 0.1.0.900
 Authors@R: 
     c(person(given = "Tom",
              family = "Auer",
