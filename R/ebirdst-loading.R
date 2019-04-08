@@ -327,7 +327,7 @@ load_summary <- function(path, return_sf = FALSE) {
 
   # define stixel summary fields
 
-  tidy_pl <- str_replace_all(str_to_lower(e$PREDICTOR_LIST), "\\.", "_")
+  tidy_pl <- stringr::str_replace_all(stringr::str_to_lower(e$PREDICTOR_LIST), "\\.", "_")
   train_covar_mean_names <- paste("train_cov_mean", tidy_pl, sep = "_")
   srd_covar_mean_names <- paste("srd_cov_mean", tidy_pl, sep = "_")
   summary_names <- c("stixel", "data_type", "stixel_id", "srd_n", "lon", "lat",
@@ -403,7 +403,7 @@ load_pis <- function(path, return_sf = FALSE) {
   # TODO for production release, remove use of load_config()
   e <- load_config(path)
   pi_names <- c("stixel", "data_type", "stixel_id",
-                str_replace_all(str_to_lower(e$PI_VARS), "\\.", "_"))
+                stringr::str_replace_all(stringr::str_to_lower(e$PI_VARS), "\\.", "_"))
 
   # pi file
   pi_df <- data.table::fread(pi_file,
@@ -548,14 +548,14 @@ load_predictors <- function(path) {
   load(config_file, envir = e)
 
   # predictors
-  predictor_df <- tibble(predictor = e$PREDICTOR_LIST) %>%
-    mutate(predictor_tidy = str_to_lower(predictor) %>%
-             str_replace_all("\\.", "_"),
-           lc_class = str_replace(predictor_tidy, "_1500_[a-z]+$", ""),
-           lc_class = if_else(str_detect(lc_class, "_fs_"),
+  predictor_df <- dplyr::tibble(predictor = e$PREDICTOR_LIST) %>%
+    dplyr::mutate(predictor_tidy = stringr::str_to_lower(predictor) %>%
+             stringr::str_replace_all("\\.", "_"),
+           lc_class = stringr::str_replace(predictor_tidy, "_1500_[a-z]+$", ""),
+           lc_class = dplyr::if_else(stringr::str_detect(lc_class, "_fs_"),
                               lc_class, NA_character_)) %>%
     # assign labels
-    mutate(lc_class_label = case_when(
+    dplyr::mutate(lc_class_label = dplyr::case_when(
       # umd landcover
       lc_class == "mcd12q1_umd_fs_c1" ~ "Evergreen Needleleaf Forests",
       lc_class == "mcd12q1_umd_fs_c10" ~ "Grasslands",
@@ -640,18 +640,18 @@ load_predictors <- function(path) {
       # intertidal
       lc_class == "intertidal_fs_c1" ~ "Tidal Mudflats",
       TRUE ~ NA_character_)) %>%
-    mutate(predictor_label = if_else(is.na(lc_class_label),
-                                     str_replace_all(predictor_tidy, "_", " ") %>%
-                                       str_to_title(),
+    dplyr::mutate(predictor_label = dplyr::if_else(is.na(lc_class_label),
+                                     stringr::str_replace_all(predictor_tidy, "_", " ") %>%
+                                       stringr::str_to_title(),
                                      paste(lc_class_label,
-                                           str_extract(predictor, "[A-Z]+$"))),
-           predictor_label = str_replace(predictor_label, "Km", "(km)"),
-           predictor_label = str_replace(predictor_label, "Hrs", "Hours"),
-           predictor_label = str_replace(predictor_label, "Elev", "Elevation"),
-           predictor_label = str_replace(predictor_label, "Sd", "SD"),
-           predictor_label = str_replace(predictor_label, "Ntl", "Nighttime Lights"),
-           lc_class_label = coalesce(lc_class_label, predictor_label)) %>%
-    select(predictor, predictor_tidy, predictor_label, lc_class, lc_class_label)
+                                           stringr::str_extract(predictor, "[A-Z]+$"))),
+           predictor_label = stringr::str_replace(predictor_label, "Km", "(km)"),
+           predictor_label = stringr::str_replace(predictor_label, "Hrs", "Hours"),
+           predictor_label = stringr::str_replace(predictor_label, "Elev", "Elevation"),
+           predictor_label = stringr::str_replace(predictor_label, "Sd", "SD"),
+           predictor_label = stringr::str_replace(predictor_label, "Ntl", "Nighttime Lights"),
+           lc_class_label = dplyr::coalesce(lc_class_label, predictor_label)) %>%
+    dplyr::select(predictor, predictor_tidy, predictor_label, lc_class, lc_class_label)
 
   return(as.data.frame(predictor_df, stringsAsFactors = FALSE))
 }
