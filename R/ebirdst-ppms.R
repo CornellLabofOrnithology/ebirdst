@@ -107,10 +107,18 @@ compute_ppms <- function(path, ext) {
 
   # false discovery rate (fdr)
   binom_test_p <- function(x) {
-    stats::binom.test(round(as.numeric(x["pat"]) * as.numeric(x["pi_es"]), 0),
-                      as.numeric(x["pi_es"]),
-                      (1 / 7),
-                      alternative = "greater")$p.value
+
+    if(is.na(x["pat"]) | is.na(x["pi_es"])) {
+      p <- NA
+    } else {
+      p <- stats::binom.test(round(as.numeric(x["pat"]) * as.numeric(x["pi_es"]),
+                                   0),
+                        as.numeric(x["pi_es"]),
+                        (1 / 7),
+                        alternative = "greater")$p.value
+    }
+
+    return(p)
   }
   p_values <- apply(ppm_data, 1, binom_test_p)
   p_adj <- stats::p.adjust(p_values, "fdr")
