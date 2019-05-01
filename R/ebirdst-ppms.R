@@ -123,7 +123,7 @@ compute_ppms <- function(path, ext) {
   p_values <- apply(ppm_data, 1, binom_test_p)
   p_adj <- stats::p.adjust(p_values, "fdr")
   # add binary prediction
-  ppm_data$binary <- as.numeric(p_adj < 0.001)
+  ppm_data$binary <- as.numeric(p_adj < 0.1)
   # treat test data out of range with binary = 0
   if (nrow(ppm_data_zeroes) > 0) {
     ppm_data_zeroes$binary <- 0
