@@ -48,10 +48,15 @@ performance metrics.
 Quick Start
 -----------
 
-This quick start guide shows how to download example data and plot
-abundance values similar to how they are plotted for the [eBird Status
-and Trends Abundance
+This quick start guide shows how to download data and plot abundance
+values similar to how they are plotted for the [eBird Status and Trends
+Abundance
 animations](https://ebird.org/science/status-and-trends/woothr/abundance-map-weekly).
+In this guide, a simplified example dataset is used consisting of
+Yellow-bellied Sapsucker in Michigan. For a full list of the species
+available for download, look at the data frame `ebirst_runs`, which is
+included in this package.
+
 **Important note: after downloading the results, do not change the file
 structure.** All functionality in this package relies on the structure
 inherent in the delivered results. Changing the folder and file
