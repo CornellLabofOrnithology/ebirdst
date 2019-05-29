@@ -552,8 +552,11 @@ load_predictors <- function(path) {
     dplyr::mutate(predictor_tidy = stringr::str_to_lower(predictor) %>%
              stringr::str_replace_all("\\.", "_"),
            lc_class = stringr::str_replace(predictor_tidy, "_1500_[a-z]+$", ""),
-           lc_class = dplyr::if_else(stringr::str_detect(lc_class, "_fs_"),
-                              lc_class, NA_character_)) %>%
+           lc_class = dplyr::if_else(stringr::str_detect(lc_class, "_fs_") |
+                                       stringr::str_detect(lc_class, "ntl"),
+                              lc_class, NA_character_),
+           lc_class = dplyr::if_else(stringr::str_detect(lc_class, "ntl"),
+                                     "ntl", lc_class)) %>%
     # assign labels
     dplyr::mutate(lc_class_label = dplyr::case_when(
       # umd landcover
@@ -639,6 +642,8 @@ load_predictors <- function(path) {
       lc_class == "mod44w_oic_fs_c3" ~ "Coastal Water",
       # intertidal
       lc_class == "intertidal_fs_c1" ~ "Tidal Mudflats",
+      # ntl
+      lc_class == "ntl" ~ "Nighttime Lights",
       TRUE ~ NA_character_)) %>%
     dplyr::mutate(predictor_label = dplyr::if_else(is.na(lc_class_label),
                                      stringr::str_replace_all(predictor_tidy, "_", " ") %>%
