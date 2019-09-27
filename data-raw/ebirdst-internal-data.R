@@ -56,7 +56,7 @@ ebirdst_summary_names <- c("stixel", "data_type", "stixel_id", "srd_n",
 # pi column names
 l <- readRDS("data-raw/woothr-ERD2018-BMEXP-20190726-4be38d37_config.rds")
 ebirdst_pi_names <- c("stixel", "data_type", "response", "stixel_id",
-                      l$PI_VARS, "encounter_rate")
+                      l$PI_VARS, "occ_pred")
 ebirdst_pi_names <- ebirdst_pi_names %>%
   str_to_lower() %>%
   str_replace_all("\\.", "_")
