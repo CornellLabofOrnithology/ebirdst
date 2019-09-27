@@ -322,37 +322,14 @@ load_summary <- function(path, return_sf = FALSE) {
     stop(paste0("The file summary.txt does not exist at ", stixel_path))
   }
 
-  # TODO for production release, remove use of load_config()
-  e <- load_config(path)
-
-  # define stixel summary fields
-
-  tidy_pl <- stringr::str_replace_all(stringr::str_to_lower(e$PREDICTOR_LIST), "\\.", "_")
-  train_covar_mean_names <- paste("train_cov_mean", tidy_pl, sep = "_")
-  srd_covar_mean_names <- paste("srd_cov_mean", tidy_pl, sep = "_")
-  summary_names <- c("stixel", "data_type", "stixel_id", "srd_n", "lon", "lat",
-                     "date", "stixel_width", "stixel_height", "stixel_area",
-                     "train_n", "positive_ob_n", "stixel_prevalence",
-                     "mean_non_zero_count", "binary_kappa", "binary_auc",
-                     "binary_deviance_model", "binary_deviance_mean",
-                     "binary_deviance_explained", "pois_deviance_model",
-                     "pois_deviance_mean", "posi_deviance_explained",
-                     "total_effort_hrs", "total_effort_distance_km",
-                     "total_number_observers", "train_elevation_mean",
-                     train_covar_mean_names, #k-covariate values
-                     "train_covariate_entropy", "srd_elevation_mean",
-                     srd_covar_mean_names, #k-covariate values
-                     "srd_covariate_entropy", "max_time")
-
+  # load stixel summary data
   summary_df <- data.table::fread(summary_file,
-                                  col.names = summary_names,
-                                  #col.names = ebirdst_summary_names_tidy,
                                   stringsAsFactors = FALSE,
                                   showProgress = FALSE)
   summary_df <- summary_df[, c("stixel", "data_type") := NULL]
   summary_df <- summary_df[!is.na(summary_df$lon), ]
 
-  summary_df <- as.data.frame(summary_df)
+  summary_df <- as.data.frame(summary_df, stringsAsFactors = FALSE)
   if (isTRUE(return_sf)) {
     summary_df <- sf::st_as_sf(summary_df, coords = c("lon", "lat"), crs = 4326)
   }
@@ -400,27 +377,21 @@ load_pis <- function(path, return_sf = FALSE) {
     stop(paste("The file pi.txt does not exist at:", stixel_path))
   }
 
-  # TODO for production release, remove use of load_config()
-  e <- load_config(path)
-  pi_names <- c("stixel", "data_type", "stixel_id",
-                stringr::str_replace_all(stringr::str_to_lower(e$PI_VARS), "\\.", "_"))
-
-  # pi file
+  # load pi file
   pi_df <- data.table::fread(pi_file,
-                             col.names = pi_names,
-                             #col.names = ebirdst_pi_names_tidy,
                              stringsAsFactors = FALSE,
                              showProgress = FALSE)
   pi_df <- pi_df[, c("stixel", "data_type") := NULL]
 
   # summary file
-  summary_df <- load_summary(path)
+  summary_df <- ebirdst:::load_summary(path)
   summary_df <- summary_df[, 1:12]
 
   # merge pis with summary
   pi_summary <- dplyr::inner_join(summary_df, pi_df, by = "stixel_id")
-
   pi_summary <- as.data.frame(pi_summary)
+  names(pi_summary) <- stringr::str_replace_all(tolower(names(pi_summary)),
+                                                "\\.", "_")
   if (isTRUE(return_sf)) {
     pi_summary <- sf::st_as_sf(pi_summary, coords = c("lon", "lat"), crs = 4326)
   }
@@ -464,6 +435,7 @@ load_pis <- function(path, return_sf = FALSE) {
 #' plot_pds(pds, "effort_hrs", ext = e)
 #' }
 load_pds <- function(path, return_sf = FALSE) {
+  stop("PD data not currently available")
   stopifnot(dir.exists(path))
   stopifnot(is.logical(return_sf), length(return_sf) == 1)
 
@@ -703,7 +675,7 @@ load_test_data_raw <- function(path, return_sf = FALSE) {
   DBI::dbDisconnect(con)
 
   # fix names
-  names(td_df) <- stringr::str_replace_all(stringr::str_to_lower(names(td_df)),
+  names(td_df) <- stringr::str_replace_all(tolower(names(td_df)),
                                            "\\.", "_")
   nm_idx <- match(c("longitude", "latitude"), names(td_df))
   names(td_df)[nm_idx] <- c("lon", "lat")
@@ -753,16 +725,15 @@ load_test_data <- function(path, return_sf = FALSE) {
 
   # load test data
   td_df <- data.table::fread(td_file,
-                             col.names = ebirdst_td_names,
                              stringsAsFactors = FALSE,
                              showProgress = FALSE)
   td_df <- td_df[, "data_type" := NULL]
-
-
   td_df <- as.data.frame(td_df, stringsAsFactors = FALSE)
+
   if (isTRUE(return_sf)) {
     td_df <- sf::st_as_sf(td_df, coords = c("lon", "lat"), crs = 4326)
   }
+
   return(td_df)
 }
 
