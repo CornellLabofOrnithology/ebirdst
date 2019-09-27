@@ -25,8 +25,6 @@
 #' @export
 #'
 #' @examples
-
-#'
 #' # download and load example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
@@ -48,6 +46,7 @@ compute_ppms <- function(path, ext) {
   ppm_data_raw <- load_test_data_raw(path = path)
 
   # add aditional rows from raw data file
+  # these are assumed zeros and therefore not in test prediciton data
   ppm_data_raw <- ppm_data_raw[c("sampling_event_id", "lon", "lat", "day", "obs")]
   ppm_data_raw$date <- ppm_data_raw$day / 366
   ppm_data_raw$day <- NULL
@@ -61,8 +60,8 @@ compute_ppms <- function(path, ext) {
     ppm_data <- ebirdst_subset(ppm_data, ext = ext)
   }
   if (nrow(ppm_data) == 0) {
-    #stop("No test data within spatiotemporal extent.")
-    return(return(list(binary_ppms = NULL, occ_ppms = NULL, abd_ppms = NULL)))
+    warning("No predicted occurrences within spatiotemporal extent.")
+    return(list(binary_ppms = NULL, occ_ppms = NULL, abd_ppms = NULL))
   }
 
   # static variables
@@ -92,32 +91,24 @@ compute_ppms <- function(path, ext) {
 
   # compute monte carlo sample of ppms for spatiotemporal subset
   # split data into within range and out of range
-  # TODO for production release, remove use of load_config()
-  e <- load_config(path)
-
-  ppm_data_zeroes <- ppm_data[ppm_data$pi_es < floor(e$FOLD_N * 0.75) |
-                                is.na(ppm_data$pi_es), ]
-  ppm_data <- ppm_data[ppm_data$pi_es >= floor(e$FOLD_N * 0.75), ]
+  ppm_data_zeroes <- ppm_data[ppm_data$pi_es < 75 | is.na(ppm_data$pi_es), ]
+  ppm_data <- ppm_data[ppm_data$pi_es >= 75, ]
 
   if (nrow(ppm_data) == 0) {
-    return(return(list(binary_ppms = NULL, occ_ppms = NULL, abd_ppms = NULL)))
     warning("No predicted occurrences within spatiotemporal extent.")
-    invisible(NULL)
+    return(list(binary_ppms = NULL, occ_ppms = NULL, abd_ppms = NULL))
   }
 
   # false discovery rate (fdr)
   binom_test_p <- function(x) {
-
     if(is.na(x["pat"]) | is.na(x["pi_es"])) {
-      p <- NA
-    } else {
-      p <- stats::binom.test(round(as.numeric(x["pat"]) * as.numeric(x["pi_es"]),
-                                   0),
-                        as.numeric(x["pi_es"]),
-                        (1 / 7),
-                        alternative = "greater")$p.value
+      return(NA)
     }
-
+    pat_pi_es <- round(as.numeric(x["pat"]) * as.numeric(x["pi_es"]), 0)
+    p <- stats::binom.test(pat_pi_es, as.numeric(x["pi_es"]),
+                           p = (1 / 7),
+                           alternative = "greater")
+    p <- p$p.value
     return(p)
   }
   p_values <- apply(ppm_data, 1, binom_test_p)
@@ -135,7 +126,7 @@ compute_ppms <- function(path, ext) {
   ppm_data <- ppm_data[!is.na(ppm_data$binary), ]
   if (nrow(ppm_data) == 0) {
     warning("No predicted occurrences within spatiotemporal extent.")
-    invisible(NULL)
+    return(list(binary_ppms = NULL, occ_ppms = NULL, abd_ppms = NULL))
   }
 
   # monte carlo samples for ppms: binary, spatially balanced sample

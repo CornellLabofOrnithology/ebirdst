@@ -54,7 +54,10 @@ Imports:
     utils,
     viridisLite,
     xml2,
-    rgdal
+    rgdal,
+    DBI,
+    RSQLite,
+    rlang
 Suggests: 
     covr,
     fields,
