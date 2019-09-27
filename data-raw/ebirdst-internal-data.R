@@ -34,60 +34,44 @@ ned_wh_st_moll <- ne_download(scale = ne_scale, category = "cultural",
          state_name = gn_name) %>%
   st_transform(crs = mollweide)
 
-# column names for tabular data
-e <- new.env()
-load("data-raw/yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83_config.RData",
-     envir = e)
-
 # summary
-train_cov_means_names <- paste("train.cov.mean", e$PREDICTOR_LIST, sep = "_")
-srd_cov_means_names <- paste("srd.cov.mean", e$PREDICTOR_LIST, sep = "_")
-ebirdst_summary_names <- c("stixel", "data_type", "stixel.id", "srd.n",
+ebirdst_summary_names <- c("stixel", "data_type", "stixel_id", "srd_n",
                            "lon", "lat", "date",
                            "stixel_width", "stixel_height", "stixel_area",
-                           "train.n",
-                           "positive.ob_n",
+                           "train_n",
+                           "positive_ob_n",
                            "stixel_prevalence",
                            "mean_non_zero_count",
-                           "binary_Kappa", "binary_AUC",
-                           "binary.deviance_model", "binary.deviance_mean",
-                           "binary.deviance_explained",
-                           "pois.deviance_model", "pois.deviance_mean",
-                           "posi.deviance_explained",
-                           "total_EFFORT_HRS",
-                           "total_EFFORT_DISTANCE_KM",
-                           "total_NUMBER_OBSERVERS",
-                           "train_elevation_mean",
-                           train_cov_means_names, #k-covariate values
-                           "train_covariate_entropy",
-                           "srd_elevation_mean",
-                           srd_cov_means_names, #k-covariate values
-                           "srd_covariate_entropy",
+                           "binary_kappa", "binary_auc",
+                           "binary_deviance_model", "binary_deviance_mean",
+                           "binary_deviance_explained",
+                           "pois_deviance_model", "pois_deviance_mean",
+                           "posi_deviance_explained",
+                           "total_effort_hrs",
+                           "total_effort_distance_km",
+                           "total_number_observers",
                            "max_time")
-ebirdst_summary_names <- ebirdst_summary_names %>%
-  str_to_lower() %>%
-  str_replace_all("\\.", "_")
 
 # predictor importance
-ebirdst_pi_names <- c("stixel", "data_type", "stixel.id", e$PI_VARS)
+# pi column names
+l <- readRDS("data-raw/woothr-ERD2018-BMEXP-20190726-4be38d37_config.rds")
+ebirdst_pi_names <- c("stixel", "data_type", "response", "stixel_id",
+                      l$PI_VARS, "encounter_rate")
 ebirdst_pi_names <- ebirdst_pi_names %>%
   str_to_lower() %>%
   str_replace_all("\\.", "_")
 
 # partial dependence
-ebirdst_pd_names <- c("stixel", "data_type", "stixel.id", "predictor",
+ebirdst_pd_names <- c("stixel", "data_type", "stixel_id", "predictor",
                       paste0("y", 1:50), "spacer", paste0("x", 1:50))
-ebirdst_pd_names <- ebirdst_pd_names %>%
-  str_to_lower() %>%
-  str_replace_all("\\.", "_")
 
 # test data
-ebirdst_td_names <- c("data_type", "row.id", "lon", "lat", "date", "obs",
-                      "pi.mean", "pi.90", "pi.10", "pi.se", "pi.mu.mean",
-                      "pi.mu.90", "pi.mu.10", "pi.mu.se", "pat", "pi.es")
-ebirdst_td_names <- ebirdst_td_names %>%
-  str_to_lower() %>%
-  str_replace_all("\\.", "_")
+ebirdst_td_names <- c("data_type", "sampling_event_id",
+                      "lon", "lat", "date", "obs",
+                      "pi_mean", "pi_upper", "pi_lower", "pi_se",
+                      "mu_mean", "mu_upper", "mu_lower", "mu_se",
+                      "pi_mu_mean", "pi_mu_upper", "pi_mu_lower", "pi_mu_se",
+                      "pat", "pi_es")
 
 # save as internal data files
 usethis::use_data(ned_wh_co_moll, ned_wh_st_moll,

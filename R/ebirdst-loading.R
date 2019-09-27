@@ -450,8 +450,6 @@ load_pis <- function(path, return_sf = FALSE) {
 #'
 #' @import data.table
 #'
-#' @export
-#'
 #' @examples
 #' # download example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
@@ -520,24 +518,19 @@ load_pds <- function(path, return_sf = FALSE) {
 #' e <- load_config(sp_path)
 #' }
 load_config <- function(path) {
-  e <- new.env()
-
-  config_file_path <- list.files(paste(path, "/data", sep = ""),
-                                 pattern = "*_config*")
-  config_file <- paste(path, "/data/", config_file_path, sep = "")
+  config_file <- list.files(paste(path, "/data", sep = ""),
+                            pattern = "*_config.rds",
+                            full.names = TRUE)
 
   if(!file.exists(config_file)) {
-    stop(paste("*_config.RData file does not exist in the /data directory. ",
+    stop(paste("*_config.rds file does not exist in the /data directory. ",
                "Check your paths so that they look like this: ",
                "~/directory/<six_letter_code-ERD2016-PROD-date-uuid>/. ",
                "Make sure you do not change the file structure of the results.",
                sep = ""))
   }
 
-  load(config_file, envir = e)
-  rm(config_file)
-
-  return(e)
+  return(readRDS(config_file))
 }
 
 load_predictors <- function(path) {
@@ -692,19 +685,22 @@ load_test_data_raw <- function(path, return_sf = FALSE) {
   stopifnot(dir.exists(path))
 
   data_path <- file.path(path, "data")
-  td_file <- list.files(data_path,
-                        pattern = "erd_test.csv",
+  td_db <- list.files(data_path,
+                        pattern = "_data\\.db",
                         full.names = TRUE)
 
-  if (length(td_file) != 1 || !file.exists(td_file)) {
+  if (length(td_db) != 1 || !file.exists(td_db)) {
     stop(paste("Error locating raw test data file at:", data_path))
   }
 
-  # load pd.txt
-  td_df <- data.table::fread(td_file,
-                             stringsAsFactors = FALSE,
-                             showProgress = FALSE)
-  td_df <- td_df[, "type" := NULL]
+  # load raw test data from sqlite db
+  con <- DBI::dbConnect(RSQLite::SQLite(), td_db)
+  # extract erd data from sqlite
+  td_df <- dplyr::tbl(con, "erd") %>%
+    dplyr::filter(.data$DATA_TYPE == 1) %>%
+    dplyr::collect()
+  td_df[["DATA_TYPE"]] <- NULL
+  DBI::dbDisconnect(con)
 
   # fix names
   names(td_df) <- stringr::str_replace_all(stringr::str_to_lower(names(td_df)),
@@ -755,10 +751,7 @@ load_test_data <- function(path, return_sf = FALSE) {
     stop(paste("The file test_pred_ave.txt does not exist at:", stixel_path))
   }
 
-  # TODO redo ebirdst_td_names for production
-  ebirdst_td_names[ebirdst_td_names == "row_id"] <- "sampling_event_id"
-
-  # load pd.txt
+  # load test data
   td_df <- data.table::fread(td_file,
                              col.names = ebirdst_td_names,
                              stringsAsFactors = FALSE,
@@ -766,7 +759,7 @@ load_test_data <- function(path, return_sf = FALSE) {
   td_df <- td_df[, "data_type" := NULL]
 
 
-  td_df <- as.data.frame(td_df)
+  td_df <- as.data.frame(td_df, stringsAsFactors = FALSE)
   if (isTRUE(return_sf)) {
     td_df <- sf::st_as_sf(td_df, coords = c("lon", "lat"), crs = 4326)
   }
