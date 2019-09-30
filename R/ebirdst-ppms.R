@@ -114,7 +114,7 @@ compute_ppms <- function(path, ext) {
   p_values <- apply(ppm_data, 1, binom_test_p)
   p_adj <- stats::p.adjust(p_values, "fdr")
   # add binary prediction
-  ppm_data$binary <- as.numeric(p_adj < 0.1)
+  ppm_data$binary <- as.numeric(p_adj < 0.01)
   # treat test data out of range with binary = 0
   if (nrow(ppm_data_zeroes) > 0) {
     ppm_data_zeroes$binary <- 0
@@ -146,7 +146,7 @@ compute_ppms <- function(path, ext) {
   for (i_mc in seq_len(n_mc)) {
     # case control sampling
     sampled <- sample_case_control(ppm_data,
-                                   res = c(10000, 10000),
+                                   res = c(3000, 3000),
                                    t_res = 7 / 365,
                                    n = 1,
                                    jitter = TRUE,
