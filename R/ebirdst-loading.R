@@ -669,7 +669,7 @@ load_test_data_raw <- function(path, return_sf = FALSE) {
   con <- DBI::dbConnect(RSQLite::SQLite(), td_db)
   # extract erd data from sqlite
   td_df <- dplyr::tbl(con, "erd") %>%
-    dplyr::filter(.data$DATA_TYPE == 1) %>%
+    dplyr::filter(DATA_TYPE == 1) %>%
     dplyr::collect()
   td_df[["DATA_TYPE"]] <- NULL
   DBI::dbDisconnect(con)
