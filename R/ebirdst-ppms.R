@@ -35,7 +35,7 @@
 #' # compute predictive performance metrics
 #' ppms <- compute_ppms(path = sp_path, ext = e)
 #' }
-compute_ppms <- function(path, ext) {
+compute_ppms <- function(path, ext, pat_cutoff) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
   if (!missing(ext)) {
     stopifnot(inherits(ext, "ebirdst_extent"))
@@ -106,7 +106,7 @@ compute_ppms <- function(path, ext) {
     }
     pat_pi_es <- round(as.numeric(x["pat"]) * as.numeric(x["pi_es"]), 0)
     p <- stats::binom.test(pat_pi_es, as.numeric(x["pi_es"]),
-                           p = (1 / 7),
+                           p = pat_cutoff,
                            alternative = "greater")
     p <- p$p.value
     return(p)
