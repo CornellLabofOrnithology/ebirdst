@@ -178,7 +178,7 @@ compute_ppms <- function(path, ext, pat_cutoff) {
 
     # within range, occupancy rate ppms
     data_i <- data_i[data_i$binary > 0, ]
-    data_i <- data_i[stats::complete.cases(data_i$pi_mean), ]
+    data_i <- data_i[stats::complete.cases(data_i$pi_median), ]
 
     os$mc_iteration[i_mc] <- i_mc
     os$sample_size[i_mc] <- nrow(data_i)
@@ -187,7 +187,7 @@ compute_ppms <- function(path, ext, pat_cutoff) {
     if (nrow(data_i) >= occ_min_ss && os$mean[i_mc] >= occ_min_mean) {
       pa_df <- data.frame(blank = "x",
                           obs = as.numeric(data_i$obs > 0),
-                          pred = data_i$pi_mean)
+                          pred = data_i$pi_median)
       pa_mets <- PresenceAbsence::presence.absence.accuracy(pa_df,
                                                             threshold = 0.5,
                                                             na.rm = TRUE,
@@ -220,18 +220,18 @@ compute_ppms <- function(path, ext, pat_cutoff) {
     if(nrow(data_i) >= count_min_ss && cs$mean[i_mc] >= count_min_mean ) {
       # poisson deviance
       cs$poisson_dev_abd[i_mc] <- poisson_dev(obs = data_i$obs,
-                                              pred = data_i$pi_mu_mean)[3]
+                                              pred = data_i$pi_mu_median)[3]
 
       pdev <- as.numeric(poisson_dev(obs = data_i$obs,
-                                     pred = data_i$pi.mean))
+                                     pred = data_i$pi_median))
       cs$poisson_dev_occ[i_mc] <- poisson_dev(obs = data_i$obs,
-                                              pred = data_i$pi_mean)[3]
+                                              pred = data_i$pi_median)[3]
 
       # spearman's rank correlations
-      cs$spearman_abd[i_mc] <- stats::cor(data_i$pi_mu_mean,
+      cs$spearman_abd[i_mc] <- stats::cor(data_i$pi_mu_median,
                                           data_i$obs,
                                           method = "spearman")
-      cs$spearman_occ[i_mc] <- stats::cor(data_i$pi_mean,
+      cs$spearman_occ[i_mc] <- stats::cor(data_i$pi_median,
                                           data_i$obs,
                                           method = "spearman")
     }
