@@ -59,7 +59,8 @@ Imports:
     tools,
     utils,
     viridisLite,
-    xml2
+    xml2,
+    Rcpp
 Suggests: 
     covr,
     fields,
@@ -75,3 +76,4 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1
+LinkingTo: Rcpp
