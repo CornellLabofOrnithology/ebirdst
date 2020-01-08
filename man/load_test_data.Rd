@@ -15,19 +15,22 @@ rather then the default data frame.}
 }
 \value{
 data.frame containing test data, including checklist locations,
-observed counts, and predicted mean and associated error for relative
-occurrence and abundance.
+observed counts, and predictor variables.
 }
 \description{
-Internal function used by \code{\link[=compute_ppms]{compute_ppms()}} to get the test data for
+Internal function used by \code{\link[=compute_ppms]{compute_ppms()}} to get the full test data set for
 calculating predictive performance metrics. This file contains the observed
-counts and model predicted relative occurrence and abundance values.
+counts and all predictor variables used for modeling for each checklist in
+the test dataset.
 }
 \examples{
+\donttest{
 # download example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
 # test data
-test_data <- load_test_data(sp_path)
+test_data <- ebirdst:::load_test_data(sp_path)
 dplyr::glimpse(test_data)
 }
+}
+\keyword{internal}

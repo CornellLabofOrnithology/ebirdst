@@ -1,6 +1,6 @@
 # clean up
 unlink(file.path(rappdirs::user_data_dir("ebirdst"),
-                 "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"),
+                 "yebsap-ERD2018-EBIRD_SCIENCE-20191030-3abe59ca-example"),
        recursive = TRUE)
 unlink(list.files("man", full.names = TRUE))
 devtools::clean_vignettes()

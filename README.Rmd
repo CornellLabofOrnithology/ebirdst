@@ -40,6 +40,13 @@ Alternatively, you can install the development version from GitHub with:
 remotes::install_github("CornellLabofOrnithology/ebirdst")
 ```
 
+ Older versions of the Status and Trends data can be accessed by installing the associated version of `ebirdst` from GitHub. For example, the 2018 data, corresponding to v0.1.0 of this package, can be accessed by installing:
+ 
+```{r gh-installation-old, eval = FALSE}
+# install.packages("remotes")
+remotes::install_github("CornellLabofOrnithology/ebirdst@v0.1.0")
+```
+
 ## Vignettes
 
 For a full introduction and advanced usage, please see the package [website](https://cornelllabofornithology.github.io/ebirdst). An [introductory vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-introduction.html) details the data access and structure of the results. An [intro mapping vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html) expands upon the quick start readme and shows the basic mapping moves. The [advanced mapping  vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-advanced-mapping.html) shows how to reproduce the seasonal maps and statistics on the [eBird Status and Trends website](https://ebird.org/science/status-and-trends). Finally, the [non-raster data vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-pipd.html) details how to access additional information from the model results about predictor importance and directionality, as well as predictive performance metrics. 
@@ -58,13 +65,13 @@ library(rnaturalearth)
 # download data
 # download a simplified example dataset from aws s3
 # example data are for yellow-bellied sapsucker in michigan
-# fby default ile will be stored in a persistent data directory:
+# by default files will be stored in a persistent data directory:
 # rappdirs::user_data_dir("ebirdst"))
 sp_path <- ebirdst_download(species = "example_data")
 
 # load estimated relative abundance and label with dates
 # this raster stack has 52 layers, one for each week of the year
-abunds <- load_raster("abundance_umean", path = sp_path)
+abunds <- load_raster("abundance", path = sp_path)
 
 # use parse_raster_dates() to get actual date objects for each layer
 date_vector <- parse_raster_dates(abunds)

@@ -4,8 +4,14 @@
 \alias{plot_pis}
 \title{Plot predictor importances boxplot}
 \usage{
-plot_pis(pis, ext, by_cover_class = FALSE, n_top_pred = 50,
-  pretty_names = TRUE, plot = TRUE)
+plot_pis(
+  pis,
+  ext,
+  by_cover_class = FALSE,
+  n_top_pred = 50,
+  pretty_names = TRUE,
+  plot = TRUE
+)
 }
 \arguments{
 \item{pis}{data.frame; predictor importance data from \code{\link[=load_pis]{load_pis()}}.}

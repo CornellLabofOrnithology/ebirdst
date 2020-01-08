@@ -4,7 +4,7 @@
 \name{ebirdst_predictors}
 \alias{ebirdst_predictors}
 \title{eBird Status and Trends predictors}
-\format{A data frame with 87 rows and 5 columns:
+\format{A data frame with 69 rows and 5 columns:
 \describe{
 \item{predictor}{Predictor variable name.}
 \item{predictor_tidy}{Predictor variable name, tidied to only contain
@@ -17,7 +17,7 @@ gives the associated landcover class. It can be used for grouping
 and summarizing the four FRAGSTATS metrics to the level of the
 landcover class.}
 \item{lc_class_label}{Similar to \code{predictor_label}; however, this variable
-gives the four FRAGSTATS metrics a single name for the landcover
+gives the FRAGSTATS metrics a single name for the landcover
 class.}
 }}
 \usage{
@@ -28,8 +28,7 @@ A data frame of the predictors used in the eBird Status and Trends models.
 These include effort variables (e.g. distance travelled, number of observers,
 etc.) in addition to land and water cover variables. These landcover
 variables are derived from the MODIS MCD12Q1 500 m landcover product, and for
-each land cover class four FRAGSTATS metrics are calculated within a 1.5 km
-buffer around each checklist: % landcover (PLAND), edge density (ED), largest
-patch index (LPI), and patch density (PD).
+each land cover class two FRAGSTATS metrics are calculated within a 1.5 km
+buffer around each checklist: \% landcover (PLAND) and edge density (ED).
 }
 \keyword{datasets}

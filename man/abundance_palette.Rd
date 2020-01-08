@@ -4,9 +4,11 @@
 \alias{abundance_palette}
 \title{eBird Status and Trends color palettes for abundance data}
 \usage{
-abundance_palette(n, season = c("weekly", "breeding", "nonbreeding",
-  "migration", "prebreeding_migration", "postbreeding_migration",
-  "year_round"))
+abundance_palette(
+  n,
+  season = c("weekly", "breeding", "nonbreeding", "migration", "prebreeding_migration",
+    "postbreeding_migration", "year_round")
+)
 }
 \arguments{
 \item{n}{integer; the number of colors to be in the palette.}

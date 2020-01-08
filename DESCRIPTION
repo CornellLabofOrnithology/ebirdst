@@ -36,10 +36,8 @@ Depends:
 Imports: 
     car,
     data.table,
-    DBI,
     dplyr (>= 0.7.0),
     fasterize,
-    gbm (>= 2.1.5),
     ggplot2,
     grDevices,
     gridExtra,
@@ -50,12 +48,11 @@ Imports:
     raster,
     rgdal,
     rlang,
-    RSQLite,
     scales,
     sf,
     stats,
     stringr,
-    tidyr,
+    tidyr (>= 1.0.0),
     tools,
     utils,
     viridisLite,
@@ -74,4 +71,4 @@ VignetteBuilder:
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2

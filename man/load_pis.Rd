@@ -19,7 +19,7 @@ well as stixel summary information.
 }
 \description{
 Loads the predictor importance data (from pi.txt), joins with stixel summary
-data, sets column names, and cleans up the data.frame.
+data, and cleans up the data.frame.
 }
 \examples{
 # download example data
