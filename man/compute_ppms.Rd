@@ -18,7 +18,7 @@ A list of three data frames: \code{binary_ppms}, \code{occ_ppms}, and
 \code{abd_ppms}. These data frames have 25 rows corresponding to 25 Monte Carlo
 iterations each estimating the PPMs using a spatiotemporal subsample of the
 test data. Columns correspond to the different PPMS. \code{binary_ppms} contains
-binary or range-based PPMS, \code{occ_ppms} contains within-range occupancy
+binary or range-based PPMS, \code{occ_ppms} contains within-range occurrence
 probability PPMS, and \code{abd_ppms} contains within-range abundance PPMs. In
 some cases, PPMs may be missing, either because there isn't a large enough
 test set within the spatiotemporal extent or because average occurrence or
