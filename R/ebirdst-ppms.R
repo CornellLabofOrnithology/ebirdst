@@ -15,7 +15,7 @@
 #'   `abd_ppms`. These data frames have 25 rows corresponding to 25 Monte Carlo
 #'   iterations each estimating the PPMs using a spatiotemporal subsample of the
 #'   test data. Columns correspond to the different PPMS. `binary_ppms` contains
-#'   binary or range-based PPMS, `occ_ppms` contains within-range occupancy
+#'   binary or range-based PPMS, `occ_ppms` contains within-range occurrence
 #'   probability PPMS, and `abd_ppms` contains within-range abundance PPMs. In
 #'   some cases, PPMs may be missing, either because there isn't a large enough
 #'   test set within the spatiotemporal extent or because average occurrence or
@@ -154,7 +154,7 @@ compute_ppms <- function(path, ext) {
     # index back to full vector
     data_i <- ppm_data[sampled, ]
 
-    # binary occupancy ppms
+    # binary occurrence ppms
     bs$mc_iteration[i_mc] <- i_mc
     bs$sample_size[i_mc] <- nrow(data_i)
     bs$mean[i_mc] <- mean(as.numeric(data_i$obs > 0))
@@ -175,7 +175,7 @@ compute_ppms <- function(path, ext) {
       bs$bernoulli_dev[i_mc] <- bde
     }
 
-    # within range, occupancy rate ppms
+    # within range, occurrence rate ppms
     data_i <- data_i[data_i$binary > 0, ]
     data_i <- data_i[stats::complete.cases(data_i$pi_median), ]
 
@@ -363,7 +363,7 @@ plot_all_ppms <- function(path, ext) {
   # prepare ppms
   ppm_data <- compute_ppms(path = path, ext = ext)
   ppm_data$binary_ppms$type <- "binary"
-  ppm_data$occ_ppms$type <- "occupancy"
+  ppm_data$occ_ppms$type <- "occurrence"
   ppm_data$abd_ppms$type <- "abundance"
   ppm_data <- dplyr::bind_rows(ppm_data)
   ppm_data <- dplyr::select(ppm_data,
@@ -398,15 +398,15 @@ plot_all_ppms <- function(path, ext) {
     ggplot2::geom_boxplot(notch = FALSE) +
     ggplot2::ylim(c(0, 1)) +
     ggplot2::labs(x = NULL, y = NULL,
-                  title = "Binary Occupancy PPMs") +
+                  title = "Binary Occurrence PPMs") +
     ggplot2::theme_light() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
 
-  # construct plot for occupancy ppms
-  ppm_o <- ppm_data[ppm_data$type == "occupancy", ]
+  # construct plot for occurrence ppms
+  ppm_o <- ppm_data[ppm_data$type == "occurrence", ]
   # negative check of bernoulli deviance
   medbde <- stats::median(ppm_o$value[ppm_o$metric == "bernoulli_dev"])
-  bderep <- data.frame(type = "occupancy",
+  bderep <- data.frame(type = "occurrence",
                        label = "Bernoulli\nDeviance",
                        value = 0,
                        stringsAsFactors = FALSE)
@@ -417,7 +417,7 @@ plot_all_ppms <- function(path, ext) {
     ggplot2::geom_boxplot(notch = FALSE) +
     ggplot2::ylim(c(0, 1)) +
     ggplot2::labs(x = NULL, y = NULL,
-                  title = "Occupancy Probability PPMs") +
+                  title = "Occurrence Probability PPMs") +
     ggplot2::theme_light() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
   # if the median bernoulli deviance value is below 0, put a red x
