@@ -7,8 +7,7 @@
 \usage{
 sample_grid(x, res, t_res, n = 1, replace = FALSE, jitter = TRUE)
 
-sample_case_control(x, res, t_res, n = 1, replace = FALSE,
-  jitter = TRUE)
+sample_case_control(x, res, t_res, n = 1, replace = FALSE, jitter = TRUE)
 }
 \arguments{
 \item{x}{data frame or \link{sf} point object; the points to subsample}
@@ -42,7 +41,7 @@ additionally samples presence and absence independently.
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
 # test data to sample
-test_data <- load_test_data(sp_path, return_sf = TRUE)
+test_data <- load_test_preds(sp_path, return_sf = TRUE)
 
 # sample on a 100km, 1 month grid
 s <- sample_grid(test_data, res = 100000, t_res = 1 / 12)

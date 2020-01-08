@@ -30,7 +30,7 @@ calc_full_extent(r)
 \donttest{
 # download and load example abundance data
 sp_path <- ebirdst_download("example_data")
-abd <- load_raster("abundance_umean", sp_path)
+abd <- load_raster("abundance", sp_path)
 
 # calculate full extent
 plot_extent <- calc_full_extent(abd)

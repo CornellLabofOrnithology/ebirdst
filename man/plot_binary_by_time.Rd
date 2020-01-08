@@ -4,8 +4,12 @@
 \alias{plot_binary_by_time}
 \title{Plot binary occurrence metrics by time}
 \usage{
-plot_binary_by_time(path, metric = c("kappa", "auc", "sensitivity",
-  "specificity"), ext, n_time_periods = 52)
+plot_binary_by_time(
+  path,
+  metric = c("kappa", "auc", "sensitivity", "specificity"),
+  ext,
+  n_time_periods = 52
+)
 }
 \arguments{
 \item{path}{character; full path to directory containing the eBird Status and
@@ -35,8 +39,13 @@ otherwise rangewide performance will be shown.
 \examples{
 # download and load example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
+
+# define a spatiotemporal extent to plot data from
+bb_vec <- c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5)
+e <- ebirdst_extent(bb_vec, t = c("04-01", "06-30"))
 \donttest{
 # plot monthly kappa
-plot_binary_by_time(path = sp_path, metric = "kappa", n_time_periods = 12)
+plot_binary_by_time(path = sp_path, metric = "kappa",
+                    ext = e, n_time_periods = 4)
 }
 }

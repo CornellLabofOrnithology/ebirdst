@@ -22,7 +22,8 @@ Internal function that converts the cryptic predictor class names to
 readable land cover names.
 }
 \examples{
-predictors <- c("UMD_FS_C1_1500_PLAND", "MODISWATER_FS_C7_1500_LPI", "ELEV")
+predictors <- c("MCD12Q1_LCCS1_FS_C1_1500_ED", "MOD44W_OIC_FS_C3_1500_ED",
+                "ELEV_SD")
 ebirdst:::convert_classes(predictors, pretty = TRUE)
 }
 \keyword{internal}

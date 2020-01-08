@@ -22,10 +22,7 @@ Date vector.
 \examples{
 # download and load example abundance data
 sp_path <- ebirdst_download("example_data")
-abd <- load_raster("abundance_umean", sp_path)
-
-# label
-abd <- label_raster_stack(abd)
+abd <- load_raster("abundance", sp_path)
 
 # parse dates
 parse_raster_dates(abd)

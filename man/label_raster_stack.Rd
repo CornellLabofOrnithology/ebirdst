@@ -27,7 +27,7 @@ with the dates for each band.
 \examples{
 # download and load example abundance data
 sp_path <- ebirdst_download("example_data")
-abd <- load_raster("abundance_umean", sp_path)
+abd <- load_raster("abundance", sp_path)
 
 # label
 abd <- label_raster_stack(abd)

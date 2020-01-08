@@ -46,7 +46,7 @@ e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 # download and load example data
 sp_path <- ebirdst_download("example_data")
 pis <- load_pis(sp_path)
-abd <- load_raster(product = "abundance_umean", sp_path)
+abd <- load_raster(product = "abundance", sp_path)
 
 # subset
 abd_ss <- ebirdst_subset(abd, ext = e)

@@ -23,7 +23,7 @@
 #' \donttest{
 #' # download and load example abundance data
 #' sp_path <- ebirdst_download("example_data")
-#' abd <- load_raster("abundance_umean", sp_path)
+#' abd <- load_raster("abundance", sp_path)
 #'
 #' # calculate full extent
 #' plot_extent <- calc_full_extent(abd)
@@ -94,7 +94,7 @@ calc_full_extent <- function(x) {
 #' @examples
 #' # download and load example abundance data
 #' sp_path <- ebirdst_download("example_data")
-#' abd <- load_raster("abundance_umean", sp_path)
+#' abd <- load_raster("abundance", sp_path)
 #' \dontshow{
 #' # crop to speed up cran tests
 #' e <-  raster::extent(abd)
@@ -186,19 +186,18 @@ calc_bins <- function(x) {
 }
 
 
-#' Map PI and PD centroid locations
+#' Map PI centroid locations
 #'
-#' Creates a map showing the stixel centroid locations for PIs and/or PDs, with
-#' an optional spatiotemporal subset using an [ebirdst_extent] object
+#' Creates a map showing the stixel centroid locations for predictor importance
+#' values, with an optional spatiotemporal subset using an [ebirdst_extent]
+#' object
 #'
 #' @param path character; full path to directory containing the eBird Status and
 #'   Trends products for a single species.
 #' @param ext [ebirdst_extent] object (optional); the spatiotemporal extent to
 #'   filter the data to.
-#' @param plot_pis logical; whether to show PI stixel centroid locations.
-#' @param plot_pds logical; whether to show PD stixel centroid locations.
 #'
-#' @return Plot showing locations of PIs and/or PDs.
+#' @return Plot showing locations of PI centroids.
 #'
 #' @export
 #'
@@ -211,13 +210,8 @@ calc_bins <- function(x) {
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #'
 #' map_centroids(path = sp_path, ext = e)
-map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
+map_centroids <- function(path, ext) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
-  stopifnot(is.logical(plot_pis), length(plot_pis) == 1)
-  stopifnot(is.logical(plot_pds), length(plot_pds) == 1)
-  if (!plot_pds & !plot_pis) {
-    stop("Plotting of both PIs and PDs set to FALSE. Nothing to plot!")
-  }
   if (missing(ext)) {
     stop("A spatiotemporal extent must be provided.")
   } else {
@@ -231,26 +225,13 @@ map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
               pi_a = "#d95f0e", pi_s = "#feb24c")
 
   # convert data to spatial, find bounding box
-  # pds
-  if (isTRUE(plot_pds)) {
-    pds <- load_pds(path = path)
-    pds <- dplyr::distinct(pds[, c("lon", "lat", "date")])
-    pds <- sf::st_as_sf(pds, coords = c("lon", "lat"), crs = 4326)
-    pds <- sf::st_transform(pds, crs = mollweide)
-  } else {
-    pds <- NULL
-  }
   # pis
-  if (isTRUE(plot_pis)) {
-    pis <- load_pis(path = path)
-    pis <- dplyr::distinct(pis[, c("lon", "lat", "date")])
-    pis <- sf::st_as_sf(pis, coords = c("lon", "lat"), crs = 4326)
-    pis <- sf::st_transform(pis, crs = mollweide)
-  } else {
-    pis <- NULL
-  }
+  pis <- load_pis(path = path)
+  pis <- dplyr::distinct(pis[, c("lon", "lat", "date")])
+  pis <- sf::st_as_sf(pis, coords = c("lon", "lat"), crs = 4326)
+  pis <- sf::st_transform(pis, crs = mollweide)
   # bbox
-  bb <- sf::st_as_sfc(sf::st_bbox(rbind(pis, pds)))
+  bb <- sf::st_as_sfc(sf::st_bbox(pis))
 
   # initialize graphical parameters
   p <- graphics::par(mfrow = c(1, 1), mar = c(0, 0, 0, 0), bg = "white")
@@ -264,58 +245,29 @@ map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
   xwidth <- usr[2] - usr[1]
   yheight <- usr[4] - usr[3]
 
-  # plotting pds
-  if (isTRUE(plot_pds)) {
-    # first plot all possible pds
-    graphics::plot(sf::st_geometry(pds), col = pal$pd_a, cex = 0.4, pch = 16,
-                   add = TRUE)
-    graphics::text(x = usr[1] + 0.05 * xwidth,
-                   y = usr[3] + 0.2 * yheight,
-                   adj = 0,
-                   paste("Available PDs: ", nrow(pds), sep = ""),
-                   cex = 1,
-                   col = pal$pd_a)
-
-    # plot pds within extent
-    if (!missing(ext)) {
-      pds_sub <- ebirdst_subset(pds, ext)
-      graphics::plot(sf::st_geometry(pds_sub),
-                     col = pal$pd_s, cex = 0.4, pch = 16,
-                     add = TRUE)
-      graphics::text(x = usr[1] + 0.05 * xwidth,
-                     y = usr[3] + 0.16 * yheight,
-                     adj = 0,
-                     paste("Selected PDs: ", nrow(pds_sub), sep = ""),
-                     cex = 1,
-                     col = pal$pd_s)
-    }
-  }
-
   # plotting pis
-  if (isTRUE(plot_pis)) {
-    # first plot all possible pis
-    graphics::plot(sf::st_geometry(pis), col = pal$pi_a, cex = 0.4, pch = 16,
+  # first plot all possible pis
+  graphics::plot(sf::st_geometry(pis), col = pal$pi_a, cex = 0.4, pch = 16,
+                 add = TRUE)
+  graphics::text(x = usr[1] + 0.05 * xwidth,
+                 y = usr[3] + 0.12 * yheight,
+                 adj = 0,
+                 paste("Available PIs: ", nrow(pis), sep = ""),
+                 cex = 1,
+                 col = pal$pi_a)
+
+  # plot pis within extent
+  if (!missing(ext)) {
+    pis_sub <- ebirdst_subset(pis, ext)
+    graphics::plot(sf::st_geometry(pis_sub),
+                   col = pal$pi_s, cex = 0.4, pch = 16,
                    add = TRUE)
     graphics::text(x = usr[1] + 0.05 * xwidth,
-                   y = usr[3] + 0.12 * yheight,
+                   y = usr[3] + 0.08 * yheight,
                    adj = 0,
-                   paste("Available PIs: ", nrow(pis), sep = ""),
+                   paste("Selected PIs: ", nrow(pis_sub), sep = ""),
                    cex = 1,
-                   col = pal$pi_a)
-
-    # plot pis within extent
-    if (!missing(ext)) {
-      pis_sub <- ebirdst_subset(pis, ext)
-      graphics::plot(sf::st_geometry(pis_sub),
-                     col = pal$pi_s, cex = 0.4, pch = 16,
-                     add = TRUE)
-      graphics::text(x = usr[1] + 0.05 * xwidth,
-                     y = usr[3] + 0.08 * yheight,
-                     adj = 0,
-                     paste("Selected PIs: ", nrow(pis_sub), sep = ""),
-                     cex = 1,
-                     col = pal$pi_s)
-    }
+                   col = pal$pi_s)
   }
 
   # plot reference data
@@ -329,40 +281,20 @@ map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
   xwidth <- usr[2] - usr[1]
   yheight <- usr[4] - usr[3]
 
-  # pds
-  if (isTRUE(plot_pds)) {
-    graphics::text(x = usr[1] + 0.05 * xwidth,
-                   y = usr[3] + 0.2 * yheight,
-                   adj = 0,
-                   paste("Available PDs: ", nrow(pds), sep = ""),
-                   cex = 1,
-                   col = pal$pd_a)
-    if (!missing(ext)) {
-      graphics::text(x = usr[1] + 0.05 * xwidth,
-                     y = usr[3] + 0.16 * yheight,
-                     adj = 0,
-                     paste("Selected PDs: ", nrow(pds_sub), sep = ""),
-                     cex = 1,
-                     col = pal$pd_s)
-    }
-  }
-
   # pis
-  if (isTRUE(plot_pis)) {
+  graphics::text(x = usr[1] + 0.05 * xwidth,
+                 y = usr[3] + 0.12 * yheight,
+                 adj = 0,
+                 paste("Available PIs: ", nrow(pis), sep = ""),
+                 cex = 1,
+                 col = pal$pi_a)
+  if (!missing(ext)) {
     graphics::text(x = usr[1] + 0.05 * xwidth,
-                   y = usr[3] + 0.12 * yheight,
+                   y = usr[3] + 0.08 * yheight,
                    adj = 0,
-                   paste("Available PIs: ", nrow(pis), sep = ""),
+                   paste("Selected PIs: ", nrow(pis_sub), sep = ""),
                    cex = 1,
-                   col = pal$pi_a)
-    if (!missing(ext)) {
-      graphics::text(x = usr[1] + 0.05 * xwidth,
-                     y = usr[3] + 0.08 * yheight,
-                     adj = 0,
-                     paste("Selected PIs: ", nrow(pis_sub), sep = ""),
-                     cex = 1,
-                     col = pal$pi_s)
-    }
+                   col = pal$pi_s)
   }
 
   graphics::par(p)
@@ -372,9 +304,9 @@ map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
 
 #' Calculate and map effective extent of selected centroids
 #'
-#' The selection of stixel centroids for analysis of PIs and/or PDs yields an
+#' The selection of stixel centroids for analysis of predictor importances (PIs) yields an
 #' effective footprint, or extent, showing the effective location of where the
-#' information going into the analysis with PIs and/or PDs is based. While a
+#' information going into the analysis with PIs is based. While a
 #' bounding box or polygon may be used to select a set of centroids, due to the
 #' models being fit within large rectangular areas, the information from a set
 #' of centroids often comes from the core of the selected area. This function
@@ -387,8 +319,6 @@ map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
 #'   Trends products for a single species.
 #' @param ext [ebirdst_extent] object (optional); the spatiotemporal
 #'   extent to filter the data to.
-#' @param pi_pd character; whether to use predictor importance (`"pi"`) or
-#'   partial dependence (`"pd"`) for stixel centroids.
 #' @param plot logical; whether to plot the results or just return a raster
 #'   without plotting.
 #'
@@ -408,13 +338,11 @@ map_centroids <- function(path, ext, plot_pis = TRUE, plot_pds = TRUE) {
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #' \donttest{
 #' # calculate effective extent map
-#' eff <- calc_effective_extent(path = sp_path, ext = e, pi_pd = "pi")
+#' eff <- calc_effective_extent(path = sp_path, ext = e)
 #' }
-calc_effective_extent <- function(path, ext, pi_pd = c("pi", "pd"),
-                                  plot = TRUE) {
+calc_effective_extent <- function(path, ext, plot = TRUE) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
   stopifnot(inherits(ext, "ebirdst_extent"))
-  pi_pd <- match.arg(pi_pd)
   stopifnot(is.logical(plot), length(plot) == 1)
   if (all(c(0, 1) == round(ext$t, 2))) {
     warning(paste("Without temporal limits in ext, this function will take",
@@ -423,11 +351,7 @@ calc_effective_extent <- function(path, ext, pi_pd = c("pi", "pd"),
 
   # load data
   r_tmplt <- load_raster(product = "template", path = path)
-  if (pi_pd == "pi") {
-    pipd <- load_pis(path = path)
-  } else {
-    pipd <- load_pds(path = path)
-  }
+  pipd <- load_pis(path = path)
 
   # subset
   pipd <- dplyr::distinct(pipd[, c("lon", "lat", "date", "stixel_width",

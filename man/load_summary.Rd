@@ -18,8 +18,8 @@ data.frame containing stixel summary information about each stixel
 centroid.
 }
 \description{
-Internal function used by \code{\link[=load_pis]{load_pis()}} and \code{\link[=load_pds]{load_pds()}} to get the stixel
-summary information (from summary.txt).
+Internal function used by \code{\link[=load_pis]{load_pis()}} to get the stixel summary information
+(from summary.txt).
 }
 \examples{
 \donttest{

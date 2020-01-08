@@ -33,12 +33,11 @@ metrics, or use \code{plot_all_ppms()} or \code{plot_binary_by_time()} to summar
 metrics.
 }
 \examples{
-
 # download and load example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
 # define a spatiotemporal extent to plot
-bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
+bb_vec <- c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5)
 e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 \donttest{
 # compute predictive performance metrics

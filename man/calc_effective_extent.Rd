@@ -4,7 +4,7 @@
 \alias{calc_effective_extent}
 \title{Calculate and map effective extent of selected centroids}
 \usage{
-calc_effective_extent(path, ext, pi_pd = c("pi", "pd"), plot = TRUE)
+calc_effective_extent(path, ext, plot = TRUE)
 }
 \arguments{
 \item{path}{character; full path to directory containing the eBird Status and
@@ -12,9 +12,6 @@ Trends products for a single species.}
 
 \item{ext}{\link{ebirdst_extent} object (optional); the spatiotemporal
 extent to filter the data to.}
-
-\item{pi_pd}{character; whether to use predictor importance (\code{"pi"}) or
-partial dependence (\code{"pd"}) for stixel centroids.}
 
 \item{plot}{logical; whether to plot the results or just return a raster
 without plotting.}
@@ -26,9 +23,9 @@ will be plotted along with centroid locations and \link{ebirdst_extent}
 boundaries.
 }
 \description{
-The selection of stixel centroids for analysis of PIs and/or PDs yields an
+The selection of stixel centroids for analysis of predictor importances (PIs) yields an
 effective footprint, or extent, showing the effective location of where the
-information going into the analysis with PIs and/or PDs is based. While a
+information going into the analysis with PIs is based. While a
 bounding box or polygon may be used to select a set of centroids, due to the
 models being fit within large rectangular areas, the information from a set
 of centroids often comes from the core of the selected area. This function
@@ -46,6 +43,6 @@ bb_vec <- c(xmin = -86, xmax = -84, ymin = 41.5, ymax = 43.5)
 e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 \donttest{
 # calculate effective extent map
-eff <- calc_effective_extent(path = sp_path, ext = e, pi_pd = "pi")
+eff <- calc_effective_extent(path = sp_path, ext = e)
 }
 }

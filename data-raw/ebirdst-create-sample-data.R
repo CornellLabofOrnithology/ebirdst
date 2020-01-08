@@ -1,133 +1,92 @@
 library(rnaturalearth)
-library(raster)
 library(sp)
-devtools::load_all()
+library(sf)
+library(data.table)
+library(readr)
+library(dplyr)
 
-# Loading data
-root_path <- "~/Box Sync/Projects/2015_stem_hwf/documentation/data-raw/"
-species <- "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"
-sp_path <- paste(root_path, species, sep = "")
+# source data
+root_path <- rappdirs::user_data_dir("ebirdst")
+species <- "yebsap-ERD2018-EBIRD_SCIENCE-20191030-3abe59ca"
+sp_path <- file.path(root_path, species)
+
+# destination
+ex_species <- "yebsap-ERD2018-EBIRD_SCIENCE-20191030-3abe59ca-example"
+ex_data_dir <- file.path(root_path, ex_species, "data")
+ex_tif_dir <- file.path(root_path, ex_species, "results", "tifs")
+ex_pred_dir <- file.path(root_path, ex_species, "results", "preds")
+ex_stix_dir <- file.path(root_path, ex_species, "results", "stixels")
+dir.create(ex_data_dir, recursive = TRUE, showWarnings = FALSE)
+dir.create(ex_tif_dir, recursive = TRUE, showWarnings = FALSE)
+dir.create(ex_pred_dir, recursive = TRUE, showWarnings = FALSE)
+dir.create(ex_stix_dir, recursive = TRUE, showWarnings = FALSE)
 
 # region for subsetting from rnaturalearth
-wh_states <- ne_states(country = "United States of America")
-wh_sub <- wh_states[wh_states$name == "Michigan", ]
+us_states <- ne_states(country = "United States of America")
+state_mi <- us_states[us_states$name == "Michigan", ]
+state_mi_sf <- st_as_sf(state_mi) %>%
+  st_transform(crs = 4326) %>%
+  st_geometry()
 
-mean_abund <- raster::stack(paste0(sp_path, "/results/tifs/", species,
-                                   "_hr_2016_abundance_umean.tif"))
-mean_occ <- raster::stack(paste0(sp_path, "/results/tifs/", species,
-                                   "_hr_2016_occurrence_umean.tif"))
-lower_abund <- raster::stack(paste0(sp_path, "/results/tifs/", species,
-                                 "_hr_2016_abundance_lower.tif"))
-upper_abund <- raster::stack(paste0(sp_path, "/results/tifs/", species,
-                                 "_hr_2016_abundance_upper.tif"))
+# raster template
+r_tmplt <- paste0(species, "_srd_raster_template.tif") %>%
+  file.path(sp_path, "data", .) %>%
+  raster::raster()
+ex_tmplt <-  paste0(ex_species, "_srd_raster_template.tif") %>%
+  file.path(ex_data_dir, .)
+sp_ss <- spTransform(state_mi, raster::projection(r_tmplt))
+r_tmplt_ex <- raster::crop(r_tmplt, sp_ss) %>%
+  raster::mask(sp_ss) %>%
+  raster::trim(values = NA) %>%
+  raster::writeRaster(filename = ex_tmplt, overwrite = TRUE)
 
-example_extent <- list(type = "polygon",
-                  polygon = wh_sub)
+# subset tifs
+f_tifs <- c("abundance_lower", "abundance_median", "abundance_upper",
+            "count_median", "occurrence_median")
+for (f in f_tifs) {
+  r <- f %>%
+    paste0(species, "_hr_2018_", ., ".tif") %>%
+    file.path(sp_path, "results", "tifs", .) %>%
+    raster::stack()
+  f_ex <- f %>%
+    paste0(ex_species, "_hr_2018_", ., ".tif") %>%
+    file.path(ex_tif_dir, .)
+  r_ex <- raster::crop(r, r_tmplt_ex) %>%
+    raster::mask(r_tmplt_ex, filename = f_ex, overwrite = TRUE)
+}
+file.copy(file.path(sp_path, "results", "tifs", "band_dates.csv"),
+          file.path(ex_tif_dir, "band_dates.csv"))
 
-example_mean_abund <- raster_st_subset(mean_abund, example_extent)
-example_mean_occ <- raster_st_subset(mean_occ, example_extent)
-example_lower_abund <- raster_st_subset(lower_abund, example_extent)
-example_upper_abund <- raster_st_subset(upper_abund, example_extent)
-
-writeRaster(example_mean_abund, paste0(
-  "/Users/mta45/ebirdst/data-raw/clo-is-da-example-data/", species,
-  "/results/tifs/", species, "_hr_2016_abundance_umean.tif"), format = "GTiff")
-
-writeRaster(example_mean_occ, paste0(
-  "/Users/mta45/ebirdst/data-raw/clo-is-da-example-data/", species,
-  "/results/tifs/", species, "_hr_2016_occurrence_umean.tif"), format = "GTiff")
-
-writeRaster(example_lower_abund, paste0(
-  "/Users/mta45/ebirdst/data-raw/clo-is-da-example-data/", species,
-  "/results/tifs/", species, "_hr_2016_abundance_lower.tif"), format = "GTiff")
-
-writeRaster(example_upper_abund, paste0(
-  "/Users/mta45/ebirdst/data-raw/clo-is-da-example-data/", species,
-  "/results/tifs/", species, "_hr_2016_abundance_upper.tif"), format = "GTiff")
-
-file.copy(paste0(sp_path, "/results/tifs/band_dates.csv"),
-          paste0("/Users/mta45/ebirdst/data-raw/clo-is-da-example-data/",
-                 species, "/results/tifs/band_dates.csv"))
-
-# abund_preds
+# subset function
+subset_df <- function(f_in, f_out) {
+  x <- fread(f_in)
+  if ("LONGITUDE" %in% names(x)) {
+    x_sf <- dplyr::select(x, LONGITUDE, LATITUDE)
+    x_sf <- sf::st_as_sf(x, coords = c("LONGITUDE", "LATITUDE"), crs = 4326)
+  } else {
+    x_sf <- dplyr::select(x, lon, lat)
+    x_sf <- sf::st_as_sf(x, coords = c("lon", "lat"), crs = 4326)
+  }
+  is_in <- suppressMessages(
+    sf::st_intersects(x_sf, state_mi_sf, sparse = FALSE)
+  )
+  x <- x[is_in[, 1, drop = TRUE], ]
+  write_csv(x, f_out)
+}
+# test data
+subset_df(file.path(sp_path, "data", paste0(species, "_test-data.csv")),
+          file.path(ex_data_dir, paste0(ex_species, "_test-data.csv")))
+# abundance predictions
+subset_df(file.path(sp_path, "results", "preds", "test_pred_ave.txt"),
+          file.path(ex_pred_dir, "test_pred_ave.txt"))
 # summary
-summary <- read.csv(paste0(sp_path,
-                           "/results/abund_preds/unpeeled_folds/summary.txt"),
-                header = FALSE)
-summary_spdf <- SpatialPointsDataFrame(summary[, c("V5", "V6")],
-                                       summary,
-                                       proj4string = CRS(proj4string(wh_sub)))
-example_summary <- summary_spdf[!is.na(over(summary_spdf,
-                                            as(wh_sub,
-                                               "SpatialPolygons"))), ]@data
-write.table(example_summary, paste0(
-  "/Users/mta45/ebirdst/data-raw/clo-is-da-example-data/", species,
-  "/results/abund_preds/summary.txt"), row.names = FALSE, col.names = FALSE,
-  sep = ",", quote = FALSE)
-
-# pis
-pis <- load_pis(sp_path)
-
-example_pis <- data_st_subset(loadpis, example_extent)
-example_pis_names <- names(example_pis)[1:88]
-example_pis$type <- "stixel"
-example_pis$summary_type <- "pi"
-example_pis <- example_pis[, c("type", "summary_type", example_pis_names)]
-
-write.table(example_pis, paste0(
-  "/Users/mta45/ebirdst/data-raw/clo-is-da-example-data/", species,
-  "/results/abund_preds/pi.txt"), row.names = FALSE, col.names = FALSE,
-  sep = ",", quote = FALSE)
-
-# pds
-pds <- load_pds(sp_path)
-
-example_pds <- data_st_subset(pds, example_extent)
-
-example_pds_names <- names(example_pds)[1:103]
-example_pds$type <- "stixel"
-example_pds$summary_type <- "pd"
-example_pds <- example_pds[, c("type", "summary_type", example_pds_names)]
-
-write.table(example_pds, paste0(
-  "/Users/mta45/ebirdst/data-raw/clo-is-da-example-data/", species,
-  "/results/abund_preds/pd.txt"), row.names = FALSE, col.names = FALSE,
-  sep = ",", quote = FALSE)
-
-# test
-test <- read.csv(paste0(sp_path,
-                        "/results/abund_preds/unpeeled_folds/test.pred.ave.txt"),
-                 header = FALSE)
-test_spdf <- SpatialPointsDataFrame(test[, c("V3", "V4")],
-                                    test,
-                                    proj4string = CRS(proj4string(wh_sub)))
-example_test <- test_spdf[!is.na(over(test_spdf,
-                                            as(wh_sub,
-                                               "SpatialPolygons"))), ]@data
-write.table(example_test, paste0(
-  "/Users/mta45/ebirdst/data-raw/clo-is-da-example-data/", species,
-  "/results/abund_preds/test.pred.ave.txt"), row.names = FALSE, col.names = FALSE,
-  sep = ",", quote = FALSE)
-
-# data pieces
-
-file.copy(paste0(sp_path, "/data/", species, "_config.RData"),
-          paste0("/Users/mta45/ebirdst/data-raw/clo-is-da-example-data/",
-                 species, "/data/", species, "_config.RData"))
-
-file.copy(paste0(sp_path, "/data/", species, "_srd_raster_template.tif"),
-          paste0("/Users/mta45/ebirdst/data-raw/clo-is-da-example-data/",
-                 species, "/data/", species, "_srd_raster_template.tif"))
-
-rtest <- read.csv(paste0(sp_path, "/data/ebird.abund_", species,
-                         "_erd.test.data.csv"),
-                 header = TRUE)
-rtest_spdf <- SpatialPointsDataFrame(rtest[, c("LONGITUDE", "LATITUDE")],
-                                     rtest,
-                                     proj4string = CRS(proj4string(wh_sub)))
-example_rtest <- rtest_spdf[!is.na(over(rtest_spdf,
-                                      as(wh_sub,
-                                         "SpatialPolygons"))), ]@data
-write.csv(example_rtest, paste0(
-  "/Users/mta45/ebirdst/data-raw/clo-is-da-example-data/", species,
-  "/data/ebird.abund_", species, "_erd.test.data.csv"), row.names = FALSE)
+subset_df(file.path(sp_path, "results", "stixels", "summary.txt"),
+          file.path(ex_stix_dir, "summary.txt"))
+# pi
+f_sum <- file.path(ex_stix_dir, "summary.txt") %>%
+  fread() %>%
+  select(stixel_id)
+f_pi <- file.path(sp_path, "results", "stixels", "pi.txt") %>%
+  fread()
+inner_join(f_sum, f_pi, by = "stixel_id") %>%
+  write_csv(file.path(ex_stix_dir, "pi.txt"))

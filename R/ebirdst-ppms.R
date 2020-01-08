@@ -29,21 +29,21 @@
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
 #' # define a spatiotemporal extent to plot
-#' bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
+#' bb_vec <- c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5)
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #' \donttest{
 #' # compute predictive performance metrics
 #' ppms <- compute_ppms(path = sp_path, ext = e)
 #' }
-compute_ppms <- function(path, ext, pat_cutoff) {
+compute_ppms <- function(path, ext) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
   if (!missing(ext)) {
     stopifnot(inherits(ext, "ebirdst_extent"))
   }
 
   # load the test data and assign names
-  ppm_data <- load_test_data(path = path)
-  ppm_data_raw <- load_test_data_raw(path = path)
+  ppm_data <- load_test_preds(path = path)
+  ppm_data_raw <- load_test_data(path = path)
 
   # add aditional rows from raw data file
   # these are assumed zeros and therefore not in test prediciton data
@@ -72,8 +72,7 @@ compute_ppms <- function(path, ext, pat_cutoff) {
   # min count sample size within range
   count_min_ss <- 50
   count_min_mean <- 0.25
-  # max count
-  count_max <- NA
+  pat_cutoff = 1 / 20
 
   # define ppms
   # binary / range ppms
@@ -101,7 +100,7 @@ compute_ppms <- function(path, ext, pat_cutoff) {
 
   # false discovery rate (fdr)
   binom_test_p <- function(x) {
-    if(is.na(x["pat"]) | is.na(x["pi_es"])) {
+    if (is.na(x["pat"]) | is.na(x["pi_es"])) {
       return(NA)
     }
     pat_pi_es <- round(as.numeric(x["pat"]) * as.numeric(x["pi_es"]), 0)
@@ -209,15 +208,11 @@ compute_ppms <- function(path, ext, pat_cutoff) {
     }
 
     # within range, expected count ppms
-    # cap count at given max
-    if (!is.na(count_max)) {
-      data_i$obs[data_i$obs > count_max] <- count_max
-    }
     cs$mc_iteration[i_mc] <- i_mc
     cs$sample_size[i_mc] <- nrow(data_i)
     cs$mean[i_mc] <- mean(as.numeric(data_i$obs))
 
-    if(nrow(data_i) >= count_min_ss && cs$mean[i_mc] >= count_min_mean ) {
+    if (nrow(data_i) >= count_min_ss && cs$mean[i_mc] >= count_min_mean) {
       # poisson deviance
       cs$poisson_dev_abd[i_mc] <- poisson_dev(obs = data_i$obs,
                                               pred = data_i$pi_mu_median)[3]
@@ -266,9 +261,14 @@ compute_ppms <- function(path, ext, pat_cutoff) {
 #' @examples
 #' # download and load example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
+#'
+#' # define a spatiotemporal extent to plot data from
+#' bb_vec <- c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5)
+#' e <- ebirdst_extent(bb_vec, t = c("04-01", "06-30"))
 #' \donttest{
 #' # plot monthly kappa
-#' plot_binary_by_time(path = sp_path, metric = "kappa", n_time_periods = 12)
+#' plot_binary_by_time(path = sp_path, metric = "kappa",
+#'                     ext = e, n_time_periods = 4)
 #' }
 plot_binary_by_time <- function(path,
                                 metric = c("kappa", "auc", "sensitivity",
@@ -313,15 +313,14 @@ plot_binary_by_time <- function(path,
   metric_lab <- c(kappa = "Kappa", auc = "AUC",
                   sensitivity = "Sensitivity",
                   specificity = "Specificity")
-
+  date_limits <- as.Date(paste0(format(t_dates[1], "%Y"), c("-01-01", "-12-31")))
   g <- ggplot2::ggplot(ppms) +
     ggplot2::aes_string(x = "date", y = metric, group = "date") +
     ggplot2::geom_boxplot() +
     ggplot2::ylim(metric_ylim) +
     ggplot2::labs(x = "Date", y = NULL, title = metric_lab[metric]) +
     ggplot2::scale_x_date(date_labels = "%b",
-                          limits = c(as.Date("2016-01-01"),
-                                     as.Date("2016-12-31")),
+                          limits = date_limits,
                           date_breaks = "1 month") +
     ggplot2::theme_light()
   suppressWarnings(print(g))
@@ -348,7 +347,7 @@ plot_binary_by_time <- function(path,
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
 #' # define a spatiotemporal extent to plot data from
-#' bb_vec <- c(xmin = -83, xmax = -82, ymin = 41, ymax = 48)
+#' bb_vec <- c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5)
 #' e <- ebirdst_extent(bb_vec, t = c("04-01", "06-30"))
 #' \donttest{
 #' # plot ppms within extent
@@ -373,7 +372,10 @@ plot_all_ppms <- function(path, ext) {
                             "poisson_dev_abd", "spearman_abd")
 
   # transform to long
-  ppm_data <- tidyr::gather(ppm_data, "metric", "value", -"type")
+  ppm_data <- tidyr::pivot_longer(ppm_data,
+                                  cols = -"type",
+                                  names_to = "metric",
+                                  values_to = "value")
   ppm_data <- ppm_data[!(ppm_data$type == "binary" &
                            ppm_data$metric == "bernoulli_dev"), ]
   ppm_data <- ppm_data[!is.na(ppm_data$value), ]

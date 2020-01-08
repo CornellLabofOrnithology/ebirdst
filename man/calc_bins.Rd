@@ -30,7 +30,7 @@ un-transforms the bins.
 \examples{
 # download and load example abundance data
 sp_path <- ebirdst_download("example_data")
-abd <- load_raster("abundance_umean", sp_path)
+abd <- load_raster("abundance", sp_path)
 \dontshow{
 # crop to speed up cran tests
 e <-  raster::extent(abd)

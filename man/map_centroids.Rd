@@ -2,9 +2,9 @@
 % Please edit documentation in R/ebirdst-mapping.R
 \name{map_centroids}
 \alias{map_centroids}
-\title{Map PI and PD centroid locations}
+\title{Map PI centroid locations}
 \usage{
-map_centroids(path, ext, plot_pis = TRUE, plot_pds = TRUE)
+map_centroids(path, ext)
 }
 \arguments{
 \item{path}{character; full path to directory containing the eBird Status and
@@ -12,17 +12,14 @@ Trends products for a single species.}
 
 \item{ext}{\link{ebirdst_extent} object (optional); the spatiotemporal extent to
 filter the data to.}
-
-\item{plot_pis}{logical; whether to show PI stixel centroid locations.}
-
-\item{plot_pds}{logical; whether to show PD stixel centroid locations.}
 }
 \value{
-Plot showing locations of PIs and/or PDs.
+Plot showing locations of PI centroids.
 }
 \description{
-Creates a map showing the stixel centroid locations for PIs and/or PDs, with
-an optional spatiotemporal subset using an \link{ebirdst_extent} object
+Creates a map showing the stixel centroid locations for predictor importance
+values, with an optional spatiotemporal subset using an \link{ebirdst_extent}
+object
 }
 \examples{
 # download and load example data
