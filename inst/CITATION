@@ -8,13 +8,13 @@ citEntry(
                    as.person("Daniel Fink"),
                    as.person("Matthew Strimas-Mackey")
                  ),
-  year         = "2019",
-  note         = "R package version 0.1.0",
+  year         = "2020",
+  note         = "R package version 0.2.0",
   url          = "https://cornelllabofornithology.github.io/ebirdst/",
 
   textVersion  =
-  paste("Tom Auer, Daniel Fink, and Matthew Strimas-Mackey (2019).",
+  paste("Tom Auer, Daniel Fink, and Matthew Strimas-Mackey (2020).",
         "ebirdst: Tools for loading, plotting, mapping and analysis of eBird Status and Trends data products.",
-        "R package version 0.1.0.",
+        "R package version 0.2.0.",
         "https://cornelllabofornithology.github.io/ebirdst/")
 )
