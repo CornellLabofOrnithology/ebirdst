@@ -64,6 +64,17 @@ date_vector <- parse_raster_dates(abunds)
 print(date_vector)
 ```
 
+All Status and Trends raster data is provided at 2.96 km spatial resolution. For many use cases, it may be desirable to work with data at a coarser resolution. The `aggregate()` function from the `raster` package can be used to aggregate cells together to reduce the resolution of raster data, and the `fact` argument specifies the number of cells in each direction to aggregate together. In general, we suggest only aggregate data by factors of 3 (i.e. `fact` values of 3, 9, 27, etc.). For example, to aggregate by a factor of 3, to produce a raster at 8.88 km resolution:
+
+```{r aggregate}
+abunds_low_res <- aggregate(abunds, fact = 3, fun = mean)
+# native resolution
+res(abunds)
+# resolution after aggregation
+res(abunds_low_res)
+```
+
+
 # Mapping Occurrence and Abundance
 
 One of the most common tasks with eBird Status and Trends products is to make maps of occurrence and abundance. It is fast and easy to make maps with limited code, but to get ideal maps takes extra preparation. This section describes some functions in the `ebirdst` package intended to assist with mapping.

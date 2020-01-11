@@ -107,15 +107,20 @@ calc_full_extent <- function(x) {
 #' year_bins <- calc_bins(abd)
 calc_bins <- function(x) {
   stopifnot(inherits(x, "Raster"))
-
   if (all(is.na(suppressWarnings(raster::maxValue(x)))) &
       all(is.na(suppressWarnings(raster::minValue(x))))) {
     stop("Input Raster* object must have non-NA values.")
+  }
+  if (all(raster::maxValue(x) == 0)) {
+    stop("Raster must have at least 2 non-zero values to calculate bins")
   }
 
   # get a vector of all the values in the stack
   zrv <- raster::getValues(x)
   vals_for_pt <- zrv[!is.na(zrv) & zrv > 0]
+  if (length(vals_for_pt) <= 1) {
+    stop("Raster must have at least 2 non-zero values to calculate bins")
+  }
 
   # box-cox transform
   pt <- car::powerTransform(vals_for_pt)
