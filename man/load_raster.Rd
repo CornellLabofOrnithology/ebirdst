@@ -5,21 +5,28 @@
 \title{Load eBird Status and Trends raster data}
 \usage{
 load_raster(
-  product = c("abundance", "count", "occurrence", "abundance_lower", "abundance_upper",
-    "template"),
+  product = c("abundance", "abundance_seasonal", "count", "occurrence",
+    "abundance_lower", "abundance_upper", "template"),
   path
 )
 }
 \arguments{
 \item{product}{character; status and trends product to load, options are
-relative abundance, count, occurrence, and upper and lower bounds on relative
-abundance. It is also possible to return a template raster with no data.}
+relative abundance, seasonal abundance, count, occurrence, and upper and
+lower bounds on relative abundance. It is also possible to return a
+template raster with no data.}
 
 \item{path}{character; full path to the directory containing single species
 eBird Status and Trends products.}
 }
 \value{
-A \code{RasterStack} of data for the given product.
+A \code{RasterStack} with 52 layers for the given product, labelled by
+week. Seasonal abundance is the result of averaging the weekly abundance
+raster layers for each season or across the whole year for resident
+species. The date boundaries used for the seasonal definitions appear in
+\code{ebirdst_runs} and if a season failed review no associated layer will be
+included. There will be up to four layers labelled according to the
+seasons.
 }
 \description{
 Each of the eBird Status and Trends products is packaged as a GeoTIFF file
