@@ -195,12 +195,19 @@ get_species_path <- function(species,
 #' for a given product and species as a `RasterStack` object.
 #'
 #' @param product character; status and trends product to load, options are
-#'   relative abundance, count, occurrence, and upper and lower bounds on relative
-#'   abundance. It is also possible to return a template raster with no data.
+#'   relative abundance, seasonal abundance, count, occurrence, and upper and
+#'   lower bounds on relative abundance. It is also possible to return a
+#'   template raster with no data.
 #' @param path character; full path to the directory containing single species
 #'   eBird Status and Trends products.
 #'
-#' @return A `RasterStack` of data for the given product.
+#' @return A `RasterStack` with 52 layers for the given product, labelled by
+#'   week. Seasonal abundance is the result of averaging the weekly abundance
+#'   raster layers for each season or across the whole year for resident
+#'   species. The date boundaries used for the seasonal definitions appear in
+#'   `ebirdst_runs` and if a season failed review no associated layer will be
+#'   included. There will be up to four layers labelled according to the
+#'   seasons.
 #'
 #' @export
 #'
@@ -211,6 +218,7 @@ get_species_path <- function(species,
 #' # load data
 #' load_raster("abundance", sp_path)
 load_raster <- function(product = c("abundance",
+                                    "abundance_seasonal",
                                     "count",
                                     "occurrence",
                                     "abundance_lower",
@@ -223,24 +231,41 @@ load_raster <- function(product = c("abundance",
     product <- paste0(product, "_median")
   }
 
-  # find the file
+  # load raster
   if (product == "template") {
+    # template raster
     tif_path <- list.files(file.path(path, "data"),
                            pattern = "srd_raster_template\\.tif$",
                            full.names = TRUE)
+    if (length(tif_path) != 1 || !file.exists(tif_path)) {
+      stop(paste("Error locating GeoTIFF file for:", product))
+    }
+    return(raster::raster(tif_path))
+  } else if (product == "abundance_seasonal") {
+    # seasonal abundance
+    tif_path <- list.files(file.path(path, "results", "tifs"),
+                           pattern = paste0(product, ".*\\.tif$"),
+                           full.names = TRUE)
+    if (length(tif_path) > 4 || !file.exists(tif_path)) {
+      stop(paste("Error locating GeoTIFF file for:", product))
+    } else if (length(tif_path) == 0) {
+      stop(paste("No seasonal abundance GeoTIFFs for:", product))
+    }
+    seasons <- stringr::str_extract(tif_path,
+                                    "(?<=abundance_seasonal_)[a-z_]+")
+    season_order <- c("postbreeding_migration", "prebreeding_migration",
+                      "nonbreeding", "breeding", "year_round")
+    s <- raster::stack(tif_path)
+    names(s) <- intersect(season_order, seasons)
+    return(s)
   } else {
+    # 52 week stack
     tif_path <- list.files(file.path(path, "results", "tifs"),
                            pattern = paste0(product, "\\.tif$"),
                            full.names = TRUE)
-  }
-  if (length(tif_path) != 1 || !file.exists(tif_path)) {
-    stop(paste("Error locating GeoTIFF file for:", product))
-  }
-
-  # return
-  if (product == "template") {
-    return(raster::raster(tif_path))
-  } else {
+    if (length(tif_path) != 1 || !file.exists(tif_path)) {
+      stop(paste("Error locating GeoTIFF file for:", product))
+    }
     return(label_raster_stack(raster::stack(tif_path)))
   }
 }

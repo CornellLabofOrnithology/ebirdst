@@ -28,7 +28,7 @@ Alternatively, you can install the development version from GitHub with:
 Older versions of the Status and Trends data can be accessed by
 installing the associated version of `ebirdst` from GitHub. For example,
 the 2018 data, corresponding to v0.1.0 of this package, can be accessed
-by installing:
+with:
 
     # install.packages("remotes")
     remotes::install_github("CornellLabofOrnithology/ebirdst@v0.1.0")
@@ -52,6 +52,15 @@ vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-pip
 details how to access additional information from the model results
 about predictor importance and directionality, as well as predictive
 performance metrics.
+
+To access old versions of the vignettes suitable for working with
+previous eBird Status and Trends releases go to the [versions page of
+the GitHub
+repository](https://github.com/CornellLabofOrnithology/ebirdst/releases).
+Download and unzip the source code for the release associated with the
+version of the data you want to work with. Opening the file
+`docs/index.html` will open the package website for this version, which
+gives access to all the documentation and vignettes.
 
 Quick Start
 -----------
@@ -87,14 +96,13 @@ directly, outside of R.
     # use parse_raster_dates() to get actual date objects for each layer
     date_vector <- parse_raster_dates(abunds)
     print(date_vector)
-    #>  [1] "2018-01-04" "2018-01-11" "2018-01-18" "2018-01-25" "2018-02-01" "2018-02-08" "2018-02-15"
-    #>  [8] "2018-02-22" "2018-03-01" "2018-03-08" "2018-03-15" "2018-03-22" "2018-03-29" "2018-04-05"
-    #> [15] "2018-04-12" "2018-04-19" "2018-04-26" "2018-05-03" "2018-05-10" "2018-05-17" "2018-05-24"
-    #> [22] "2018-05-31" "2018-06-07" "2018-06-14" "2018-06-21" "2018-06-28" "2018-07-06" "2018-07-13"
-    #> [29] "2018-07-20" "2018-07-27" "2018-08-03" "2018-08-10" "2018-08-17" "2018-08-24" "2018-08-31"
-    #> [36] "2018-09-07" "2018-09-14" "2018-09-21" "2018-09-28" "2018-10-05" "2018-10-12" "2018-10-19"
-    #> [43] "2018-10-26" "2018-11-02" "2018-11-09" "2018-11-16" "2018-11-23" "2018-11-30" "2018-12-07"
-    #> [50] "2018-12-14" "2018-12-21" "2018-12-28"
+    #>  [1] "2018-01-04" "2018-01-11" "2018-01-18" "2018-01-25" "2018-02-01" "2018-02-08" "2018-02-15" "2018-02-22"
+    #>  [9] "2018-03-01" "2018-03-08" "2018-03-15" "2018-03-22" "2018-03-29" "2018-04-05" "2018-04-12" "2018-04-19"
+    #> [17] "2018-04-26" "2018-05-03" "2018-05-10" "2018-05-17" "2018-05-24" "2018-05-31" "2018-06-07" "2018-06-14"
+    #> [25] "2018-06-21" "2018-06-28" "2018-07-06" "2018-07-13" "2018-07-20" "2018-07-27" "2018-08-03" "2018-08-10"
+    #> [33] "2018-08-17" "2018-08-24" "2018-08-31" "2018-09-07" "2018-09-14" "2018-09-21" "2018-09-28" "2018-10-05"
+    #> [41] "2018-10-12" "2018-10-19" "2018-10-26" "2018-11-02" "2018-11-09" "2018-11-16" "2018-11-23" "2018-11-30"
+    #> [49] "2018-12-07" "2018-12-14" "2018-12-21" "2018-12-28"
 
     # select a week in the summer
     abund <- abunds[[26]]
