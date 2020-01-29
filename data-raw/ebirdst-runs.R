@@ -1,6 +1,7 @@
 library(tidyverse)
 
-run_names <- read_csv("data-raw/run-names.csv") %>%
+run_names <- read_csv("data-raw/stem_erd2018_seasons.csv") %>%
+  select(run_name = RUN_NAME) %>%
   mutate(species_code = str_extract(run_name, "^[^-]+"))
 runs <- read_csv("data-raw/all-stats-regional-2019.csv") %>%
   inner_join(run_names, by = "species_code") %>%

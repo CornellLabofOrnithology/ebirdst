@@ -42,6 +42,9 @@ r_tmplt_ex <- raster::crop(r_tmplt, sp_ss) %>%
 
 # subset tifs
 f_tifs <- c("abundance_lower", "abundance_median", "abundance_upper",
+            "abundance_seasonal_breeding", "abundance_seasonal_nonbreeding",
+            "abundance_seasonal_prebreeding_migration",
+            "abundance_seasonal_postbreeding_migration",
             "count_median", "occurrence_median")
 for (f in f_tifs) {
   r <- f %>%
