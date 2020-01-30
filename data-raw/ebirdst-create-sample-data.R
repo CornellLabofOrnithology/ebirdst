@@ -11,7 +11,7 @@ species <- "yebsap-ERD2018-EBIRD_SCIENCE-20191030-3abe59ca"
 sp_path <- file.path(root_path, species)
 
 # destination
-ex_species <- "yebsap-ERD2018-EBIRD_SCIENCE-20191030-3abe59ca-example"
+ex_species <- paste0(species, "-example")
 ex_data_dir <- file.path(root_path, ex_species, "data")
 ex_tif_dir <- file.path(root_path, ex_species, "results", "tifs")
 ex_pred_dir <- file.path(root_path, ex_species, "results", "preds")
@@ -20,6 +20,10 @@ dir.create(ex_data_dir, recursive = TRUE, showWarnings = FALSE)
 dir.create(ex_tif_dir, recursive = TRUE, showWarnings = FALSE)
 dir.create(ex_pred_dir, recursive = TRUE, showWarnings = FALSE)
 dir.create(ex_stix_dir, recursive = TRUE, showWarnings = FALSE)
+
+# copy rds file
+file.path(sp_path, "data", paste0(species, "_config.rds")) %>%
+  file.copy(file.path(ex_data_dir, paste0(species, "_config.rds")))
 
 # region for subsetting from rnaturalearth
 us_states <- ne_states(country = "United States of America")
@@ -61,8 +65,9 @@ file.copy(file.path(sp_path, "results", "tifs", "band_dates.csv"),
           file.path(ex_tif_dir, "band_dates.csv"))
 
 # subset function
+
 subset_df <- function(f_in, f_out) {
-  x <- fread(f_in)
+  x <- fread(file = f_in)
   if ("LONGITUDE" %in% names(x)) {
     x_sf <- dplyr::select(x, LONGITUDE, LATITUDE)
     x_sf <- sf::st_as_sf(x, coords = c("LONGITUDE", "LATITUDE"), crs = 4326)
@@ -74,6 +79,7 @@ subset_df <- function(f_in, f_out) {
     sf::st_intersects(x_sf, state_mi_sf, sparse = FALSE)
   )
   x <- x[is_in[, 1, drop = TRUE], ]
+  x[["SCORE"]] <- NULL
   write_csv(x, f_out)
 }
 # test data

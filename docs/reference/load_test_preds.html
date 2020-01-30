@@ -148,7 +148,8 @@ intervals are provided for predicted occurrence, count, and relativce
 abundance.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># download example data</span>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+<span class='co'># download example data</span>
 <span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span>(<span class='st'>"example_data"</span>, <span class='kw'>tifs_only</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; <span class='message'>Data already exists, use force = TRUE to re-download.</span></div><div class='input'>
 <span class='co'># test data</span>
 <span class='no'>test_preds</span> <span class='kw'>&lt;-</span> <span class='fu'>load_test_preds</span>(<span class='no'>sp_path</span>)
@@ -173,7 +174,8 @@ abundance.</p>
 #&gt; $ pi_mu_lower       </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 0.0132323599, 0.0170529123, 0.0110360559, 0.0058412…
 #&gt; $ pi_mu_se          </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 0.0022193199, 0.0024380267, 0.0019564225, 0.0006456…
 #&gt; $ pat               </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.0…
-#&gt; $ pi_es             </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> 100, 100, 100, 100, 97, 87, 100, 98, 99, 98, 100, 8…</div></span></pre>
+#&gt; $ pi_es             </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> 100, 100, 100, 100, 97, 87, 100, 98, 99, 98, 100, 8…</div><div class='input'># }
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

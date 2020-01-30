@@ -543,12 +543,14 @@ load_test_data <- function(path, return_sf = FALSE) {
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' # download example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
 #' # test data
 #' test_preds <- load_test_preds(sp_path)
 #' dplyr::glimpse(test_preds)
+#' }
 load_test_preds <- function(path, return_sf = FALSE) {
   stopifnot(dir.exists(path))
   stopifnot(is.logical(return_sf), length(return_sf) == 1)
@@ -573,6 +575,80 @@ load_test_preds <- function(path, return_sf = FALSE) {
 
   return(td_df)
 }
+
+#' Config file loader
+#'
+#' Internal function used by load_summary(), load_pis(), and load_pds() to get
+#' configuration variables from STEM species run information
+#' (from *_config.RData).
+#'
+#' @param path character; full path to the directory containing single species
+#'   eBird Status and Trends products.
+#'
+#' @return environment object containing all run parameters.
+#'
+#' @keywords internal
+#'
+#' @examples
+#' \donttest{
+#' # download example data
+#' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
+#' ebirdst:::load_config(sp_path)
+#' }
+load_config <- function(path) {
+  config_file <- list.files(paste(path, "/data", sep = ""),
+                            pattern = "*_config.rds",
+                            full.names = TRUE)
+
+  if(length(config_file) != 1 || !file.exists(config_file)) {
+    stop(paste("*_config.rds file does not exist in the /data directory. ",
+               "Check your paths so that they look like this: ",
+               "~/directory/<six_letter_code-ERD2016-PROD-date-uuid>/. ",
+               "Make sure you do not change the file structure of the results.",
+               sep = ""))
+  }
+
+  return(readRDS(config_file))
+}
+
+
+#' Load full annual cycle map parameters
+#'
+#' Get the map parameters used on the eBird Status and Trends website to
+#' optimally display the full annual cycle data. This includes bins for the
+#' abundace data, a projection, and an extent to map. The extent is the spatial
+#' extent of non-zero data across the full annual cycle and the projection is
+#' optimized for this extent.
+#'
+#' @param path character; full path to the directory containing single species
+#'   eBird Status and Trends products.
+#'
+#' @return A list containing elements:
+#' - `custom_projection`: a custom projection optimized for the given species'
+#'    full annyal cycle
+#' - `fa_extent`: an `Extent` object storing the spatial extent of non-zero
+#'    data for the given species in the custom projection
+#' - `fa_extent_sinu`: the extent in sinusoidal projection
+#' - `abundance_bins`: abundance bins for the full annual cycle
+#'
+#' @export
+#'
+#' @examples
+#' \donttest{
+#' # download example data
+#' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
+#' # get map parameters
+#' load_fac_map_parameters(sp_path)
+#' }
+load_fac_map_parameters <- function(path) {
+  l <- load_config(path)
+
+  list(custom_projection = l$CUS_PRJ,
+       fa_extent = l$FA_EXTENT,
+       fa_extent_sinu = l$SINU_EXTENT,
+       abundance_bins = l$ABUND_BINS)
+}
+
 
 get_species <- function(x) {
   stopifnot(is.character(x), all(!is.na(x)))

@@ -2,9 +2,11 @@
 #'
 #' After loading a RasterStack of results, there are lots of NA values
 #' and plots of individual raster layers will display at the full extent of the
-#' study extent. To show an ideal extent, this function trims away 0 and
-#' NA values and checks to make sure it returns a reasonable extent for
-#' plotting. The returned Extent object can then be used for plotting.
+#' study extent. To show an ideal extent, this function trims away 0 and NA
+#' values and checks to make sure it returns a reasonable extent for plotting.
+#' The returned Extent object can then be used for plotting. To access a
+#' pre-calculated extent for the full annual cycle use
+#' [load_fac_map_parameters()].
 #'
 #' @param x Raster* object; either full RasterStack or subset.
 #'
@@ -75,7 +77,8 @@ calc_full_extent <- function(x) {
 #' that first selects an optimal power (the Box-Cox method) for normalizing
 #' the data, then power transforms the entire year of non-zero data, constructs
 #' bins with the power-transformed data using standard-deviations, and then
-#' un-transforms the bins.
+#' un-transforms the bins. To access a pre-calculated bins for the full annual
+#' cycle use [load_fac_map_parameters()].
 #'
 #' @param x RasterStack or RasterBrick; original eBird Status and Trends product
 #'   raster GeoTIFF with 52 bands, one for each week.
