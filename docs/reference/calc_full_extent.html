@@ -38,9 +38,11 @@
 <meta property="og:title" content="Calculates spatial extent of non-zero data from Raster* object for plotting — calc_full_extent" />
 <meta property="og:description" content="After loading a RasterStack of results, there are lots of NA values
 and plots of individual raster layers will display at the full extent of the
-study extent. To show an ideal extent, this function trims away 0 and
-NA values and checks to make sure it returns a reasonable extent for
-plotting. The returned Extent object can then be used for plotting." />
+study extent. To show an ideal extent, this function trims away 0 and NA
+values and checks to make sure it returns a reasonable extent for plotting.
+The returned Extent object can then be used for plotting. To access a
+pre-calculated extent for the full annual cycle use
+load_fac_map_parameters()." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -123,9 +125,11 @@ plotting. The returned Extent object can then be used for plotting." />
     <div class="ref-description">
     <p>After loading a RasterStack of results, there are lots of NA values
 and plots of individual raster layers will display at the full extent of the
-study extent. To show an ideal extent, this function trims away 0 and
-NA values and checks to make sure it returns a reasonable extent for
-plotting. The returned Extent object can then be used for plotting.</p>
+study extent. To show an ideal extent, this function trims away 0 and NA
+values and checks to make sure it returns a reasonable extent for plotting.
+The returned Extent object can then be used for plotting. To access a
+pre-calculated extent for the full annual cycle use
+<code><a href='load_fac_map_parameters.html'>load_fac_map_parameters()</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>calc_full_extent</span>(<span class='no'>x</span>)</pre>

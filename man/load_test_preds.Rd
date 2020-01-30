@@ -24,10 +24,12 @@ and upper and lower confidence intervals are provided for predicted
 occurrence, count, and relativce abundance.
 }
 \examples{
+\donttest{
 # download example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
 # test data
 test_preds <- load_test_preds(sp_path)
 dplyr::glimpse(test_preds)
+}
 }
