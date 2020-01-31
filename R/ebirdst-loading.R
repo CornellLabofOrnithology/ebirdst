@@ -86,7 +86,9 @@ ebirdst_download <- function(species,
   # only dl rasters unless requested otherwise
   if (isTRUE(tifs_only)) {
     s3_files <- s3_files[grepl("results/tifs", s3_files$file) |
-                           grepl("tif$", s3_files$file), ]
+                           grepl("tif$", s3_files$file) |
+                           grepl("rds$", s3_files$file) |
+                           grepl("band_dates", s3_files$file), ]
   }
 
   # human readable download size if we want to add a message
