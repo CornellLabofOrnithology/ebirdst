@@ -129,18 +129,19 @@ This layer represents the expected probability of occurrence of the species, ran
 
 #### `count_median`
 
+This layer represents the associated, expected count of a species, regardless of and separate from occurrence, on an eBird Traveling Count by a skilled eBirder starting at the optimal time of day with the optimal search duration and distance that maximizes detection of that species in a region.
 
 #### `abundance_median`
 
-This layer represents the expected count of the species on an eBird Traveling Count by a skilled eBirder starting at the optimal time of day with the optimal search duration and distance that maximizes detection of that species in a region.
+This layer represents the expected relative abundance, modulated by occurrence rate (being derived by multiplying occurrence by count), of the species on an eBird Traveling Count by a skilled eBirder starting at the optimal time of day with the optimal search duration and distance that maximizes detection of that species in a region.
 
 #### `abundance_lower`
 
-This layer represents the lower 10th quantile of the estimated relative abundance of the species, defined as the expected number of birds encountered on an eBird Traveling Count by a skilled eBirder starting at the optimal time of day with the optimal search duration and distance that maximizes detection of that species in a region.
+This layer represents the lower 10th quantile of the estimated relative abundance of the species, defined as the expected count, again modulated by occurrence rate (being derived by multiplying occurrence by count), on an eBird Traveling Count by a skilled eBirder starting at the optimal time of day with the optimal search duration and distance that maximizes detection of that species in a region.
 
 #### `abundance_upper`
 
-This layer represents the upper 90th quantile of the estimated relative abundance of the species, defined as the expected number of birds encountered  on an eBird Traveling Count by a skilled eBirder starting at the optimal time of day with the optimal search duration and distance that maximizes detection of that species in a region.
+This layer represents the upper 90th quantile of the estimated relative abundance of the species, defined as the expected count, again modulated by occurrence rate (being derived by multiplying occurrence by count), on an eBird Traveling Count by a skilled eBirder starting at the optimal time of day with the optimal search duration and distance that maximizes detection of that species in a region.
 
 ## Non-raster Data
 
