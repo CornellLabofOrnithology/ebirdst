@@ -203,6 +203,32 @@ get_species_path <- function(species,
 #' @param path character; full path to the directory containing single species
 #'   eBird Status and Trends products.
 #'
+#' @details The available raster layers are as follows:
+#'
+#' - `occurrence`: the expected probability of occurrence of the species,
+#' ranging from 0 to 1, on an eBird Traveling Count by a skilled eBirder
+#' starting at the optimal time of day with the optimal search duration and
+#' distance that maximizes detection of that species in a region.
+#' - `count`: the expected count of a species, conditional on its occurrence at
+#' the given locatiion, on an eBird Traveling Count by a skilled eBirder
+#' starting at the optimal time of day with the optimal search duration and
+#' distance that maximizes detection of that species in a region.
+#' - `abundance`: the expected relative abundance, computed as the product of
+#' the probability of occurrence and the count conditional on occurrence, of the
+#' species on an eBird Traveling Count by a skilled eBirder starting at the
+#' optimal time of day with the optimal search duration and distance that
+#' maximizes detection of that species in a region.
+#' - `abundance_seasonal`: the expected relative abundance averaged across the
+#' weeks within each season.
+#' - `abundance_lower`: the lower 10th quantile of the expected relative
+#' abundance of the species on an eBird Traveling Count by a skilled eBirder
+#' starting at the optimal time of day with the optimal search duration and
+#' distance that maximizes detection of that species in a region.
+#' - `abundance_upper`: the upper 90th quantile of the expected relative
+#' abundance of the species on an eBird Traveling Count by a skilled eBirder
+#' starting at the optimal time of day with the optimal search duration and
+#' distance that maximizes detection of that species in a region.
+#'
 #' @return A `RasterStack` with 52 layers for the given product, labelled by
 #'   week. Seasonal abundance is the result of averaging the weekly abundance
 #'   raster layers for each season or across the whole year for resident

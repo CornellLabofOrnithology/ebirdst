@@ -33,6 +33,34 @@ Each of the eBird Status and Trends products is packaged as a GeoTIFF file
 with 52 bands, one for each week of the year. This function loads the data
 for a given product and species as a \code{RasterStack} object.
 }
+\details{
+The available raster layers are as follows:
+\itemize{
+\item \code{occurrence}: the expected probability of occurrence of the species,
+ranging from 0 to 1, on an eBird Traveling Count by a skilled eBirder
+starting at the optimal time of day with the optimal search duration and
+distance that maximizes detection of that species in a region.
+\item \code{count}: the expected count of a species, conditional on its occurrence at
+the given locatiion, on an eBird Traveling Count by a skilled eBirder
+starting at the optimal time of day with the optimal search duration and
+distance that maximizes detection of that species in a region.
+\item \code{abundance}: the expected relative abundance, computed as the product of
+the probability of occurrence and the count conditional on occurrence, of the
+species on an eBird Traveling Count by a skilled eBirder starting at the
+optimal time of day with the optimal search duration and distance that
+maximizes detection of that species in a region.
+\item \code{abundance_seasonal}: the expected relative abundance averaged across the
+weeks within each season.
+\item \code{abundance_lower}: the lower 10th quantile of the expected relative
+abundance of the species on an eBird Traveling Count by a skilled eBirder
+starting at the optimal time of day with the optimal search duration and
+distance that maximizes detection of that species in a region.
+\item \code{abundance_upper}: the upper 90th quantile of the expected relative
+abundance of the species on an eBird Traveling Count by a skilled eBirder
+starting at the optimal time of day with the optimal search duration and
+distance that maximizes detection of that species in a region.
+}
+}
 \examples{
 # download example data
 sp_path <- ebirdst_download("example_data")

@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -76,7 +76,7 @@
       <h1>Background, Data Access, and Data Structure</h1>
                         <h4 class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2020-01-30</h4>
+            <h4 class="date">2020-02-07</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-introduction.Rmd"><code>vignettes/ebirdst-introduction.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-introduction.Rmd</code></div>
@@ -203,24 +203,25 @@
 <h4 class="hasAnchor">
 <a href="#count_median" class="anchor"></a><code>count_median</code>
 </h4>
+<p>This layer represents the expected count of a species, conditional on its occurrence at the given locatiion, on an eBird Traveling Count by a skilled eBirder starting at the optimal time of day with the optimal search duration and distance that maximizes detection of that species in a region.</p>
 </div>
 <div id="abundance_median" class="section level4">
 <h4 class="hasAnchor">
 <a href="#abundance_median" class="anchor"></a><code>abundance_median</code>
 </h4>
-<p>This layer represents the expected count of the species on an eBird Traveling Count by a skilled eBirder starting at the optimal time of day with the optimal search duration and distance that maximizes detection of that species in a region.</p>
+<p>This layer represents the expected relative abundance, computed as the product of the probability of occurrence and the count conditional on occurrence, of the species on an eBird Traveling Count by a skilled eBirder starting at the optimal time of day with the optimal search duration and distance that maximizes detection of that species in a region.</p>
 </div>
 <div id="abundance_lower" class="section level4">
 <h4 class="hasAnchor">
 <a href="#abundance_lower" class="anchor"></a><code>abundance_lower</code>
 </h4>
-<p>This layer represents the lower 10th quantile of the estimated relative abundance of the species, defined as the expected number of birds encountered on an eBird Traveling Count by a skilled eBirder starting at the optimal time of day with the optimal search duration and distance that maximizes detection of that species in a region.</p>
+<p>This layer represents the lower 10th quantile of the expected relative abundance of the species on an eBird Traveling Count by a skilled eBirder starting at the optimal time of day with the optimal search duration and distance that maximizes detection of that species in a region.</p>
 </div>
 <div id="abundance_upper" class="section level4">
 <h4 class="hasAnchor">
 <a href="#abundance_upper" class="anchor"></a><code>abundance_upper</code>
 </h4>
-<p>This layer represents the upper 90th quantile of the estimated relative abundance of the species, defined as the expected number of birds encountered on an eBird Traveling Count by a skilled eBirder starting at the optimal time of day with the optimal search duration and distance that maximizes detection of that species in a region.</p>
+<p>This layer represents the upper 90th quantile of the expected relative abundance of the species on an eBird Traveling Count by a skilled eBirder starting at the optimal time of day with the optimal search duration and distance that maximizes detection of that species in a region.</p>
 </div>
 </div>
 </div>
