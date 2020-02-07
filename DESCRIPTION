@@ -1,7 +1,7 @@
 Type: Package
 Package: ebirdst
 Title: Access and Analyze eBird Status and Trends Data
-Version: 0.1.0.900
+Version: 0.2.0
 Authors@R: 
     c(person(given = "Tom",
              family = "Auer",
@@ -20,11 +20,13 @@ Authors@R:
              comment = c(ORCID = "0000-0001-8929-7776")),
       person(given = "Cornell Lab of Ornithology",
              role = "cph"))
-Description: Tools to download, map, plot and analyze eBird Status
-    and Trends data (<https://ebird.org/science/status-and-trends>). eBird 
-    (<https://ebird.org>) is a global database of bird observations collected by 
-    citizen scientists. eBird Status and Trends uses these data to analyse 
-    continental bird abundances, range boundaries, habitats, and trends.
+Description: Tools to download, map, plot and analyze eBird
+    Status and Trends data
+    (<https://ebird.org/science/status-and-trends>). eBird
+    (<https://ebird.org>) is a global database of bird observations
+    collected by citizen scientists. eBird Status and Trends uses these
+    data to analyse continental bird abundances, range boundaries,
+    habitats, and trends.
 License: GPL-3
 URL: https://github.com/CornellLabofOrnithology/ebirdst
 BugReports: 
@@ -36,7 +38,6 @@ Imports:
     data.table,
     dplyr (>= 0.7.0),
     fasterize,
-    gbm (>= 2.1.5),
     ggplot2,
     grDevices,
     gridExtra,
@@ -45,16 +46,17 @@ Imports:
     PresenceAbsence,
     rappdirs,
     raster,
+    rgdal,
+    rlang,
     scales,
     sf,
     stats,
     stringr,
-    tidyr,
+    tidyr (>= 1.0.0),
     tools,
     utils,
     viridisLite,
-    xml2,
-    rgdal
+    xml2
 Suggests: 
     covr,
     fields,
@@ -69,4 +71,4 @@ VignetteBuilder:
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2

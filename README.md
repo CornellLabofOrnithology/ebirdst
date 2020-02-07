@@ -25,6 +25,14 @@ Alternatively, you can install the development version from GitHub with:
     # install.packages("remotes")
     remotes::install_github("CornellLabofOrnithology/ebirdst")
 
+Older versions of the Status and Trends data can be accessed by
+installing the associated version of `ebirdst` from GitHub. For example,
+the 2018 data, corresponding to v0.1.0 of this package, can be accessed
+with:
+
+    # install.packages("remotes")
+    remotes::install_github("CornellLabofOrnithology/ebirdst@v0.1.0")
+
 Vignettes
 ---------
 
@@ -44,6 +52,15 @@ vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-pip
 details how to access additional information from the model results
 about predictor importance and directionality, as well as predictive
 performance metrics.
+
+To access old versions of the vignettes suitable for working with
+previous eBird Status and Trends releases go to the [versions page of
+the GitHub
+repository](https://github.com/CornellLabofOrnithology/ebirdst/releases).
+Download and unzip the source code for the release associated with the
+version of the data you want to work with. Opening the file
+`docs/index.html` will open the package website for this version, which
+gives access to all the documentation and vignettes.
 
 Quick Start
 -----------
@@ -73,28 +90,25 @@ directly, outside of R.
     # download data
     # download a simplified example dataset from aws s3
     # example data are for yellow-bellied sapsucker in michigan
-    # fby default ile will be stored in a persistent data directory:
+    # by default files will be stored in a persistent data directory:
     # rappdirs::user_data_dir("ebirdst"))
     sp_path <- ebirdst_download(species = "example_data")
 
     # load estimated relative abundance and label with dates
     # this raster stack has 52 layers, one for each week of the year
-    abunds <- load_raster("abundance_umean", path = sp_path)
+    abunds <- load_raster("abundance", path = sp_path)
 
     # use parse_raster_dates() to get actual date objects for each layer
     date_vector <- parse_raster_dates(abunds)
     print(date_vector)
-    #>  [1] "2016-01-04" "2016-01-11" "2016-01-18" "2016-01-25" "2016-02-01"
-    #>  [6] "2016-02-08" "2016-02-15" "2016-02-22" "2016-03-01" "2016-03-08"
-    #> [11] "2016-03-15" "2016-03-22" "2016-03-29" "2016-04-05" "2016-04-12"
-    #> [16] "2016-04-19" "2016-04-26" "2016-05-03" "2016-05-10" "2016-05-17"
-    #> [21] "2016-05-24" "2016-05-31" "2016-06-07" "2016-06-14" "2016-06-21"
-    #> [26] "2016-06-28" "2016-07-06" "2016-07-13" "2016-07-20" "2016-07-27"
-    #> [31] "2016-08-03" "2016-08-10" "2016-08-17" "2016-08-24" "2016-08-31"
-    #> [36] "2016-09-07" "2016-09-14" "2016-09-21" "2016-09-28" "2016-10-05"
-    #> [41] "2016-10-12" "2016-10-19" "2016-10-26" "2016-11-02" "2016-11-09"
-    #> [46] "2016-11-16" "2016-11-23" "2016-11-30" "2016-12-07" "2016-12-14"
-    #> [51] "2016-12-21" "2016-12-28"
+    #>  [1] "2018-01-04" "2018-01-11" "2018-01-18" "2018-01-25" "2018-02-01" "2018-02-08" "2018-02-15"
+    #>  [8] "2018-02-22" "2018-03-01" "2018-03-08" "2018-03-15" "2018-03-22" "2018-03-29" "2018-04-05"
+    #> [15] "2018-04-12" "2018-04-19" "2018-04-26" "2018-05-03" "2018-05-10" "2018-05-17" "2018-05-24"
+    #> [22] "2018-05-31" "2018-06-07" "2018-06-14" "2018-06-21" "2018-06-28" "2018-07-06" "2018-07-13"
+    #> [29] "2018-07-20" "2018-07-27" "2018-08-03" "2018-08-10" "2018-08-17" "2018-08-24" "2018-08-31"
+    #> [36] "2018-09-07" "2018-09-14" "2018-09-21" "2018-09-28" "2018-10-05" "2018-10-12" "2018-10-19"
+    #> [43] "2018-10-26" "2018-11-02" "2018-11-09" "2018-11-16" "2018-11-23" "2018-11-30" "2018-12-07"
+    #> [50] "2018-12-14" "2018-12-21" "2018-12-28"
 
     # select a week in the summer
     abund <- abunds[[26]]

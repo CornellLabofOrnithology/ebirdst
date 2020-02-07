@@ -64,7 +64,7 @@ Before we do anything else, we'll need to download and load the example abundanc
 sp_path <- ebirdst_download(species = "example_data")
 # load the abundance data
 # this automaticaaly labels layers with their dates
-abd <- load_raster("abundance_umean", path = sp_path)
+abd <- load_raster("abundance", path = sp_path)
 ```
 
 The abundance data now consist of a `RasterStack` object with 52 layers, each corresponding to the relative abundance for a single week.
@@ -335,7 +335,7 @@ for (i in seq_along(legend_seasons)) {
                    legend.args = list(text = legend_title, side = 3, 
                                       cex = 0.9, col = "black", line = 0.1))
 }
-title("Yellow-bellied Sapsucker Relative Abundance (birds per km/hr)", 
+title("Yellow-bellied Sapsucker Relative Abundance", 
       line = -1, cex.main = 1)
 ```
 

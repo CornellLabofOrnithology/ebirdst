@@ -4,7 +4,7 @@
 \alias{stixelize}
 \alias{stixelize.data.frame}
 \alias{stixelize.sf}
-\title{Generate stixel polygons from PI/PD data}
+\title{Generate stixel polygons from PI data}
 \usage{
 stixelize(x)
 
@@ -13,20 +13,19 @@ stixelize(x)
 \method{stixelize}{sf}(x)
 }
 \arguments{
-\item{x}{\code{data.frame} or \link{sf} object; PI or PD data loaded with \code{\link[=load_pis]{load_pis()}}
-or \code{\link[=load_pds]{load_pds()}}, or any other data frame with fields \code{lon}, \code{lat},
-\code{stixel_width}, and \code{stixel_hight}.}
+\item{x}{\code{data.frame} or \link{sf} object; PI data loaded with \code{\link[=load_pis]{load_pis()}}, or
+any other data frame with fields \code{lon}, \code{lat}, \code{stixel_width}, and
+\code{stixel_hight}.}
 }
 \value{
 \link{sf} object with geometry column storing polygons representing the s
 tixels boundaries.
 }
 \description{
-All predictor importance and partial dependence data are provided at the
-stixel level. In these files, the stixel is defined based on a centroid,
-width, and height. This function uses this information to define polygons for
-each stixel and attaches them to the original data in the form of an \link{sf}
-object
+All predictor importance data are provided at the stixel level. In these
+files, the stixel is defined based on a centroid, width, and height. This
+function uses this information to define polygons for each stixel and
+attaches them to the original data in the form of an \link{sf} object
 }
 \section{Methods (by class)}{
 \itemize{

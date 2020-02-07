@@ -36,24 +36,23 @@ knitr::opts_chunk$set(eval = nzchar(Sys.getenv("BUILD_VIGNETTES")))
 
 # Introduction
 
-Beyond estimates of occurrence and relative abundance, the eBird Status and Trends products contain information about predictor importance, predictor directionality (also known as partial dependencies), as well as predictive performance metrics (PPMs). The PPMs can be used to evaluate statistical performance of the models, either over the entire spatiotemporal extent of the model results, or for a specific region and season. Predictor Importances (PIs) and Partial Dependencies (PDs) can be used to understand relationships between occurrence and abundance and predictors, most notably the land cover variables used in the model. When PIs and PDs are combined, we can depict habitat association and avoidance, as well as the strength of the relationship with those habitats. The functions described in this section help load this data from the results packages, give tools for assessing predictive performance, and synthesize information about predictor importances and partial dependencies.
+Beyond estimates of occurrence and relative abundance, the eBird Status and Trends products contain information about predictor importance as well as predictive performance metrics (PPMs). The PPMs can be used to evaluate statistical performance of the models, either over the entire spatiotemporal extent of the model results, or for a specific region and season. Predictor Importances (PIs) and can be used to understand relationships between occurrence and abundance and predictors, most notably the land cover variables used in the model. The functions described in this section help load this data from the results packages, give tools for assessing predictive performance and predictor importances.
 
 ## Data Structure
 
 **IMPORTANT. AFTER DOWNLOADING THE RESULTS, DO NOT CHANGE THE FILE STRUCTURE.** All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package.
 
-Data are stored in four files, found under `/<run_name>/results/abund_preds/unpeeled_folds`, as described below.
+Data are stored in three files, found under `/<run_name>/results/`, as described below.
 
-`/<run_name>/results/abund_preds/unpeeled_folds/pd.txt`
-`/<run_name>/results/abund_preds/unpeeled_folds/pi.txt`
-`/<run_name>/results/abund_preds/unpeeled_folds/summary.txt`
-`/<run_name>/results/abund_preds/unpeeled_folds/test.pred.ave.txt`
+`/<run_name>/results/preds/test_pred_ave.txt`
+`/<run_name>/results/stixels/pi.txt`
+`/<run_name>/results/stixels/summary.txt`
 
 The `ebirdst` package provides functions for accessing these, such that you should never have to handle them manually, granted that the original file structure of the results is maintained. These data are stored at "stixel centroids," which are the centers of the independent, partitioned, regional model extents (see Fink et al. 2010, Fink et al. 2013).
 
 # Loading Centroids
 
-The first step when working with stixel centroid data is to load the Predictor Importances (PIs) and the Partial Dependencies (PDs). These files will be used for all of the functions in this vignette and are the input to many of the functions in `ebirdst`.
+The first step when working with stixel centroid data is to load the Predictor Importances (PIs). This file will be used for all of the functions in this vignette and is the input to many of the functions in `ebirdst`.
 
 ```{r load_pipd}
 library(ebirdst)
@@ -61,9 +60,7 @@ library(ebirdst)
 # DOWNLOAD DATA
 # Currently, example data is available on a public s3 bucket. The following 
 # ebirdst_download() function copies the species results to a selected path and 
-# returns the full path of the results. Please note that the example_data is
-# for Yellow-bellied Sapsucker and has the same run code as the real data,
-# so if you download both, make sure you put the example_data somewhere else.
+# returns the full path of the results.
 
 # Because the non-raster data is large, there is a parameter on the
 # ebirdst_download function that defaults to downloading only the raster data.
@@ -72,12 +69,11 @@ sp_path <- ebirdst_download(species = "example_data", tifs_only = FALSE)
 print(sp_path)
 
 pis <- load_pis(sp_path)
-pds <- load_pds(sp_path)
 ```
 
 # Selecting Region and Season
 
-When working with Predictive Performance Metrics (PPMs), PIs, and/or PDs, it is very common to select a subset of space and time for analysis. In `ebirdst` this is done by creating a spatiotemporal extent object with `ebirdst_extent()`. These objects define the region and season for analysis and are passed to many functions in `ebirdst`. To review the available stixel centroids associated with both PIs and PDs and to see which have been selected by a spatiotemporal subset, use the `map_centroids` function, which will map and summarize this information.
+When working with Predictive Performance Metrics (PPMs) and/or PIs, it is very common to select a subset of space and time for analysis. In `ebirdst` this is done by creating a spatiotemporal extent object with `ebirdst_extent()`. These objects define the region and season for analysis and are passed to many functions in `ebirdst`. To review the available stixel centroids associated with both PIs and PDs and to see which have been selected by a spatiotemporal subset, use the `map_centroids` function, which will map and summarize this information.
 
 ```{r map_centroids}
 lp_extent <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 45),
@@ -104,16 +100,6 @@ plot_pis(pis, ext = lp_extent, by_cover_class = FALSE, n_top_pred = 15)
 
 # aggregating fragstats for cover classes
 plot_pis(pis, ext = lp_extent, by_cover_class = TRUE, n_top_pred = 15)
-```
-
-# Plot Partial Dependencies (predictor directionality)
-
-Complementary to `plot_pis()`, the `plot_pds()` function plots the partial dependency curves for individual predictors, with various levels of detail and smoothing available.
-
-```{r plot_pds}
-mypds <- plot_pds(pds, predictor = "effort_hrs", 
-                  ext = lp_extent, 
-                  bootstrap_smooth = TRUE)
 ```
 
 # Predictive Performance Metrics

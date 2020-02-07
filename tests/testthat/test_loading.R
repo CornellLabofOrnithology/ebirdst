@@ -6,7 +6,7 @@ lp_extent <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 45),
 
 test_that("subset raster", {
   #skip_on_cran()
-  abunds <- load_raster("abundance_umean", sp_path)
+  abunds <- load_raster("abundance", sp_path)
   #abunds <- raster::stack(f_dl)
   expect_is(abunds, "RasterStack")
 
@@ -38,7 +38,7 @@ test_that("subset raster", {
 
   expect_is(abund_sub, "RasterBrick")
   ### error tests
-  expect_error(load_raster("abundance_umean", "/bad/path"))
+  expect_error(load_raster("abundance", "/bad/path"))
   # broken path
 
   # reversed min max
@@ -53,10 +53,10 @@ context("label_raster_stack and parse_raster_dates")
 
 test_that("ebirdst label_raster_stack", {
   skip_on_cran()
-  abunds <- load_raster("abundance_umean", sp_path)
+  abunds <- load_raster("abundance", sp_path)
 
   # expected
-  expect_equal(length(grep("X2016.", names(abunds)[1])), 1)
+  expect_equal(length(grep("X2018.", names(abunds)[1])), 1)
 
   # error
   expect_error(label_raster_stack(abunds[[1:3]]))
@@ -75,14 +75,4 @@ test_that("ebirdst load_pis", {
 
   # broken path
   expect_error(load_pis("~/some/messed/up/path/that/does/not/exist"))
-})
-
-context("load_pds")
-
-test_that("ebirdst load_pds", {
-  expect_is(load_pds(sp_path), "data.frame")
-  expect_gt(nrow(load_pds(sp_path)), 0)
-
-  # broken path
-  expect_error(load_pds("~/some/messed/up/path/that/does/not/exist"))
 })

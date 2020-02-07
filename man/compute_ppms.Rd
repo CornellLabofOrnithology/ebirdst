@@ -18,7 +18,7 @@ A list of three data frames: \code{binary_ppms}, \code{occ_ppms}, and
 \code{abd_ppms}. These data frames have 25 rows corresponding to 25 Monte Carlo
 iterations each estimating the PPMs using a spatiotemporal subsample of the
 test data. Columns correspond to the different PPMS. \code{binary_ppms} contains
-binary or range-based PPMS, \code{occ_ppms} contains within-range occupancy
+binary or range-based PPMS, \code{occ_ppms} contains within-range occurrence
 probability PPMS, and \code{abd_ppms} contains within-range abundance PPMs. In
 some cases, PPMs may be missing, either because there isn't a large enough
 test set within the spatiotemporal extent or because average occurrence or
@@ -33,12 +33,11 @@ metrics, or use \code{plot_all_ppms()} or \code{plot_binary_by_time()} to summar
 metrics.
 }
 \examples{
-
 # download and load example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
 # define a spatiotemporal extent to plot
-bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
+bb_vec <- c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5)
 e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 \donttest{
 # compute predictive performance metrics

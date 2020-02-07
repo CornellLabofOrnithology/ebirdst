@@ -7,7 +7,7 @@ lp_extent <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 45),
 context("calc_full_extent")
 
 test_that("ebirdst calc_full_extent", {
-  abund <- load_raster("abundance_umean", sp_path)
+  abund <- load_raster("abundance", sp_path)
   abund <- ebirdst_subset(abund, lp_extent)
 
   # expected RasterStack
@@ -30,7 +30,7 @@ test_that("ebirdst calc_full_extent", {
 context("calc_bins")
 
 test_that("ebirdst calc_bins", {
-  abund <- load_raster("abundance_umean", sp_path)
+  abund <- load_raster("abundance", sp_path)
   abund <- ebirdst_subset(abund, lp_extent)
 
   # expect a list greater than 1 for RasterStack

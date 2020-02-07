@@ -3,7 +3,6 @@
 \docType{package}
 \name{ebirdst}
 \alias{ebirdst}
-\alias{ebirdst-package}
 \title{\code{ebirdst}: Tools to Load, Map, Plot, and Analyze eBird Status and Trends
 Data Products}
 \description{

@@ -52,19 +52,28 @@ extract <- raster::extract
 
 # Currently, example data is available on a public s3 bucket. The following 
 # ebirdst_download() function copies the species results to a selected path and 
-# returns the full path of the results. Please note that the example_data is
-# for Yellow-bellied Sapsucker and has the same run code as the real data,
-# so if you download both, make sure you put the example_data somewhere else.
+# returns the full path of the results. In this vignette, we'll use example data 
+# for Yellow-bellied Sapsucker
 sp_path <- ebirdst_download(species = "example_data")
 
-
 # load trimmed mean abundances and label dates
-abunds <- load_raster("abundance_umean", path = sp_path)
+abunds <- load_raster("abundance", path = sp_path)
 
 # use parse_raster_dates() to get actual date objects for each layer
 date_vector <- parse_raster_dates(abunds)
 print(date_vector)
 ```
+
+All Status and Trends raster data is provided at 2.96 km spatial resolution. For many use cases, it may be desirable to work with data at a coarser resolution. The `aggregate()` function from the `raster` package can be used to aggregate cells together to reduce the resolution of raster data, and the `fact` argument specifies the number of cells in each direction to aggregate together. In general, we suggest only aggregate data by factors of 3 (i.e. `fact` values of 3, 9, 27, etc.). For example, to aggregate by a factor of 3, to produce a raster at 8.88 km resolution:
+
+```{r aggregate}
+abunds_low_res <- aggregate(abunds, fact = 3, fun = mean)
+# native resolution
+res(abunds)
+# resolution after aggregation
+res(abunds_low_res)
+```
+
 
 # Mapping Occurrence and Abundance
 
@@ -80,6 +89,7 @@ mollweide <- "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
 
 # project single layer from stack to mollweide
 week38_moll <- projectRaster(abunds[[38]], crs = mollweide, method = "ngb")
+week38_moll <- trim(week38_moll)
 
 # optionally, you can project an entire stack, but it takes much longer
 # abund_moll <- projectRaster(abund, crs = mollweide, method = "ngb")
@@ -99,14 +109,15 @@ If working with a full set of data for a species, mapping the layer at the full 
 Most examples in this vignette focus primarily on relative abundance estimates, as they're the most novel and informative. However, we also provide estimates for the probability of occurrence. These are much simpler to map than abundance in terms of color scales and binning, as values range between 0 and 1 throughout the year.
 
 ```{r map_occurrence}
-occs <- load_raster("occurrence_umean", path = sp_path)
+occs <- load_raster("occurrence", path = sp_path)
 
 # select a week in the summer
 occ <- occs[[26]]
 
-# create breaks every 0.05 from 0 to 1
-occ_bins <- seq(0, 1, by = 0.05)
+# create breaks every 0.1 from 0 to 1
+occ_bins <- seq(0, 1, by = 0.1)
 occ_moll <- projectRaster(occ, crs = mollweide, method = "ngb")
+occ_moll <- trim(occ_moll)
 
 par(mar = c(0, 0, 0, 2), cex = 0.9)
 plot(occ_moll, 
@@ -127,6 +138,7 @@ To compare, we first scale the colors linearly, based on the maximum from the en
 year_max <- max(maxValue(abunds), na.rm = TRUE)
 
 week14_moll <- projectRaster(abunds[[14]], crs = mollweide, method = "ngb")
+week14_moll <- trim(week14_moll)
 
 # set graphical params
 par(mfrow = c(1, 2), mar = c(0, 0, 0, 4))
@@ -158,7 +170,7 @@ year_bins <- calc_bins(abunds)
 
 # plot
 par(mfrow = c(1, 2), mar = c(0, 0, 0, 6))
-plot(st_as_sfc(st_bbox(trim(week38_moll))), col = "white", border = "white")
+plot(st_as_sfc(st_bbox(week38_moll)), col = "white", border = "white")
 plot(week38_moll, 
      breaks = year_bins$bins, 
      col = abundance_palette(length(year_bins$bins) - 1, season = "weekly"), 
@@ -197,14 +209,15 @@ wh_states <- ne_states(country = c("United States of America", "Canada"),
   st_transform(crs = mollweide) %>% 
   st_geometry()
 
-# well plot a week in the middle of summer
+# we'll plot a week in the middle of summer
 week26_moll <- projectRaster(abunds[[26]], crs = mollweide, method = "ngb")
+week26_moll <- trim(week26_moll)
 
 # set graphics params
 par(mfrow = c(1, 1), mar = c(0, 0, 0, 6))
 
 # use the extent object to set the spatial extent for the plot
-plot(st_as_sfc(st_bbox(trim(week26_moll))), col = "white", border = "white")
+plot(st_as_sfc(st_bbox(week26_moll)), col = "white", border = "white")
 
 # add background spatial context
 plot(wh_states, col = "#eeeeee", border = NA, add = TRUE)
@@ -297,7 +310,7 @@ ggplot(plot_frame, aes(x, y)) +
   geom_ribbon(data = plot_frame, 
               aes(ymin = lower, ymax = upper), 
               alpha = 0.3) +
-  ylab("Expected Count (count/(km hr))") +
+  ylab("Expected Count") +
   xlab("Week") +
   theme_light()
 ```
@@ -332,7 +345,7 @@ ggplot(plot_frame, aes(x, y)) +
   geom_ribbon(data = plot_frame, 
               aes(ymin = lower, ymax =upper), 
               alpha = 0.3) +
-  ylab("Expected Count (count/(km hr))") +
+  ylab("Expected Count") +
   xlab("Week") +
   theme_light()
 ```
