@@ -6,4 +6,5 @@
 #'
 #' @name ebirdst
 #' @docType package
+#' @importFrom rlang .data
 NULL

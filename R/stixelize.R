@@ -1,14 +1,13 @@
-#' Generate stixel polygons from PI/PD data
+#' Generate stixel polygons from PI data
 #'
-#' All predictor importance and partial dependence data are provided at the
-#' stixel level. In these files, the stixel is defined based on a centroid,
-#' width, and height. This function uses this information to define polygons for
-#' each stixel and attaches them to the original data in the form of an [sf]
-#' object
+#' All predictor importance data are provided at the stixel level. In these
+#' files, the stixel is defined based on a centroid, width, and height. This
+#' function uses this information to define polygons for each stixel and
+#' attaches them to the original data in the form of an [sf] object
 #'
-#' @param x `data.frame` or [sf] object; PI or PD data loaded with [load_pis()]
-#'   or [load_pds()], or any other data frame with fields `lon`, `lat`,
-#'   `stixel_width`, and `stixel_hight`.
+#' @param x `data.frame` or [sf] object; PI data loaded with [load_pis()], or
+#'   any other data frame with fields `lon`, `lat`, `stixel_width`, and
+#'   `stixel_hight`.
 #'
 #' @return [sf] object with geometry column storing polygons representing the s
 #'   tixels boundaries.

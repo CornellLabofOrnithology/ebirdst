@@ -34,9 +34,9 @@
 #' ebirdst_download("woothr")
 #' }
 ebirdst_download <- function(species,
-                          path = rappdirs::user_data_dir("ebirdst"),
-                          tifs_only = TRUE,
-                          force = FALSE) {
+                             path = rappdirs::user_data_dir("ebirdst"),
+                             tifs_only = TRUE,
+                             force = FALSE) {
   stopifnot(is.character(species), length(species) == 1)
   stopifnot(is.character(path), length(path) == 1)
   stopifnot(is.logical(tifs_only), length(tifs_only) == 1)
@@ -48,9 +48,9 @@ ebirdst_download <- function(species,
   }
 
   # example data or a real run
+  bucket_url <- "https://ebirdst-data.s3.amazonaws.com/"
   if (species == "example_data") {
-    bucket_url <- "https://clo-is-da-example-data.s3.amazonaws.com/"
-    run <- "yebsap-ERD2016-EBIRD_SCIENCE-20180729-7c8cec83"
+    run <- "yebsap-ERD2018-EBIRD_SCIENCE-20191030-3abe59ca-example"
   } else {
     species <- get_species(species)
     row_id <- which(ebirdst::ebirdst_runs$species_code == species)
@@ -58,7 +58,6 @@ ebirdst_download <- function(species,
       stop(sprintf("species = %s does not uniquely identify a species.",
                    species))
     }
-    bucket_url <- "https://ebirdst-data.s3.amazonaws.com/"
     run <- ebirdst::ebirdst_runs$run_name[row_id]
   }
   bucket_url_sp <- paste0(bucket_url, "?prefix=", run)
@@ -80,8 +79,6 @@ ebirdst_download <- function(species,
   # filter to desired run/species
   s3_files <- s3_files[as.numeric(s3_files$size) > 0 &
                          grepl(run, s3_files$file), ]
-  # don't need rdata file
-  s3_files <- s3_files[!grepl("RData$", s3_files$file), ]
   if (nrow(s3_files) == 0) {
     stop(sprintf("Files not found on AWS S3 for species = %s", species))
   }
@@ -89,7 +86,9 @@ ebirdst_download <- function(species,
   # only dl rasters unless requested otherwise
   if (isTRUE(tifs_only)) {
     s3_files <- s3_files[grepl("results/tifs", s3_files$file) |
-                           grepl("tif$", s3_files$file), ]
+                           grepl("tif$", s3_files$file) |
+                           grepl("rds$", s3_files$file) |
+                           grepl("band_dates", s3_files$file), ]
   }
 
   # human readable download size if we want to add a message
@@ -133,17 +132,63 @@ ebirdst_download <- function(species,
   return(invisible(normalizePath(file.path(path, run))))
 }
 
-#' @describeIn ebirdst_download deprecated, use `ebirdst_download()`
-download_data <- function(species,
-                          path = rappdirs::user_data_dir("ebirdst"),
-                          tifs_only = TRUE,
-                          force = FALSE) {
-  .Deprecated("ebirdst_download")
-  ebirdst_download(species = species,
-                   path = path,
-                   tifs_only = tifs_only,
-                   force = force)
+
+#' Get the data package path for a given species
+#'
+#' This helper function can be used to get the path to a data package for a
+#' given species to be used by the various loading functions.
+#'
+#' @param species character; a single species given as a scientific name, common
+#'   name or six-letter species code (e.g. woothr). The full list of valid
+#'   species is can be viewed in the [ebirdst_runs] data frame included in this
+#'   package. To return the path to the example data, use "example_data".
+#' @param path character; directory that the data were downloaded to. Defaults
+#'   to the suggested persistent data directory data directory:
+#'   rappdirs::user_data_dir("ebirdst")).
+#'
+#' @return The path to the data package directory.
+#' @export
+#'
+#' @examples
+#' # download the example data
+#' ebirdst_download("example_data")
+#'
+#' # get the path
+#' sp_path <- get_species_path("example_data")
+#'
+#' # use it to load data
+#' abd <- load_raster("abundance", sp_path)
+#'
+#' \dontrun{
+#' # get the path to the full data package for yellow-bellied sapsucker
+#' # common name, scientific name, or species code can be used
+#' get_species_path("Yellow-bellied Sapsucker")
+#' get_species_path("Sphyrapicus varius")
+#' get_species_path("yebsap")
+#' }
+get_species_path <- function(species,
+                             path = rappdirs::user_data_dir("ebirdst")) {
+  stopifnot(is.character(species), length(species) == 1)
+  stopifnot(is.character(path), length(path) == 1, dir.exists(path))
+
+  if (species == "example_data") {
+    run <- "yebsap-ERD2018-EBIRD_SCIENCE-20191030-3abe59ca-example"
+  } else {
+    species <- get_species(species)
+    row_id <- which(ebirdst::ebirdst_runs$species_code == species)
+    if (length(row_id) != 1) {
+      stop(sprintf("species = %s does not uniquely identify a species.",
+                   species))
+    }
+    run <- ebirdst::ebirdst_runs$run_name[row_id]
+  }
+  species_path <- file.path(path, run)
+  if (!dir.exists(species_path)) {
+    stop(paste("No data package found for species:", species))
+  }
+  return(species_path)
 }
+
 
 #' Load eBird Status and Trends raster data
 #'
@@ -152,12 +197,45 @@ download_data <- function(species,
 #' for a given product and species as a `RasterStack` object.
 #'
 #' @param product character; status and trends product to load, options are
-#'   relative abundance, occurrence, and upper and lower bounds on relative
-#'   abundance. It is also possible to return a template raster with no data.
+#'   relative abundance, seasonal abundance, count, occurrence, and upper and
+#'   lower bounds on relative abundance. It is also possible to return a
+#'   template raster with no data.
 #' @param path character; full path to the directory containing single species
 #'   eBird Status and Trends products.
 #'
-#' @return A `RasterStack` of data for the given product.
+#' @details The available raster layers are as follows:
+#'
+#' - `occurrence`: the expected probability of occurrence of the species,
+#' ranging from 0 to 1, on an eBird Traveling Count by a skilled eBirder
+#' starting at the optimal time of day with the optimal search duration and
+#' distance that maximizes detection of that species in a region.
+#' - `count`: the expected count of a species, conditional on its occurrence at
+#' the given locatiion, on an eBird Traveling Count by a skilled eBirder
+#' starting at the optimal time of day with the optimal search duration and
+#' distance that maximizes detection of that species in a region.
+#' - `abundance`: the expected relative abundance, computed as the product of
+#' the probability of occurrence and the count conditional on occurrence, of the
+#' species on an eBird Traveling Count by a skilled eBirder starting at the
+#' optimal time of day with the optimal search duration and distance that
+#' maximizes detection of that species in a region.
+#' - `abundance_seasonal`: the expected relative abundance averaged across the
+#' weeks within each season.
+#' - `abundance_lower`: the lower 10th quantile of the expected relative
+#' abundance of the species on an eBird Traveling Count by a skilled eBirder
+#' starting at the optimal time of day with the optimal search duration and
+#' distance that maximizes detection of that species in a region.
+#' - `abundance_upper`: the upper 90th quantile of the expected relative
+#' abundance of the species on an eBird Traveling Count by a skilled eBirder
+#' starting at the optimal time of day with the optimal search duration and
+#' distance that maximizes detection of that species in a region.
+#'
+#' @return A `RasterStack` with 52 layers for the given product, labelled by
+#'   week. Seasonal abundance is the result of averaging the weekly abundance
+#'   raster layers for each season or across the whole year for resident
+#'   species. The date boundaries used for the seasonal definitions appear in
+#'   `ebirdst_runs` and if a season failed review no associated layer will be
+#'   included. There will be up to four layers labelled according to the
+#'   seasons.
 #'
 #' @export
 #'
@@ -166,34 +244,56 @@ download_data <- function(species,
 #' sp_path <- ebirdst_download("example_data")
 #'
 #' # load data
-#' load_raster("abundance_umean", sp_path)
-load_raster <- function(product = c("abundance_umean",
-                                    "occurrence_umean",
+#' load_raster("abundance", sp_path)
+load_raster <- function(product = c("abundance",
+                                    "abundance_seasonal",
+                                    "count",
+                                    "occurrence",
                                     "abundance_lower",
                                     "abundance_upper",
                                     "template"),
                         path) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
   product <- match.arg(product)
+  if (product %in% c("abundance", "count", "occurrence")) {
+    product <- paste0(product, "_median")
+  }
 
-  # find the file
+  # load raster
   if (product == "template") {
+    # template raster
     tif_path <- list.files(file.path(path, "data"),
                            pattern = "srd_raster_template\\.tif$",
                            full.names = TRUE)
-  } else {
-    tif_path <- list.files(file.path(path, "results", "tifs"),
-                           pattern = paste0("hr_2016_", product, "\\.tif$"),
-                           full.names = TRUE)
-  }
-  if (length(tif_path) != 1 || !file.exists(tif_path)) {
-    stop(paste("Error locating GeoTIFF file for:", product))
-  }
-
-  # return
-  if (product == "template") {
+    if (length(tif_path) != 1 || !file.exists(tif_path)) {
+      stop(paste("Error locating GeoTIFF file for:", product))
+    }
     return(raster::raster(tif_path))
+  } else if (product == "abundance_seasonal") {
+    # seasonal abundance
+    tif_path <- list.files(file.path(path, "results", "tifs"),
+                           pattern = paste0(product, ".*\\.tif$"),
+                           full.names = TRUE)
+    if (length(tif_path) > 4 || !file.exists(tif_path)) {
+      stop(paste("Error locating GeoTIFF file for:", product))
+    } else if (length(tif_path) == 0) {
+      stop(paste("No seasonal abundance GeoTIFFs for:", product))
+    }
+    seasons <- stringr::str_extract(tif_path,
+                                    "(?<=abundance_seasonal_)[a-z_]+")
+    season_order <- c("postbreeding_migration", "prebreeding_migration",
+                      "nonbreeding", "breeding", "year_round")
+    s <- raster::stack(tif_path)
+    names(s) <- intersect(season_order, seasons)
+    return(s)
   } else {
+    # 52 week stack
+    tif_path <- list.files(file.path(path, "results", "tifs"),
+                           pattern = paste0(product, "\\.tif$"),
+                           full.names = TRUE)
+    if (length(tif_path) != 1 || !file.exists(tif_path)) {
+      stop(paste("Error locating GeoTIFF file for:", product))
+    }
     return(label_raster_stack(raster::stack(tif_path)))
   }
 }
@@ -221,7 +321,7 @@ load_raster <- function(product = c("abundance_umean",
 #' @examples
 #' # download and load example abundance data
 #' sp_path <- ebirdst_download("example_data")
-#' abd <- load_raster("abundance_umean", sp_path)
+#' abd <- load_raster("abundance", sp_path)
 #'
 #' # label
 #' abd <- label_raster_stack(abd)
@@ -247,7 +347,7 @@ label_raster_stack <- function(x) {
                               flag = "0"),
                       sep = "-")
 
-  names(x) <- paste(2016, date_names, sep = "-")
+  names(x) <- paste(2018, date_names, sep = "-")
 
   return(x)
 }
@@ -270,16 +370,13 @@ label_raster_stack <- function(x) {
 #' @examples
 #' # download and load example abundance data
 #' sp_path <- ebirdst_download("example_data")
-#' abd <- load_raster("abundance_umean", sp_path)
-#'
-#' # label
-#' abd <- label_raster_stack(abd)
+#' abd <- load_raster("abundance", sp_path)
 #'
 #' # parse dates
 #' parse_raster_dates(abd)
 parse_raster_dates <- function(x) {
   stopifnot(inherits(x, "Raster"))
-  if(length(grep("X2016.", names(x)[1])) == 0) {
+  if (!all(grepl("X[0-9]{4}\\.[0-9]{2}\\.[0-9]{2}", names(x)))) {
     stop("Raster names not in correct format, call label_raster_stack() first.")
   }
 
@@ -289,8 +386,8 @@ parse_raster_dates <- function(x) {
 
 #' Stixel summary file loader
 #'
-#' Internal function used by [load_pis()] and [load_pds()] to get the stixel
-#' summary information (from summary.txt).
+#' Internal function used by [load_pis()] to get the stixel summary information
+#' (from summary.txt).
 #'
 #' @param path character; full path to the directory containing single species
 #'   eBird Status and Trends products.
@@ -315,22 +412,21 @@ load_summary <- function(path, return_sf = FALSE) {
   stopifnot(dir.exists(path))
   stopifnot(is.logical(return_sf), length(return_sf) == 1)
 
-  stixel_path <- file.path(path, "results", "abund_preds", "unpeeled_folds")
+  stixel_path <- file.path(path, "results", "stixels")
   summary_file <- file.path(stixel_path, "summary.txt")
 
   if(!file.exists(summary_file)) {
     stop(paste0("The file summary.txt does not exist at ", stixel_path))
   }
 
+  # load stixel summary data
   summary_df <- data.table::fread(summary_file,
-                                  col.names = ebirdst_summary_names,
-                                  #col.names = ebirdst_summary_names_tidy,
                                   stringsAsFactors = FALSE,
                                   showProgress = FALSE)
   summary_df <- summary_df[, c("stixel", "data_type") := NULL]
   summary_df <- summary_df[!is.na(summary_df$lon), ]
 
-  summary_df <- as.data.frame(summary_df)
+  summary_df <- as.data.frame(summary_df, stringsAsFactors = FALSE)
   if (isTRUE(return_sf)) {
     summary_df <- sf::st_as_sf(summary_df, coords = c("lon", "lat"), crs = 4326)
   }
@@ -341,7 +437,7 @@ load_summary <- function(path, return_sf = FALSE) {
 #' Load predictor importances for single species eBird Status and Trends products
 #'
 #' Loads the predictor importance data (from pi.txt), joins with stixel summary
-#' data, sets column names, and cleans up the data.frame.
+#' data, and cleans up the data.frame.
 #'
 #' @param path character; full path to the directory containing single species
 #'   eBird Status and Trends products.
@@ -371,17 +467,15 @@ load_pis <- function(path, return_sf = FALSE) {
   stopifnot(dir.exists(path))
   stopifnot(is.logical(return_sf), length(return_sf) == 1)
 
-  stixel_path <- file.path(path, "results", "abund_preds", "unpeeled_folds")
+  stixel_path <- file.path(path, "results", "stixels")
   pi_file <- file.path(stixel_path, "pi.txt")
 
   if(!file.exists(pi_file)) {
     stop(paste("The file pi.txt does not exist at:", stixel_path))
   }
 
-  # pi file
+  # load pi file
   pi_df <- data.table::fread(pi_file,
-                             col.names = ebirdst_pi_names,
-                             #col.names = ebirdst_pi_names_tidy,
                              stringsAsFactors = FALSE,
                              showProgress = FALSE)
   pi_df <- pi_df[, c("stixel", "data_type") := NULL]
@@ -392,8 +486,9 @@ load_pis <- function(path, return_sf = FALSE) {
 
   # merge pis with summary
   pi_summary <- dplyr::inner_join(summary_df, pi_df, by = "stixel_id")
-
   pi_summary <- as.data.frame(pi_summary)
+  names(pi_summary) <- tolower(names(pi_summary))
+
   if (isTRUE(return_sf)) {
     pi_summary <- sf::st_as_sf(pi_summary, coords = c("lon", "lat"), crs = 4326)
   }
@@ -401,83 +496,12 @@ load_pis <- function(path, return_sf = FALSE) {
 }
 
 
-#' Load partial dependencies for single species eBird Status and Trends products
+#' Test data loader
 #'
-#' Loads the partial dependency data (from pd.txt), joins with stixel summary
-#' data, sets the names`, and cleans up the data.frame. This is one of the
-#' slower functions in the package, due to the size of the pd.txt file (usually
-#' multiple GB).
-#'
-#' @param path character; full path to the directory containing single species
-#'   eBird Status and Trends products.
-#' @param return_sf logical; whether to return an [sf] object of spatial points
-#'   rather then the default data frame.
-#'
-#' @return data.frame containing partial dependency values for each stixel, as
-#'   well as stixel summary information. To make these data more compact,
-#'   they're stored in a wide format. Each row corresponds to the partial
-#'   dependence relationship of one predictor for a single stixel. There are
-#'   50 columns (x1-x50) at which the partial dependence is measured and 50
-#'   columns (y1-y50) that give the resulting probability of occurrence on the
-#'   logit scale.
-#'
-#' @import data.table
-#'
-#' @export
-#'
-#' @examples
-#' # download example data
-#' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
-#'
-#' # load partial dependence
-#' pds <- load_pds(sp_path)
-#' \donttest{
-#' # plot partial dependence for effort hours
-#' # define a spatiotemporal extent to plot data from
-#' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
-#' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
-#' plot_pds(pds, "effort_hrs", ext = e)
-#' }
-load_pds <- function(path, return_sf = FALSE) {
-  stopifnot(dir.exists(path))
-  stopifnot(is.logical(return_sf), length(return_sf) == 1)
-
-  stixel_path <- file.path(path, "results", "abund_preds", "unpeeled_folds")
-  pd_file <- file.path(stixel_path, "pd.txt")
-
-  if(!file.exists(pd_file)) {
-    stop(paste("The file pd.txt does not exist at:", stixel_path))
-  }
-
-  # load pd.txt
-  pd_df <- data.table::fread(pd_file,
-                             col.names = ebirdst_pd_names,
-                             #col.names = ebirdst_pi_names_tidy,
-                             stringsAsFactors = FALSE,
-                             showProgress = FALSE)
-  pd_df <- pd_df[, c("stixel", "data_type", "spacer") := NULL]
-
-  # load summary file
-  summary_df <- load_summary(path)
-  summary_df <- summary_df[, 1:12]
-
-  # merge
-  pd_summary <- dplyr::right_join(pd_df, summary_df, by = "stixel_id")
-  rm(pd_df, summary_df)
-
-  pd_summary <- as.data.frame(pd_summary)
-  if (isTRUE(return_sf)) {
-    pd_summary <- sf::st_as_sf(pd_summary, coords = c("lon", "lat"), crs = 4326)
-  }
-  return(pd_summary)
-}
-
-
-#' Raw test data loader
-#'
-#' Internal function used by [load_test_data()] to get the full test data for
+#' Internal function used by [compute_ppms()] to get the full test data set for
 #' calculating predictive performance metrics. This file contains the observed
-#' counts and model predicted relative occurrence and abundance values.
+#' counts and all predictor variables used for modeling for each checklist in
+#' the test dataset.
 #'
 #' @param path character; full path to the directory containing single species
 #'   eBird Status and Trends products.
@@ -485,8 +509,7 @@ load_pds <- function(path, return_sf = FALSE) {
 #'   rather then the default data frame.
 #'
 #' @return data.frame containing test data, including checklist locations,
-#'   observed counts, and predicted mean and associated error for relative
-#'   occurrence and abundance.
+#'   observed counts, and predictor variables.
 #'
 #' @keywords internal
 #'
@@ -496,30 +519,29 @@ load_pds <- function(path, return_sf = FALSE) {
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
 #' # test data
-#' test_data <- ebirdst:::load_test_data_raw(sp_path)
+#' test_data <- ebirdst:::load_test_data(sp_path)
 #' dplyr::glimpse(test_data)
 #' }
-load_test_data_raw <- function(path, return_sf = FALSE) {
+load_test_data <- function(path, return_sf = FALSE) {
   stopifnot(dir.exists(path))
+  stopifnot(is.logical(return_sf), length(return_sf) == 1)
 
   data_path <- file.path(path, "data")
-  td_file <- list.files(data_path,
-                        pattern = "erd\\.test\\.data\\.csv",
+  td_file <- list.files(file.path(path, "data"),
+                        pattern = "test-data\\.csv$",
                         full.names = TRUE)
-
   if (length(td_file) != 1 || !file.exists(td_file)) {
     stop(paste("Error locating raw test data file at:", data_path))
   }
 
-  # load pd.txt
+  # load raw test data from sqlite db
   td_df <- data.table::fread(td_file,
                              stringsAsFactors = FALSE,
                              showProgress = FALSE)
-  td_df <- td_df[, "type" := NULL]
+  td_df[["DATA_TYPE"]] <- NULL
 
   # fix names
-  names(td_df) <- stringr::str_replace_all(stringr::str_to_lower(names(td_df)),
-                                           "\\.", "_")
+  names(td_df) <- tolower(names(td_df))
   nm_idx <- match(c("longitude", "latitude"), names(td_df))
   names(td_df)[nm_idx] <- c("lon", "lat")
 
@@ -531,55 +553,130 @@ load_test_data_raw <- function(path, return_sf = FALSE) {
 }
 
 
-#' Test data loader
+#' Test data predictions loader
 #'
-#' Internal function used by [compute_ppms()] to get the test data for
-#' calculating predictive performance metrics. This file contains the observed
-#' counts and model predicted relative occurrence and abundance values.
+#' Loads the model predictions for each checklist in the test dataset. Median,
+#' and upper and lower confidence intervals are provided for predicted
+#' occurrence, count, and relativce abundance.
 #'
 #' @param path character; full path to the directory containing single species
 #'   eBird Status and Trends products.
 #' @param return_sf logical; whether to return an [sf] object of spatial points
 #'   rather then the default data frame.
 #'
-#' @return data.frame containing test data, including checklist locations,
-#'   observed counts, and predicted mean and associated error for relative
-#'   occurrence and abundance.
+#' @return data.frame containing median, and upper and lower confidence
+#'   intervals are provided for predicted occurrence, count, and relativce
+#'   abundance.
 #'
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' # download example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
 #' # test data
-#' test_data <- load_test_data(sp_path)
-#' dplyr::glimpse(test_data)
-load_test_data <- function(path, return_sf = FALSE) {
+#' test_preds <- load_test_preds(sp_path)
+#' dplyr::glimpse(test_preds)
+#' }
+load_test_preds <- function(path, return_sf = FALSE) {
   stopifnot(dir.exists(path))
   stopifnot(is.logical(return_sf), length(return_sf) == 1)
 
-  stixel_path <- file.path(path, "results", "abund_preds", "unpeeled_folds")
-  td_file <- file.path(stixel_path, "test.pred.ave.txt")
+  pred_path <- file.path(path, "results", "preds")
+  td_file <- file.path(pred_path, "test_pred_ave.txt")
 
   if(!file.exists(td_file)) {
-    stop(paste("The file test.pred.ave.txt does not exist at:", stixel_path))
+    stop(paste("The file test_pred_ave.txt does not exist at:", pred_path))
   }
 
-  # load pd.txt
+  # load test data
   td_df <- data.table::fread(td_file,
-                             col.names= ebirdst_td_names,
                              stringsAsFactors = FALSE,
                              showProgress = FALSE)
   td_df <- td_df[, "data_type" := NULL]
+  td_df <- as.data.frame(td_df, stringsAsFactors = FALSE)
 
-
-  td_df <- as.data.frame(td_df)
   if (isTRUE(return_sf)) {
     td_df <- sf::st_as_sf(td_df, coords = c("lon", "lat"), crs = 4326)
   }
+
   return(td_df)
 }
+
+#' Config file loader
+#'
+#' Internal function used by load_summary(), load_pis(), and load_pds() to get
+#' configuration variables from STEM species run information
+#' (from *_config.RData).
+#'
+#' @param path character; full path to the directory containing single species
+#'   eBird Status and Trends products.
+#'
+#' @return environment object containing all run parameters.
+#'
+#' @keywords internal
+#'
+#' @examples
+#' \donttest{
+#' # download example data
+#' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
+#' ebirdst:::load_config(sp_path)
+#' }
+load_config <- function(path) {
+  config_file <- list.files(paste(path, "/data", sep = ""),
+                            pattern = "*_config.rds",
+                            full.names = TRUE)
+
+  if(length(config_file) != 1 || !file.exists(config_file)) {
+    stop(paste("*_config.rds file does not exist in the /data directory. ",
+               "Check your paths so that they look like this: ",
+               "~/directory/<six_letter_code-ERD2016-PROD-date-uuid>/. ",
+               "Make sure you do not change the file structure of the results.",
+               sep = ""))
+  }
+
+  return(readRDS(config_file))
+}
+
+
+#' Load full annual cycle map parameters
+#'
+#' Get the map parameters used on the eBird Status and Trends website to
+#' optimally display the full annual cycle data. This includes bins for the
+#' abundace data, a projection, and an extent to map. The extent is the spatial
+#' extent of non-zero data across the full annual cycle and the projection is
+#' optimized for this extent.
+#'
+#' @param path character; full path to the directory containing single species
+#'   eBird Status and Trends products.
+#'
+#' @return A list containing elements:
+#' - `custom_projection`: a custom projection optimized for the given species'
+#'    full annyal cycle
+#' - `fa_extent`: an `Extent` object storing the spatial extent of non-zero
+#'    data for the given species in the custom projection
+#' - `fa_extent_sinu`: the extent in sinusoidal projection
+#' - `abundance_bins`: abundance bins for the full annual cycle
+#'
+#' @export
+#'
+#' @examples
+#' \donttest{
+#' # download example data
+#' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
+#' # get map parameters
+#' load_fac_map_parameters(sp_path)
+#' }
+load_fac_map_parameters <- function(path) {
+  l <- load_config(path)
+
+  list(custom_projection = l$CUS_PRJ,
+       fa_extent = l$FA_EXTENT,
+       fa_extent_sinu = l$SINU_EXTENT,
+       abundance_bins = l$ABUND_BINS)
+}
+
 
 get_species <- function(x) {
   stopifnot(is.character(x), all(!is.na(x)))

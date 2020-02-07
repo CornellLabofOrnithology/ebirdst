@@ -2,14 +2,14 @@
 % Please edit documentation in R/ebirdst-loading.R
 \name{ebirdst_download}
 \alias{ebirdst_download}
-\alias{download_data}
 \title{Download eBird Status and Trends Data}
 \usage{
-ebirdst_download(species, path = rappdirs::user_data_dir("ebirdst"),
-  tifs_only = TRUE, force = FALSE)
-
-download_data(species, path = rappdirs::user_data_dir("ebirdst"),
-  tifs_only = TRUE, force = FALSE)
+ebirdst_download(
+  species,
+  path = rappdirs::user_data_dir("ebirdst"),
+  tifs_only = TRUE,
+  force = FALSE
+)
 }
 \arguments{
 \item{species}{character; a single species given as a scientific name, common
@@ -40,11 +40,6 @@ an example species, to a specified path. The example data consist of the
 results for Yellow-bellied Sapsucker subset to Michigan and are much smaller
 than the full dataset making these data quicker to download and process.
 }
-\section{Functions}{
-\itemize{
-\item \code{download_data}: deprecated, use \code{ebirdst_download()}
-}}
-
 \examples{
 # download the example data
 ebirdst_download("example_data")

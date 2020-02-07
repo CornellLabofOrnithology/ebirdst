@@ -6,13 +6,15 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Generate stixel polygons from PI/PD data — stixelize • ebirdst</title>
+<title>Generate stixel polygons from PI data — stixelize • ebirdst</title>
+
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
@@ -22,8 +24,9 @@
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -31,14 +34,14 @@
 
 
 
-<meta property="og:title" content="Generate stixel polygons from PI/PD data — stixelize" />
 
-<meta property="og:description" content="All predictor importance and partial dependence data are provided at the
-stixel level. In these files, the stixel is defined based on a centroid,
-width, and height. This function uses this information to define polygons for
-each stixel and attaches them to the original data in the form of an sf
-object" />
+<meta property="og:title" content="Generate stixel polygons from PI data — stixelize" />
+<meta property="og:description" content="All predictor importance data are provided at the stixel level. In these
+files, the stixel is defined based on a centroid, width, and height. This
+function uses this information to define polygons for each stixel and
+attaches them to the original data in the form of an sf object" />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -50,6 +53,7 @@ object" />
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
+
 
 
   </head>
@@ -68,7 +72,7 @@ object" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -90,7 +94,6 @@ object" />
   <a href="../reference/index.html">Function Reference</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/CornellLabofOrnithology/ebirdst">
@@ -105,24 +108,22 @@ object" />
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Generate stixel polygons from PI/PD data</h1>
+    <h1>Generate stixel polygons from PI data</h1>
     <small class="dont-index">Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/R/stixelize.R'><code>R/stixelize.R</code></a></small>
     <div class="hidden name"><code>stixelize.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    
-    <p>All predictor importance and partial dependence data are provided at the
-stixel level. In these files, the stixel is defined based on a centroid,
-width, and height. This function uses this information to define polygons for
-each stixel and attaches them to the original data in the form of an sf
-object</p>
-    
+    <p>All predictor importance data are provided at the stixel level. In these
+files, the stixel is defined based on a centroid, width, and height. This
+function uses this information to define polygons for each stixel and
+attaches them to the original data in the form of an sf object</p>
     </div>
 
     <pre class="usage"><span class='fu'>stixelize</span>(<span class='no'>x</span>)
@@ -132,30 +133,29 @@ object</p>
 
 <span class='co'># S3 method for sf</span>
 <span class='fu'>stixelize</span>(<span class='no'>x</span>)</pre>
-    
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p><code>data.frame</code> or sf object; PI or PD data loaded with <code><a href='load_pis.html'>load_pis()</a></code>
-or <code><a href='load_pds.html'>load_pds()</a></code>, or any other data frame with fields <code>lon</code>, <code>lat</code>,
-<code>stixel_width</code>, and <code>stixel_hight</code>.</p></td>
+      <td><p><code>data.frame</code> or sf object; PI data loaded with <code><a href='load_pis.html'>load_pis()</a></code>, or
+any other data frame with fields <code>lon</code>, <code>lat</code>, <code>stixel_width</code>, and
+<code>stixel_hight</code>.</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>sf object with geometry column storing polygons representing the s
 tixels boundaries.</p>
-    
     <h2 class="hasAnchor" id="methods-by-class-"><a class="anchor" href="#methods-by-class-"></a>Methods (by class)</h2>
 
-    <ul>
+    
+<ul>
 <li><p><code>data.frame</code>: PI or PD data</p></li>
 <li><p><code>sf</code>: PI or PD data as <code>sf</code> object</p></li>
 </ul>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># download example data</span>
@@ -163,719 +163,728 @@ tixels boundaries.</p>
 <span class='co'># load predictor importance</span>
 <span class='no'>pis</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='load_pis.html'>load_pis</a></span>(<span class='no'>sp_path</span>)
 
-<span class='fu'>stixelize</span>(<span class='no'>pis</span>)</div><div class='output co'>#&gt; Simple feature collection with 849 features and 99 fields
+<span class='fu'>stixelize</span>(<span class='no'>pis</span>)</div><div class='output co'>#&gt; Simple feature collection with 1890 features and 83 fields
 #&gt; geometry type:  POLYGON
 #&gt; dimension:      XY
-#&gt; bbox:           xmin: -93.90373 ymin: 37.76792 xmax: -78.44666 ymax: 50.88339
+#&gt; bbox:           xmin: -92.95246 ymin: 38.64864 xmax: -79.32725 ymax: 51.0932
 #&gt; epsg (SRID):    4326
 #&gt; proj4string:    +proj=longlat +datum=WGS84 +no_defs
 #&gt; First 10 features:
-#&gt;        stixel_id  srd_n       lon      lat      date stixel_width stixel_height
-#&gt; 1   69-121.4-289 190745 -82.66239 43.16171 0.3719356     8.112887         8.125
-#&gt; 2    7-255.2-342  46020 -83.01648 43.71361 0.7401063     4.122559         4.125
-#&gt; 3   7-102.7-1150 142716 -84.55903 44.98568 0.3264353     5.963944         5.775
-#&gt; 4    10-68.4-680  41756 -86.21622 41.79261 0.2301514     4.196807         4.200
-#&gt; 5   20-348.7-330  40660 -85.36707 42.01676 0.9945355     3.971627         4.050
-#&gt; 6   44-264.6-303  43064 -84.86500 42.85970 0.7679523     4.054165         4.225
-#&gt; 7     1-181-1249  40564 -85.86240 42.68140 0.5376825     4.191180         4.200
-#&gt; 8       2-76-690  43184 -82.92381 42.43289 0.2506176     3.849929         3.825
-#&gt; 9       2-76-691  40580 -85.74791 43.50642 0.2509622     3.859651         3.825
-#&gt; 10 14-161.1-1151 137772 -89.04060 46.70954 0.4808628     7.043668         6.925
+#&gt;        stixel_id srd_n       lon      lat      date stixel_width stixel_height
+#&gt; 1   61-98.6-1205 78104 -84.76490 42.70233 0.3128632      4.69994       4.68954
+#&gt; 2   61-98.6-1205 78104 -84.76490 42.70233 0.3128632      4.69994       4.68954
+#&gt; 3   35-207.8-284 78252 -83.29157 43.19564 0.6141653      5.99353       6.02181
+#&gt; 4   35-207.8-284 78252 -83.29157 43.19564 0.6141653      5.99353       6.02181
+#&gt; 5   99-166.8-326 76112 -84.34107 45.36555 0.4991869      5.73436       5.67542
+#&gt; 6   99-166.8-326 76112 -84.34107 45.36555 0.4991869      5.73436       5.67542
+#&gt; 7    29-49.3-822 73404 -84.39816 44.68508 0.1739911      5.84128       5.88858
+#&gt; 8    29-49.3-822 73404 -84.39816 44.68508 0.1739911      5.84128       5.88858
+#&gt; 9  19-176.3-1247 82496 -84.84778 44.03590 0.5197299      4.64485       4.44974
+#&gt; 10 19-176.3-1247 82496 -84.84778 44.03590 0.5197299      4.64485       4.44974
 #&gt;    stixel_area train_n positive_ob_n stixel_prevalence mean_non_zero_count
-#&gt; 1     65.91721    5471          1080        0.19740450            1.379630
-#&gt; 2     17.00556     788           186        0.23604060            1.354839
-#&gt; 3     34.44178    3429           920        0.26829980            1.604348
-#&gt; 4     17.62659    1752           389        0.22203200            2.272494
-#&gt; 5     16.08509    1069            96        0.08980355            1.072917
-#&gt; 6     17.12885    1469           358        0.24370320            1.254190
-#&gt; 7     17.60296     917            81        0.08833152            1.358025
-#&gt; 8     14.72598    2193           545        0.24851800            1.825688
-#&gt; 9     14.76317    1171           256        0.21861660            1.640625
-#&gt; 10    48.77740    2513           844        0.33585360            1.896919
-#&gt;    i_stationary         year         day        time effort_hrs
-#&gt; 1  0.0009782551 0.0753970200 0.093119370 0.074023190 0.33446210
-#&gt; 2  0.0009866625 0.0021844780 0.429846900 0.079498190 0.19003850
-#&gt; 3  0.0102888000 0.0755529600 0.563472600 0.167291600 0.57488890
-#&gt; 4  0.0040716770 0.0367294600 2.447557000 0.074426400 1.49242100
-#&gt; 5  0.0000000000 0.0007547261 0.006725923 0.008760425 0.04499456
-#&gt; 6  0.0087457020 0.0261479800 0.221674200 0.047343970 0.51563640
-#&gt; 7  0.0000000000 0.0117553100 0.038932490 0.024324970 0.02840611
-#&gt; 8  0.0007947534 0.0855764300 1.572839000 0.077741130 0.32078650
-#&gt; 9  0.0000000000 0.0295483100 2.528617000 0.065845020 0.33829840
-#&gt; 10 0.0017567630 0.0626012700 0.099072150 0.242724200 0.54061170
-#&gt;    effort_distance_km number_observers      score        elev   northness
-#&gt; 1         0.064391580     0.0088865010 0.10977060 0.101280800 0.058624140
-#&gt; 2         0.025708500     0.0055416540 0.25857680 0.038186440 0.008635983
-#&gt; 3         0.047441550     0.0145845300 0.27700610 0.051606640 0.050119220
-#&gt; 4         0.055355820     0.0106324500 0.14673300 0.024641730 0.043448080
-#&gt; 5         0.006688545     0.0003075676 0.03260055 0.006023087 0.016163430
-#&gt; 6         0.017106310     0.0047872150 0.18981830 0.039282690 0.033774600
-#&gt; 7         0.025159800     0.0023204540 0.02805700 0.132365400 0.009956901
-#&gt; 8         0.091529390     0.0059237920 0.15148180 0.027221590 0.026129700
-#&gt; 9         0.022476220     0.0021075910 0.13850190 0.025894900 0.015056400
-#&gt; 10        0.094723330     0.0056619270 0.39327290 0.429150600 0.138358900
-#&gt;        eastness umd_fs_c1_1500_pland umd_fs_c1_1500_lpi umd_fs_c1_1500_pd
-#&gt; 1  0.0498227900         0.0027234820       0.0043938350      0.0058794630
-#&gt; 2  0.0439463500         0.0003502530       0.0001266096      0.0004442638
-#&gt; 3  0.0807455400         0.0060644240       0.0043841150      0.0082682620
-#&gt; 4  0.0528379000         0.0003767716       0.0000000000      0.0015705880
-#&gt; 5  0.0037916700         0.0001454525       0.0005360913      0.0001232081
-#&gt; 6  0.0259320500         0.0011469630       0.0005356339      0.0031612130
-#&gt; 7  0.0009159445         0.0009700515       0.0000000000      0.0029727750
-#&gt; 8  0.0367949100         0.0030186030       0.0006602018      0.0018477210
-#&gt; 9  0.0407276700         0.0001568978       0.0005858426      0.0022897110
-#&gt; 10 0.1529488000         0.0017953200       0.0025331400      0.0123944400
-#&gt;    umd_fs_c1_1500_ed umd_fs_c2_1500_pland umd_fs_c2_1500_lpi umd_fs_c2_1500_pd
-#&gt; 1       1.090972e-02         6.536036e-05       1.385875e-04      1.026900e-03
-#&gt; 2       1.582699e-03         1.077418e-05       3.952960e-05      9.194824e-06
-#&gt; 3       7.763431e-03         5.425665e-05       5.851937e-04      6.861657e-04
-#&gt; 4       0.000000e+00         0.000000e+00       0.000000e+00      0.000000e+00
-#&gt; 5       1.034165e-04         1.635908e-04       5.725049e-03      1.998624e-04
-#&gt; 6       7.653757e-04         4.606220e-04       2.419310e-04      2.795407e-03
-#&gt; 7       5.057419e-06         0.000000e+00       1.295022e-10      0.000000e+00
-#&gt; 8       1.618128e-02         3.166677e-04       9.074745e-04      1.076650e-03
-#&gt; 9       6.114657e-04         7.054024e-06       7.327908e-05      3.181748e-04
-#&gt; 10      8.705668e-03         2.121127e-03       1.048519e-04      1.609226e-03
-#&gt;    umd_fs_c2_1500_ed umd_fs_c3_1500_pland umd_fs_c3_1500_lpi umd_fs_c3_1500_pd
-#&gt; 1       1.232356e-03         1.455139e-03       1.526986e-03      7.971544e-03
-#&gt; 2       2.129982e-04         0.000000e+00       3.034003e-05      0.000000e+00
-#&gt; 3       2.957774e-04         1.913617e-04       0.000000e+00      3.109620e-03
-#&gt; 4       0.000000e+00         4.595576e-05       1.206368e-04      0.000000e+00
-#&gt; 5       3.461667e-04         4.525723e-04       2.187336e-04      3.239615e-05
-#&gt; 6       7.645322e-04         8.663736e-05       5.011296e-04      4.581229e-04
-#&gt; 7       2.368322e-06         2.894102e-05       4.264299e-05      8.528113e-06
-#&gt; 8       4.978517e-04         9.545342e-04       1.052294e-03      1.098517e-02
-#&gt; 9       1.245962e-04         3.840394e-05       1.974018e-04      3.055801e-04
-#&gt; 10      0.000000e+00         1.718965e-03       8.333924e-04      1.390082e-02
-#&gt;    umd_fs_c3_1500_ed umd_fs_c4_1500_pland umd_fs_c4_1500_lpi umd_fs_c4_1500_pd
-#&gt; 1       8.491477e-04         0.0118347200       0.0322640700      0.0165489900
-#&gt; 2       2.807541e-02         0.0003564676       0.0015225970      0.0002984091
-#&gt; 3       1.399894e-03         0.0135092800       0.0180964800      0.0170723000
-#&gt; 4       8.711829e-04         0.0389391300       0.0159553100      0.0000000000
-#&gt; 5       2.849426e-04         0.0030635470       0.0003596819      0.0006753856
-#&gt; 6       3.872048e-04         0.0033715010       0.0040507510      0.0034322360
-#&gt; 7       1.531512e-05         0.0003196179       0.0095018490      0.0006281342
-#&gt; 8       1.097212e-03         0.0000000000       0.0029066850      0.0036290150
-#&gt; 9       1.989313e-05         0.0118694200       0.0014086050      0.0000000000
-#&gt; 10      2.397269e-03         0.0227168000       0.0399350800      0.0257360200
-#&gt;    umd_fs_c4_1500_ed umd_fs_c5_1500_pland umd_fs_c5_1500_lpi umd_fs_c5_1500_pd
-#&gt; 1       0.0099758480         0.0643741700       0.0072241630      0.0094194450
-#&gt; 2       0.0046034140         0.0011754040       0.0015831200      0.0002397078
-#&gt; 3       0.0194793600         0.0263829500       0.0433506700      0.0531123600
-#&gt; 4       0.0075254340         0.0122201100       0.0002632751      0.0000000000
-#&gt; 5       0.0002279311         0.0026361000       0.0004159598      0.0000000000
-#&gt; 6       0.0051245310         0.0008610701       0.0011230750      0.0197389700
-#&gt; 7       0.0010909900         0.0628251900       0.0635573300      0.0020898600
-#&gt; 8       0.0041386510         0.0025750870       0.0075747480      0.0041839780
-#&gt; 9       0.0070110180         0.0015117300       0.0029289940      0.0130602500
-#&gt; 10      0.0221969300         0.0396101900       0.0292842000      0.0312701700
-#&gt;    umd_fs_c5_1500_ed umd_fs_c6_1500_pland umd_fs_c6_1500_lpi umd_fs_c6_1500_pd
-#&gt; 1        0.007366266         5.233432e-05       1.380878e-04      5.841338e-03
-#&gt; 2        0.005266960         5.087715e-04       6.911137e-05      4.114848e-04
-#&gt; 3        0.025607830         1.954680e-04       1.408856e-03      3.875513e-03
-#&gt; 4        0.003939228         6.479944e-05       0.000000e+00      1.120315e-02
-#&gt; 5        0.001174661         1.379272e-04       8.474243e-04      2.499540e-03
-#&gt; 6        0.001359950         0.000000e+00       1.653208e-03      0.000000e+00
-#&gt; 7        0.001586942         6.777296e-06       0.000000e+00      2.346564e-06
-#&gt; 8        0.012418150         4.663898e-04       1.730161e-03      3.672262e-03
-#&gt; 9        0.004332934         1.093363e-03       1.679315e-04      0.000000e+00
-#&gt; 10       0.042510870         7.813094e-05       1.911201e-03      1.172361e-03
-#&gt;    umd_fs_c6_1500_ed umd_fs_c7_1500_pland umd_fs_c7_1500_lpi umd_fs_c7_1500_pd
-#&gt; 1       6.391328e-04         5.640498e-04       2.633142e-04      5.600501e-03
-#&gt; 2       1.803258e-03         2.755346e-04       1.431500e-04      4.869038e-04
-#&gt; 3       7.496521e-04         1.691197e-03       0.000000e+00      2.321885e-03
-#&gt; 4       0.000000e+00         3.858310e-05       3.448250e-04      6.560645e-04
-#&gt; 5       4.439042e-04         0.000000e+00       1.136329e-05      1.200172e-04
-#&gt; 6       1.296503e-03         5.652319e-05       3.417103e-04      1.953913e-03
-#&gt; 7       2.330573e-07         9.284303e-06       5.518037e-06      1.421568e-05
-#&gt; 8       1.202988e-03         1.768961e-04       6.690362e-04      2.805375e-04
-#&gt; 9       5.898564e-05         0.000000e+00       0.000000e+00      5.057841e-04
-#&gt; 10      4.098645e-04         6.142973e-04       5.773952e-04      3.394403e-03
-#&gt;    umd_fs_c7_1500_ed umd_fs_c8_1500_pland umd_fs_c8_1500_lpi umd_fs_c8_1500_pd
-#&gt; 1       1.294010e-03         2.472845e-03       1.000584e-02      0.0182494800
-#&gt; 2       0.000000e+00         6.402638e-04       1.630647e-03      0.0000000000
-#&gt; 3       2.442502e-03         4.805627e-03       3.913934e-03      0.0132522100
-#&gt; 4       1.270205e-03         5.550385e-03       1.201889e-03      0.0000000000
-#&gt; 5       0.000000e+00         9.689634e-05       5.511230e-05      0.0001275135
-#&gt; 6       7.240330e-04         2.874408e-03       2.599331e-03      0.0041826080
-#&gt; 7       1.275092e-05         0.000000e+00       3.419007e-05      0.0000000000
-#&gt; 8       7.285159e-04         1.159885e-03       3.923804e-03      0.0025455950
-#&gt; 9       8.295934e-05         0.000000e+00       2.302469e-03      0.0027952730
-#&gt; 10      2.398857e-03         2.270147e-03       1.535899e-02      0.0075878610
-#&gt;    umd_fs_c8_1500_ed umd_fs_c9_1500_pland umd_fs_c9_1500_lpi umd_fs_c9_1500_pd
-#&gt; 1       5.020096e-03         1.312570e-02       1.047461e-03      9.112189e-04
-#&gt; 2       9.395646e-03         5.082500e-05       1.792404e-05      4.504748e-05
-#&gt; 3       4.112604e-03         1.924896e-03       1.402168e-03      3.578811e-03
-#&gt; 4       2.974373e-03         1.124381e-02       3.329991e-05      2.852331e-03
-#&gt; 5       4.828050e-05         3.649386e-04       4.504763e-04      1.001990e-04
-#&gt; 6       5.051250e-03         1.660827e-03       1.152216e-03      6.901364e-04
-#&gt; 7       3.718155e-06         0.000000e+00       0.000000e+00      0.000000e+00
-#&gt; 8       3.709961e-04         0.000000e+00       1.424751e-03      8.798311e-05
-#&gt; 9       2.816046e-04         9.378029e-05       3.585386e-04      8.247225e-04
-#&gt; 10      8.187648e-03         1.543305e-03       1.677419e-03      1.318444e-03
-#&gt;    umd_fs_c9_1500_ed umd_fs_c10_1500_pland umd_fs_c10_1500_lpi
-#&gt; 1       7.525897e-03          5.077317e-03        0.0056275280
-#&gt; 2       6.439477e-06          0.000000e+00        0.0000000000
-#&gt; 3       2.614111e-03          4.310695e-03        0.0059748070
-#&gt; 4       3.470937e-04          6.459465e-03        0.0055587130
-#&gt; 5       1.502924e-04          3.654462e-04        0.0008241602
-#&gt; 6       3.474777e-04          3.322055e-03        0.0016373330
-#&gt; 7       0.000000e+00          4.802601e-05        0.0008022391
-#&gt; 8       9.476459e-04          3.450309e-03        0.0045647170
-#&gt; 9       2.162118e-05          6.876998e-04        0.0000000000
-#&gt; 10      7.325498e-03          1.437191e-03        0.0081857350
-#&gt;    umd_fs_c10_1500_pd umd_fs_c10_1500_ed umd_fs_c12_1500_pland
-#&gt; 1        0.0054368170       0.0057728050          0.0000000000
-#&gt; 2        0.0002489004       0.0009617416          0.0014104860
-#&gt; 3        0.0131386800       0.0049837320          0.0004563543
-#&gt; 4        0.0020258800       0.0044471880          0.0198884900
-#&gt; 5        0.0010591500       0.0014818100          0.0007562517
-#&gt; 6        0.0035058750       0.0041458280          0.0119007000
-#&gt; 7        0.0010976530       0.0020050760          0.0023693210
-#&gt; 8        0.0040236310       0.0034751460          0.0147784100
-#&gt; 9        0.0086990240       0.0016580520          0.0017732110
-#&gt; 10       0.0046592460       0.0071767080          0.0126661100
-#&gt;    umd_fs_c12_1500_lpi umd_fs_c12_1500_pd umd_fs_c12_1500_ed
-#&gt; 1         0.0130861700       0.0139291800        0.004212341
-#&gt; 2         0.0000000000       0.0046999840        0.005488440
-#&gt; 3         0.0063664180       0.0151762200        0.031009010
-#&gt; 4         0.0152740600       0.0117102800        0.018385990
-#&gt; 5         0.0022990800       0.0006057489        0.001008587
-#&gt; 6         0.0205046500       0.0164028700        0.011252710
-#&gt; 7         0.0007324885       0.0017421320        0.003357973
-#&gt; 8         0.0186357900       0.0158348000        0.027817910
-#&gt; 9         0.0003935473       0.0048519320        0.005652433
-#&gt; 10        0.0201326300       0.0381519400        0.024380870
-#&gt;    umd_fs_c13_1500_pland umd_fs_c13_1500_lpi umd_fs_c13_1500_pd
-#&gt; 1           3.146028e-03        1.548292e-02       6.761831e-03
-#&gt; 2           0.000000e+00        1.775985e-03       1.018786e-03
-#&gt; 3           1.256673e-02        9.735008e-03       2.293037e-03
-#&gt; 4           4.098051e-02        1.261063e-02       1.010415e-02
-#&gt; 5           3.747120e-05        0.000000e+00       4.095015e-03
-#&gt; 6           2.225345e-02        1.662034e-02       5.295310e-03
-#&gt; 7           1.481655e-05        1.623951e-05       5.204746e-07
-#&gt; 8           9.872144e-03        4.312237e-02       7.012191e-03
-#&gt; 9           3.904330e-03        1.780807e-01       7.079755e-03
-#&gt; 10          4.836227e-04        9.201509e-04       1.488433e-03
-#&gt;    umd_fs_c13_1500_ed umd_fs_c16_1500_pland umd_fs_c16_1500_lpi
-#&gt; 1        0.0069343890          5.989389e-04        2.881679e-04
-#&gt; 2        0.0011464460          5.475057e-05        2.568530e-05
-#&gt; 3        0.0119386500          2.225828e-04        4.455246e-04
-#&gt; 4        0.0104906400          1.863171e-04        2.164185e-04
-#&gt; 5        0.0002266771          3.546646e-04        5.344158e-04
-#&gt; 6        0.0059594500          3.526997e-04        5.015967e-05
-#&gt; 7        0.0000226393          1.060825e-05        1.316949e-05
-#&gt; 8        0.0144625500          5.724629e-04        1.358344e-04
-#&gt; 9        0.0067691490          1.742886e-04        3.205752e-05
-#&gt; 10       0.0013423870          2.211702e-03        1.160202e-03
-#&gt;    umd_fs_c16_1500_pd umd_fs_c16_1500_ed modiswater_fs_c0_1500_pland
-#&gt; 1        3.826464e-03       9.059628e-04                           0
-#&gt; 2        2.000764e-05       1.617079e-03                           0
-#&gt; 3        8.183452e-04       3.279005e-03                           0
-#&gt; 4        3.619752e-04       3.324844e-05                           0
-#&gt; 5        1.948389e-03       2.763306e-04                           0
-#&gt; 6        0.000000e+00       0.000000e+00                           0
-#&gt; 7        5.519794e-05       1.291217e-06                           0
-#&gt; 8        2.238055e-03       1.412964e-03                           0
-#&gt; 9        2.735311e-05       0.000000e+00                           0
-#&gt; 10       0.000000e+00       2.423434e-03                           0
-#&gt;    modiswater_fs_c0_1500_lpi modiswater_fs_c0_1500_pd modiswater_fs_c0_1500_ed
-#&gt; 1                          0                        0                        0
-#&gt; 2                          0                        0                        0
-#&gt; 3                          0                        0                        0
-#&gt; 4                          0                        0                        0
-#&gt; 5                          0                        0                        0
-#&gt; 6                          0                        0                        0
-#&gt; 7                          0                        0                        0
-#&gt; 8                          0                        0                        0
-#&gt; 9                          0                        0                        0
-#&gt; 10                         0                        0                        0
-#&gt;    modiswater_fs_c2_1500_pland modiswater_fs_c2_1500_lpi
-#&gt; 1                 1.067327e-03              2.581512e-03
-#&gt; 2                 1.905170e-02              0.000000e+00
-#&gt; 3                 5.693548e-03              8.845807e-03
-#&gt; 4                 0.000000e+00              0.000000e+00
-#&gt; 5                 1.495959e-05              0.000000e+00
-#&gt; 6                 2.764553e-03              5.532147e-03
-#&gt; 7                 9.599133e-07              4.296279e-06
-#&gt; 8                 0.000000e+00              0.000000e+00
-#&gt; 9                 6.526358e-04              3.118275e-06
-#&gt; 10                1.952885e-02              1.852254e-02
-#&gt;    modiswater_fs_c2_1500_pd modiswater_fs_c2_1500_ed
-#&gt; 1              0.000000e+00             4.556112e-03
-#&gt; 2              5.322000e-05             0.000000e+00
-#&gt; 3              6.550407e-03             9.315848e-03
-#&gt; 4              1.550674e-02             1.442754e-03
-#&gt; 5              2.865152e-05             1.672565e-06
-#&gt; 6              2.095630e-03             0.000000e+00
-#&gt; 7              0.000000e+00             2.975016e-06
-#&gt; 8              3.848252e-04             0.000000e+00
-#&gt; 9              0.000000e+00             0.000000e+00
-#&gt; 10             3.123477e-03             2.098731e-03
-#&gt;    modiswater_fs_c3_1500_pland modiswater_fs_c3_1500_lpi
-#&gt; 1                 4.066281e-03              3.121652e-03
-#&gt; 2                 9.150461e-04              2.019311e-03
-#&gt; 3                 6.144256e-03              1.295595e-02
-#&gt; 4                 0.000000e+00              7.203367e-02
-#&gt; 5                 1.127380e-04              8.890402e-03
-#&gt; 6                 1.002220e-03              1.348484e-04
-#&gt; 7                 8.165212e-06              1.111249e-06
-#&gt; 8                 1.270143e-03              2.783997e-03
-#&gt; 9                 1.656058e-04              5.654289e-04
-#&gt; 10                2.266942e-02              5.855875e-04
-#&gt;    modiswater_fs_c3_1500_pd modiswater_fs_c3_1500_ed
-#&gt; 1              7.289954e-04             4.689107e-03
-#&gt; 2              3.139606e-04             2.628940e-03
-#&gt; 3              7.743777e-03             9.265749e-03
-#&gt; 4              1.146467e-03             6.863937e-03
-#&gt; 5              2.665627e-04             2.400638e-05
-#&gt; 6              1.627095e-04             7.416909e-04
-#&gt; 7              8.293932e-07             4.544068e-06
-#&gt; 8              4.701189e-03             9.542242e-03
-#&gt; 9              4.057823e-03             1.067300e-03
-#&gt; 10             4.813483e-04             8.116956e-04
-#&gt;    modiswater_fs_c5_1500_pland modiswater_fs_c5_1500_lpi
-#&gt; 1                 0.0030293660              5.312359e-02
-#&gt; 2                 0.0000000000              0.000000e+00
-#&gt; 3                 0.0056210160              2.296938e-03
-#&gt; 4                 0.0005640737              2.279971e-04
-#&gt; 5                 0.0000000000              0.000000e+00
-#&gt; 6                 0.0040434390              3.756638e-03
-#&gt; 7                 0.0030735310              3.953502e-05
-#&gt; 8                 0.0000000000              0.000000e+00
-#&gt; 9                 0.0021510310              3.260836e-04
-#&gt; 10                0.0004609059              2.169040e-04
-#&gt;    modiswater_fs_c5_1500_pd modiswater_fs_c5_1500_ed
-#&gt; 1              7.567552e-03             7.557046e-04
-#&gt; 2              0.000000e+00             0.000000e+00
-#&gt; 3              8.548060e-03             1.216775e-03
-#&gt; 4              7.547949e-05             4.408866e-05
-#&gt; 5              0.000000e+00             0.000000e+00
-#&gt; 6              6.677018e-03             1.302557e-03
-#&gt; 7              1.684493e-05             7.273663e-07
-#&gt; 8              0.000000e+00             0.000000e+00
-#&gt; 9              4.722435e-05             8.709963e-05
-#&gt; 10             3.561498e-03             3.036658e-03
-#&gt;    modiswater_fs_c6_1500_pland modiswater_fs_c6_1500_lpi
-#&gt; 1                            0                         0
-#&gt; 2                            0                         0
-#&gt; 3                            0                         0
-#&gt; 4                            0                         0
-#&gt; 5                            0                         0
-#&gt; 6                            0                         0
-#&gt; 7                            0                         0
-#&gt; 8                            0                         0
-#&gt; 9                            0                         0
-#&gt; 10                           0                         0
-#&gt;    modiswater_fs_c6_1500_pd modiswater_fs_c6_1500_ed
-#&gt; 1                         0                        0
-#&gt; 2                         0                        0
-#&gt; 3                         0                        0
-#&gt; 4                         0                        0
-#&gt; 5                         0                        0
-#&gt; 6                         0                        0
-#&gt; 7                         0                        0
-#&gt; 8                         0                        0
-#&gt; 9                         0                        0
-#&gt; 10                        0                        0
-#&gt;    modiswater_fs_c7_1500_pland modiswater_fs_c7_1500_lpi
-#&gt; 1                            0                         0
-#&gt; 2                            0                         0
-#&gt; 3                            0                         0
-#&gt; 4                            0                         0
-#&gt; 5                            0                         0
-#&gt; 6                            0                         0
-#&gt; 7                            0                         0
-#&gt; 8                            0                         0
-#&gt; 9                            0                         0
-#&gt; 10                           0                         0
-#&gt;    modiswater_fs_c7_1500_pd modiswater_fs_c7_1500_ed
-#&gt; 1                         0                        0
-#&gt; 2                         0                        0
-#&gt; 3                         0                        0
-#&gt; 4                         0                        0
-#&gt; 5                         0                        0
-#&gt; 6                         0                        0
-#&gt; 7                         0                        0
-#&gt; 8                         0                        0
-#&gt; 9                         0                        0
-#&gt; 10                        0                        0
-#&gt;                          geometry
-#&gt; 1  POLYGON ((-86.71883 39.0992...
-#&gt; 2  POLYGON ((-85.07776 41.6511...
-#&gt; 3  POLYGON ((-87.541 42.09818,...
-#&gt; 4  POLYGON ((-88.31462 39.6926...
-#&gt; 5  POLYGON ((-87.35288 39.9917...
-#&gt; 6  POLYGON ((-86.89208 40.7472...
-#&gt; 7  POLYGON ((-87.95799 40.5814...
-#&gt; 8  POLYGON ((-84.84877 40.5203...
-#&gt; 9  POLYGON ((-87.67774 41.5939...
-#&gt; 10 POLYGON ((-92.56243 43.2470...</div><div class='input'>
+#&gt; 1       171404    5000          1250        0.25000000            1.558400
+#&gt; 2       171404    5000          1250        0.25000000            1.558400
+#&gt; 3       171729    3977           227        0.05707820            1.405286
+#&gt; 4       171729    3977           227        0.05707820            1.405286
+#&gt; 5       167032    4629           879        0.18988980            1.732651
+#&gt; 6       167032    4629           879        0.18988980            1.732651
+#&gt; 7       161090    3768            18        0.00477707            1.111111
+#&gt; 8       161090    3768            18        0.00477707            1.111111
+#&gt; 9       181042    4437           687        0.15483430            1.720524
+#&gt; 10      181042    4437           687        0.15483430            1.720524
+#&gt;    model i_stationary       year        day solar_noon_diff effort_hrs
+#&gt; 1    occ  24.18707000 10.1801800 78.9268100      40.2446700 129.823200
+#&gt; 2    abd  10.24263000 36.2267800 70.3328600     105.1565000  93.205910
+#&gt; 3    occ   0.38905790  1.1717870  1.3809290       8.9742190   8.905770
+#&gt; 4    abd   7.62567300 18.0336900 29.7783700      42.7801600  41.015810
+#&gt; 5    occ   3.54344200  9.0204600 17.8429800      30.9645900  66.917100
+#&gt; 6    abd  10.90930000 44.4792300 80.0185900     124.0631000 157.817400
+#&gt; 7    occ   0.05294615  0.6771610  0.1159236       0.2655264   1.036582
+#&gt; 8    abd   0.86835680  0.9879237  7.7037590       9.8005980  15.225370
+#&gt; 9    occ   1.17900700  4.5955350  8.2097440      18.0402600  34.650790
+#&gt; 10   abd  10.42443000 37.5335300 70.7147200      94.5145200  94.067850
+#&gt;    effort_distance_km number_observers       score eastness_median eastness_sd
+#&gt; 1          44.1411700       8.33171300  58.6079000      26.8404300  29.6457300
+#&gt; 2          89.0186400      27.37254000 131.6649000      61.0394200  50.9689000
+#&gt; 3           2.7944950       2.25546000   4.4803810       3.2779640   4.7464030
+#&gt; 4          49.6596800       8.18439400  34.8283800      25.9071500  24.6154600
+#&gt; 5          22.1657500       5.96007400  44.2075400      21.0891700  21.6299200
+#&gt; 6         159.9211000      26.38941000 119.8442000      75.1853700 112.6947000
+#&gt; 7           0.1231976       0.04656722   0.2142364       0.6255806   0.7512855
+#&gt; 8           9.8772990       2.95652300  13.3819900       5.4506480   3.7381450
+#&gt; 9           8.4439520       3.15378500  16.2911800      11.8642000  12.4472800
+#&gt; 10        105.6165000      26.95173000 145.6026000      54.0047600  70.7726500
+#&gt;    elev_median    elev_sd intertidal_fs_c1_1500_ed intertidal_fs_c1_1500_pland
+#&gt; 1   28.2940200 28.5690200                        0                           0
+#&gt; 2   74.6983800 81.1311200                        0                           0
+#&gt; 3    5.0742500  5.6214600                        0                           0
+#&gt; 4   24.6968800 54.0873500                        0                           0
+#&gt; 5   25.2590400 23.9697100                        0                           0
+#&gt; 6   76.1887300 70.8472800                        0                           0
+#&gt; 7    0.4947129  0.6661111                        0                           0
+#&gt; 8    1.8124090  3.1344200                        0                           0
+#&gt; 9   18.2243100 14.6229200                        0                           0
+#&gt; 10  61.1362800 88.3837300                        0                           0
+#&gt;    island mcd12q1_lccs1_fs_c1_1500_ed mcd12q1_lccs1_fs_c1_1500_pland
+#&gt; 1       0                  1.82164200                     1.25800700
+#&gt; 2       0                  6.92690000                     3.68125800
+#&gt; 3       0                  0.03674876                     0.05277983
+#&gt; 4       0                 11.65426000                    10.18063000
+#&gt; 5       0                  1.39911800                     0.99302300
+#&gt; 6       0                 15.58255000                    16.44564000
+#&gt; 7       0                  0.00000000                     0.00000000
+#&gt; 8       0                  0.00000000                     0.00000000
+#&gt; 9       0                  0.55352340                     0.70717020
+#&gt; 10      0                 19.31904000                    30.34296000
+#&gt;    mcd12q1_lccs1_fs_c2_1500_ed mcd12q1_lccs1_fs_c2_1500_pland
+#&gt; 1                            0                              0
+#&gt; 2                            0                              0
+#&gt; 3                            0                              0
+#&gt; 4                            0                              0
+#&gt; 5                            0                              0
+#&gt; 6                            0                              0
+#&gt; 7                            0                              0
+#&gt; 8                            0                              0
+#&gt; 9                            0                              0
+#&gt; 10                           0                              0
+#&gt;    mcd12q1_lccs1_fs_c11_1500_ed mcd12q1_lccs1_fs_c11_1500_pland
+#&gt; 1                     0.6585089                       0.8290236
+#&gt; 2                     0.6922234                       1.0719160
+#&gt; 3                     0.3121489                       0.3053405
+#&gt; 4                    26.1694300                      23.4049100
+#&gt; 5                     4.4127140                       3.5043990
+#&gt; 6                    17.6538200                      17.9486300
+#&gt; 7                     0.0000000                       0.0000000
+#&gt; 8                     0.0000000                       0.0000000
+#&gt; 9                     1.5799600                       1.0119940
+#&gt; 10                   29.0575800                      25.2682600
+#&gt;    mcd12q1_lccs1_fs_c12_1500_ed mcd12q1_lccs1_fs_c12_1500_pland
+#&gt; 1                             0                               0
+#&gt; 2                             0                               0
+#&gt; 3                             0                               0
+#&gt; 4                             0                               0
+#&gt; 5                             0                               0
+#&gt; 6                             0                               0
+#&gt; 7                             0                               0
+#&gt; 8                             0                               0
+#&gt; 9                             0                               0
+#&gt; 10                            0                               0
+#&gt;    mcd12q1_lccs1_fs_c13_1500_ed mcd12q1_lccs1_fs_c13_1500_pland
+#&gt; 1                     0.5288506                     0.665394500
+#&gt; 2                     0.2907630                     0.346792200
+#&gt; 3                     0.1441503                     0.170333100
+#&gt; 4                    16.6392800                     9.859671000
+#&gt; 5                     0.2542677                     0.475688600
+#&gt; 6                    16.0169200                    15.599210000
+#&gt; 7                     0.0000000                     0.005142857
+#&gt; 8                     0.2312156                     0.603448000
+#&gt; 9                     0.4859604                     0.381008000
+#&gt; 10                   22.1463600                    36.349110000
+#&gt;    mcd12q1_lccs1_fs_c14_1500_ed mcd12q1_lccs1_fs_c14_1500_pland
+#&gt; 1                     21.996530                      20.0456500
+#&gt; 2                     44.898150                     114.6416000
+#&gt; 3                     14.786010                      10.1154400
+#&gt; 4                     26.924370                      21.1664300
+#&gt; 5                     28.371550                      33.8922800
+#&gt; 6                     78.860860                      90.6730600
+#&gt; 7                      0.232777                       0.1538259
+#&gt; 8                      1.614361                       1.7659350
+#&gt; 9                     26.269270                      30.9372300
+#&gt; 10                    63.530060                      76.1354600
+#&gt;    mcd12q1_lccs1_fs_c15_1500_ed mcd12q1_lccs1_fs_c15_1500_pland
+#&gt; 1                    8.01043400                       6.8004110
+#&gt; 2                   21.11212000                      18.5301000
+#&gt; 3                    2.65250600                       2.8771020
+#&gt; 4                   23.89627000                      40.7677400
+#&gt; 5                   12.29142000                       9.8089910
+#&gt; 6                   69.54450000                      72.2020700
+#&gt; 7                    0.03403406                       0.1198244
+#&gt; 8                    0.00000000                       0.0000000
+#&gt; 9                    6.34960700                       5.4850770
+#&gt; 10                 140.34770000                      55.4626300
+#&gt;    mcd12q1_lccs1_fs_c16_1500_ed mcd12q1_lccs1_fs_c16_1500_pland
+#&gt; 1                             0                               0
+#&gt; 2                             0                               0
+#&gt; 3                             0                               0
+#&gt; 4                             0                               0
+#&gt; 5                             0                               0
+#&gt; 6                             0                               0
+#&gt; 7                             0                               0
+#&gt; 8                             0                               0
+#&gt; 9                             0                               0
+#&gt; 10                            0                               0
+#&gt;    mcd12q1_lccs1_fs_c21_1500_ed mcd12q1_lccs1_fs_c21_1500_pland
+#&gt; 1                     22.861860                      32.5837100
+#&gt; 2                     53.192940                      53.5446100
+#&gt; 3                      6.286148                      12.8456200
+#&gt; 4                     25.274860                      29.4880500
+#&gt; 5                     22.069560                      23.9928200
+#&gt; 6                     72.763710                      64.9640500
+#&gt; 7                      1.175361                       0.9157576
+#&gt; 8                      2.189837                       1.9130980
+#&gt; 9                     19.421980                      32.3080700
+#&gt; 10                    61.765020                      73.4411600
+#&gt;    mcd12q1_lccs1_fs_c22_1500_ed mcd12q1_lccs1_fs_c22_1500_pland
+#&gt; 1                    27.7817500                      30.9212800
+#&gt; 2                    42.6540700                      50.4776200
+#&gt; 3                     7.6620600                      14.2926100
+#&gt; 4                    17.0204600                      23.4018500
+#&gt; 5                    18.8724400                      17.1532500
+#&gt; 6                    37.6783300                      34.5785400
+#&gt; 7                     0.9907191                       0.8301785
+#&gt; 8                     4.7788170                       2.0469090
+#&gt; 9                    41.9058800                      66.1279300
+#&gt; 10                   43.4596500                      42.7917600
+#&gt;    mcd12q1_lccs1_fs_c255_1500_ed mcd12q1_lccs1_fs_c255_1500_pland
+#&gt; 1                              0                                0
+#&gt; 2                              0                                0
+#&gt; 3                              0                                0
+#&gt; 4                              0                                0
+#&gt; 5                              0                                0
+#&gt; 6                              0                                0
+#&gt; 7                              0                                0
+#&gt; 8                              0                                0
+#&gt; 9                              0                                0
+#&gt; 10                             0                                0
+#&gt;    mcd12q1_lccs1_fs_c31_1500_ed mcd12q1_lccs1_fs_c31_1500_pland
+#&gt; 1                    19.4717800                      25.3155000
+#&gt; 2                    43.1386300                      45.2810800
+#&gt; 3                     2.9219930                       7.0509290
+#&gt; 4                    24.6432400                      17.3307700
+#&gt; 5                    25.4481000                      23.6027600
+#&gt; 6                    31.6919400                      32.9481200
+#&gt; 7                     0.2881879                       0.6854411
+#&gt; 8                     0.9332024                       1.1621300
+#&gt; 9                    10.5408800                      16.3113400
+#&gt; 10                   46.2008300                      39.6852000
+#&gt;    mcd12q1_lccs1_fs_c32_1500_ed mcd12q1_lccs1_fs_c32_1500_pland
+#&gt; 1                    4.19176700                      4.44221000
+#&gt; 2                    9.70928400                      8.83644000
+#&gt; 3                    0.22879560                      0.79073050
+#&gt; 4                   12.58080000                     10.42160000
+#&gt; 5                    2.99687300                      2.48808500
+#&gt; 6                   16.20664000                     14.03066000
+#&gt; 7                    0.07516549                      0.03521078
+#&gt; 8                    0.43417560                      0.67279130
+#&gt; 9                    1.80027400                      1.08300100
+#&gt; 10                  19.92774000                     24.12544000
+#&gt;    mcd12q1_lccs1_fs_c41_1500_ed mcd12q1_lccs1_fs_c41_1500_pland
+#&gt; 1                             0                               0
+#&gt; 2                             0                               0
+#&gt; 3                             0                               0
+#&gt; 4                             0                               0
+#&gt; 5                             0                               0
+#&gt; 6                             0                               0
+#&gt; 7                             0                               0
+#&gt; 8                             0                               0
+#&gt; 9                             0                               0
+#&gt; 10                            0                               0
+#&gt;    mcd12q1_lccs1_fs_c42_1500_ed mcd12q1_lccs1_fs_c42_1500_pland
+#&gt; 1                             0                               0
+#&gt; 2                             0                               0
+#&gt; 3                             0                               0
+#&gt; 4                             0                               0
+#&gt; 5                             0                               0
+#&gt; 6                             0                               0
+#&gt; 7                             0                               0
+#&gt; 8                             0                               0
+#&gt; 9                             0                               0
+#&gt; 10                            0                               0
+#&gt;    mcd12q1_lccs1_fs_c43_1500_ed mcd12q1_lccs1_fs_c43_1500_pland
+#&gt; 1                             0                               0
+#&gt; 2                             0                               0
+#&gt; 3                             0                               0
+#&gt; 4                             0                               0
+#&gt; 5                             0                               0
+#&gt; 6                             0                               0
+#&gt; 7                             0                               0
+#&gt; 8                             0                               0
+#&gt; 9                             0                               0
+#&gt; 10                            0                               0
+#&gt;    mcd12q1_lccs2_fs_c25_1500_ed mcd12q1_lccs2_fs_c25_1500_pland
+#&gt; 1                    11.8997800                      10.2390200
+#&gt; 2                    20.9668900                      21.2857100
+#&gt; 3                     1.1211720                       0.9209590
+#&gt; 4                    12.5088500                      13.0991700
+#&gt; 5                     3.3275580                       3.4273650
+#&gt; 6                    21.1664500                      22.5751300
+#&gt; 7                     0.2056323                       0.4047535
+#&gt; 8                     4.1069130                       1.9476850
+#&gt; 9                     4.9205120                       5.9711220
+#&gt; 10                   25.2547900                      21.9112900
+#&gt;    mcd12q1_lccs2_fs_c35_1500_ed mcd12q1_lccs2_fs_c35_1500_pland
+#&gt; 1                             0                               0
+#&gt; 2                             0                               0
+#&gt; 3                             0                               0
+#&gt; 4                             0                               0
+#&gt; 5                             0                               0
+#&gt; 6                             0                               0
+#&gt; 7                             0                               0
+#&gt; 8                             0                               0
+#&gt; 9                             0                               0
+#&gt; 10                            0                               0
+#&gt;    mcd12q1_lccs2_fs_c36_1500_ed mcd12q1_lccs2_fs_c36_1500_pland
+#&gt; 1                    15.8521200                      30.3875300
+#&gt; 2                    25.5261600                      28.1239600
+#&gt; 3                     4.0767850                       5.3921200
+#&gt; 4                    23.9473300                      12.9201100
+#&gt; 5                     4.7243690                       5.1887840
+#&gt; 6                    28.4678600                      37.3769000
+#&gt; 7                     0.2511085                       0.3493021
+#&gt; 8                     0.9160119                       1.0508390
+#&gt; 9                     7.7205830                       9.7649460
+#&gt; 10                   29.7108400                      30.6608100
+#&gt;    mcd12q1_lccs3_fs_c27_1500_ed mcd12q1_lccs3_fs_c27_1500_pland
+#&gt; 1                    4.44595700                      3.51203700
+#&gt; 2                   17.41136000                     10.04045000
+#&gt; 3                    0.39134740                      0.46287210
+#&gt; 4                    9.50136900                     11.80231000
+#&gt; 5                    6.75439600                      4.75613000
+#&gt; 6                   34.21617000                     34.79181000
+#&gt; 7                    0.07111018                      0.01654412
+#&gt; 8                    0.00000000                      0.00000000
+#&gt; 9                    3.05751700                      3.05953200
+#&gt; 10                  48.37982000                     33.07469000
+#&gt;    mcd12q1_lccs3_fs_c50_1500_ed mcd12q1_lccs3_fs_c50_1500_pland
+#&gt; 1                    7.40833500                      6.82271500
+#&gt; 2                   24.30552000                     12.96813000
+#&gt; 3                    1.67022900                      2.08179300
+#&gt; 4                   11.06195000                     10.86274000
+#&gt; 5                    5.27820000                      3.58529000
+#&gt; 6                   15.37334000                     17.18862000
+#&gt; 7                    0.04681818                      0.01846154
+#&gt; 8                    0.49071630                      0.21196370
+#&gt; 9                    5.62996100                      3.24979200
+#&gt; 10                  27.54641000                     28.70575000
+#&gt;    mcd12q1_lccs3_fs_c51_1500_ed mcd12q1_lccs3_fs_c51_1500_pland
+#&gt; 1                    0.01705263                      0.01818182
+#&gt; 2                    0.00000000                      0.00000000
+#&gt; 3                    0.00000000                      0.00000000
+#&gt; 4                    0.00000000                      0.00000000
+#&gt; 5                    0.00000000                      0.00000000
+#&gt; 6                    0.00000000                      0.00000000
+#&gt; 7                    0.00000000                      0.00000000
+#&gt; 8                    0.00000000                      0.00000000
+#&gt; 9                    0.00000000                      0.00000000
+#&gt; 10                   0.00000000                      0.00000000
+#&gt;    mod44w_oic_fs_c1_1500_ed mod44w_oic_fs_c1_1500_pland
+#&gt; 1                         0                           0
+#&gt; 2                         0                           0
+#&gt; 3                         0                           0
+#&gt; 4                         0                           0
+#&gt; 5                         0                           0
+#&gt; 6                         0                           0
+#&gt; 7                         0                           0
+#&gt; 8                         0                           0
+#&gt; 9                         0                           0
+#&gt; 10                        0                           0
+#&gt;    mod44w_oic_fs_c2_1500_ed mod44w_oic_fs_c2_1500_pland
+#&gt; 1               15.46767000                 14.74223000
+#&gt; 2               33.64474000                 37.68181000
+#&gt; 3                1.34929300                  1.89335200
+#&gt; 4               24.77956000                 16.41344000
+#&gt; 5               12.33578000                 12.92125000
+#&gt; 6               62.44858000                 44.55207000
+#&gt; 7                0.03280719                  0.08289036
+#&gt; 8                1.15728200                  0.47897420
+#&gt; 9                6.16370900                  8.85562600
+#&gt; 10              52.55379000                 45.53346000
+#&gt;    mod44w_oic_fs_c3_1500_ed mod44w_oic_fs_c3_1500_pland northness_median
+#&gt; 1                         0                           0        25.433390
+#&gt; 2                         0                           0        57.628350
+#&gt; 3                         0                           0         3.573285
+#&gt; 4                         0                           0        23.137530
+#&gt; 5                         0                           0        21.966200
+#&gt; 6                         0                           0        97.390090
+#&gt; 7                         0                           0         1.069602
+#&gt; 8                         0                           0         3.939664
+#&gt; 9                         0                           0        11.679120
+#&gt; 10                        0                           0        72.930860
+#&gt;    northness_sd   ntl_mean     ntl_sd   occ_pred                       geometry
+#&gt; 1    26.0659000 40.4421200 38.0727900         NA POLYGON ((-87.11487 40.3575...
+#&gt; 2    66.8392900 53.8194000 66.4963200 487.638300 POLYGON ((-87.11487 40.3575...
+#&gt; 3     6.2836990 18.9002500 14.6203500         NA POLYGON ((-86.28833 40.1847...
+#&gt; 4    47.0065300 13.1281800 15.3372200  38.836020 POLYGON ((-86.28833 40.1847...
+#&gt; 5    23.2101800 30.6434000 25.3725400         NA POLYGON ((-87.20825 42.5278...
+#&gt; 6    93.6506500 48.1280900 61.5661300 490.692100 POLYGON ((-87.20825 42.5278...
+#&gt; 7     0.3094516  0.4001483  0.3258341         NA POLYGON ((-87.3188 41.74079...
+#&gt; 8     2.9094090  2.5334110  1.7408370   3.777097 POLYGON ((-87.3188 41.74079...
+#&gt; 9    11.7714700 43.0598200 43.0754200         NA POLYGON ((-87.1702 41.81103...
+#&gt; 10   79.8862600 58.1800900 42.0242000 256.427000 POLYGON ((-87.1702 41.81103...</div><div class='input'>
 <span class='co'># also works on sf objects</span>
-<span class='no'>pis_sf</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>sf</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/sf/topics/st_as_sf'>st_as_sf</a></span>(<span class='no'>pis</span>, <span class='kw'>coords</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"lon"</span>, <span class='st'>"lat"</span>), <span class='kw'>crs</span> <span class='kw'>=</span> <span class='fl'>4326</span>)
-<span class='fu'>stixelize</span>(<span class='no'>pis_sf</span>)</div><div class='output co'>#&gt; Simple feature collection with 849 features and 99 fields
+<span class='no'>pis_sf</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>sf</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sf/man/st_as_sf.html'>st_as_sf</a></span>(<span class='no'>pis</span>, <span class='kw'>coords</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"lon"</span>, <span class='st'>"lat"</span>), <span class='kw'>crs</span> <span class='kw'>=</span> <span class='fl'>4326</span>)
+<span class='fu'>stixelize</span>(<span class='no'>pis_sf</span>)</div><div class='output co'>#&gt; Simple feature collection with 1890 features and 83 fields
 #&gt; geometry type:  POLYGON
 #&gt; dimension:      XY
-#&gt; bbox:           xmin: -93.90373 ymin: 37.76792 xmax: -78.44666 ymax: 50.88339
+#&gt; bbox:           xmin: -92.95246 ymin: 38.64864 xmax: -79.32725 ymax: 51.0932
 #&gt; epsg (SRID):    4326
 #&gt; proj4string:    +proj=longlat +datum=WGS84 +no_defs
 #&gt; First 10 features:
-#&gt;        stixel_id  srd_n      date stixel_width stixel_height stixel_area
-#&gt; 1   69-121.4-289 190745 0.3719356     8.112887         8.125    65.91721
-#&gt; 2    7-255.2-342  46020 0.7401063     4.122559         4.125    17.00556
-#&gt; 3   7-102.7-1150 142716 0.3264353     5.963944         5.775    34.44178
-#&gt; 4    10-68.4-680  41756 0.2301514     4.196807         4.200    17.62659
-#&gt; 5   20-348.7-330  40660 0.9945355     3.971627         4.050    16.08509
-#&gt; 6   44-264.6-303  43064 0.7679523     4.054165         4.225    17.12885
-#&gt; 7     1-181-1249  40564 0.5376825     4.191180         4.200    17.60296
-#&gt; 8       2-76-690  43184 0.2506176     3.849929         3.825    14.72598
-#&gt; 9       2-76-691  40580 0.2509622     3.859651         3.825    14.76317
-#&gt; 10 14-161.1-1151 137772 0.4808628     7.043668         6.925    48.77740
-#&gt;    train_n positive_ob_n stixel_prevalence mean_non_zero_count i_stationary
-#&gt; 1     5471          1080        0.19740450            1.379630 0.0009782551
-#&gt; 2      788           186        0.23604060            1.354839 0.0009866625
-#&gt; 3     3429           920        0.26829980            1.604348 0.0102888000
-#&gt; 4     1752           389        0.22203200            2.272494 0.0040716770
-#&gt; 5     1069            96        0.08980355            1.072917 0.0000000000
-#&gt; 6     1469           358        0.24370320            1.254190 0.0087457020
-#&gt; 7      917            81        0.08833152            1.358025 0.0000000000
-#&gt; 8     2193           545        0.24851800            1.825688 0.0007947534
-#&gt; 9     1171           256        0.21861660            1.640625 0.0000000000
-#&gt; 10    2513           844        0.33585360            1.896919 0.0017567630
-#&gt;            year         day        time effort_hrs effort_distance_km
-#&gt; 1  0.0753970200 0.093119370 0.074023190 0.33446210        0.064391580
-#&gt; 2  0.0021844780 0.429846900 0.079498190 0.19003850        0.025708500
-#&gt; 3  0.0755529600 0.563472600 0.167291600 0.57488890        0.047441550
-#&gt; 4  0.0367294600 2.447557000 0.074426400 1.49242100        0.055355820
-#&gt; 5  0.0007547261 0.006725923 0.008760425 0.04499456        0.006688545
-#&gt; 6  0.0261479800 0.221674200 0.047343970 0.51563640        0.017106310
-#&gt; 7  0.0117553100 0.038932490 0.024324970 0.02840611        0.025159800
-#&gt; 8  0.0855764300 1.572839000 0.077741130 0.32078650        0.091529390
-#&gt; 9  0.0295483100 2.528617000 0.065845020 0.33829840        0.022476220
-#&gt; 10 0.0626012700 0.099072150 0.242724200 0.54061170        0.094723330
-#&gt;    number_observers      score        elev   northness     eastness
-#&gt; 1      0.0088865010 0.10977060 0.101280800 0.058624140 0.0498227900
-#&gt; 2      0.0055416540 0.25857680 0.038186440 0.008635983 0.0439463500
-#&gt; 3      0.0145845300 0.27700610 0.051606640 0.050119220 0.0807455400
-#&gt; 4      0.0106324500 0.14673300 0.024641730 0.043448080 0.0528379000
-#&gt; 5      0.0003075676 0.03260055 0.006023087 0.016163430 0.0037916700
-#&gt; 6      0.0047872150 0.18981830 0.039282690 0.033774600 0.0259320500
-#&gt; 7      0.0023204540 0.02805700 0.132365400 0.009956901 0.0009159445
-#&gt; 8      0.0059237920 0.15148180 0.027221590 0.026129700 0.0367949100
-#&gt; 9      0.0021075910 0.13850190 0.025894900 0.015056400 0.0407276700
-#&gt; 10     0.0056619270 0.39327290 0.429150600 0.138358900 0.1529488000
-#&gt;    umd_fs_c1_1500_pland umd_fs_c1_1500_lpi umd_fs_c1_1500_pd umd_fs_c1_1500_ed
-#&gt; 1          0.0027234820       0.0043938350      0.0058794630      1.090972e-02
-#&gt; 2          0.0003502530       0.0001266096      0.0004442638      1.582699e-03
-#&gt; 3          0.0060644240       0.0043841150      0.0082682620      7.763431e-03
-#&gt; 4          0.0003767716       0.0000000000      0.0015705880      0.000000e+00
-#&gt; 5          0.0001454525       0.0005360913      0.0001232081      1.034165e-04
-#&gt; 6          0.0011469630       0.0005356339      0.0031612130      7.653757e-04
-#&gt; 7          0.0009700515       0.0000000000      0.0029727750      5.057419e-06
-#&gt; 8          0.0030186030       0.0006602018      0.0018477210      1.618128e-02
-#&gt; 9          0.0001568978       0.0005858426      0.0022897110      6.114657e-04
-#&gt; 10         0.0017953200       0.0025331400      0.0123944400      8.705668e-03
-#&gt;    umd_fs_c2_1500_pland umd_fs_c2_1500_lpi umd_fs_c2_1500_pd umd_fs_c2_1500_ed
-#&gt; 1          6.536036e-05       1.385875e-04      1.026900e-03      1.232356e-03
-#&gt; 2          1.077418e-05       3.952960e-05      9.194824e-06      2.129982e-04
-#&gt; 3          5.425665e-05       5.851937e-04      6.861657e-04      2.957774e-04
-#&gt; 4          0.000000e+00       0.000000e+00      0.000000e+00      0.000000e+00
-#&gt; 5          1.635908e-04       5.725049e-03      1.998624e-04      3.461667e-04
-#&gt; 6          4.606220e-04       2.419310e-04      2.795407e-03      7.645322e-04
-#&gt; 7          0.000000e+00       1.295022e-10      0.000000e+00      2.368322e-06
-#&gt; 8          3.166677e-04       9.074745e-04      1.076650e-03      4.978517e-04
-#&gt; 9          7.054024e-06       7.327908e-05      3.181748e-04      1.245962e-04
-#&gt; 10         2.121127e-03       1.048519e-04      1.609226e-03      0.000000e+00
-#&gt;    umd_fs_c3_1500_pland umd_fs_c3_1500_lpi umd_fs_c3_1500_pd umd_fs_c3_1500_ed
-#&gt; 1          1.455139e-03       1.526986e-03      7.971544e-03      8.491477e-04
-#&gt; 2          0.000000e+00       3.034003e-05      0.000000e+00      2.807541e-02
-#&gt; 3          1.913617e-04       0.000000e+00      3.109620e-03      1.399894e-03
-#&gt; 4          4.595576e-05       1.206368e-04      0.000000e+00      8.711829e-04
-#&gt; 5          4.525723e-04       2.187336e-04      3.239615e-05      2.849426e-04
-#&gt; 6          8.663736e-05       5.011296e-04      4.581229e-04      3.872048e-04
-#&gt; 7          2.894102e-05       4.264299e-05      8.528113e-06      1.531512e-05
-#&gt; 8          9.545342e-04       1.052294e-03      1.098517e-02      1.097212e-03
-#&gt; 9          3.840394e-05       1.974018e-04      3.055801e-04      1.989313e-05
-#&gt; 10         1.718965e-03       8.333924e-04      1.390082e-02      2.397269e-03
-#&gt;    umd_fs_c4_1500_pland umd_fs_c4_1500_lpi umd_fs_c4_1500_pd umd_fs_c4_1500_ed
-#&gt; 1          0.0118347200       0.0322640700      0.0165489900      0.0099758480
-#&gt; 2          0.0003564676       0.0015225970      0.0002984091      0.0046034140
-#&gt; 3          0.0135092800       0.0180964800      0.0170723000      0.0194793600
-#&gt; 4          0.0389391300       0.0159553100      0.0000000000      0.0075254340
-#&gt; 5          0.0030635470       0.0003596819      0.0006753856      0.0002279311
-#&gt; 6          0.0033715010       0.0040507510      0.0034322360      0.0051245310
-#&gt; 7          0.0003196179       0.0095018490      0.0006281342      0.0010909900
-#&gt; 8          0.0000000000       0.0029066850      0.0036290150      0.0041386510
-#&gt; 9          0.0118694200       0.0014086050      0.0000000000      0.0070110180
-#&gt; 10         0.0227168000       0.0399350800      0.0257360200      0.0221969300
-#&gt;    umd_fs_c5_1500_pland umd_fs_c5_1500_lpi umd_fs_c5_1500_pd umd_fs_c5_1500_ed
-#&gt; 1          0.0643741700       0.0072241630      0.0094194450       0.007366266
-#&gt; 2          0.0011754040       0.0015831200      0.0002397078       0.005266960
-#&gt; 3          0.0263829500       0.0433506700      0.0531123600       0.025607830
-#&gt; 4          0.0122201100       0.0002632751      0.0000000000       0.003939228
-#&gt; 5          0.0026361000       0.0004159598      0.0000000000       0.001174661
-#&gt; 6          0.0008610701       0.0011230750      0.0197389700       0.001359950
-#&gt; 7          0.0628251900       0.0635573300      0.0020898600       0.001586942
-#&gt; 8          0.0025750870       0.0075747480      0.0041839780       0.012418150
-#&gt; 9          0.0015117300       0.0029289940      0.0130602500       0.004332934
-#&gt; 10         0.0396101900       0.0292842000      0.0312701700       0.042510870
-#&gt;    umd_fs_c6_1500_pland umd_fs_c6_1500_lpi umd_fs_c6_1500_pd umd_fs_c6_1500_ed
-#&gt; 1          5.233432e-05       1.380878e-04      5.841338e-03      6.391328e-04
-#&gt; 2          5.087715e-04       6.911137e-05      4.114848e-04      1.803258e-03
-#&gt; 3          1.954680e-04       1.408856e-03      3.875513e-03      7.496521e-04
-#&gt; 4          6.479944e-05       0.000000e+00      1.120315e-02      0.000000e+00
-#&gt; 5          1.379272e-04       8.474243e-04      2.499540e-03      4.439042e-04
-#&gt; 6          0.000000e+00       1.653208e-03      0.000000e+00      1.296503e-03
-#&gt; 7          6.777296e-06       0.000000e+00      2.346564e-06      2.330573e-07
-#&gt; 8          4.663898e-04       1.730161e-03      3.672262e-03      1.202988e-03
-#&gt; 9          1.093363e-03       1.679315e-04      0.000000e+00      5.898564e-05
-#&gt; 10         7.813094e-05       1.911201e-03      1.172361e-03      4.098645e-04
-#&gt;    umd_fs_c7_1500_pland umd_fs_c7_1500_lpi umd_fs_c7_1500_pd umd_fs_c7_1500_ed
-#&gt; 1          5.640498e-04       2.633142e-04      5.600501e-03      1.294010e-03
-#&gt; 2          2.755346e-04       1.431500e-04      4.869038e-04      0.000000e+00
-#&gt; 3          1.691197e-03       0.000000e+00      2.321885e-03      2.442502e-03
-#&gt; 4          3.858310e-05       3.448250e-04      6.560645e-04      1.270205e-03
-#&gt; 5          0.000000e+00       1.136329e-05      1.200172e-04      0.000000e+00
-#&gt; 6          5.652319e-05       3.417103e-04      1.953913e-03      7.240330e-04
-#&gt; 7          9.284303e-06       5.518037e-06      1.421568e-05      1.275092e-05
-#&gt; 8          1.768961e-04       6.690362e-04      2.805375e-04      7.285159e-04
-#&gt; 9          0.000000e+00       0.000000e+00      5.057841e-04      8.295934e-05
-#&gt; 10         6.142973e-04       5.773952e-04      3.394403e-03      2.398857e-03
-#&gt;    umd_fs_c8_1500_pland umd_fs_c8_1500_lpi umd_fs_c8_1500_pd umd_fs_c8_1500_ed
-#&gt; 1          2.472845e-03       1.000584e-02      0.0182494800      5.020096e-03
-#&gt; 2          6.402638e-04       1.630647e-03      0.0000000000      9.395646e-03
-#&gt; 3          4.805627e-03       3.913934e-03      0.0132522100      4.112604e-03
-#&gt; 4          5.550385e-03       1.201889e-03      0.0000000000      2.974373e-03
-#&gt; 5          9.689634e-05       5.511230e-05      0.0001275135      4.828050e-05
-#&gt; 6          2.874408e-03       2.599331e-03      0.0041826080      5.051250e-03
-#&gt; 7          0.000000e+00       3.419007e-05      0.0000000000      3.718155e-06
-#&gt; 8          1.159885e-03       3.923804e-03      0.0025455950      3.709961e-04
-#&gt; 9          0.000000e+00       2.302469e-03      0.0027952730      2.816046e-04
-#&gt; 10         2.270147e-03       1.535899e-02      0.0075878610      8.187648e-03
-#&gt;    umd_fs_c9_1500_pland umd_fs_c9_1500_lpi umd_fs_c9_1500_pd umd_fs_c9_1500_ed
-#&gt; 1          1.312570e-02       1.047461e-03      9.112189e-04      7.525897e-03
-#&gt; 2          5.082500e-05       1.792404e-05      4.504748e-05      6.439477e-06
-#&gt; 3          1.924896e-03       1.402168e-03      3.578811e-03      2.614111e-03
-#&gt; 4          1.124381e-02       3.329991e-05      2.852331e-03      3.470937e-04
-#&gt; 5          3.649386e-04       4.504763e-04      1.001990e-04      1.502924e-04
-#&gt; 6          1.660827e-03       1.152216e-03      6.901364e-04      3.474777e-04
-#&gt; 7          0.000000e+00       0.000000e+00      0.000000e+00      0.000000e+00
-#&gt; 8          0.000000e+00       1.424751e-03      8.798311e-05      9.476459e-04
-#&gt; 9          9.378029e-05       3.585386e-04      8.247225e-04      2.162118e-05
-#&gt; 10         1.543305e-03       1.677419e-03      1.318444e-03      7.325498e-03
-#&gt;    umd_fs_c10_1500_pland umd_fs_c10_1500_lpi umd_fs_c10_1500_pd
-#&gt; 1           5.077317e-03        0.0056275280       0.0054368170
-#&gt; 2           0.000000e+00        0.0000000000       0.0002489004
-#&gt; 3           4.310695e-03        0.0059748070       0.0131386800
-#&gt; 4           6.459465e-03        0.0055587130       0.0020258800
-#&gt; 5           3.654462e-04        0.0008241602       0.0010591500
-#&gt; 6           3.322055e-03        0.0016373330       0.0035058750
-#&gt; 7           4.802601e-05        0.0008022391       0.0010976530
-#&gt; 8           3.450309e-03        0.0045647170       0.0040236310
-#&gt; 9           6.876998e-04        0.0000000000       0.0086990240
-#&gt; 10          1.437191e-03        0.0081857350       0.0046592460
-#&gt;    umd_fs_c10_1500_ed umd_fs_c12_1500_pland umd_fs_c12_1500_lpi
-#&gt; 1        0.0057728050          0.0000000000        0.0130861700
-#&gt; 2        0.0009617416          0.0014104860        0.0000000000
-#&gt; 3        0.0049837320          0.0004563543        0.0063664180
-#&gt; 4        0.0044471880          0.0198884900        0.0152740600
-#&gt; 5        0.0014818100          0.0007562517        0.0022990800
-#&gt; 6        0.0041458280          0.0119007000        0.0205046500
-#&gt; 7        0.0020050760          0.0023693210        0.0007324885
-#&gt; 8        0.0034751460          0.0147784100        0.0186357900
-#&gt; 9        0.0016580520          0.0017732110        0.0003935473
-#&gt; 10       0.0071767080          0.0126661100        0.0201326300
-#&gt;    umd_fs_c12_1500_pd umd_fs_c12_1500_ed umd_fs_c13_1500_pland
-#&gt; 1        0.0139291800        0.004212341          3.146028e-03
-#&gt; 2        0.0046999840        0.005488440          0.000000e+00
-#&gt; 3        0.0151762200        0.031009010          1.256673e-02
-#&gt; 4        0.0117102800        0.018385990          4.098051e-02
-#&gt; 5        0.0006057489        0.001008587          3.747120e-05
-#&gt; 6        0.0164028700        0.011252710          2.225345e-02
-#&gt; 7        0.0017421320        0.003357973          1.481655e-05
-#&gt; 8        0.0158348000        0.027817910          9.872144e-03
-#&gt; 9        0.0048519320        0.005652433          3.904330e-03
-#&gt; 10       0.0381519400        0.024380870          4.836227e-04
-#&gt;    umd_fs_c13_1500_lpi umd_fs_c13_1500_pd umd_fs_c13_1500_ed
-#&gt; 1         1.548292e-02       6.761831e-03       0.0069343890
-#&gt; 2         1.775985e-03       1.018786e-03       0.0011464460
-#&gt; 3         9.735008e-03       2.293037e-03       0.0119386500
-#&gt; 4         1.261063e-02       1.010415e-02       0.0104906400
-#&gt; 5         0.000000e+00       4.095015e-03       0.0002266771
-#&gt; 6         1.662034e-02       5.295310e-03       0.0059594500
-#&gt; 7         1.623951e-05       5.204746e-07       0.0000226393
-#&gt; 8         4.312237e-02       7.012191e-03       0.0144625500
-#&gt; 9         1.780807e-01       7.079755e-03       0.0067691490
-#&gt; 10        9.201509e-04       1.488433e-03       0.0013423870
-#&gt;    umd_fs_c16_1500_pland umd_fs_c16_1500_lpi umd_fs_c16_1500_pd
-#&gt; 1           5.989389e-04        2.881679e-04       3.826464e-03
-#&gt; 2           5.475057e-05        2.568530e-05       2.000764e-05
-#&gt; 3           2.225828e-04        4.455246e-04       8.183452e-04
-#&gt; 4           1.863171e-04        2.164185e-04       3.619752e-04
-#&gt; 5           3.546646e-04        5.344158e-04       1.948389e-03
-#&gt; 6           3.526997e-04        5.015967e-05       0.000000e+00
-#&gt; 7           1.060825e-05        1.316949e-05       5.519794e-05
-#&gt; 8           5.724629e-04        1.358344e-04       2.238055e-03
-#&gt; 9           1.742886e-04        3.205752e-05       2.735311e-05
-#&gt; 10          2.211702e-03        1.160202e-03       0.000000e+00
-#&gt;    umd_fs_c16_1500_ed modiswater_fs_c0_1500_pland modiswater_fs_c0_1500_lpi
-#&gt; 1        9.059628e-04                           0                         0
-#&gt; 2        1.617079e-03                           0                         0
-#&gt; 3        3.279005e-03                           0                         0
-#&gt; 4        3.324844e-05                           0                         0
-#&gt; 5        2.763306e-04                           0                         0
-#&gt; 6        0.000000e+00                           0                         0
-#&gt; 7        1.291217e-06                           0                         0
-#&gt; 8        1.412964e-03                           0                         0
-#&gt; 9        0.000000e+00                           0                         0
-#&gt; 10       2.423434e-03                           0                         0
-#&gt;    modiswater_fs_c0_1500_pd modiswater_fs_c0_1500_ed
-#&gt; 1                         0                        0
-#&gt; 2                         0                        0
-#&gt; 3                         0                        0
-#&gt; 4                         0                        0
-#&gt; 5                         0                        0
-#&gt; 6                         0                        0
-#&gt; 7                         0                        0
-#&gt; 8                         0                        0
-#&gt; 9                         0                        0
-#&gt; 10                        0                        0
-#&gt;    modiswater_fs_c2_1500_pland modiswater_fs_c2_1500_lpi
-#&gt; 1                 1.067327e-03              2.581512e-03
-#&gt; 2                 1.905170e-02              0.000000e+00
-#&gt; 3                 5.693548e-03              8.845807e-03
-#&gt; 4                 0.000000e+00              0.000000e+00
-#&gt; 5                 1.495959e-05              0.000000e+00
-#&gt; 6                 2.764553e-03              5.532147e-03
-#&gt; 7                 9.599133e-07              4.296279e-06
-#&gt; 8                 0.000000e+00              0.000000e+00
-#&gt; 9                 6.526358e-04              3.118275e-06
-#&gt; 10                1.952885e-02              1.852254e-02
-#&gt;    modiswater_fs_c2_1500_pd modiswater_fs_c2_1500_ed
-#&gt; 1              0.000000e+00             4.556112e-03
-#&gt; 2              5.322000e-05             0.000000e+00
-#&gt; 3              6.550407e-03             9.315848e-03
-#&gt; 4              1.550674e-02             1.442754e-03
-#&gt; 5              2.865152e-05             1.672565e-06
-#&gt; 6              2.095630e-03             0.000000e+00
-#&gt; 7              0.000000e+00             2.975016e-06
-#&gt; 8              3.848252e-04             0.000000e+00
-#&gt; 9              0.000000e+00             0.000000e+00
-#&gt; 10             3.123477e-03             2.098731e-03
-#&gt;    modiswater_fs_c3_1500_pland modiswater_fs_c3_1500_lpi
-#&gt; 1                 4.066281e-03              3.121652e-03
-#&gt; 2                 9.150461e-04              2.019311e-03
-#&gt; 3                 6.144256e-03              1.295595e-02
-#&gt; 4                 0.000000e+00              7.203367e-02
-#&gt; 5                 1.127380e-04              8.890402e-03
-#&gt; 6                 1.002220e-03              1.348484e-04
-#&gt; 7                 8.165212e-06              1.111249e-06
-#&gt; 8                 1.270143e-03              2.783997e-03
-#&gt; 9                 1.656058e-04              5.654289e-04
-#&gt; 10                2.266942e-02              5.855875e-04
-#&gt;    modiswater_fs_c3_1500_pd modiswater_fs_c3_1500_ed
-#&gt; 1              7.289954e-04             4.689107e-03
-#&gt; 2              3.139606e-04             2.628940e-03
-#&gt; 3              7.743777e-03             9.265749e-03
-#&gt; 4              1.146467e-03             6.863937e-03
-#&gt; 5              2.665627e-04             2.400638e-05
-#&gt; 6              1.627095e-04             7.416909e-04
-#&gt; 7              8.293932e-07             4.544068e-06
-#&gt; 8              4.701189e-03             9.542242e-03
-#&gt; 9              4.057823e-03             1.067300e-03
-#&gt; 10             4.813483e-04             8.116956e-04
-#&gt;    modiswater_fs_c5_1500_pland modiswater_fs_c5_1500_lpi
-#&gt; 1                 0.0030293660              5.312359e-02
-#&gt; 2                 0.0000000000              0.000000e+00
-#&gt; 3                 0.0056210160              2.296938e-03
-#&gt; 4                 0.0005640737              2.279971e-04
-#&gt; 5                 0.0000000000              0.000000e+00
-#&gt; 6                 0.0040434390              3.756638e-03
-#&gt; 7                 0.0030735310              3.953502e-05
-#&gt; 8                 0.0000000000              0.000000e+00
-#&gt; 9                 0.0021510310              3.260836e-04
-#&gt; 10                0.0004609059              2.169040e-04
-#&gt;    modiswater_fs_c5_1500_pd modiswater_fs_c5_1500_ed
-#&gt; 1              7.567552e-03             7.557046e-04
-#&gt; 2              0.000000e+00             0.000000e+00
-#&gt; 3              8.548060e-03             1.216775e-03
-#&gt; 4              7.547949e-05             4.408866e-05
-#&gt; 5              0.000000e+00             0.000000e+00
-#&gt; 6              6.677018e-03             1.302557e-03
-#&gt; 7              1.684493e-05             7.273663e-07
-#&gt; 8              0.000000e+00             0.000000e+00
-#&gt; 9              4.722435e-05             8.709963e-05
-#&gt; 10             3.561498e-03             3.036658e-03
-#&gt;    modiswater_fs_c6_1500_pland modiswater_fs_c6_1500_lpi
-#&gt; 1                            0                         0
-#&gt; 2                            0                         0
-#&gt; 3                            0                         0
-#&gt; 4                            0                         0
-#&gt; 5                            0                         0
-#&gt; 6                            0                         0
-#&gt; 7                            0                         0
-#&gt; 8                            0                         0
-#&gt; 9                            0                         0
-#&gt; 10                           0                         0
-#&gt;    modiswater_fs_c6_1500_pd modiswater_fs_c6_1500_ed
-#&gt; 1                         0                        0
-#&gt; 2                         0                        0
-#&gt; 3                         0                        0
-#&gt; 4                         0                        0
-#&gt; 5                         0                        0
-#&gt; 6                         0                        0
-#&gt; 7                         0                        0
-#&gt; 8                         0                        0
-#&gt; 9                         0                        0
-#&gt; 10                        0                        0
-#&gt;    modiswater_fs_c7_1500_pland modiswater_fs_c7_1500_lpi
-#&gt; 1                            0                         0
-#&gt; 2                            0                         0
-#&gt; 3                            0                         0
-#&gt; 4                            0                         0
-#&gt; 5                            0                         0
-#&gt; 6                            0                         0
-#&gt; 7                            0                         0
-#&gt; 8                            0                         0
-#&gt; 9                            0                         0
-#&gt; 10                           0                         0
-#&gt;    modiswater_fs_c7_1500_pd modiswater_fs_c7_1500_ed       lon      lat
-#&gt; 1                         0                        0 -82.66239 43.16171
-#&gt; 2                         0                        0 -83.01648 43.71361
-#&gt; 3                         0                        0 -84.55903 44.98568
-#&gt; 4                         0                        0 -86.21622 41.79261
-#&gt; 5                         0                        0 -85.36707 42.01676
-#&gt; 6                         0                        0 -84.86500 42.85970
-#&gt; 7                         0                        0 -85.86240 42.68140
-#&gt; 8                         0                        0 -82.92381 42.43289
-#&gt; 9                         0                        0 -85.74791 43.50642
-#&gt; 10                        0                        0 -89.04060 46.70954
+#&gt;        stixel_id srd_n      date stixel_width stixel_height stixel_area train_n
+#&gt; 1   61-98.6-1205 78104 0.3128632      4.69994       4.68954      171404    5000
+#&gt; 2   61-98.6-1205 78104 0.3128632      4.69994       4.68954      171404    5000
+#&gt; 3   35-207.8-284 78252 0.6141653      5.99353       6.02181      171729    3977
+#&gt; 4   35-207.8-284 78252 0.6141653      5.99353       6.02181      171729    3977
+#&gt; 5   99-166.8-326 76112 0.4991869      5.73436       5.67542      167032    4629
+#&gt; 6   99-166.8-326 76112 0.4991869      5.73436       5.67542      167032    4629
+#&gt; 7    29-49.3-822 73404 0.1739911      5.84128       5.88858      161090    3768
+#&gt; 8    29-49.3-822 73404 0.1739911      5.84128       5.88858      161090    3768
+#&gt; 9  19-176.3-1247 82496 0.5197299      4.64485       4.44974      181042    4437
+#&gt; 10 19-176.3-1247 82496 0.5197299      4.64485       4.44974      181042    4437
+#&gt;    positive_ob_n stixel_prevalence mean_non_zero_count model i_stationary
+#&gt; 1           1250        0.25000000            1.558400   occ  24.18707000
+#&gt; 2           1250        0.25000000            1.558400   abd  10.24263000
+#&gt; 3            227        0.05707820            1.405286   occ   0.38905790
+#&gt; 4            227        0.05707820            1.405286   abd   7.62567300
+#&gt; 5            879        0.18988980            1.732651   occ   3.54344200
+#&gt; 6            879        0.18988980            1.732651   abd  10.90930000
+#&gt; 7             18        0.00477707            1.111111   occ   0.05294615
+#&gt; 8             18        0.00477707            1.111111   abd   0.86835680
+#&gt; 9            687        0.15483430            1.720524   occ   1.17900700
+#&gt; 10           687        0.15483430            1.720524   abd  10.42443000
+#&gt;          year        day solar_noon_diff effort_hrs effort_distance_km
+#&gt; 1  10.1801800 78.9268100      40.2446700 129.823200         44.1411700
+#&gt; 2  36.2267800 70.3328600     105.1565000  93.205910         89.0186400
+#&gt; 3   1.1717870  1.3809290       8.9742190   8.905770          2.7944950
+#&gt; 4  18.0336900 29.7783700      42.7801600  41.015810         49.6596800
+#&gt; 5   9.0204600 17.8429800      30.9645900  66.917100         22.1657500
+#&gt; 6  44.4792300 80.0185900     124.0631000 157.817400        159.9211000
+#&gt; 7   0.6771610  0.1159236       0.2655264   1.036582          0.1231976
+#&gt; 8   0.9879237  7.7037590       9.8005980  15.225370          9.8772990
+#&gt; 9   4.5955350  8.2097440      18.0402600  34.650790          8.4439520
+#&gt; 10 37.5335300 70.7147200      94.5145200  94.067850        105.6165000
+#&gt;    number_observers       score eastness_median eastness_sd elev_median
+#&gt; 1        8.33171300  58.6079000      26.8404300  29.6457300  28.2940200
+#&gt; 2       27.37254000 131.6649000      61.0394200  50.9689000  74.6983800
+#&gt; 3        2.25546000   4.4803810       3.2779640   4.7464030   5.0742500
+#&gt; 4        8.18439400  34.8283800      25.9071500  24.6154600  24.6968800
+#&gt; 5        5.96007400  44.2075400      21.0891700  21.6299200  25.2590400
+#&gt; 6       26.38941000 119.8442000      75.1853700 112.6947000  76.1887300
+#&gt; 7        0.04656722   0.2142364       0.6255806   0.7512855   0.4947129
+#&gt; 8        2.95652300  13.3819900       5.4506480   3.7381450   1.8124090
+#&gt; 9        3.15378500  16.2911800      11.8642000  12.4472800  18.2243100
+#&gt; 10      26.95173000 145.6026000      54.0047600  70.7726500  61.1362800
+#&gt;       elev_sd intertidal_fs_c1_1500_ed intertidal_fs_c1_1500_pland island
+#&gt; 1  28.5690200                        0                           0      0
+#&gt; 2  81.1311200                        0                           0      0
+#&gt; 3   5.6214600                        0                           0      0
+#&gt; 4  54.0873500                        0                           0      0
+#&gt; 5  23.9697100                        0                           0      0
+#&gt; 6  70.8472800                        0                           0      0
+#&gt; 7   0.6661111                        0                           0      0
+#&gt; 8   3.1344200                        0                           0      0
+#&gt; 9  14.6229200                        0                           0      0
+#&gt; 10 88.3837300                        0                           0      0
+#&gt;    mcd12q1_lccs1_fs_c1_1500_ed mcd12q1_lccs1_fs_c1_1500_pland
+#&gt; 1                   1.82164200                     1.25800700
+#&gt; 2                   6.92690000                     3.68125800
+#&gt; 3                   0.03674876                     0.05277983
+#&gt; 4                  11.65426000                    10.18063000
+#&gt; 5                   1.39911800                     0.99302300
+#&gt; 6                  15.58255000                    16.44564000
+#&gt; 7                   0.00000000                     0.00000000
+#&gt; 8                   0.00000000                     0.00000000
+#&gt; 9                   0.55352340                     0.70717020
+#&gt; 10                 19.31904000                    30.34296000
+#&gt;    mcd12q1_lccs1_fs_c2_1500_ed mcd12q1_lccs1_fs_c2_1500_pland
+#&gt; 1                            0                              0
+#&gt; 2                            0                              0
+#&gt; 3                            0                              0
+#&gt; 4                            0                              0
+#&gt; 5                            0                              0
+#&gt; 6                            0                              0
+#&gt; 7                            0                              0
+#&gt; 8                            0                              0
+#&gt; 9                            0                              0
+#&gt; 10                           0                              0
+#&gt;    mcd12q1_lccs1_fs_c11_1500_ed mcd12q1_lccs1_fs_c11_1500_pland
+#&gt; 1                     0.6585089                       0.8290236
+#&gt; 2                     0.6922234                       1.0719160
+#&gt; 3                     0.3121489                       0.3053405
+#&gt; 4                    26.1694300                      23.4049100
+#&gt; 5                     4.4127140                       3.5043990
+#&gt; 6                    17.6538200                      17.9486300
+#&gt; 7                     0.0000000                       0.0000000
+#&gt; 8                     0.0000000                       0.0000000
+#&gt; 9                     1.5799600                       1.0119940
+#&gt; 10                   29.0575800                      25.2682600
+#&gt;    mcd12q1_lccs1_fs_c12_1500_ed mcd12q1_lccs1_fs_c12_1500_pland
+#&gt; 1                             0                               0
+#&gt; 2                             0                               0
+#&gt; 3                             0                               0
+#&gt; 4                             0                               0
+#&gt; 5                             0                               0
+#&gt; 6                             0                               0
+#&gt; 7                             0                               0
+#&gt; 8                             0                               0
+#&gt; 9                             0                               0
+#&gt; 10                            0                               0
+#&gt;    mcd12q1_lccs1_fs_c13_1500_ed mcd12q1_lccs1_fs_c13_1500_pland
+#&gt; 1                     0.5288506                     0.665394500
+#&gt; 2                     0.2907630                     0.346792200
+#&gt; 3                     0.1441503                     0.170333100
+#&gt; 4                    16.6392800                     9.859671000
+#&gt; 5                     0.2542677                     0.475688600
+#&gt; 6                    16.0169200                    15.599210000
+#&gt; 7                     0.0000000                     0.005142857
+#&gt; 8                     0.2312156                     0.603448000
+#&gt; 9                     0.4859604                     0.381008000
+#&gt; 10                   22.1463600                    36.349110000
+#&gt;    mcd12q1_lccs1_fs_c14_1500_ed mcd12q1_lccs1_fs_c14_1500_pland
+#&gt; 1                     21.996530                      20.0456500
+#&gt; 2                     44.898150                     114.6416000
+#&gt; 3                     14.786010                      10.1154400
+#&gt; 4                     26.924370                      21.1664300
+#&gt; 5                     28.371550                      33.8922800
+#&gt; 6                     78.860860                      90.6730600
+#&gt; 7                      0.232777                       0.1538259
+#&gt; 8                      1.614361                       1.7659350
+#&gt; 9                     26.269270                      30.9372300
+#&gt; 10                    63.530060                      76.1354600
+#&gt;    mcd12q1_lccs1_fs_c15_1500_ed mcd12q1_lccs1_fs_c15_1500_pland
+#&gt; 1                    8.01043400                       6.8004110
+#&gt; 2                   21.11212000                      18.5301000
+#&gt; 3                    2.65250600                       2.8771020
+#&gt; 4                   23.89627000                      40.7677400
+#&gt; 5                   12.29142000                       9.8089910
+#&gt; 6                   69.54450000                      72.2020700
+#&gt; 7                    0.03403406                       0.1198244
+#&gt; 8                    0.00000000                       0.0000000
+#&gt; 9                    6.34960700                       5.4850770
+#&gt; 10                 140.34770000                      55.4626300
+#&gt;    mcd12q1_lccs1_fs_c16_1500_ed mcd12q1_lccs1_fs_c16_1500_pland
+#&gt; 1                             0                               0
+#&gt; 2                             0                               0
+#&gt; 3                             0                               0
+#&gt; 4                             0                               0
+#&gt; 5                             0                               0
+#&gt; 6                             0                               0
+#&gt; 7                             0                               0
+#&gt; 8                             0                               0
+#&gt; 9                             0                               0
+#&gt; 10                            0                               0
+#&gt;    mcd12q1_lccs1_fs_c21_1500_ed mcd12q1_lccs1_fs_c21_1500_pland
+#&gt; 1                     22.861860                      32.5837100
+#&gt; 2                     53.192940                      53.5446100
+#&gt; 3                      6.286148                      12.8456200
+#&gt; 4                     25.274860                      29.4880500
+#&gt; 5                     22.069560                      23.9928200
+#&gt; 6                     72.763710                      64.9640500
+#&gt; 7                      1.175361                       0.9157576
+#&gt; 8                      2.189837                       1.9130980
+#&gt; 9                     19.421980                      32.3080700
+#&gt; 10                    61.765020                      73.4411600
+#&gt;    mcd12q1_lccs1_fs_c22_1500_ed mcd12q1_lccs1_fs_c22_1500_pland
+#&gt; 1                    27.7817500                      30.9212800
+#&gt; 2                    42.6540700                      50.4776200
+#&gt; 3                     7.6620600                      14.2926100
+#&gt; 4                    17.0204600                      23.4018500
+#&gt; 5                    18.8724400                      17.1532500
+#&gt; 6                    37.6783300                      34.5785400
+#&gt; 7                     0.9907191                       0.8301785
+#&gt; 8                     4.7788170                       2.0469090
+#&gt; 9                    41.9058800                      66.1279300
+#&gt; 10                   43.4596500                      42.7917600
+#&gt;    mcd12q1_lccs1_fs_c255_1500_ed mcd12q1_lccs1_fs_c255_1500_pland
+#&gt; 1                              0                                0
+#&gt; 2                              0                                0
+#&gt; 3                              0                                0
+#&gt; 4                              0                                0
+#&gt; 5                              0                                0
+#&gt; 6                              0                                0
+#&gt; 7                              0                                0
+#&gt; 8                              0                                0
+#&gt; 9                              0                                0
+#&gt; 10                             0                                0
+#&gt;    mcd12q1_lccs1_fs_c31_1500_ed mcd12q1_lccs1_fs_c31_1500_pland
+#&gt; 1                    19.4717800                      25.3155000
+#&gt; 2                    43.1386300                      45.2810800
+#&gt; 3                     2.9219930                       7.0509290
+#&gt; 4                    24.6432400                      17.3307700
+#&gt; 5                    25.4481000                      23.6027600
+#&gt; 6                    31.6919400                      32.9481200
+#&gt; 7                     0.2881879                       0.6854411
+#&gt; 8                     0.9332024                       1.1621300
+#&gt; 9                    10.5408800                      16.3113400
+#&gt; 10                   46.2008300                      39.6852000
+#&gt;    mcd12q1_lccs1_fs_c32_1500_ed mcd12q1_lccs1_fs_c32_1500_pland
+#&gt; 1                    4.19176700                      4.44221000
+#&gt; 2                    9.70928400                      8.83644000
+#&gt; 3                    0.22879560                      0.79073050
+#&gt; 4                   12.58080000                     10.42160000
+#&gt; 5                    2.99687300                      2.48808500
+#&gt; 6                   16.20664000                     14.03066000
+#&gt; 7                    0.07516549                      0.03521078
+#&gt; 8                    0.43417560                      0.67279130
+#&gt; 9                    1.80027400                      1.08300100
+#&gt; 10                  19.92774000                     24.12544000
+#&gt;    mcd12q1_lccs1_fs_c41_1500_ed mcd12q1_lccs1_fs_c41_1500_pland
+#&gt; 1                             0                               0
+#&gt; 2                             0                               0
+#&gt; 3                             0                               0
+#&gt; 4                             0                               0
+#&gt; 5                             0                               0
+#&gt; 6                             0                               0
+#&gt; 7                             0                               0
+#&gt; 8                             0                               0
+#&gt; 9                             0                               0
+#&gt; 10                            0                               0
+#&gt;    mcd12q1_lccs1_fs_c42_1500_ed mcd12q1_lccs1_fs_c42_1500_pland
+#&gt; 1                             0                               0
+#&gt; 2                             0                               0
+#&gt; 3                             0                               0
+#&gt; 4                             0                               0
+#&gt; 5                             0                               0
+#&gt; 6                             0                               0
+#&gt; 7                             0                               0
+#&gt; 8                             0                               0
+#&gt; 9                             0                               0
+#&gt; 10                            0                               0
+#&gt;    mcd12q1_lccs1_fs_c43_1500_ed mcd12q1_lccs1_fs_c43_1500_pland
+#&gt; 1                             0                               0
+#&gt; 2                             0                               0
+#&gt; 3                             0                               0
+#&gt; 4                             0                               0
+#&gt; 5                             0                               0
+#&gt; 6                             0                               0
+#&gt; 7                             0                               0
+#&gt; 8                             0                               0
+#&gt; 9                             0                               0
+#&gt; 10                            0                               0
+#&gt;    mcd12q1_lccs2_fs_c25_1500_ed mcd12q1_lccs2_fs_c25_1500_pland
+#&gt; 1                    11.8997800                      10.2390200
+#&gt; 2                    20.9668900                      21.2857100
+#&gt; 3                     1.1211720                       0.9209590
+#&gt; 4                    12.5088500                      13.0991700
+#&gt; 5                     3.3275580                       3.4273650
+#&gt; 6                    21.1664500                      22.5751300
+#&gt; 7                     0.2056323                       0.4047535
+#&gt; 8                     4.1069130                       1.9476850
+#&gt; 9                     4.9205120                       5.9711220
+#&gt; 10                   25.2547900                      21.9112900
+#&gt;    mcd12q1_lccs2_fs_c35_1500_ed mcd12q1_lccs2_fs_c35_1500_pland
+#&gt; 1                             0                               0
+#&gt; 2                             0                               0
+#&gt; 3                             0                               0
+#&gt; 4                             0                               0
+#&gt; 5                             0                               0
+#&gt; 6                             0                               0
+#&gt; 7                             0                               0
+#&gt; 8                             0                               0
+#&gt; 9                             0                               0
+#&gt; 10                            0                               0
+#&gt;    mcd12q1_lccs2_fs_c36_1500_ed mcd12q1_lccs2_fs_c36_1500_pland
+#&gt; 1                    15.8521200                      30.3875300
+#&gt; 2                    25.5261600                      28.1239600
+#&gt; 3                     4.0767850                       5.3921200
+#&gt; 4                    23.9473300                      12.9201100
+#&gt; 5                     4.7243690                       5.1887840
+#&gt; 6                    28.4678600                      37.3769000
+#&gt; 7                     0.2511085                       0.3493021
+#&gt; 8                     0.9160119                       1.0508390
+#&gt; 9                     7.7205830                       9.7649460
+#&gt; 10                   29.7108400                      30.6608100
+#&gt;    mcd12q1_lccs3_fs_c27_1500_ed mcd12q1_lccs3_fs_c27_1500_pland
+#&gt; 1                    4.44595700                      3.51203700
+#&gt; 2                   17.41136000                     10.04045000
+#&gt; 3                    0.39134740                      0.46287210
+#&gt; 4                    9.50136900                     11.80231000
+#&gt; 5                    6.75439600                      4.75613000
+#&gt; 6                   34.21617000                     34.79181000
+#&gt; 7                    0.07111018                      0.01654412
+#&gt; 8                    0.00000000                      0.00000000
+#&gt; 9                    3.05751700                      3.05953200
+#&gt; 10                  48.37982000                     33.07469000
+#&gt;    mcd12q1_lccs3_fs_c50_1500_ed mcd12q1_lccs3_fs_c50_1500_pland
+#&gt; 1                    7.40833500                      6.82271500
+#&gt; 2                   24.30552000                     12.96813000
+#&gt; 3                    1.67022900                      2.08179300
+#&gt; 4                   11.06195000                     10.86274000
+#&gt; 5                    5.27820000                      3.58529000
+#&gt; 6                   15.37334000                     17.18862000
+#&gt; 7                    0.04681818                      0.01846154
+#&gt; 8                    0.49071630                      0.21196370
+#&gt; 9                    5.62996100                      3.24979200
+#&gt; 10                  27.54641000                     28.70575000
+#&gt;    mcd12q1_lccs3_fs_c51_1500_ed mcd12q1_lccs3_fs_c51_1500_pland
+#&gt; 1                    0.01705263                      0.01818182
+#&gt; 2                    0.00000000                      0.00000000
+#&gt; 3                    0.00000000                      0.00000000
+#&gt; 4                    0.00000000                      0.00000000
+#&gt; 5                    0.00000000                      0.00000000
+#&gt; 6                    0.00000000                      0.00000000
+#&gt; 7                    0.00000000                      0.00000000
+#&gt; 8                    0.00000000                      0.00000000
+#&gt; 9                    0.00000000                      0.00000000
+#&gt; 10                   0.00000000                      0.00000000
+#&gt;    mod44w_oic_fs_c1_1500_ed mod44w_oic_fs_c1_1500_pland
+#&gt; 1                         0                           0
+#&gt; 2                         0                           0
+#&gt; 3                         0                           0
+#&gt; 4                         0                           0
+#&gt; 5                         0                           0
+#&gt; 6                         0                           0
+#&gt; 7                         0                           0
+#&gt; 8                         0                           0
+#&gt; 9                         0                           0
+#&gt; 10                        0                           0
+#&gt;    mod44w_oic_fs_c2_1500_ed mod44w_oic_fs_c2_1500_pland
+#&gt; 1               15.46767000                 14.74223000
+#&gt; 2               33.64474000                 37.68181000
+#&gt; 3                1.34929300                  1.89335200
+#&gt; 4               24.77956000                 16.41344000
+#&gt; 5               12.33578000                 12.92125000
+#&gt; 6               62.44858000                 44.55207000
+#&gt; 7                0.03280719                  0.08289036
+#&gt; 8                1.15728200                  0.47897420
+#&gt; 9                6.16370900                  8.85562600
+#&gt; 10              52.55379000                 45.53346000
+#&gt;    mod44w_oic_fs_c3_1500_ed mod44w_oic_fs_c3_1500_pland northness_median
+#&gt; 1                         0                           0        25.433390
+#&gt; 2                         0                           0        57.628350
+#&gt; 3                         0                           0         3.573285
+#&gt; 4                         0                           0        23.137530
+#&gt; 5                         0                           0        21.966200
+#&gt; 6                         0                           0        97.390090
+#&gt; 7                         0                           0         1.069602
+#&gt; 8                         0                           0         3.939664
+#&gt; 9                         0                           0        11.679120
+#&gt; 10                        0                           0        72.930860
+#&gt;    northness_sd   ntl_mean     ntl_sd   occ_pred       lon      lat
+#&gt; 1    26.0659000 40.4421200 38.0727900         NA -84.76490 42.70233
+#&gt; 2    66.8392900 53.8194000 66.4963200 487.638300 -84.76490 42.70233
+#&gt; 3     6.2836990 18.9002500 14.6203500         NA -83.29157 43.19564
+#&gt; 4    47.0065300 13.1281800 15.3372200  38.836020 -83.29157 43.19564
+#&gt; 5    23.2101800 30.6434000 25.3725400         NA -84.34107 45.36555
+#&gt; 6    93.6506500 48.1280900 61.5661300 490.692100 -84.34107 45.36555
+#&gt; 7     0.3094516  0.4001483  0.3258341         NA -84.39816 44.68508
+#&gt; 8     2.9094090  2.5334110  1.7408370   3.777097 -84.39816 44.68508
+#&gt; 9    11.7714700 43.0598200 43.0754200         NA -84.84778 44.03590
+#&gt; 10   79.8862600 58.1800900 42.0242000 256.427000 -84.84778 44.03590
 #&gt;                          geometry
-#&gt; 1  POLYGON ((-86.71883 39.0992...
-#&gt; 2  POLYGON ((-85.07776 41.6511...
-#&gt; 3  POLYGON ((-87.541 42.09818,...
-#&gt; 4  POLYGON ((-88.31462 39.6926...
-#&gt; 5  POLYGON ((-87.35288 39.9917...
-#&gt; 6  POLYGON ((-86.89208 40.7472...
-#&gt; 7  POLYGON ((-87.95799 40.5814...
-#&gt; 8  POLYGON ((-84.84877 40.5203...
-#&gt; 9  POLYGON ((-87.67774 41.5939...
-#&gt; 10 POLYGON ((-92.56243 43.2470...</div></pre>
+#&gt; 1  POLYGON ((-87.11487 40.3575...
+#&gt; 2  POLYGON ((-87.11487 40.3575...
+#&gt; 3  POLYGON ((-86.28833 40.1847...
+#&gt; 4  POLYGON ((-86.28833 40.1847...
+#&gt; 5  POLYGON ((-87.20825 42.5278...
+#&gt; 6  POLYGON ((-87.20825 42.5278...
+#&gt; 7  POLYGON ((-87.3188 41.74079...
+#&gt; 8  POLYGON ((-87.3188 41.74079...
+#&gt; 9  POLYGON ((-87.1702 41.81103...
+#&gt; 10 POLYGON ((-87.1702 41.81103...</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#value">Value</a></li>
-
       <li><a href="#methods-by-class-">Methods (by class)</a></li>
-      
       <li><a href="#examples">Examples</a></li>
     </ul>
 
   </div>
 </div>
+
 
       <footer>
       <div class="copyright">
@@ -883,13 +892,16 @@ tixels boundaries.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 

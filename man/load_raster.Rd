@@ -4,29 +4,67 @@
 \alias{load_raster}
 \title{Load eBird Status and Trends raster data}
 \usage{
-load_raster(product = c("abundance_umean", "occurrence_umean",
-  "abundance_lower", "abundance_upper", "template"), path)
+load_raster(
+  product = c("abundance", "abundance_seasonal", "count", "occurrence",
+    "abundance_lower", "abundance_upper", "template"),
+  path
+)
 }
 \arguments{
 \item{product}{character; status and trends product to load, options are
-relative abundance, occurrence, and upper and lower bounds on relative
-abundance. It is also possible to return a template raster with no data.}
+relative abundance, seasonal abundance, count, occurrence, and upper and
+lower bounds on relative abundance. It is also possible to return a
+template raster with no data.}
 
 \item{path}{character; full path to the directory containing single species
 eBird Status and Trends products.}
 }
 \value{
-A \code{RasterStack} of data for the given product.
+A \code{RasterStack} with 52 layers for the given product, labelled by
+week. Seasonal abundance is the result of averaging the weekly abundance
+raster layers for each season or across the whole year for resident
+species. The date boundaries used for the seasonal definitions appear in
+\code{ebirdst_runs} and if a season failed review no associated layer will be
+included. There will be up to four layers labelled according to the
+seasons.
 }
 \description{
 Each of the eBird Status and Trends products is packaged as a GeoTIFF file
 with 52 bands, one for each week of the year. This function loads the data
 for a given product and species as a \code{RasterStack} object.
 }
+\details{
+The available raster layers are as follows:
+\itemize{
+\item \code{occurrence}: the expected probability of occurrence of the species,
+ranging from 0 to 1, on an eBird Traveling Count by a skilled eBirder
+starting at the optimal time of day with the optimal search duration and
+distance that maximizes detection of that species in a region.
+\item \code{count}: the expected count of a species, conditional on its occurrence at
+the given locatiion, on an eBird Traveling Count by a skilled eBirder
+starting at the optimal time of day with the optimal search duration and
+distance that maximizes detection of that species in a region.
+\item \code{abundance}: the expected relative abundance, computed as the product of
+the probability of occurrence and the count conditional on occurrence, of the
+species on an eBird Traveling Count by a skilled eBirder starting at the
+optimal time of day with the optimal search duration and distance that
+maximizes detection of that species in a region.
+\item \code{abundance_seasonal}: the expected relative abundance averaged across the
+weeks within each season.
+\item \code{abundance_lower}: the lower 10th quantile of the expected relative
+abundance of the species on an eBird Traveling Count by a skilled eBirder
+starting at the optimal time of day with the optimal search duration and
+distance that maximizes detection of that species in a region.
+\item \code{abundance_upper}: the upper 90th quantile of the expected relative
+abundance of the species on an eBird Traveling Count by a skilled eBirder
+starting at the optimal time of day with the optimal search duration and
+distance that maximizes detection of that species in a region.
+}
+}
 \examples{
 # download example data
 sp_path <- ebirdst_download("example_data")
 
 # load data
-load_raster("abundance_umean", sp_path)
+load_raster("abundance", sp_path)
 }

@@ -25,12 +25,13 @@ address this, we selected a method (described by Maciejewski et al. 2013)
 that first selects an optimal power (the Box-Cox method) for normalizing
 the data, then power transforms the entire year of non-zero data, constructs
 bins with the power-transformed data using standard-deviations, and then
-un-transforms the bins.
+un-transforms the bins. To access a pre-calculated bins for the full annual
+cycle use \code{\link[=load_fac_map_parameters]{load_fac_map_parameters()}}.
 }
 \examples{
 # download and load example abundance data
 sp_path <- ebirdst_download("example_data")
-abd <- load_raster("abundance_umean", sp_path)
+abd <- load_raster("abundance", sp_path)
 \dontshow{
 # crop to speed up cran tests
 e <-  raster::extent(abd)

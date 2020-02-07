@@ -8,11 +8,13 @@
 
 <title>Calculate and map effective extent of selected centroids — calc_effective_extent • ebirdst</title>
 
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
@@ -22,8 +24,9 @@
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -31,11 +34,11 @@
 
 
 
-<meta property="og:title" content="Calculate and map effective extent of selected centroids — calc_effective_extent" />
 
-<meta property="og:description" content="The selection of stixel centroids for analysis of PIs and/or PDs yields an
+<meta property="og:title" content="Calculate and map effective extent of selected centroids — calc_effective_extent" />
+<meta property="og:description" content="The selection of stixel centroids for analysis of predictor importances (PIs) yields an
 effective footprint, or extent, showing the effective location of where the
-information going into the analysis with PIs and/or PDs is based. While a
+information going into the analysis with PIs is based. While a
 bounding box or polygon may be used to select a set of centroids, due to the
 models being fit within large rectangular areas, the information from a set
 of centroids often comes from the core of the selected area. This function
@@ -47,6 +50,7 @@ selected stixels are contributing information, ranging from 0 to 1." />
 
 
 
+
 <!-- mathjax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
@@ -55,6 +59,7 @@ selected stixels are contributing information, ranging from 0 to 1." />
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
+
 
 
   </head>
@@ -73,7 +78,7 @@ selected stixels are contributing information, ranging from 0 to 1." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0.900</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -95,7 +100,6 @@ selected stixels are contributing information, ranging from 0 to 1." />
   <a href="../reference/index.html">Function Reference</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/CornellLabofOrnithology/ebirdst">
@@ -110,6 +114,7 @@ selected stixels are contributing information, ranging from 0 to 1." />
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -121,10 +126,9 @@ selected stixels are contributing information, ranging from 0 to 1." />
     </div>
 
     <div class="ref-description">
-    
-    <p>The selection of stixel centroids for analysis of PIs and/or PDs yields an
+    <p>The selection of stixel centroids for analysis of predictor importances (PIs) yields an
 effective footprint, or extent, showing the effective location of where the
-information going into the analysis with PIs and/or PDs is based. While a
+information going into the analysis with PIs is based. While a
 bounding box or polygon may be used to select a set of centroids, due to the
 models being fit within large rectangular areas, the information from a set
 of centroids often comes from the core of the selected area. This function
@@ -132,11 +136,10 @@ calculates where the highest proportion of information is coming from,
 returns a raster and plots that raster, with the selected area and centroids
 for reference. The legend shows, for each pixel, what percentage of the
 selected stixels are contributing information, ranging from 0 to 1.</p>
-    
     </div>
 
-    <pre class="usage"><span class='fu'>calc_effective_extent</span>(<span class='no'>path</span>, <span class='no'>ext</span>, <span class='kw'>pi_pd</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"pi"</span>, <span class='st'>"pd"</span>), <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
-    
+    <pre class="usage"><span class='fu'>calc_effective_extent</span>(<span class='no'>path</span>, <span class='no'>ext</span>, <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -151,45 +154,41 @@ Trends products for a single species.</p></td>
 extent to filter the data to.</p></td>
     </tr>
     <tr>
-      <th>pi_pd</th>
-      <td><p>character; whether to use predictor importance (<code>"pi"</code>) or
-partial dependence (<code>"pd"</code>) for stixel centroids.</p></td>
-    </tr>
-    <tr>
       <th>plot</th>
       <td><p>logical; whether to plot the results or just return a raster
 without plotting.</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A raster showing the percentage of the selected stixels that are
 contributing to each grid cell. In addition, if <code>plot = TRUE</code> this raster
 will be plotted along with centroid locations and <a href='ebirdst_extent.html'>ebirdst_extent</a>
 boundaries.</p>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># download and load example data</span>
 <span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span>(<span class='st'>"example_data"</span>, <span class='kw'>tifs_only</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; <span class='message'>Data already exists, use force = TRUE to re-download.</span></div><div class='input'>
 <span class='co'># define a spatioremporal extent</span>
-<span class='no'>bb_vec</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='kw'>xmin</span> <span class='kw'>=</span> -<span class='fl'>86</span>, <span class='kw'>xmax</span> <span class='kw'>=</span> -<span class='fl'>84</span>, <span class='kw'>ymin</span> <span class='kw'>=</span> <span class='fl'>41.5</span>, <span class='kw'>ymax</span> <span class='kw'>=</span> <span class='fl'>43.5</span>)
-<span class='no'>e</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_extent.html'>ebirdst_extent</a></span>(<span class='no'>bb_vec</span>, <span class='kw'>t</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"05-01"</span>, <span class='st'>"05-31"</span>))</div><div class='input'><span class='co'># calculate effective extent map</span>
-<span class='no'>eff</span> <span class='kw'>&lt;-</span> <span class='fu'>calc_effective_extent</span>(<span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>sp_path</span>, <span class='kw'>ext</span> <span class='kw'>=</span> <span class='no'>e</span>, <span class='kw'>pi_pd</span> <span class='kw'>=</span> <span class='st'>"pi"</span>)</div><div class='img'><img src='calc_effective_extent-1.png' alt='' width='700' height='433' /></div></pre>
+<span class='no'>bb_vec</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='kw'>xmin</span> <span class='kw'>=</span> -<span class='fl'>86</span>, <span class='kw'>xmax</span> <span class='kw'>=</span> -<span class='fl'>84</span>, <span class='kw'>ymin</span> <span class='kw'>=</span> <span class='fl'>41.5</span>, <span class='kw'>ymax</span> <span class='kw'>=</span> <span class='fl'>43.5</span>)
+<span class='no'>e</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_extent.html'>ebirdst_extent</a></span>(<span class='no'>bb_vec</span>, <span class='kw'>t</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"05-01"</span>, <span class='st'>"05-31"</span>))
+<span class='co'># \donttest{</span>
+<span class='co'># calculate effective extent map</span>
+<span class='no'>eff</span> <span class='kw'>&lt;-</span> <span class='fu'>calc_effective_extent</span>(<span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>sp_path</span>, <span class='kw'>ext</span> <span class='kw'>=</span> <span class='no'>e</span>)</div><div class='img'><img src='calc_effective_extent-1.png' alt='' width='700' height='433' /></div><div class='input'># }
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#value">Value</a></li>
-      
       <li><a href="#examples">Examples</a></li>
     </ul>
 
   </div>
 </div>
+
 
       <footer>
       <div class="copyright">
@@ -197,13 +196,16 @@ boundaries.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 

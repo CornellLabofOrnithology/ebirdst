@@ -15,7 +15,7 @@
 #'   `abd_ppms`. These data frames have 25 rows corresponding to 25 Monte Carlo
 #'   iterations each estimating the PPMs using a spatiotemporal subsample of the
 #'   test data. Columns correspond to the different PPMS. `binary_ppms` contains
-#'   binary or range-based PPMS, `occ_ppms` contains within-range occupancy
+#'   binary or range-based PPMS, `occ_ppms` contains within-range occurrence
 #'   probability PPMS, and `abd_ppms` contains within-range abundance PPMs. In
 #'   some cases, PPMs may be missing, either because there isn't a large enough
 #'   test set within the spatiotemporal extent or because average occurrence or
@@ -25,13 +25,11 @@
 #' @export
 #'
 #' @examples
-
-#'
 #' # download and load example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
 #' # define a spatiotemporal extent to plot
-#' bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
+#' bb_vec <- c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5)
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #' \donttest{
 #' # compute predictive performance metrics
@@ -44,14 +42,15 @@ compute_ppms <- function(path, ext) {
   }
 
   # load the test data and assign names
-  ppm_data <- load_test_data(path = path)
-  ppm_data_raw <- load_test_data_raw(path = path)
+  ppm_data <- load_test_preds(path = path)
+  ppm_data_raw <- load_test_data(path = path)
 
   # add aditional rows from raw data file
-  ppm_data_raw <- ppm_data_raw[c("row_id", "lon", "lat", "dates", "y")]
-  names(ppm_data_raw) <- c("row_id", "lon", "lat", "date", "obs")
-  ppm_data_raw$date <- ppm_data_raw$date - floor(ppm_data_raw$date)
-  ppm_data_raw <- ppm_data_raw[!(ppm_data_raw$row_id %in% ppm_data$row_id), ]
+  # these are assumed zeros and therefore not in test prediciton data
+  ppm_data_raw <- ppm_data_raw[c("sampling_event_id", "lon", "lat", "day", "obs")]
+  ppm_data_raw$date <- ppm_data_raw$day / 366
+  ppm_data_raw$day <- NULL
+  ppm_data_raw <- ppm_data_raw[!(ppm_data_raw$sampling_event_id %in% ppm_data$sampling_event_id), ]
 
   ppm_data <- dplyr::bind_rows(ppm_data, ppm_data_raw)
   rm(ppm_data_raw)
@@ -61,7 +60,8 @@ compute_ppms <- function(path, ext) {
     ppm_data <- ebirdst_subset(ppm_data, ext = ext)
   }
   if (nrow(ppm_data) == 0) {
-    stop("No test data within spatiotemporal extent.")
+    warning("No predicted occurrences within spatiotemporal extent.")
+    return(list(binary_ppms = NULL, occ_ppms = NULL, abd_ppms = NULL))
   }
 
   # static variables
@@ -72,8 +72,7 @@ compute_ppms <- function(path, ext) {
   # min count sample size within range
   count_min_ss <- 50
   count_min_mean <- 0.25
-  # max count
-  count_max <- NA
+  pat_cutoff = 1 / 20
 
   # define ppms
   # binary / range ppms
@@ -96,25 +95,25 @@ compute_ppms <- function(path, ext) {
 
   if (nrow(ppm_data) == 0) {
     warning("No predicted occurrences within spatiotemporal extent.")
-    invisible(NULL)
+    return(list(binary_ppms = NULL, occ_ppms = NULL, abd_ppms = NULL))
   }
 
   # false discovery rate (fdr)
   binom_test_p <- function(x) {
-    if(is.na(x["pat"]) | is.na(x["pi_es"])) {
-      p <- NA
-    } else {
-      p <- stats::binom.test(round(as.numeric(x["pat"]) * as.numeric(x["pi_es"]),
-                                   0),
-                             as.numeric(x["pi_es"]),
-                             (1 / 7),
-                             alternative = "greater")$p.value
+    if (is.na(x["pat"]) | is.na(x["pi_es"])) {
+      return(NA)
     }
+    pat_pi_es <- round(as.numeric(x["pat"]) * as.numeric(x["pi_es"]), 0)
+    p <- stats::binom.test(pat_pi_es, as.numeric(x["pi_es"]),
+                           p = pat_cutoff,
+                           alternative = "greater")
+    p <- p$p.value
+    return(p)
   }
   p_values <- apply(ppm_data, 1, binom_test_p)
   p_adj <- stats::p.adjust(p_values, "fdr")
   # add binary prediction
-  ppm_data$binary <- as.numeric(p_adj < 0.001)
+  ppm_data$binary <- as.numeric(p_adj < 0.01)
   # treat test data out of range with binary = 0
   if (nrow(ppm_data_zeroes) > 0) {
     ppm_data_zeroes$binary <- 0
@@ -126,7 +125,7 @@ compute_ppms <- function(path, ext) {
   ppm_data <- ppm_data[!is.na(ppm_data$binary), ]
   if (nrow(ppm_data) == 0) {
     warning("No predicted occurrences within spatiotemporal extent.")
-    invisible(NULL)
+    return(list(binary_ppms = NULL, occ_ppms = NULL, abd_ppms = NULL))
   }
 
   # monte carlo samples for ppms: binary, spatially balanced sample
@@ -146,7 +145,7 @@ compute_ppms <- function(path, ext) {
   for (i_mc in seq_len(n_mc)) {
     # case control sampling
     sampled <- sample_case_control(ppm_data,
-                                   res = c(10000, 10000),
+                                   res = c(3000, 3000),
                                    t_res = 7 / 365,
                                    n = 1,
                                    jitter = TRUE,
@@ -155,7 +154,7 @@ compute_ppms <- function(path, ext) {
     # index back to full vector
     data_i <- ppm_data[sampled, ]
 
-    # binary occupancy ppms
+    # binary occurrence ppms
     bs$mc_iteration[i_mc] <- i_mc
     bs$sample_size[i_mc] <- nrow(data_i)
     bs$mean[i_mc] <- mean(as.numeric(data_i$obs > 0))
@@ -176,9 +175,9 @@ compute_ppms <- function(path, ext) {
       bs$bernoulli_dev[i_mc] <- bde
     }
 
-    # within range, occupancy rate ppms
+    # within range, occurrence rate ppms
     data_i <- data_i[data_i$binary > 0, ]
-    data_i <- data_i[stats::complete.cases(data_i$pi_mean), ]
+    data_i <- data_i[stats::complete.cases(data_i$pi_median), ]
 
     os$mc_iteration[i_mc] <- i_mc
     os$sample_size[i_mc] <- nrow(data_i)
@@ -187,7 +186,7 @@ compute_ppms <- function(path, ext) {
     if (nrow(data_i) >= occ_min_ss && os$mean[i_mc] >= occ_min_mean) {
       pa_df <- data.frame(blank = "x",
                           obs = as.numeric(data_i$obs > 0),
-                          pred = data_i$pi_mean)
+                          pred = data_i$pi_median)
       pa_mets <- PresenceAbsence::presence.absence.accuracy(pa_df,
                                                             threshold = 0.5,
                                                             na.rm = TRUE,
@@ -209,29 +208,25 @@ compute_ppms <- function(path, ext) {
     }
 
     # within range, expected count ppms
-    # cap count at given max
-    if (!is.na(count_max)) {
-      data_i$obs[data_i$obs > count_max] <- count_max
-    }
     cs$mc_iteration[i_mc] <- i_mc
     cs$sample_size[i_mc] <- nrow(data_i)
     cs$mean[i_mc] <- mean(as.numeric(data_i$obs))
 
-    if(nrow(data_i) >= count_min_ss && cs$mean[i_mc] >= count_min_mean ) {
+    if (nrow(data_i) >= count_min_ss && cs$mean[i_mc] >= count_min_mean) {
       # poisson deviance
       cs$poisson_dev_abd[i_mc] <- poisson_dev(obs = data_i$obs,
-                                              pred = data_i$pi_mu_mean)[3]
+                                              pred = data_i$pi_mu_median)[3]
 
       pdev <- as.numeric(poisson_dev(obs = data_i$obs,
-                                     pred = data_i$pi.mean))
+                                     pred = data_i$pi_median))
       cs$poisson_dev_occ[i_mc] <- poisson_dev(obs = data_i$obs,
-                                              pred = data_i$pi_mean)[3]
+                                              pred = data_i$pi_median)[3]
 
       # spearman's rank correlations
-      cs$spearman_abd[i_mc] <- stats::cor(data_i$pi_mu_mean,
+      cs$spearman_abd[i_mc] <- stats::cor(data_i$pi_mu_median,
                                           data_i$obs,
                                           method = "spearman")
-      cs$spearman_occ[i_mc] <- stats::cor(data_i$pi_mean,
+      cs$spearman_occ[i_mc] <- stats::cor(data_i$pi_median,
                                           data_i$obs,
                                           method = "spearman")
     }
@@ -266,9 +261,14 @@ compute_ppms <- function(path, ext) {
 #' @examples
 #' # download and load example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
+#'
+#' # define a spatiotemporal extent to plot data from
+#' bb_vec <- c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5)
+#' e <- ebirdst_extent(bb_vec, t = c("04-01", "06-30"))
 #' \donttest{
 #' # plot monthly kappa
-#' plot_binary_by_time(path = sp_path, metric = "kappa", n_time_periods = 12)
+#' plot_binary_by_time(path = sp_path, metric = "kappa",
+#'                     ext = e, n_time_periods = 4)
 #' }
 plot_binary_by_time <- function(path,
                                 metric = c("kappa", "auc", "sensitivity",
@@ -313,15 +313,14 @@ plot_binary_by_time <- function(path,
   metric_lab <- c(kappa = "Kappa", auc = "AUC",
                   sensitivity = "Sensitivity",
                   specificity = "Specificity")
-
+  date_limits <- as.Date(paste0(format(t_dates[1], "%Y"), c("-01-01", "-12-31")))
   g <- ggplot2::ggplot(ppms) +
     ggplot2::aes_string(x = "date", y = metric, group = "date") +
     ggplot2::geom_boxplot() +
     ggplot2::ylim(metric_ylim) +
     ggplot2::labs(x = "Date", y = NULL, title = metric_lab[metric]) +
     ggplot2::scale_x_date(date_labels = "%b",
-                          limits = c(as.Date("2016-01-01"),
-                                     as.Date("2016-12-31")),
+                          limits = date_limits,
                           date_breaks = "1 month") +
     ggplot2::theme_light()
   suppressWarnings(print(g))
@@ -348,7 +347,7 @@ plot_binary_by_time <- function(path,
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
 #' # define a spatiotemporal extent to plot data from
-#' bb_vec <- c(xmin = -83, xmax = -82, ymin = 41, ymax = 48)
+#' bb_vec <- c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5)
 #' e <- ebirdst_extent(bb_vec, t = c("04-01", "06-30"))
 #' \donttest{
 #' # plot ppms within extent
@@ -364,7 +363,7 @@ plot_all_ppms <- function(path, ext) {
   # prepare ppms
   ppm_data <- compute_ppms(path = path, ext = ext)
   ppm_data$binary_ppms$type <- "binary"
-  ppm_data$occ_ppms$type <- "occupancy"
+  ppm_data$occ_ppms$type <- "occurrence"
   ppm_data$abd_ppms$type <- "abundance"
   ppm_data <- dplyr::bind_rows(ppm_data)
   ppm_data <- dplyr::select(ppm_data,
@@ -373,7 +372,10 @@ plot_all_ppms <- function(path, ext) {
                             "poisson_dev_abd", "spearman_abd")
 
   # transform to long
-  ppm_data <- tidyr::gather(ppm_data, "metric", "value", -"type")
+  ppm_data <- tidyr::pivot_longer(ppm_data,
+                                  cols = -"type",
+                                  names_to = "metric",
+                                  values_to = "value")
   ppm_data <- ppm_data[!(ppm_data$type == "binary" &
                            ppm_data$metric == "bernoulli_dev"), ]
   ppm_data <- ppm_data[!is.na(ppm_data$value), ]
@@ -396,15 +398,15 @@ plot_all_ppms <- function(path, ext) {
     ggplot2::geom_boxplot(notch = FALSE) +
     ggplot2::ylim(c(0, 1)) +
     ggplot2::labs(x = NULL, y = NULL,
-                  title = "Binary Occupancy PPMs") +
+                  title = "Binary Occurrence PPMs") +
     ggplot2::theme_light() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
 
-  # construct plot for occupancy ppms
-  ppm_o <- ppm_data[ppm_data$type == "occupancy", ]
+  # construct plot for occurrence ppms
+  ppm_o <- ppm_data[ppm_data$type == "occurrence", ]
   # negative check of bernoulli deviance
   medbde <- stats::median(ppm_o$value[ppm_o$metric == "bernoulli_dev"])
-  bderep <- data.frame(type = "occupancy",
+  bderep <- data.frame(type = "occurrence",
                        label = "Bernoulli\nDeviance",
                        value = 0,
                        stringsAsFactors = FALSE)
@@ -415,7 +417,7 @@ plot_all_ppms <- function(path, ext) {
     ggplot2::geom_boxplot(notch = FALSE) +
     ggplot2::ylim(c(0, 1)) +
     ggplot2::labs(x = NULL, y = NULL,
-                  title = "Occupancy Probability PPMs") +
+                  title = "Occurrence Probability PPMs") +
     ggplot2::theme_light() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
   # if the median bernoulli deviance value is below 0, put a red x

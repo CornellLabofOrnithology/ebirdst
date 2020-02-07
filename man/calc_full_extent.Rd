@@ -15,9 +15,11 @@ raster Extent object
 \description{
 After loading a RasterStack of results, there are lots of NA values
 and plots of individual raster layers will display at the full extent of the
-study extent. To show an ideal extent, this function trims away 0 and
-NA values and checks to make sure it returns a reasonable extent for
-plotting. The returned Extent object can then be used for plotting.
+study extent. To show an ideal extent, this function trims away 0 and NA
+values and checks to make sure it returns a reasonable extent for plotting.
+The returned Extent object can then be used for plotting. To access a
+pre-calculated extent for the full annual cycle use
+\code{\link[=load_fac_map_parameters]{load_fac_map_parameters()}}.
 }
 \examples{
 \dontshow{
@@ -30,7 +32,7 @@ calc_full_extent(r)
 \donttest{
 # download and load example abundance data
 sp_path <- ebirdst_download("example_data")
-abd <- load_raster("abundance_umean", sp_path)
+abd <- load_raster("abundance", sp_path)
 
 # calculate full extent
 plot_extent <- calc_full_extent(abd)

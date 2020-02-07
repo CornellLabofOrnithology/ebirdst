@@ -42,7 +42,7 @@ knitr::opts_chunk$set(eval = nzchar(Sys.getenv("BUILD_VIGNETTES")))
 
 The study and conservation of the natural world relies on detailed information about species’ distributions, abundances, environmental associations, and population trends over time. For many taxa, this information is challenging to obtain at relevant geographic scales. The goal of the eBird Status and Trends project is to use data from [eBird](https://eBird.org), the global citizen science bird monitoring administered by Cornell Lab of Ornithology, to generate a reliable, standardized source of biodiversity information for the world’s bird populations. To translate the eBird observations into robust data products, we use statistical models to fill spatiotemporal gaps, using local land cover descriptions derived from NASA MODIS and other remote sensing data, while controlling for biases inherent in species observations collected by volunteers.
 
-This data set provides estimates of the year-round distribution, abundances, and environmental associations for a strategically selected set of 107 North American bird species in 2018. For each species, distribution and abundance estimates are available for all 52 weeks of the year across a regular grid of locations that cover terrestrial North America at a resolution of 2.8km x 2.8km. Variation in detectability associated with the search effort is controlled by standardizing the estimates as the expected occupancy rate and count of the species on a search conducted for one hour while traveling 1 km at the optimal time of day for detection of that species, on the given day at the given location by a skilled eBirder. To describe how each species is associated with features of its local environment, estimates of the relative importance and partial dependence of each remote sensed variable (e.g. land cover, elevation, etc), are available throughout the year at a monthly temporal and regional spatial resolution. Additionally, to assess estimate quality, we provide upper and lower confidence bounds for all abundance estimates and we provide regional-seasonal scale validation metrics for the underlying statistical models.  For more information about the data products see the [FAQ and summaries](https://ebird.org/science/status-and-trends). See (Fink et al. 2018) for more information about the analysis used to generate these data. 
+This data set provides estimates of the year-round distribution, abundances, and environmental associations for a the majority of North American bird species in 2018. For each species, distribution and abundance estimates are available for all 52 weeks of the year across a regular grid of locations that cover terrestrial North and South America at a resolution of 2.8km x 2.8km. Variation in detectability associated with the search effort is controlled by standardizing the estimates as the expected occupancy rate and count of the species on a search conducted for one hour while traveling 1 km at the optimal time of day for detection of that species, on the given day at the given location by a skilled eBirder. To describe how each species is associated with features of its local environment, estimates of the relative importance each remote sensed variable (e.g. land cover, elevation, etc), are available throughout the year at a monthly temporal and regional spatial resolution. Additionally, to assess estimate quality, we provide upper and lower confidence bounds for all abundance estimates and we provide regional-seasonal scale validation metrics for the underlying statistical models.  For more information about the data products see the [FAQ and summaries](https://ebird.org/science/status-and-trends). See (Fink et al. 2018) for more information about the analysis used to generate these data. 
 
 # Data Access
 
@@ -73,64 +73,77 @@ For instruction on how to set up RStudio on an AWS EC2 instance consult [Louis A
 
 ## Data Types
 
-The data products included in the downloads contain two types of data: a) raster data containing occurrence and abundance estimates at a 2.8km resolution for each of 52 week across North America, b) non-raster, tabular, text data containing information about modeled relationships between observations and the ecological covariates, in the form of: predictor importances (PIs), predictor directionality (PDs), and predictive performance metrics (PPMs). The raster data will be the most commonly used data, as it provides high resolution, spatially-explicit information about the abundance and occurrence of each species. The non-raster data is an advanced, modeling-oriented product that requires more understanding about the modeling process.
+The data products included in the downloads contain two types of data: a) raster data containing occurrence and abundance estimates at a 2.8km resolution for each of 52 week across North America, b) non-raster, tabular, text data containing information about modeled relationships between observations and the ecological covariates, in the form of: predictor importances (PIs) and predictive performance metrics (PPMs). The raster data will be the most commonly used data, as it provides high resolution, spatially-explicit information about the abundance and occurrence of each species. The non-raster data is an advanced, modeling-oriented product that requires more understanding about the modeling process.
 
 ## Data Structure
 
-Data are grouped by species, using a unique run name. The structure of the run name is: `six_letter_code-ERD2016-EBIRD_SCIENCE-date-uuid`. A full list of species and run names can be found in the `ebirdst_runs` [data frame](https://cornelllabofornithology.github.io/ebirdst/reference/ebirdst_runs.html). If you are not using the R package you can find a CSV equivalent at the root of the AWS s3 bucket at this [url](https://s3-us-west-2.amazonaws.com/ebirdst-data/ebirdst_run_names.csv). 
+Data are grouped by species, using a unique run name. The structure of the run name is: `six_letter_code-ERD2018-EBIRD_SCIENCE-date-uuid`. A full list of species and run names can be found in the `ebirdst_runs` [data frame](https://cornelllabofornithology.github.io/ebirdst/reference/ebirdst_runs.html). If you are not using the R package you can find a CSV equivalent at the root of the AWS s3 bucket at this [url](https://s3-us-west-2.amazonaws.com/ebirdst-data/ebirdst_run_names.csv). 
 
 For each individual species, the data are structured in the following way:
   
-`/<run_name>/data/ebird.abund_<run_name>_erd.test.data.csv`
+`/<run_name>/data/<run_name>_test-data.csv`
 `/<run_name>/data/<run_name>_srd_raster_template.tif`
-`/<run_name>/results/abund_preds/unpeeled_folds/pd.txt`
-`/<run_name>/results/abund_preds/unpeeled_folds/pi.txt`
-`/<run_name>/results/abund_preds/unpeeled_folds/summary.txt`
-`/<run_name>/results/abund_preds/unpeeled_folds/test.pred.ave.txt`
-`/<run_name>/results/tifs/<run_name>_hr_2016_abundance_umean.tif`
-`/<run_name>/results/tifs/<run_name>_hr_2016_abundance_upper.tif`
-`/<run_name>/results/tifs/<run_name>_hr_2016_abundance_lower.tif`
-`/<run_name>/results/tifs/<run_name>_hr_2016_occurrence_umean.tif`
+`/<run_name>/results/preds/test_pred_ave.txt`
+`/<run_name>/results/stixels/pi.txt`
+`/<run_name>/results/stixels/summary.txt`
+`/<run_name>/results/tifs/<run_name>_hr_2018_abundance_median.tif`
+`/<run_name>/results/tifs/<run_name>_hr_2018_abundance_upper.tif`
+`/<run_name>/results/tifs/<run_name>_hr_2018_abundance_lower.tif`
+`/<run_name>/results/tifs/<run_name>_hr_2018_count_median.tif`
+`/<run_name>/results/tifs/<run_name>_hr_2018_occurrence_median.tif`
+
+In addition, seasonal abundance rasters are provided for those seasons that passed the review process. Up to four layers are provided, structured as follows:
+
+`/<run_name>/results/tifs/<run_name>_hr_2018_abundance_seasonal_<season>.tif`
+
+Where `<season>` is one of `postbreeding_migration`, `prebreeding_migration`,  `nonbreeding`, `breeding`, or `year_round`.
 
 ## Raster Data
 
-eBird Status and Trends abundance and occurrence estimates are currently provided in the widely used GeoTIFF raster format. These are easily opened with the `raster` package in R, as well as with a variety of GIS software tools. Each estimate is stored in a multi-band GeoTIFF file. These "cubes" come with areas of predicted and assumed zeroes, such that any cells that are NA represent areas outside of the area of estimation. All cubes have 52 weeks, even if some weeks are all NA (such as those species that winter entirely outside of North America). The two vignettes that are relevant to the raster data are the [intro mapping vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html) and the [advanced mapping  vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-advanced-mapping.html).
+eBird Status and Trends abundance, count, and occurrence estimates are currently provided in the widely used GeoTIFF raster format. These are easily opened with the `raster` package in R, as well as with a variety of GIS software tools. Each estimate is stored in a multi-band GeoTIFF file. These "cubes" come with areas of predicted and assumed zeroes, such that any cells that are NA represent areas outside of the area of estimation. All cubes have 52 weeks, even if some weeks are all NA (such as those species that winter entirely outside of the study area). In addition, seasonally averaged abundance layers are provided. The two vignettes that are relevant to the raster data are the [intro mapping vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html) and the [advanced mapping  vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-advanced-mapping.html).
 
 The relevant abundance and occurrence estimate GeoTiff files are found under the `/<run_name>/results/tifs/` directory and contain the following files.
 
-`/<run_name>/results/tifs/<run_name>_hr_2016_abundance_umean.tif`
-`/<run_name>/results/tifs/<run_name>_hr_2016_abundance_upper.tif`
-`/<run_name>/results/tifs/<run_name>_hr_2016_abundance_lower.tif`
-`/<run_name>/results/tifs/<run_name>_hr_2016_occurrence_umean.tif`
+`/<run_name>/results/tifs/<run_name>_hr_2018_abundance_median.tif`
+`/<run_name>/results/tifs/<run_name>_hr_2018_abundance_upper.tif`
+`/<run_name>/results/tifs/<run_name>_hr_2018_abundance_lower.tif`
+`/<run_name>/results/tifs/<run_name>_hr_2018_count_median.tif`
+`/<run_name>/results/tifs/<run_name>_hr_2018_occurrence_median.tif`
+`/<run_name>/results/tifs/<run_name>_hr_2018_abundance_seasonal_<season>.tif`
 
 ### Projection
 
-The GeoTIFFs use the same Sinusoidal projection as NASA MODIS data. As part of this package, we provide a template raster (`/<run_name>/data/<run_name_srd_raster_template.tif`), that contains the spatial extent and resolution for the full Western Hemisphere. Note that 2018's results cover only North America. Accessing this raster directly through the package is not necessary, and can be applied elsewhere (e.g., other GIS software). Note that this projection is ideal for analysis, as it is an equal are projection, but is not ideal for mapping. See the [intro mapping vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html) for details on using a more suitable projection for mapping.
+The GeoTIFFs use the same Sinusoidal projection as NASA MODIS data. As part of each data package, a template raster (`/<run_name>/data/<run_name_srd_raster_template.tif`) is provided, that contains the spatial extent and resolution for the full Western Hemisphere. Accessing this raster directly through the package is not necessary, and can be applied elsewhere (e.g., other GIS software). Note that this projection is ideal for analysis, as it is an equal are projection, but is not ideal for mapping. See the [intro mapping vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html) for details on using a more suitable projection for mapping.
     
 ### Raster Layer Descriptions
 
 | Type | Measure | File Name |
 | ---------- | ---------- |  ---------- |
-| occurrence | trimmed mean | `<run_name>_hr_2016_occurrence_umean.tif`  |
-| abundance  | trimmed mean | `<run_name>_hr_2016_abundance_umean.tif` |
-| abundance  | 10th quantile | `<run_name>_hr_2016_abundance_lower.tif`  |
-| abundance  | 90th quantile | `<run_name>_hr_2016_abundance_upper.tif`  |
+| occurrence | median | `<run_name>_hr_2018_occurrence_median.tif`  |
+| count  | median | `<run_name>_hr_2018_count_median.tif` |
+| abundance  | median | `<run_name>_hr_2018_abundance_median.tif` |
+| abundance  | 10th quantile | `<run_name>_hr_2018_abundance_lower.tif`  |
+| abundance  | 90th quantile | `<run_name>_hr_2018_abundance_upper.tif`  |
     
-#### occurrence_umean
+#### `occurrence_median`
 
-This layer represents the mean probability of occurrence, ranging from 0 to 1, for a 1-hour, 1-kilometer eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.
+This layer represents the expected probability of occurrence of the species, ranging from 0 to 1, on an eBird Traveling Count by a skilled eBirder starting at the optimal time of day with the optimal search duration and distance that maximizes detection of that species in a region.
 
-#### abundance_umean
+#### `count_median`
 
-This layer represents the mean estimated relative abundance of the species, defined as the expected number of birds encountered on a 1-hour, 1-kilometer eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.
+This layer represents the expected count of a species, conditional on its occurrence at the given locatiion, on an eBird Traveling Count by a skilled eBirder starting at the optimal time of day with the optimal search duration and distance that maximizes detection of that species in a region.
 
-#### abundance_lower
+#### `abundance_median`
 
-This layer represents the lower 10th quantile of the estimated relative abundance of the species, defined as the expected number of birds encountered on a 1-hour, 1-kilometer eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.
+This layer represents the expected relative abundance, computed as the product of the probability of occurrence and the count conditional on occurrence, of the species on an eBird Traveling Count by a skilled eBirder starting at the optimal time of day with the optimal search duration and distance that maximizes detection of that species in a region.
 
-#### abundance_upper
+#### `abundance_lower`
 
-This layer represents the upper 90th quantile of the estimated relative abundance of the species, defined as the expected number of birds encountered on a 1-hour, 1-kilometer eBird checklist at the optimal time of day for detection of the species by a skilled eBirder.
+This layer represents the lower 10th quantile of the expected relative abundance of the species on an eBird Traveling Count by a skilled eBirder starting at the optimal time of day with the optimal search duration and distance that maximizes detection of that species in a region.
+
+#### `abundance_upper`
+
+This layer represents the upper 90th quantile of the expected relative abundance of the species on an eBird Traveling Count by a skilled eBirder starting at the optimal time of day with the optimal search duration and distance that maximizes detection of that species in a region.
 
 ## Non-raster Data
 
@@ -148,7 +161,7 @@ The `raster` package has a lot of functionality and the `RasterLayer` format is 
 library(raster)
 
 # load trimmed mean abundances
-abunds <- load_raster("abundance_umean", path = sp_path)
+abunds <- load_raster("abundance", path = sp_path)
 
 # use parse_raster_dates() to get actual date objects for each layer
 date_vector <- parse_raster_dates(abunds)
