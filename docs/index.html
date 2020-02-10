@@ -90,9 +90,17 @@
 <p>Alternatively, you can install the development version from GitHub with:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="co"># install.packages("remotes")</span></a>
 <a class="sourceLine" id="cb2-2" data-line-number="2">remotes<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/remotes/man/install_github.html">install_github</a></span>(<span class="st">"CornellLabofOrnithology/ebirdst"</span>)</a></code></pre></div>
-<p>Older versions of the Status and Trends data can be accessed by installing the associated version of <code>ebirdst</code> from GitHub. For example, the 2018 data, corresponding to v0.1.0 of this package, can be accessed with:</p>
+<p>The current version of <code>ebirdst</code> is designed for working with the eBird Status and Trends data estimated for 2018. Older versions of the Status and Trends data can be accessed by installing the associated version of <code>ebirdst</code> from GitHub. For example, 2016 estimates, corresponding to v0.1.0 of this package, can be accessed with:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="co"># install.packages("remotes")</span></a>
 <a class="sourceLine" id="cb3-2" data-line-number="2">remotes<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/remotes/man/install_github.html">install_github</a></span>(<span class="st">"CornellLabofOrnithology/ebirdst@v0.1.0"</span>)</a></code></pre></div>
+</div>
+<div id="citation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#citation" class="anchor"></a>Citation</h2>
+<p>If you use the the eBird Status &amp; Trends data please cite it with:</p>
+<blockquote>
+<p>Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, B. Petersen, C. Wood, I. Davies, B. Sullivan, M. Iliff, S. Kelling. 2019. eBird Status and Trends, Version: November 2019. Cornell Lab of Ornithology, Ithaca, New York. <a href="https://doi.org/10.2173/ebirdst.2019" class="uri">https://doi.org/10.2173/ebirdst.2019</a></p>
+</blockquote>
 </div>
 <div id="vignettes" class="section level2">
 <h2 class="hasAnchor">
@@ -200,7 +208,7 @@
 <a class="sourceLine" id="cb4-93" data-line-number="93"></a>
 <a class="sourceLine" id="cb4-94" data-line-number="94"><span class="co"># add state boundaries on top</span></a>
 <a class="sourceLine" id="cb4-95" data-line-number="95"><span class="kw"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/sf/man/st_geometry.html">st_geometry</a></span>(wh_states), <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="ot">NA</span>, <span class="dt">border =</span> <span class="st">"white"</span>, <span class="dt">lwd =</span> <span class="fl">1.5</span>)</a></code></pre></div>
-<p><img src="README-quick_start-1.png" style="display: block; margin: auto;"></p>
+<p><img src="README-quick_start-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 </div>
   </div>

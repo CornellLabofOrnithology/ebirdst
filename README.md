@@ -25,13 +25,25 @@ Alternatively, you can install the development version from GitHub with:
     # install.packages("remotes")
     remotes::install_github("CornellLabofOrnithology/ebirdst")
 
-Older versions of the Status and Trends data can be accessed by
-installing the associated version of `ebirdst` from GitHub. For example,
-the 2018 data, corresponding to v0.1.0 of this package, can be accessed
-with:
+The current version of `ebirdst` is designed for working with the eBird
+Status and Trends data estimated for 2018. Older versions of the Status
+and Trends data can be accessed by installing the associated version of
+`ebirdst` from GitHub. For example, 2016 estimates, corresponding to
+v0.1.0 of this package, can be accessed with:
 
     # install.packages("remotes")
     remotes::install_github("CornellLabofOrnithology/ebirdst@v0.1.0")
+
+Citation
+--------
+
+If you use the the eBird Status & Trends data please cite it with:
+
+> Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S.
+> Ligocki, B. Petersen, C. Wood, I. Davies, B. Sullivan, M. Iliff, S.
+> Kelling. 2019. eBird Status and Trends, Version: November 2019.
+> Cornell Lab of Ornithology, Ithaca, New York.
+> <a href="https://doi.org/10.2173/ebirdst.2019" class="uri">https://doi.org/10.2173/ebirdst.2019</a>
 
 Vignettes
 ---------
@@ -177,4 +189,4 @@ directly, outside of R.
     # add state boundaries on top
     plot(st_geometry(wh_states), add = TRUE, col = NA, border = "white", lwd = 1.5)
 
-<img src="README-quick_start-1.png" style="display: block; margin: auto;" />
+<img src="README-quick_start-1.png" width="\textwidth" style="display: block; margin: auto;" />

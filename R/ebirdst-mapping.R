@@ -95,19 +95,14 @@ calc_full_extent <- function(x) {
 #' 19(1): 130-140, 2013.
 #'
 #' @examples
+#' \donttest{
 #' # download and load example abundance data
 #' sp_path <- ebirdst_download("example_data")
 #' abd <- load_raster("abundance", sp_path)
-#' \dontshow{
-#' # crop to speed up cran tests
-#' e <-  raster::extent(abd)
-#' e[2] <- e[1] + (e[2] - e[1]) / 4
-#' e[4] <- e[3] + (e[4] - e[3]) / 4
-#' abd <- raster::crop(abd[[30]], e)
-#' }
 #'
 #' # calculate bins for a single week for this example
 #' year_bins <- calc_bins(abd)
+#' }
 calc_bins <- function(x) {
   stopifnot(inherits(x, "Raster"))
   if (all(is.na(suppressWarnings(raster::maxValue(x)))) &
@@ -338,13 +333,13 @@ map_centroids <- function(path, ext) {
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' # download and load example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
 #' # define a spatioremporal extent
 #' bb_vec <- c(xmin = -86, xmax = -84, ymin = 41.5, ymax = 43.5)
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
-#' \donttest{
 #' # calculate effective extent map
 #' eff <- calc_effective_extent(path = sp_path, ext = e)
 #' }

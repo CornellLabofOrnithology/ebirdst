@@ -130,7 +130,7 @@ plot(occ_moll,
 
 ## Calculating Abundance Bins
 
-Mapping relative abundance estimates across the full-annual cycle presents a challenge, in that patterns of concentration and dispersal in abundance change throughout the year, making it difficult to define color bins that suit all seasons and accurately reflect the detail of abundance predictions. To address this, we selected a method (described by Maciejewski et al. 2013) that does a Box-Cox power transformation of the entire year of data, constructs bins with the transformed data using standard deviations, and then un-transforms the bins.
+Mapping relative abundance estimates across the full-annual cycle presents a challenge, in that patterns of concentration and dispersal in abundance change throughout the year, making it difficult to define color bins that suit all seasons and accurately reflect the detail of abundance predictions. To address this, we selected a method (described by Maciejewski et al. 2012) that does a Box-Cox power transformation of the entire year of data, constructs bins with the transformed data using standard deviations, and then un-transforms the bins.
 
 To compare, we first scale the colors linearly, based on the maximum from the entire year. Since the max is quite high, times of the year with low concentration appear flat.
 
@@ -352,4 +352,4 @@ ggplot(plot_frame, aes(x, y)) +
 
 ## References
 
-Ross Maciejewski, Avin Pattah, Sungahn Ko, Ryan Hafen, William S. Cleveland, David S. Ebert. Automated Box-Cox Transformations for Improved Visual Encoding. IEEE Transactions on Visualization and Computer Graphics, 19(1): 130-140, 2013.
+Maciejewski, R., A. Pattah, S. Ko, R. Hafen, W.S. Cleveland, D.S. Ebert. 2012. Automated Box-Cox Transformations for Improved Visual Encoding. IEEE Transactions on Visualization and Computer Graphics, 19(1): 130-140. 

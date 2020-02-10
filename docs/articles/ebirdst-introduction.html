@@ -76,7 +76,7 @@
       <h1>Background, Data Access, and Data Structure</h1>
                         <h4 class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2020-02-07</h4>
+            <h4 class="date">2020-02-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-introduction.Rmd"><code>vignettes/ebirdst-introduction.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-introduction.Rmd</code></div>
@@ -105,7 +105,7 @@
 <h1 class="hasAnchor">
 <a href="#background" class="anchor"></a>Background</h1>
 <p>The study and conservation of the natural world relies on detailed information about species’ distributions, abundances, environmental associations, and population trends over time. For many taxa, this information is challenging to obtain at relevant geographic scales. The goal of the eBird Status and Trends project is to use data from <a href="https://eBird.org">eBird</a>, the global citizen science bird monitoring administered by Cornell Lab of Ornithology, to generate a reliable, standardized source of biodiversity information for the world’s bird populations. To translate the eBird observations into robust data products, we use statistical models to fill spatiotemporal gaps, using local land cover descriptions derived from NASA MODIS and other remote sensing data, while controlling for biases inherent in species observations collected by volunteers.</p>
-<p>This data set provides estimates of the year-round distribution, abundances, and environmental associations for a the majority of North American bird species in 2018. For each species, distribution and abundance estimates are available for all 52 weeks of the year across a regular grid of locations that cover terrestrial North and South America at a resolution of 2.8km x 2.8km. Variation in detectability associated with the search effort is controlled by standardizing the estimates as the expected occupancy rate and count of the species on a search conducted for one hour while traveling 1 km at the optimal time of day for detection of that species, on the given day at the given location by a skilled eBirder. To describe how each species is associated with features of its local environment, estimates of the relative importance each remote sensed variable (e.g. land cover, elevation, etc), are available throughout the year at a monthly temporal and regional spatial resolution. Additionally, to assess estimate quality, we provide upper and lower confidence bounds for all abundance estimates and we provide regional-seasonal scale validation metrics for the underlying statistical models. For more information about the data products see the <a href="https://ebird.org/science/status-and-trends">FAQ and summaries</a>. See (Fink et al. 2018) for more information about the analysis used to generate these data.</p>
+<p>This data set provides estimates of the year-round distribution, abundances, and environmental associations for a the majority of North American bird species in 2018. For each species, distribution and abundance estimates are available for all 52 weeks of the year across a regular grid of locations that cover terrestrial North and South America at a resolution of 2.96 km x 2.96 km. Variation in detectability associated with the search effort is controlled by standardizing the estimates as the expected occupancy rate and count of the species on a search conducted for one hour while traveling 1 km at the optimal time of day for detection of that species, on the given day at the given location by a skilled eBirder. To describe how each species is associated with features of its local environment, estimates of the relative importance each remote sensed variable (e.g. land cover, elevation, etc), are available throughout the year at a monthly temporal and regional spatial resolution. Additionally, to assess estimate quality, we provide upper and lower confidence bounds for all abundance estimates and we provide regional-seasonal scale validation metrics for the underlying statistical models. For more information about the data products see the <a href="https://ebird.org/science/status-and-trends">FAQ and summaries</a>. See Fink et al. (2019) for more information about the analysis used to generate these data.</p>
 </div>
 <div id="data-access" class="section level1">
 <h1 class="hasAnchor">
@@ -134,7 +134,7 @@
 <div id="data-types" class="section level2">
 <h2 class="hasAnchor">
 <a href="#data-types" class="anchor"></a>Data Types</h2>
-<p>The data products included in the downloads contain two types of data: a) raster data containing occurrence and abundance estimates at a 2.8km resolution for each of 52 week across North America, b) non-raster, tabular, text data containing information about modeled relationships between observations and the ecological covariates, in the form of: predictor importances (PIs) and predictive performance metrics (PPMs). The raster data will be the most commonly used data, as it provides high resolution, spatially-explicit information about the abundance and occurrence of each species. The non-raster data is an advanced, modeling-oriented product that requires more understanding about the modeling process.</p>
+<p>The data products included in the downloads contain two types of data: a) raster data containing occurrence and abundance estimates at a 2.96 km resolution for each of 52 week across North America, b) non-raster, tabular, text data containing information about modeled relationships between observations and the ecological covariates, in the form of: predictor importances (PIs) and predictive performance metrics (PPMs). The raster data will be the most commonly used data, as it provides high resolution, spatially-explicit information about the abundance and occurrence of each species. The non-raster data is an advanced, modeling-oriented product that requires more understanding about the modeling process.</p>
 </div>
 <div id="data-structure" class="section level2">
 <h2 class="hasAnchor">
@@ -270,7 +270,7 @@
 <div id="references" class="section level2">
 <h2 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h2>
-<p>Daniel Fink, Tom Auer, Viviana Ruiz-Gutierrez, Wesley M. Hochachka, Alison Johnston, Frank A. La Sorte, Steve Kelling. Modeling Avian Full Annual Cycle Distribution and Population Trends with Citizen Science Data. In Press. bioRxiv 251868; doi: <a href="https://doi.org/10.1101/251868" class="uri">https://doi.org/10.1101/251868</a></p>
+<p>Fink, D., T. Auer, A. Johnston, V. Ruiz‐Gutierrez, W.M. Hochachka, S. Kelling. 2019. Modeling avian full annual cycle distribution and population trends with citizen science data. Ecological Applications, 00(00):e02056. <a href="https://doi.org/10.2173/10.1002/eap.2056" class="uri">https://doi.org/10.2173/10.1002/eap.2056</a></p>
 </div>
 </div>
   </div>

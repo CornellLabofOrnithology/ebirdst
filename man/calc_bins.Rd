@@ -29,19 +29,14 @@ un-transforms the bins. To access a pre-calculated bins for the full annual
 cycle use \code{\link[=load_fac_map_parameters]{load_fac_map_parameters()}}.
 }
 \examples{
+\donttest{
 # download and load example abundance data
 sp_path <- ebirdst_download("example_data")
 abd <- load_raster("abundance", sp_path)
-\dontshow{
-# crop to speed up cran tests
-e <-  raster::extent(abd)
-e[2] <- e[1] + (e[2] - e[1]) / 4
-e[4] <- e[3] + (e[4] - e[3]) / 4
-abd <- raster::crop(abd[[30]], e)
-}
 
 # calculate bins for a single week for this example
 year_bins <- calc_bins(abd)
+}
 }
 \references{
 Ross Maciejewski, Avin Pattah, Sungahn Ko, Ryan Hafen, William S.
