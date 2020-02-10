@@ -25,6 +25,4 @@ Sys.unsetenv("BUILD_VIGNETTES")
 # checks
 devtools::check_win_devel()
 devtools::check_win_release()
-rhub::check_for_cran(platforms = c("windows-x86_64-devel",
-                                   "fedora-clang-devel"),
-                     show_status = FALSE)
+rhub::check_for_cran()

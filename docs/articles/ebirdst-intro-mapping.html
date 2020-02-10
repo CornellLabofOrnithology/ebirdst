@@ -76,7 +76,7 @@
       <h1>Introduction to loading, mapping, and plotting</h1>
                         <h4 class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2020-02-07</h4>
+            <h4 class="date">2020-02-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-intro-mapping.Rmd"><code>vignettes/ebirdst-intro-mapping.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-intro-mapping.Rmd</code></div>
@@ -197,7 +197,7 @@
 <div id="calculating-abundance-bins" class="section level2">
 <h2 class="hasAnchor">
 <a href="#calculating-abundance-bins" class="anchor"></a>Calculating Abundance Bins</h2>
-<p>Mapping relative abundance estimates across the full-annual cycle presents a challenge, in that patterns of concentration and dispersal in abundance change throughout the year, making it difficult to define color bins that suit all seasons and accurately reflect the detail of abundance predictions. To address this, we selected a method (described by Maciejewski et al. 2013) that does a Box-Cox power transformation of the entire year of data, constructs bins with the transformed data using standard deviations, and then un-transforms the bins.</p>
+<p>Mapping relative abundance estimates across the full-annual cycle presents a challenge, in that patterns of concentration and dispersal in abundance change throughout the year, making it difficult to define color bins that suit all seasons and accurately reflect the detail of abundance predictions. To address this, we selected a method (described by Maciejewski et al. 2012) that does a Box-Cox power transformation of the entire year of data, constructs bins with the transformed data using standard deviations, and then un-transforms the bins.</p>
 <p>To compare, we first scale the colors linearly, based on the maximum from the entire year. Since the max is quite high, times of the year with low concentration appear flat.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">year_max &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/raster/man/extremeValues.html">maxValue</a></span>(abunds), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb5-2" data-line-number="2"></a>
@@ -408,7 +408,7 @@
 <div id="references" class="section level2">
 <h2 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h2>
-<p>Ross Maciejewski, Avin Pattah, Sungahn Ko, Ryan Hafen, William S. Cleveland, David S. Ebert. Automated Box-Cox Transformations for Improved Visual Encoding. IEEE Transactions on Visualization and Computer Graphics, 19(1): 130-140, 2013.</p>
+<p>Maciejewski, R., A. Pattah, S. Ko, R. Hafen, W.S. Cleveland, D.S. Ebert. 2012. Automated Box-Cox Transformations for Improved Visual Encoding. IEEE Transactions on Visualization and Computer Graphics, 19(1): 130-140.</p>
 </div>
 </div>
   </div>

@@ -36,7 +36,7 @@ knitr::opts_chunk$set(eval = nzchar(Sys.getenv("BUILD_VIGNETTES")))
 
 # Introduction
 
-Beyond estimates of occurrence and relative abundance, the eBird Status and Trends products contain information about predictor importance as well as predictive performance metrics (PPMs). The PPMs can be used to evaluate statistical performance of the models, either over the entire spatiotemporal extent of the model results, or for a specific region and season. Predictor Importances (PIs) and can be used to understand relationships between occurrence and abundance and predictors, most notably the land cover variables used in the model. The functions described in this section help load this data from the results packages, give tools for assessing predictive performance and predictor importances.
+Beyond estimates of occurrence and relative abundance, the eBird Status and Trends products contain information about predictor importance as well as predictive performance metrics (PPMs). The PPMs can be used to evaluate statistical performance of the models, either over the entire spatiotemporal extent of the model results, or for a specific region and season. Predictor Importances (PIs) and can be used to understand relationships between occurrence and abundance and predictors, most notably the land cover variables used in the model. The functions described in this section help load this data from the results packages, give tools for assessing predictive performance and predictor importances. More details about predictive performance metrics and how they were calculated and interpreted can be found in Fink et al. (2019).
 
 ## Data Structure
 
@@ -124,6 +124,8 @@ plot_all_ppms(sp_path, lp_extent)
 
 ## References
 
-Fink, D., Damoulas, T., & Dave, J. (2013, July). Adaptive Spatio-Temporal Exploratory Models: Hemisphere-wide species distributions from massively crowdsourced eBird data. In AAAI.
+Fink, D., T. Damoulas, & J. Dave, J. 2013. Adaptive Spatio-Temporal Exploratory Models: Hemisphere-wide species distributions from massively crowdsourced eBird data. In Twenty-Seventh AAAI Conference on Artificial Intelligence.
 
-Fink, D., Hochachka, W. M., Zuckerberg, B., Winkler, D. W., Shaby, B., Munson, M. A., … & Kelling, S. (2010). Spatiotemporal exploratory models for broad‐scale survey data. Ecological Applications, 20(8), 2131-2147.
+Fink, D., W.M. Hochachka, B. Zuckerberg, D.W. Winkler, B. Shaby, M.A. Munson, G. Hooker, M. Riedewald, D. Sheldon, & S. Kelling. 2010. Spatiotemporal exploratory models for broad‐scale survey data. Ecological Applications, 20(8), 2131-2147.
+
+Fink, D., T. Auer, A. Johnston, V. Ruiz‐Gutierrez, W.M. Hochachka, & S. Kelling. 2019. Modeling avian full annual cycle distribution and population trends with citizen science data. Ecological Applications, 00(00):e02056. https://doi.org/10.1002/eap.2056
