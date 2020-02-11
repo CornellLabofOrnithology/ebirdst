@@ -41,9 +41,9 @@ If you use the the eBird Status & Trends data please cite it with:
 
 > Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S.
 > Ligocki, B. Petersen, C. Wood, I. Davies, B. Sullivan, M. Iliff, S.
-> Kelling. 2019. eBird Status and Trends, Version: November 2019.
-> Cornell Lab of Ornithology, Ithaca, New York.
-> <a href="https://doi.org/10.2173/ebirdst.2019" class="uri">https://doi.org/10.2173/ebirdst.2019</a>
+> Kelling. 2020. eBird Status and Trends, Data Version: 2018; Released:
+> 2020. Cornell Lab of Ornithology, Ithaca, New York.
+> <a href="https://doi.org/10.2173/ebirdst.2018" class="uri">https://doi.org/10.2173/ebirdst.2018</a>
 
 Vignettes
 ---------
@@ -113,14 +113,13 @@ directly, outside of R.
     # use parse_raster_dates() to get actual date objects for each layer
     date_vector <- parse_raster_dates(abunds)
     print(date_vector)
-    #>  [1] "2018-01-04" "2018-01-11" "2018-01-18" "2018-01-25" "2018-02-01" "2018-02-08" "2018-02-15"
-    #>  [8] "2018-02-22" "2018-03-01" "2018-03-08" "2018-03-15" "2018-03-22" "2018-03-29" "2018-04-05"
-    #> [15] "2018-04-12" "2018-04-19" "2018-04-26" "2018-05-03" "2018-05-10" "2018-05-17" "2018-05-24"
-    #> [22] "2018-05-31" "2018-06-07" "2018-06-14" "2018-06-21" "2018-06-28" "2018-07-06" "2018-07-13"
-    #> [29] "2018-07-20" "2018-07-27" "2018-08-03" "2018-08-10" "2018-08-17" "2018-08-24" "2018-08-31"
-    #> [36] "2018-09-07" "2018-09-14" "2018-09-21" "2018-09-28" "2018-10-05" "2018-10-12" "2018-10-19"
-    #> [43] "2018-10-26" "2018-11-02" "2018-11-09" "2018-11-16" "2018-11-23" "2018-11-30" "2018-12-07"
-    #> [50] "2018-12-14" "2018-12-21" "2018-12-28"
+    #>  [1] "2018-01-04" "2018-01-11" "2018-01-18" "2018-01-25" "2018-02-01" "2018-02-08" "2018-02-15" "2018-02-22"
+    #>  [9] "2018-03-01" "2018-03-08" "2018-03-15" "2018-03-22" "2018-03-29" "2018-04-05" "2018-04-12" "2018-04-19"
+    #> [17] "2018-04-26" "2018-05-03" "2018-05-10" "2018-05-17" "2018-05-24" "2018-05-31" "2018-06-07" "2018-06-14"
+    #> [25] "2018-06-21" "2018-06-28" "2018-07-06" "2018-07-13" "2018-07-20" "2018-07-27" "2018-08-03" "2018-08-10"
+    #> [33] "2018-08-17" "2018-08-24" "2018-08-31" "2018-09-07" "2018-09-14" "2018-09-21" "2018-09-28" "2018-10-05"
+    #> [41] "2018-10-12" "2018-10-19" "2018-10-26" "2018-11-02" "2018-11-09" "2018-11-16" "2018-11-23" "2018-11-30"
+    #> [49] "2018-12-07" "2018-12-14" "2018-12-21" "2018-12-28"
 
     # select a week in the summer
     abund <- abunds[[26]]
@@ -189,4 +188,4 @@ directly, outside of R.
     # add state boundaries on top
     plot(st_geometry(wh_states), add = TRUE, col = NA, border = "white", lwd = 1.5)
 
-<img src="README-quick_start-1.png" width="\textwidth" style="display: block; margin: auto;" />
+<img src="README-quick_start-1.png" style="display: block; margin: auto;" />
