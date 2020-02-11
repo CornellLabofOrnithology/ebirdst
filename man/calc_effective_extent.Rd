@@ -35,13 +35,13 @@ for reference. The legend shows, for each pixel, what percentage of the
 selected stixels are contributing information, ranging from 0 to 1.
 }
 \examples{
+\donttest{
 # download and load example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
 # define a spatioremporal extent
 bb_vec <- c(xmin = -86, xmax = -84, ymin = 41.5, ymax = 43.5)
 e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
-\donttest{
 # calculate effective extent map
 eff <- calc_effective_extent(path = sp_path, ext = e)
 }

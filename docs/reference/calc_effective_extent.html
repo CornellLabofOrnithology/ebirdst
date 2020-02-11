@@ -168,12 +168,12 @@ will be plotted along with centroid locations and <a href='ebirdst_extent.html'>
 boundaries.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># download and load example data</span>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+<span class='co'># download and load example data</span>
 <span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span>(<span class='st'>"example_data"</span>, <span class='kw'>tifs_only</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; <span class='message'>Data already exists, use force = TRUE to re-download.</span></div><div class='input'>
 <span class='co'># define a spatioremporal extent</span>
 <span class='no'>bb_vec</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='kw'>xmin</span> <span class='kw'>=</span> -<span class='fl'>86</span>, <span class='kw'>xmax</span> <span class='kw'>=</span> -<span class='fl'>84</span>, <span class='kw'>ymin</span> <span class='kw'>=</span> <span class='fl'>41.5</span>, <span class='kw'>ymax</span> <span class='kw'>=</span> <span class='fl'>43.5</span>)
 <span class='no'>e</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_extent.html'>ebirdst_extent</a></span>(<span class='no'>bb_vec</span>, <span class='kw'>t</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"05-01"</span>, <span class='st'>"05-31"</span>))
-<span class='co'># \donttest{</span>
 <span class='co'># calculate effective extent map</span>
 <span class='no'>eff</span> <span class='kw'>&lt;-</span> <span class='fu'>calc_effective_extent</span>(<span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>sp_path</span>, <span class='kw'>ext</span> <span class='kw'>=</span> <span class='no'>e</span>)</div><div class='img'><img src='calc_effective_extent-1.png' alt='' width='700' height='433' /></div><div class='input'># }
 </div></pre>
