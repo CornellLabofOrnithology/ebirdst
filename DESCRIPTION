@@ -1,11 +1,16 @@
 Type: Package
 Package: ebirdst
 Title: Access and Analyze eBird Status and Trends Data
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: 
-    c(person(given = "Tom",
-             family = "Auer",
+    c(person(given = "Matthew",
+             family = "Strimas-Mackey",
              role = c("aut", "cre"),
+             email = "mes335@cornell.edu",
+             comment = c(ORCID = "0000-0001-8929-7776")),
+      person(given = "Tom",
+             family = "Auer",
+             role = "aut",
              email = "mta45@cornell.edu",
              comment = c(ORCID = "0000-0001-8619-7147")),
       person(given = "Daniel",
@@ -13,11 +18,6 @@ Authors@R:
              role = "aut",
              email = "df36@cornell.edu",
              comment = c(ORCID = "0000-0002-8368-1248")),
-      person(given = "Matthew",
-             family = "Strimas-Mackey",
-             role = "aut",
-             email = "mes335@cornell.edu",
-             comment = c(ORCID = "0000-0001-8929-7776")),
       person(given = "Cornell Lab of Ornithology",
              role = "cph"))
 Description: Tools to download, map, plot and analyze eBird
