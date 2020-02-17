@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot predictor importances boxplot — plot_pis • ebirdst</title>
+<title>Get the status and trends week that a date falls into — date_to_st_week • ebirdst</title>
 
 
 <!-- jquery -->
@@ -35,11 +35,8 @@
 
 
 
-<meta property="og:title" content="Plot predictor importances boxplot — plot_pis" />
-<meta property="og:description" content="For all of the available predictors in a single set of species eBird
-Status and Trends products, this function makes a bar plot of those relative
-importances, from highest to lowest. Many function parameters allow for
-customized plots." />
+<meta property="og:title" content="Get the status and trends week that a date falls into — date_to_st_week" />
+<meta property="og:description" content="Get the status and trends week that a date falls into" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -114,86 +111,33 @@ customized plots." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot predictor importances boxplot</h1>
-    <small class="dont-index">Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/R/ebirdst-plotting.R'><code>R/ebirdst-plotting.R</code></a></small>
-    <div class="hidden name"><code>plot_pis.Rd</code></div>
+    <h1>Get the status and trends week that a date falls into</h1>
+    <small class="dont-index">Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/R/ebirdst-loading.R'><code>R/ebirdst-loading.R</code></a></small>
+    <div class="hidden name"><code>date_to_st_week.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>For all of the available predictors in a single set of species eBird
-Status and Trends products, this function makes a bar plot of those relative
-importances, from highest to lowest. Many function parameters allow for
-customized plots.</p>
+    <p>Get the status and trends week that a date falls into</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plot_pis</span>(
-  <span class='no'>pis</span>,
-  <span class='no'>ext</span>,
-  <span class='kw'>by_cover_class</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>n_top_pred</span> <span class='kw'>=</span> <span class='fl'>50</span>,
-  <span class='kw'>pretty_names</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>date_to_st_week</span>(<span class='no'>dates</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>pis</th>
-      <td><p>data.frame; predictor importance data from <code><a href='load_pis.html'>load_pis()</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>ext</th>
-      <td><p><a href='ebirdst_extent.html'>ebirdst_extent</a> object; the spatiotemporal extent to
-filter the data to. Required, since results are less meaningful over large
-spatiotemporal extents.</p></td>
-    </tr>
-    <tr>
-      <th>by_cover_class</th>
-      <td><p>logical; whether to aggregate the four FRAGSTATS
-metrics for the land cover classes into single values for the land cover
-classes.</p></td>
-    </tr>
-    <tr>
-      <th>n_top_pred</th>
-      <td><p>integer; how many predictors to show.</p></td>
-    </tr>
-    <tr>
-      <th>pretty_names</th>
-      <td><p>logical; whether to convert cryptic land cover codes to
-readable land cover class names.</p></td>
-    </tr>
-    <tr>
-      <th>plot</th>
-      <td><p>logical; whether to plot predictor importance or just return top
-predictors.</p></td>
+      <th>dates</th>
+      <td><p>a vector of dates.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Plots a boxplot of predictor importance and invisibly returns a named
-vector of top predictors, and their median predictor importance, based on
-the <code>n_top_pred</code> parameter.</p>
+    <p>An integer vector of weeks numbers from 1-52.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># download and load example data</span>
-<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span>(<span class='st'>"example_data"</span>, <span class='kw'>tifs_only</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; <span class='message'>Data already exists, use force = TRUE to re-download.</span></div><div class='input'><span class='no'>pis</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='load_pis.html'>load_pis</a></span>(<span class='no'>sp_path</span>)
-
-<span class='co'># define a spatiotemporal extent to plot data from</span>
-<span class='no'>bb_vec</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='kw'>xmin</span> <span class='kw'>=</span> -<span class='fl'>86</span>, <span class='kw'>xmax</span> <span class='kw'>=</span> -<span class='fl'>83</span>, <span class='kw'>ymin</span> <span class='kw'>=</span> <span class='fl'>41.5</span>, <span class='kw'>ymax</span> <span class='kw'>=</span> <span class='fl'>43.5</span>)
-<span class='no'>e</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_extent.html'>ebirdst_extent</a></span>(<span class='no'>bb_vec</span>, <span class='kw'>t</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"05-01"</span>, <span class='st'>"05-31"</span>))
-
-<span class='no'>top_pred</span> <span class='kw'>&lt;-</span> <span class='fu'>plot_pis</span>(<span class='no'>pis</span>, <span class='kw'>ext</span> <span class='kw'>=</span> <span class='no'>e</span>, <span class='kw'>by_cover_class</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>n_top_pred</span> <span class='kw'>=</span> <span class='fl'>10</span>)</div><div class='img'><img src='plot_pis-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='no'>top_pred</span></div><div class='output co'>#&gt;                Effort Hours                       Score 
-#&gt;                    89.99205                    60.02343 
-#&gt;            Nighttime Lights             Solar Noon Diff 
-#&gt;                    54.64375                    51.94917 
-#&gt;              Sparse Forests        Effort Distance (km) 
-#&gt;                    50.80866                    50.00172 
-#&gt;                         Day                Open Forests 
-#&gt;                    44.98163                    44.98001 
-#&gt; Deciduous Broadleaf Forests            Elevation Median 
-#&gt;                    43.05994                    40.71359 </div></pre>
+    <pre class="examples"><div class='input'><span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"2016-04-08"</span>, <span class='st'>"2018-12-31"</span>, <span class='st'>"2014-01-01"</span>))
+<span class='fu'>date_to_st_week</span>(<span class='no'>d</span>)</div><div class='output co'>#&gt; [1] 14 52  1</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
