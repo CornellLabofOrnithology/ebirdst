@@ -2,19 +2,23 @@
 % Please edit documentation in R/ebirdst-mapping.R
 \name{calc_bins}
 \alias{calc_bins}
-\title{Calculates bins (breaks) based on standard deviations of Box-Cox
-power-transformed data for mapping}
+\title{Calculates bins (breaks) based for mapping}
 \usage{
-calc_bins(x)
+calc_bins(x, method = c("boxcox", "quantile"))
 }
 \arguments{
 \item{x}{RasterStack or RasterBrick; original eBird Status and Trends product
 raster GeoTIFF with 52 bands, one for each week.}
+
+\item{method}{character; method to calculate bins: \code{"boxcox"} for bins based
+on standard deviations of Box-Cox power-transformed data or \code{"quantile"}
+for quantile bins.}
 }
 \value{
 A list with two elements: \code{bins} is a vector containing the break
 points of the bins and \code{power} is the optimal power used to transform data
-when calculating bins.
+when calculating bins. If \code{method = "quantile"} is used, \code{power} will be
+missing.
 }
 \description{
 Mapping species abundance across the full-annual cycle presents a challenge,
@@ -28,6 +32,11 @@ bins with the power-transformed data using standard-deviations, and then
 un-transforms the bins. To access a pre-calculated bins for the full annual
 cycle use \code{\link[=load_fac_map_parameters]{load_fac_map_parameters()}}.
 }
+\details{
+The Box-Cox method used in the online version of Status & Trends is
+used as the default for calculating bins; however, an alternative method
+using quantile-based bins can be used by setting \code{method = "quantile"}.
+}
 \examples{
 \donttest{
 # download and load example abundance data
@@ -35,7 +44,9 @@ sp_path <- ebirdst_download("example_data")
 abd <- load_raster("abundance", sp_path)
 
 # calculate bins for a single week for this example
-year_bins <- calc_bins(abd)
+bins_boxcox <- calc_bins(abd)
+# for some scenarios quantile bins may work better
+bins_quantile <- calc_bins(abd, method = "quantile")
 }
 }
 \references{

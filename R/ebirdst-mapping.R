@@ -66,8 +66,7 @@ calc_full_extent <- function(x) {
 }
 
 
-#' Calculates bins (breaks) based on standard deviations of Box-Cox
-#' power-transformed data for mapping
+#' Calculates bins (breaks) based for mapping
 #'
 #' Mapping species abundance across the full-annual cycle presents a challenge,
 #' in that patterns of concentration and dispersion in abundance change
@@ -82,10 +81,18 @@ calc_full_extent <- function(x) {
 #'
 #' @param x RasterStack or RasterBrick; original eBird Status and Trends product
 #'   raster GeoTIFF with 52 bands, one for each week.
+#' @param method character; method to calculate bins: `"boxcox"` for bins based
+#'   on standard deviations of Box-Cox power-transformed data or `"quantile"`
+#'   for quantile bins.
 #'
 #' @return A list with two elements: `bins` is a vector containing the break
 #'   points of the bins and `power` is the optimal power used to transform data
-#'   when calculating bins.
+#'   when calculating bins. If `method = "quantile"` is used, `power` will be
+#'   missing.
+#'
+#' @details The Box-Cox method used in the online version of Status & Trends is
+#'   used as the default for calculating bins; however, an alternative method
+#'   using quantile-based bins can be used by setting `method = "quantile"`.
 #'
 #' @export
 #'
@@ -101,10 +108,13 @@ calc_full_extent <- function(x) {
 #' abd <- load_raster("abundance", sp_path)
 #'
 #' # calculate bins for a single week for this example
-#' year_bins <- calc_bins(abd)
+#' bins_boxcox <- calc_bins(abd)
+#' # for some scenarios quantile bins may work better
+#' bins_quantile <- calc_bins(abd, method = "quantile")
 #' }
-calc_bins <- function(x) {
+calc_bins <- function(x, method = c("boxcox", "quantile")) {
   stopifnot(inherits(x, "Raster"))
+  method <- match.arg(method)
   if (all(is.na(suppressWarnings(raster::maxValue(x)))) &
       all(is.na(suppressWarnings(raster::minValue(x))))) {
     stop("Input Raster* object must have non-NA values.")
@@ -120,69 +130,78 @@ calc_bins <- function(x) {
     stop("Raster must have at least 2 non-zero values to calculate bins")
   }
 
-  # box-cox transform
-  pt <- car::powerTransform(vals_for_pt)
-  this_power <- pt$lambda
+  if (method == "boxcox") {
+    # box-cox transform
+    pt <- car::powerTransform(vals_for_pt)
+    this_power <- pt$lambda
 
-  lzwk <- vals_for_pt ^ this_power
-  rm(zrv)
+    lzwk <- vals_for_pt^this_power
+    rm(zrv)
 
-  # setup the binning structure
-  # calculate metrics
-  maxl <- max(lzwk, na.rm = TRUE)
-  minl <- min(lzwk, na.rm = TRUE)
-  mdl <- mean(lzwk, na.rm = TRUE)
-  sdl <- stats::sd(lzwk, na.rm = TRUE)
-  rm(lzwk)
+    # setup the binning structure
+    # calculate metrics
+    maxl <- max(lzwk, na.rm = TRUE)
+    minl <- min(lzwk, na.rm = TRUE)
+    mdl <- mean(lzwk, na.rm = TRUE)
+    sdl <- stats::sd(lzwk, na.rm = TRUE)
+    rm(lzwk)
 
-  # build a vector of bins
-  log_sd <- c(mdl - (3.00 * sdl), mdl - (2.50 * sdl), mdl - (2.00 * sdl),
-              mdl - (1.75 * sdl), mdl - (1.50 * sdl), mdl - (1.25 * sdl),
-              mdl - (1.00 * sdl), mdl - (0.75 * sdl), mdl - (0.50 * sdl),
-              mdl - (0.25 * sdl), mdl - (0.125 * sdl),
-              mdl,
-              mdl + (0.125 * sdl), mdl + (0.25 * sdl),
-              mdl + (0.50 * sdl), mdl + (0.75 * sdl), mdl + (1.00 * sdl),
-              mdl + (1.25 * sdl), mdl + (1.50 * sdl), mdl + (1.75 * sdl),
-              mdl + (2.00 * sdl), mdl + (2.50 * sdl), mdl + (3.00 * sdl))
+    # build a vector of bins
+    log_sd <- c(mdl - (3.00 * sdl), mdl - (2.50 * sdl), mdl - (2.00 * sdl),
+                mdl - (1.75 * sdl), mdl - (1.50 * sdl), mdl - (1.25 * sdl),
+                mdl - (1.00 * sdl), mdl - (0.75 * sdl), mdl - (0.50 * sdl),
+                mdl - (0.25 * sdl), mdl - (0.125 * sdl),
+                mdl,
+                mdl + (0.125 * sdl), mdl + (0.25 * sdl),
+                mdl + (0.50 * sdl), mdl + (0.75 * sdl), mdl + (1.00 * sdl),
+                mdl + (1.25 * sdl), mdl + (1.50 * sdl), mdl + (1.75 * sdl),
+                mdl + (2.00 * sdl), mdl + (2.50 * sdl), mdl + (3.00 * sdl))
 
-  # lots of checks for values outside of the upper and lower bounds
+    # lots of checks for values outside of the upper and lower bounds
 
-  # remove +3 sd break if it is greater than max
-  if (maxl < mdl + (3.00 * sdl)) {
-    log_sd <- log_sd[1:length(log_sd) - 1]
-  }
+    # remove +3 sd break if it is greater than max
+    if (maxl < mdl + (3.00 * sdl)) {
+      log_sd <- log_sd[1:length(log_sd) - 1]
+    }
 
-  # add max if the max is greater than +3 sd break
-  if (maxl > mdl + (3.00 * sdl) | maxl > log_sd[length(log_sd)]) {
-    log_sd <- append(log_sd, maxl)
-  }
+    # add max if the max is greater than +3 sd break
+    if (maxl > mdl + (3.00 * sdl) | maxl > log_sd[length(log_sd)]) {
+      log_sd <- append(log_sd, maxl)
+    }
 
-  # remove the -3 sd break if it is less than the min
-  if (minl > mdl - (3.00 * sdl)) {
-    log_sd <- log_sd[2:length(log_sd)]
-  }
+    # remove the -3 sd break if it is less than the min
+    if (minl > mdl - (3.00 * sdl)) {
+      log_sd <- log_sd[2:length(log_sd)]
+    }
 
-  # add min if the min is less than -3 sd break
-  if (minl < mdl - (3.00 * sdl) | minl < log_sd[1]) {
-    log_sd <- append(log_sd, minl, after = 0)
-  }
+    # add min if the min is less than -3 sd break
+    if (minl < mdl - (3.00 * sdl) | minl < log_sd[1]) {
+      log_sd <- append(log_sd, minl, after = 0)
+    }
 
-  if (log_sd[1] < 0) {
-    log_sd[1] <- 0.01 ^ this_power
-  }
+    if (log_sd[1] < 0) {
+      log_sd[1] <- 0.01 ^ this_power
+    }
 
-  if (log_sd[1] ^ (1 / this_power) < 0.01) {
-    log_sd[1] <- 0.01 ^ this_power
-  }
+    if (log_sd[1] ^ (1 / this_power) < 0.01) {
+      log_sd[1] <- 0.01 ^ this_power
+    }
 
-  # untransform
-  bins <- log_sd ^ (1 / this_power)
-  rm(log_sd)
+    # untransform
+    bins <- log_sd ^ (1 / this_power)
+    rm(log_sd)
 
-  # if transform power was negative, flip bins
-  if (this_power < 0) {
-    bins <- rev(bins)
+    # if transform power was negative, flip bins
+    if (this_power < 0) {
+      bins <- rev(bins)
+    }
+  } else if (method == "quantile") {
+    bins <- stats::quantile(vals_for_pt,
+                            probs = seq(from = 0, to = 1, by = 0.05),
+                            na.rm = TRUE)
+    this_power <- NULL
+  } else {
+    stop(paste("unrecognized binning method:", method))
   }
 
   return(list(bins = sort(unname(bins)), power = unname(this_power)))
