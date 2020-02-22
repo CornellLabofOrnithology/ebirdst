@@ -6,8 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Calculates bins (breaks) based on standard deviations of Box-Cox
-power-transformed data for mapping — calc_bins • ebirdst</title>
+<title>Calculates bins (breaks) based for mapping — calc_bins • ebirdst</title>
 
 
 <!-- jquery -->
@@ -36,8 +35,7 @@ power-transformed data for mapping — calc_bins • ebirdst</title>
 
 
 
-<meta property="og:title" content="Calculates bins (breaks) based on standard deviations of Box-Cox
-power-transformed data for mapping — calc_bins" />
+<meta property="og:title" content="Calculates bins (breaks) based for mapping — calc_bins" />
 <meta property="og:description" content="Mapping species abundance across the full-annual cycle presents a challenge,
 in that patterns of concentration and dispersion in abundance change
 throughout the year, making it difficult to define color bins that suit all
@@ -122,8 +120,7 @@ cycle use load_fac_map_parameters()." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Calculates bins (breaks) based on standard deviations of Box-Cox
-power-transformed data for mapping</h1>
+    <h1>Calculates bins (breaks) based for mapping</h1>
     <small class="dont-index">Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/R/ebirdst-mapping.R'><code>R/ebirdst-mapping.R</code></a></small>
     <div class="hidden name"><code>calc_bins.Rd</code></div>
     </div>
@@ -141,7 +138,7 @@ un-transforms the bins. To access a pre-calculated bins for the full annual
 cycle use <code><a href='load_fac_map_parameters.html'>load_fac_map_parameters()</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>calc_bins</span>(<span class='no'>x</span>)</pre>
+    <pre class="usage"><span class='fu'>calc_bins</span>(<span class='no'>x</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"boxcox"</span>, <span class='st'>"quantile"</span>))</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -151,13 +148,25 @@ cycle use <code><a href='load_fac_map_parameters.html'>load_fac_map_parameters()
       <td><p>RasterStack or RasterBrick; original eBird Status and Trends product
 raster GeoTIFF with 52 bands, one for each week.</p></td>
     </tr>
+    <tr>
+      <th>method</th>
+      <td><p>character; method to calculate bins: <code>"boxcox"</code> for bins based
+on standard deviations of Box-Cox power-transformed data or <code>"quantile"</code>
+for quantile bins.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A list with two elements: <code>bins</code> is a vector containing the break
 points of the bins and <code>power</code> is the optimal power used to transform data
-when calculating bins.</p>
+when calculating bins. If <code>method = "quantile"</code> is used, <code>power</code> will be
+missing.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>The Box-Cox method used in the online version of Status &amp; Trends is
+used as the default for calculating bins; however, an alternative method
+using quantile-based bins can be used by setting <code>method = "quantile"</code>.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Ross Maciejewski, Avin Pattah, Sungahn Ko, Ryan Hafen, William S.
@@ -171,7 +180,9 @@ Visual Encoding. IEEE Transactions on Visualization and Computer Graphics,
 <span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span>(<span class='st'>"example_data"</span>)</div><div class='output co'>#&gt; <span class='message'>Data already exists, use force = TRUE to re-download.</span></div><div class='input'><span class='no'>abd</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='load_raster.html'>load_raster</a></span>(<span class='st'>"abundance"</span>, <span class='no'>sp_path</span>)
 
 <span class='co'># calculate bins for a single week for this example</span>
-<span class='no'>year_bins</span> <span class='kw'>&lt;-</span> <span class='fu'>calc_bins</span>(<span class='no'>abd</span>)
+<span class='no'>bins_boxcox</span> <span class='kw'>&lt;-</span> <span class='fu'>calc_bins</span>(<span class='no'>abd</span>)
+<span class='co'># for some scenarios quantile bins may work better</span>
+<span class='no'>bins_quantile</span> <span class='kw'>&lt;-</span> <span class='fu'>calc_bins</span>(<span class='no'>abd</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"quantile"</span>)
 <span class='co'># }</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -179,6 +190,7 @@ Visual Encoding. IEEE Transactions on Visualization and Computer Graphics,
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#details">Details</a></li>
       <li><a href="#references">References</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
