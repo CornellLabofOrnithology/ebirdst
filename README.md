@@ -39,12 +39,13 @@ Citation
 
 If you use the the eBird Status & Trends data please cite it with:
 
-> Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S.
-> Ligocki, B. Petersen, C. Wood, I. Davies, B. Sullivan, M. Iliff, S.
-> Kelling. 2020. eBird Status and Trends, Data Version: 2018; Released:
-> 2020. Cornell Lab of Ornithology, Ithaca, New York.
-> <a href="https://doi.org/10.2173/ebirdst.2018" class="uri">https://doi.org/10.2173/ebirdst.2018</a>
-
+<blockquote>
+Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S.
+Ligocki, B. Petersen, C. Wood, I. Davies, B. Sullivan, M. Iliff, S.
+Kelling. 2020. eBird Status and Trends, Data Version: 2018; Released:
+2020. Cornell Lab of Ornithology, Ithaca, New York.
+<a href="https://doi.org/10.2173/ebirdst.2018" class="uri">https://doi.org/10.2173/ebirdst.2018</a>
+</blockquote>
 Vignettes
 ---------
 
