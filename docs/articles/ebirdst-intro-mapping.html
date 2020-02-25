@@ -76,7 +76,7 @@
       <h1>Introduction to loading, mapping, and plotting</h1>
                         <h4 class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2020-02-23</h4>
+            <h4 class="date">2020-02-25</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-intro-mapping.Rmd"><code>vignettes/ebirdst-intro-mapping.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-intro-mapping.Rmd</code></div>
@@ -264,7 +264,7 @@
 <a href="#mapping-abundance" class="anchor"></a>Mapping Abundance</h2>
 <p>As seen in the map above, the <code>calc_bins</code> method excludes zeroes. However, with color bins that accurately represent the data distribution, we can add in details about zeroes, tweak the legend, and add some reference data to make a complete map. Like the quick start guide, this will show you how to download example data and plot abundance values similar to how they are plotted for the <a href="https://ebird.org/science/status-and-trends/woothr/abundance-map-weekly">eBird Status and Trends Abundance animations</a>.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="co"># to add context, let's pull in some reference data to add</span></a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">wh_states &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/rnaturalearth/man/ne_states.html">ne_states</a></span>(<span class="dt">country =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"United States of America"</span>, <span class="st">"Canada"</span>),</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2">wh_states &lt;-<span class="st"> </span><span class="kw"><a href="https://docs.ropensci.org/rnaturalearth/reference/ne_states.html">ne_states</a></span>(<span class="dt">country =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"United States of America"</span>, <span class="st">"Canada"</span>),</a>
 <a class="sourceLine" id="cb7-3" data-line-number="3">                    <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb7-4" data-line-number="4"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/sf/man/st_transform.html">st_transform</a></span>(<span class="dt">crs =</span> mollweide) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb7-5" data-line-number="5"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/sf/man/st_geometry.html">st_geometry</a></span>()</a>
@@ -375,7 +375,7 @@
 <p><img src="ebirdst-intro-mapping_files/figure-html/trajectories-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 <p>It is also possible to extract trajectories for regions, but it takes a little more data work.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="co"># set an extent based on polygon</span></a>
-<a class="sourceLine" id="cb10-2" data-line-number="2">mi &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/rnaturalearth/man/ne_states.html">ne_states</a></span>(<span class="dt">country =</span> <span class="st">"United States of America"</span>, <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb10-2" data-line-number="2">mi &lt;-<span class="st"> </span><span class="kw"><a href="https://docs.ropensci.org/rnaturalearth/reference/ne_states.html">ne_states</a></span>(<span class="dt">country =</span> <span class="st">"United States of America"</span>, <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb10-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/sf/man/st_transform.html">st_transform</a></span>(<span class="dt">crs =</span> <span class="kw"><a href="https://rdrr.io/pkg/raster/man/projection.html">projection</a></span>(abunds))</a>
 <a class="sourceLine" id="cb10-4" data-line-number="4">mi &lt;-<span class="st"> </span>mi[mi<span class="op">$</span>name <span class="op">==</span><span class="st"> "Michigan"</span>]</a>
 <a class="sourceLine" id="cb10-5" data-line-number="5"></a>

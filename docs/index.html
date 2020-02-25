@@ -137,82 +137,81 @@ Kelling. 2020. eBird Status and Trends, Data Version: 2018; Released:
 <a class="sourceLine" id="cb4-18" data-line-number="18"><span class="co"># use parse_raster_dates() to get actual date objects for each layer</span></a>
 <a class="sourceLine" id="cb4-19" data-line-number="19">date_vector &lt;-<span class="st"> </span><span class="kw"><a href="reference/parse_raster_dates.html">parse_raster_dates</a></span>(abunds)</a>
 <a class="sourceLine" id="cb4-20" data-line-number="20"><span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(date_vector)</a>
-<a class="sourceLine" id="cb4-21" data-line-number="21"><span class="co">#&gt;  [1] "2018-01-04" "2018-01-11" "2018-01-18" "2018-01-25" "2018-02-01" "2018-02-08"</span></a>
-<a class="sourceLine" id="cb4-22" data-line-number="22"><span class="co">#&gt;  [7] "2018-02-15" "2018-02-22" "2018-03-01" "2018-03-08" "2018-03-15" "2018-03-22"</span></a>
-<a class="sourceLine" id="cb4-23" data-line-number="23"><span class="co">#&gt; [13] "2018-03-29" "2018-04-05" "2018-04-12" "2018-04-19" "2018-04-26" "2018-05-03"</span></a>
-<a class="sourceLine" id="cb4-24" data-line-number="24"><span class="co">#&gt; [19] "2018-05-10" "2018-05-17" "2018-05-24" "2018-05-31" "2018-06-07" "2018-06-14"</span></a>
-<a class="sourceLine" id="cb4-25" data-line-number="25"><span class="co">#&gt; [25] "2018-06-21" "2018-06-28" "2018-07-06" "2018-07-13" "2018-07-20" "2018-07-27"</span></a>
-<a class="sourceLine" id="cb4-26" data-line-number="26"><span class="co">#&gt; [31] "2018-08-03" "2018-08-10" "2018-08-17" "2018-08-24" "2018-08-31" "2018-09-07"</span></a>
-<a class="sourceLine" id="cb4-27" data-line-number="27"><span class="co">#&gt; [37] "2018-09-14" "2018-09-21" "2018-09-28" "2018-10-05" "2018-10-12" "2018-10-19"</span></a>
-<a class="sourceLine" id="cb4-28" data-line-number="28"><span class="co">#&gt; [43] "2018-10-26" "2018-11-02" "2018-11-09" "2018-11-16" "2018-11-23" "2018-11-30"</span></a>
-<a class="sourceLine" id="cb4-29" data-line-number="29"><span class="co">#&gt; [49] "2018-12-07" "2018-12-14" "2018-12-21" "2018-12-28"</span></a>
-<a class="sourceLine" id="cb4-30" data-line-number="30"></a>
-<a class="sourceLine" id="cb4-31" data-line-number="31"><span class="co"># select a week in the summer</span></a>
-<a class="sourceLine" id="cb4-32" data-line-number="32">abund &lt;-<span class="st"> </span>abunds[[<span class="dv">26</span>]]</a>
-<a class="sourceLine" id="cb4-33" data-line-number="33"><span class="kw"><a href="https://rdrr.io/r/base/rm.html">rm</a></span>(abunds)</a>
-<a class="sourceLine" id="cb4-34" data-line-number="34"></a>
-<a class="sourceLine" id="cb4-35" data-line-number="35"><span class="co"># project to mollweide for mapping</span></a>
-<a class="sourceLine" id="cb4-36" data-line-number="36"><span class="co"># the nearest neighbor method preserves cell values across projections</span></a>
-<a class="sourceLine" id="cb4-37" data-line-number="37">mollweide &lt;-<span class="st"> "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"</span></a>
-<a class="sourceLine" id="cb4-38" data-line-number="38">abund_moll &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/raster/man/projectRaster.html">projectRaster</a></span>(abund, <span class="dt">crs =</span> mollweide, <span class="dt">method =</span> <span class="st">"ngb"</span>)</a>
-<a class="sourceLine" id="cb4-39" data-line-number="39"></a>
-<a class="sourceLine" id="cb4-40" data-line-number="40"><span class="co"># get reference data from the rnaturalearth package</span></a>
-<a class="sourceLine" id="cb4-41" data-line-number="41"><span class="co"># the example data currently shows only the US state of Michigan</span></a>
-<a class="sourceLine" id="cb4-42" data-line-number="42">wh_states &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/rnaturalearth/man/ne_states.html">ne_states</a></span>(<span class="dt">country =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"United States of America"</span>, <span class="st">"Canada"</span>),</a>
-<a class="sourceLine" id="cb4-43" data-line-number="43">                    <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb4-44" data-line-number="44"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/sf/man/st_transform.html">st_transform</a></span>(<span class="dt">crs =</span> mollweide) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb4-45" data-line-number="45"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/sf/man/st_geometry.html">st_geometry</a></span>()</a>
-<a class="sourceLine" id="cb4-46" data-line-number="46">  </a>
-<a class="sourceLine" id="cb4-47" data-line-number="47"><span class="co"># calculate ideal color bins for abundance values for this week</span></a>
-<a class="sourceLine" id="cb4-48" data-line-number="48">week_bins &lt;-<span class="st"> </span><span class="kw"><a href="reference/calc_bins.html">calc_bins</a></span>(abund_moll)</a>
-<a class="sourceLine" id="cb4-49" data-line-number="49"></a>
-<a class="sourceLine" id="cb4-50" data-line-number="50"><span class="co"># start plotting</span></a>
-<a class="sourceLine" id="cb4-51" data-line-number="51"><span class="kw"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span>, <span class="dv">1</span>), <span class="dt">mar =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">6</span>))</a>
-<a class="sourceLine" id="cb4-52" data-line-number="52"></a>
-<a class="sourceLine" id="cb4-53" data-line-number="53"><span class="co"># use raster bounding box to set the spatial extent for the plot</span></a>
-<a class="sourceLine" id="cb4-54" data-line-number="54">bb &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/sf/man/st_as_sfc.html">st_as_sfc</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/sf/man/st_bbox.html">st_bbox</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/raster/man/trim.html">trim</a></span>(abund_moll)))</a>
-<a class="sourceLine" id="cb4-55" data-line-number="55"><span class="kw"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span>(bb, <span class="dt">col =</span> <span class="st">"white"</span>, <span class="dt">border =</span> <span class="st">"white"</span>)</a>
-<a class="sourceLine" id="cb4-56" data-line-number="56"></a>
-<a class="sourceLine" id="cb4-57" data-line-number="57"><span class="co"># add background reference data</span></a>
-<a class="sourceLine" id="cb4-58" data-line-number="58"><span class="kw"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span>(wh_states, <span class="dt">col =</span> <span class="st">"#eeeeee"</span>, <span class="dt">border =</span> <span class="ot">NA</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb4-59" data-line-number="59"></a>
-<a class="sourceLine" id="cb4-60" data-line-number="60"><span class="co"># plot zeroes as gray</span></a>
-<a class="sourceLine" id="cb4-61" data-line-number="61"><span class="kw"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span>(abund_moll <span class="op">==</span><span class="st"> </span><span class="dv">0</span>, <span class="dt">col =</span> <span class="st">"#dddddd"</span>, </a>
-<a class="sourceLine" id="cb4-62" data-line-number="62">     <span class="dt">maxpixels =</span> <span class="kw"><a href="https://rdrr.io/pkg/raster/man/ncell.html">ncell</a></span>(abund_moll),</a>
-<a class="sourceLine" id="cb4-63" data-line-number="63">     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb4-64" data-line-number="64"></a>
-<a class="sourceLine" id="cb4-65" data-line-number="65"><span class="co"># define color bins</span></a>
-<a class="sourceLine" id="cb4-66" data-line-number="66">qcol &lt;-<span class="st"> </span><span class="kw"><a href="reference/abundance_palette.html">abundance_palette</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(week_bins<span class="op">$</span>bins) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="st">"weekly"</span>)</a>
-<a class="sourceLine" id="cb4-67" data-line-number="67"></a>
-<a class="sourceLine" id="cb4-68" data-line-number="68"><span class="co"># plot abundances</span></a>
-<a class="sourceLine" id="cb4-69" data-line-number="69"><span class="kw"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span>(abund_moll, <span class="dt">col =</span> qcol, <span class="dt">breaks =</span> week_bins<span class="op">$</span>bins,</a>
-<a class="sourceLine" id="cb4-70" data-line-number="70">     <span class="dt">maxpixels =</span> <span class="kw"><a href="https://rdrr.io/pkg/raster/man/ncell.html">ncell</a></span>(abund_moll),</a>
-<a class="sourceLine" id="cb4-71" data-line-number="71">     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb4-72" data-line-number="72"></a>
-<a class="sourceLine" id="cb4-73" data-line-number="73"><span class="co"># for legend, create a smaller set of bin labels</span></a>
-<a class="sourceLine" id="cb4-74" data-line-number="74">bin_labels &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/format.html">format</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(week_bins<span class="op">$</span>bins, <span class="dv">2</span>), <span class="dt">nsmall =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb4-75" data-line-number="75">bin_labels[<span class="op">!</span>(bin_labels <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(bin_labels[<span class="dv">1</span>],</a>
-<a class="sourceLine" id="cb4-76" data-line-number="76">                               bin_labels[<span class="kw"><a href="https://rdrr.io/r/base/Round.html">round</a></span>((<span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(bin_labels) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>)) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>],</a>
-<a class="sourceLine" id="cb4-77" data-line-number="77">                               bin_labels[<span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(bin_labels)]))] &lt;-<span class="st"> ""</span></a>
-<a class="sourceLine" id="cb4-78" data-line-number="78">bin_labels &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"0"</span>, bin_labels)</a>
-<a class="sourceLine" id="cb4-79" data-line-number="79"></a>
-<a class="sourceLine" id="cb4-80" data-line-number="80"><span class="co"># create colors that include gray for 0</span></a>
-<a class="sourceLine" id="cb4-81" data-line-number="81">lcol &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"#dddddd"</span>, qcol)</a>
-<a class="sourceLine" id="cb4-82" data-line-number="82"></a>
-<a class="sourceLine" id="cb4-83" data-line-number="83"><span class="co"># set legend such that color ramp appears linearly</span></a>
-<a class="sourceLine" id="cb4-84" data-line-number="84">ltq &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="dt">from =</span> week_bins<span class="op">$</span>bins[<span class="dv">1</span>], <span class="dt">to =</span> week_bins<span class="op">$</span>bins[<span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(week_bins<span class="op">$</span>bins)],</a>
-<a class="sourceLine" id="cb4-85" data-line-number="85">           <span class="dt">length.out =</span> <span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(week_bins<span class="op">$</span>bins))</a>
-<a class="sourceLine" id="cb4-86" data-line-number="86">ltq &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">0</span>, ltq)</a>
-<a class="sourceLine" id="cb4-87" data-line-number="87"></a>
-<a class="sourceLine" id="cb4-88" data-line-number="88"><span class="co"># plot legend</span></a>
-<a class="sourceLine" id="cb4-89" data-line-number="89"><span class="kw"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span>(abund_moll <span class="op">^</span><span class="st"> </span>week_bins<span class="op">$</span>power, <span class="dt">legend.only =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb4-90" data-line-number="90">     <span class="dt">col =</span> lcol,</a>
-<a class="sourceLine" id="cb4-91" data-line-number="91">     <span class="dt">breaks =</span> ltq <span class="op">^</span><span class="st"> </span>week_bins<span class="op">$</span>power, </a>
-<a class="sourceLine" id="cb4-92" data-line-number="92">     <span class="dt">lab.breaks =</span> bin_labels, <span class="dt">legend.shrink =</span> <span class="fl">0.97</span>,</a>
-<a class="sourceLine" id="cb4-93" data-line-number="93">     <span class="dt">legend.width =</span> <span class="dv">2</span>, <span class="dt">axis.args =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cex.axis =</span> <span class="fl">0.9</span>, <span class="dt">lwd.ticks =</span> <span class="dv">0</span>))</a>
-<a class="sourceLine" id="cb4-94" data-line-number="94"></a>
-<a class="sourceLine" id="cb4-95" data-line-number="95"><span class="co"># add state boundaries on top</span></a>
-<a class="sourceLine" id="cb4-96" data-line-number="96"><span class="kw"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/sf/man/st_geometry.html">st_geometry</a></span>(wh_states), <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="ot">NA</span>, <span class="dt">border =</span> <span class="st">"white"</span>, <span class="dt">lwd =</span> <span class="fl">1.5</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb4-21" data-line-number="21"><span class="co">#&gt;  [1] "2018-01-04" "2018-01-11" "2018-01-18" "2018-01-25" "2018-02-01" "2018-02-08" "2018-02-15"</span></a>
+<a class="sourceLine" id="cb4-22" data-line-number="22"><span class="co">#&gt;  [8] "2018-02-22" "2018-03-01" "2018-03-08" "2018-03-15" "2018-03-22" "2018-03-29" "2018-04-05"</span></a>
+<a class="sourceLine" id="cb4-23" data-line-number="23"><span class="co">#&gt; [15] "2018-04-12" "2018-04-19" "2018-04-26" "2018-05-03" "2018-05-10" "2018-05-17" "2018-05-24"</span></a>
+<a class="sourceLine" id="cb4-24" data-line-number="24"><span class="co">#&gt; [22] "2018-05-31" "2018-06-07" "2018-06-14" "2018-06-21" "2018-06-28" "2018-07-06" "2018-07-13"</span></a>
+<a class="sourceLine" id="cb4-25" data-line-number="25"><span class="co">#&gt; [29] "2018-07-20" "2018-07-27" "2018-08-03" "2018-08-10" "2018-08-17" "2018-08-24" "2018-08-31"</span></a>
+<a class="sourceLine" id="cb4-26" data-line-number="26"><span class="co">#&gt; [36] "2018-09-07" "2018-09-14" "2018-09-21" "2018-09-28" "2018-10-05" "2018-10-12" "2018-10-19"</span></a>
+<a class="sourceLine" id="cb4-27" data-line-number="27"><span class="co">#&gt; [43] "2018-10-26" "2018-11-02" "2018-11-09" "2018-11-16" "2018-11-23" "2018-11-30" "2018-12-07"</span></a>
+<a class="sourceLine" id="cb4-28" data-line-number="28"><span class="co">#&gt; [50] "2018-12-14" "2018-12-21" "2018-12-28"</span></a>
+<a class="sourceLine" id="cb4-29" data-line-number="29"></a>
+<a class="sourceLine" id="cb4-30" data-line-number="30"><span class="co"># select a week in the summer</span></a>
+<a class="sourceLine" id="cb4-31" data-line-number="31">abund &lt;-<span class="st"> </span>abunds[[<span class="dv">26</span>]]</a>
+<a class="sourceLine" id="cb4-32" data-line-number="32"><span class="kw"><a href="https://rdrr.io/r/base/rm.html">rm</a></span>(abunds)</a>
+<a class="sourceLine" id="cb4-33" data-line-number="33"></a>
+<a class="sourceLine" id="cb4-34" data-line-number="34"><span class="co"># project to mollweide for mapping</span></a>
+<a class="sourceLine" id="cb4-35" data-line-number="35"><span class="co"># the nearest neighbor method preserves cell values across projections</span></a>
+<a class="sourceLine" id="cb4-36" data-line-number="36">mollweide &lt;-<span class="st"> "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"</span></a>
+<a class="sourceLine" id="cb4-37" data-line-number="37">abund_moll &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/raster/man/projectRaster.html">projectRaster</a></span>(abund, <span class="dt">crs =</span> mollweide, <span class="dt">method =</span> <span class="st">"ngb"</span>)</a>
+<a class="sourceLine" id="cb4-38" data-line-number="38"></a>
+<a class="sourceLine" id="cb4-39" data-line-number="39"><span class="co"># get reference data from the rnaturalearth package</span></a>
+<a class="sourceLine" id="cb4-40" data-line-number="40"><span class="co"># the example data currently shows only the US state of Michigan</span></a>
+<a class="sourceLine" id="cb4-41" data-line-number="41">wh_states &lt;-<span class="st"> </span><span class="kw"><a href="https://docs.ropensci.org/rnaturalearth/reference/ne_states.html">ne_states</a></span>(<span class="dt">country =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"United States of America"</span>, <span class="st">"Canada"</span>),</a>
+<a class="sourceLine" id="cb4-42" data-line-number="42">                    <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-43" data-line-number="43"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/sf/man/st_transform.html">st_transform</a></span>(<span class="dt">crs =</span> mollweide) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-44" data-line-number="44"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/sf/man/st_geometry.html">st_geometry</a></span>()</a>
+<a class="sourceLine" id="cb4-45" data-line-number="45">  </a>
+<a class="sourceLine" id="cb4-46" data-line-number="46"><span class="co"># calculate ideal color bins for abundance values for this week</span></a>
+<a class="sourceLine" id="cb4-47" data-line-number="47">week_bins &lt;-<span class="st"> </span><span class="kw"><a href="reference/calc_bins.html">calc_bins</a></span>(abund_moll)</a>
+<a class="sourceLine" id="cb4-48" data-line-number="48"></a>
+<a class="sourceLine" id="cb4-49" data-line-number="49"><span class="co"># start plotting</span></a>
+<a class="sourceLine" id="cb4-50" data-line-number="50"><span class="kw"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span>, <span class="dv">1</span>), <span class="dt">mar =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">6</span>))</a>
+<a class="sourceLine" id="cb4-51" data-line-number="51"></a>
+<a class="sourceLine" id="cb4-52" data-line-number="52"><span class="co"># use raster bounding box to set the spatial extent for the plot</span></a>
+<a class="sourceLine" id="cb4-53" data-line-number="53">bb &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/sf/man/st_as_sfc.html">st_as_sfc</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/sf/man/st_bbox.html">st_bbox</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/raster/man/trim.html">trim</a></span>(abund_moll)))</a>
+<a class="sourceLine" id="cb4-54" data-line-number="54"><span class="kw"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span>(bb, <span class="dt">col =</span> <span class="st">"white"</span>, <span class="dt">border =</span> <span class="st">"white"</span>)</a>
+<a class="sourceLine" id="cb4-55" data-line-number="55"></a>
+<a class="sourceLine" id="cb4-56" data-line-number="56"><span class="co"># add background reference data</span></a>
+<a class="sourceLine" id="cb4-57" data-line-number="57"><span class="kw"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span>(wh_states, <span class="dt">col =</span> <span class="st">"#eeeeee"</span>, <span class="dt">border =</span> <span class="ot">NA</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb4-58" data-line-number="58"></a>
+<a class="sourceLine" id="cb4-59" data-line-number="59"><span class="co"># plot zeroes as gray</span></a>
+<a class="sourceLine" id="cb4-60" data-line-number="60"><span class="kw"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span>(abund_moll <span class="op">==</span><span class="st"> </span><span class="dv">0</span>, <span class="dt">col =</span> <span class="st">"#dddddd"</span>, </a>
+<a class="sourceLine" id="cb4-61" data-line-number="61">     <span class="dt">maxpixels =</span> <span class="kw"><a href="https://rdrr.io/pkg/raster/man/ncell.html">ncell</a></span>(abund_moll),</a>
+<a class="sourceLine" id="cb4-62" data-line-number="62">     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb4-63" data-line-number="63"></a>
+<a class="sourceLine" id="cb4-64" data-line-number="64"><span class="co"># define color bins</span></a>
+<a class="sourceLine" id="cb4-65" data-line-number="65">qcol &lt;-<span class="st"> </span><span class="kw"><a href="reference/abundance_palette.html">abundance_palette</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(week_bins<span class="op">$</span>bins) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="st">"weekly"</span>)</a>
+<a class="sourceLine" id="cb4-66" data-line-number="66"></a>
+<a class="sourceLine" id="cb4-67" data-line-number="67"><span class="co"># plot abundances</span></a>
+<a class="sourceLine" id="cb4-68" data-line-number="68"><span class="kw"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span>(abund_moll, <span class="dt">col =</span> qcol, <span class="dt">breaks =</span> week_bins<span class="op">$</span>bins,</a>
+<a class="sourceLine" id="cb4-69" data-line-number="69">     <span class="dt">maxpixels =</span> <span class="kw"><a href="https://rdrr.io/pkg/raster/man/ncell.html">ncell</a></span>(abund_moll),</a>
+<a class="sourceLine" id="cb4-70" data-line-number="70">     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb4-71" data-line-number="71"></a>
+<a class="sourceLine" id="cb4-72" data-line-number="72"><span class="co"># for legend, create a smaller set of bin labels</span></a>
+<a class="sourceLine" id="cb4-73" data-line-number="73">bin_labels &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/format.html">format</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(week_bins<span class="op">$</span>bins, <span class="dv">2</span>), <span class="dt">nsmall =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb4-74" data-line-number="74">bin_labels[<span class="op">!</span>(bin_labels <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(bin_labels[<span class="dv">1</span>],</a>
+<a class="sourceLine" id="cb4-75" data-line-number="75">                               bin_labels[<span class="kw"><a href="https://rdrr.io/r/base/Round.html">round</a></span>((<span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(bin_labels) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>)) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>],</a>
+<a class="sourceLine" id="cb4-76" data-line-number="76">                               bin_labels[<span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(bin_labels)]))] &lt;-<span class="st"> ""</span></a>
+<a class="sourceLine" id="cb4-77" data-line-number="77">bin_labels &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"0"</span>, bin_labels)</a>
+<a class="sourceLine" id="cb4-78" data-line-number="78"></a>
+<a class="sourceLine" id="cb4-79" data-line-number="79"><span class="co"># create colors that include gray for 0</span></a>
+<a class="sourceLine" id="cb4-80" data-line-number="80">lcol &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"#dddddd"</span>, qcol)</a>
+<a class="sourceLine" id="cb4-81" data-line-number="81"></a>
+<a class="sourceLine" id="cb4-82" data-line-number="82"><span class="co"># set legend such that color ramp appears linearly</span></a>
+<a class="sourceLine" id="cb4-83" data-line-number="83">ltq &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="dt">from =</span> week_bins<span class="op">$</span>bins[<span class="dv">1</span>], <span class="dt">to =</span> week_bins<span class="op">$</span>bins[<span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(week_bins<span class="op">$</span>bins)],</a>
+<a class="sourceLine" id="cb4-84" data-line-number="84">           <span class="dt">length.out =</span> <span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(week_bins<span class="op">$</span>bins))</a>
+<a class="sourceLine" id="cb4-85" data-line-number="85">ltq &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">0</span>, ltq)</a>
+<a class="sourceLine" id="cb4-86" data-line-number="86"></a>
+<a class="sourceLine" id="cb4-87" data-line-number="87"><span class="co"># plot legend</span></a>
+<a class="sourceLine" id="cb4-88" data-line-number="88"><span class="kw"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span>(abund_moll <span class="op">^</span><span class="st"> </span>week_bins<span class="op">$</span>power, <span class="dt">legend.only =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb4-89" data-line-number="89">     <span class="dt">col =</span> lcol,</a>
+<a class="sourceLine" id="cb4-90" data-line-number="90">     <span class="dt">breaks =</span> ltq <span class="op">^</span><span class="st"> </span>week_bins<span class="op">$</span>power, </a>
+<a class="sourceLine" id="cb4-91" data-line-number="91">     <span class="dt">lab.breaks =</span> bin_labels, <span class="dt">legend.shrink =</span> <span class="fl">0.97</span>,</a>
+<a class="sourceLine" id="cb4-92" data-line-number="92">     <span class="dt">legend.width =</span> <span class="dv">2</span>, <span class="dt">axis.args =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cex.axis =</span> <span class="fl">0.9</span>, <span class="dt">lwd.ticks =</span> <span class="dv">0</span>))</a>
+<a class="sourceLine" id="cb4-93" data-line-number="93"></a>
+<a class="sourceLine" id="cb4-94" data-line-number="94"><span class="co"># add state boundaries on top</span></a>
+<a class="sourceLine" id="cb4-95" data-line-number="95"><span class="kw"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/sf/man/st_geometry.html">st_geometry</a></span>(wh_states), <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="ot">NA</span>, <span class="dt">border =</span> <span class="st">"white"</span>, <span class="dt">lwd =</span> <span class="fl">1.5</span>)</a></code></pre></div>
 <p><img src="README-quick_start-1.png" style="display: block; margin: auto;"></p>
 </div>
 </div>
