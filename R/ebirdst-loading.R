@@ -281,10 +281,8 @@ load_raster <- function(product = c("abundance",
     }
     seasons <- stringr::str_extract(tif_path,
                                     "(?<=abundance_seasonal_)[a-z_]+")
-    season_order <- c("postbreeding_migration", "prebreeding_migration",
-                      "nonbreeding", "breeding", "year_round")
     s <- raster::stack(tif_path)
-    names(s) <- intersect(season_order, seasons)
+    names(s) <- seasons
     return(s)
   } else {
     # 52 week stack
