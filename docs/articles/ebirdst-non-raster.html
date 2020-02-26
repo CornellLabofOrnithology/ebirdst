@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -76,7 +76,7 @@
       <h1>Non-raster Data: Using Predictor Importance, Predictor Directionality,and Predictive Performance Metrics</h1>
                         <h4 class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2020-02-25</h4>
+            <h4 class="date">2020-02-26</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-non-raster.Rmd"><code>vignettes/ebirdst-non-raster.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-non-raster.Rmd</code></div>
@@ -101,7 +101,7 @@
 <div id="introduction" class="section level1">
 <h1 class="hasAnchor">
 <a href="#introduction" class="anchor"></a>Introduction</h1>
-<p>Beyond estimates of occurrence and relative abundance, the eBird Status and Trends products contain information about predictor importance as well as predictive performance metrics (PPMs). The PPMs can be used to evaluate statistical performance of the models, either over the entire spatiotemporal extent of the model results, or for a specific region and season. Predictor Importances (PIs) and can be used to understand relationships between occurrence and abundance and predictors, most notably the land cover variables used in the model. The functions described in this section help load this data from the results packages, give tools for assessing predictive performance and predictor importances. More details about predictive performance metrics and how they were calculated and interpreted can be found in Fink et al. (2019).</p>
+<p>Beyond estimates of occurrence and relative abundance, the eBird Status and Trends products contain information about predictor importance as well as predictive performance metrics (PPMs). The PPMs can be used to evaluate statistical performance of the models, either over the entire spatiotemporal extent of the model results, or for a specific region and season. Predictor Importances (PIs) and can be used to understand relationships between occurrence and abundance and predictors, most notably the land cover variables used in the model. The functions described in this section help load this data from the results packages, give tools for assessing predictive performance and predictor importances. More details about predictive performance metrics and how they were calculated and interpreted can be found in Fink et al. (2019).</p>
 <div id="data-structure" class="section level2">
 <h2 class="hasAnchor">
 <a href="#data-structure" class="anchor"></a>Data Structure</h2>
@@ -115,49 +115,49 @@
 <h1 class="hasAnchor">
 <a href="#loading-centroids" class="anchor"></a>Loading Centroids</h1>
 <p>The first step when working with stixel centroid data is to load the Predictor Importances (PIs). This file will be used for all of the functions in this vignette and is the input to many of the functions in <code>ebirdst</code>.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(ebirdst)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="co"># DOWNLOAD DATA</span></a>
-<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="co"># Currently, example data is available on a public s3 bucket. The following </span></a>
-<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="co"># ebirdst_download() function copies the species results to a selected path and </span></a>
-<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="co"># returns the full path of the results.</span></a>
-<a class="sourceLine" id="cb1-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="co"># Because the non-raster data is large, there is a parameter on the</span></a>
-<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="co"># ebirdst_download function that defaults to downloading only the raster data.</span></a>
-<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co"># To access the non-raster data, set tifs_only = FALSE.</span></a>
-<a class="sourceLine" id="cb1-11" data-line-number="11">sp_path &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ebirdst_download.html">ebirdst_download</a></span>(<span class="dt">species =</span> <span class="st">"example_data"</span>, <span class="dt">tifs_only =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(sp_path)</a>
-<a class="sourceLine" id="cb1-13" data-line-number="13"><span class="co">#&gt; [1] "/Users/mes335/Library/Application Support/ebirdst/yebsap-ERD2018-EBIRD_SCIENCE-20191030-3abe59ca-example"</span></a>
-<a class="sourceLine" id="cb1-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb1-15" data-line-number="15">pis &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_pis.html">load_pis</a></span>(sp_path)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(ebirdst)</span>
+<span id="cb1-2"><a href="#cb1-2"></a></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="co"># DOWNLOAD DATA</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="co"># Currently, example data is available on a public s3 bucket. The following </span></span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="co"># ebirdst_download() function copies the species results to a selected path and </span></span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="co"># returns the full path of the results.</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a></span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="co"># Because the non-raster data is large, there is a parameter on the</span></span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="co"># ebirdst_download function that defaults to downloading only the raster data.</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="co"># To access the non-raster data, set tifs_only = FALSE.</span></span>
+<span id="cb1-11"><a href="#cb1-11"></a>sp_path &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ebirdst_download.html">ebirdst_download</a></span>(<span class="dt">species =</span> <span class="st">"example_data"</span>, <span class="dt">tifs_only =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb1-12"><a href="#cb1-12"></a><span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(sp_path)</span>
+<span id="cb1-13"><a href="#cb1-13"></a><span class="co">#&gt; [1] "/Users/mes335/Library/Application Support/ebirdst/yebsap-ERD2018-EBIRD_SCIENCE-20191030-3abe59ca-example"</span></span>
+<span id="cb1-14"><a href="#cb1-14"></a></span>
+<span id="cb1-15"><a href="#cb1-15"></a>pis &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_pis.html">load_pis</a></span>(sp_path)</span></code></pre></div>
 </div>
 <div id="selecting-region-and-season" class="section level1">
 <h1 class="hasAnchor">
 <a href="#selecting-region-and-season" class="anchor"></a>Selecting Region and Season</h1>
 <p>When working with Predictive Performance Metrics (PPMs) and/or PIs, it is very common to select a subset of space and time for analysis. In <code>ebirdst</code> this is done by creating a spatiotemporal extent object with <code><a href="../reference/ebirdst_extent.html">ebirdst_extent()</a></code>. These objects define the region and season for analysis and are passed to many functions in <code>ebirdst</code>. To review the available stixel centroids associated with both PIs and PDs and to see which have been selected by a spatiotemporal subset, use the <code>map_centroids</code> function, which will map and summarize this information.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">lp_extent &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ebirdst_extent.html">ebirdst_extent</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dt">xmin =</span> <span class="dv">-86</span>, <span class="dt">xmax =</span> <span class="dv">-83</span>, <span class="dt">ymin =</span> <span class="dv">42</span>, <span class="dt">ymax =</span> <span class="dv">45</span>),</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">                            <span class="dt">t =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.425</span>, <span class="fl">0.475</span>))</a>
-<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="kw"><a href="../reference/map_centroids.html">map_centroids</a></span>(sp_path, <span class="dt">ext =</span> lp_extent)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>lp_extent &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ebirdst_extent.html">ebirdst_extent</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dt">xmin =</span> <span class="dv">-86</span>, <span class="dt">xmax =</span> <span class="dv">-83</span>, <span class="dt">ymin =</span> <span class="dv">42</span>, <span class="dt">ymax =</span> <span class="dv">45</span>),</span>
+<span id="cb2-2"><a href="#cb2-2"></a>                            <span class="dt">t =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.425</span>, <span class="fl">0.475</span>))</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="kw"><a href="../reference/map_centroids.html">map_centroids</a></span>(sp_path, <span class="dt">ext =</span> lp_extent)</span></code></pre></div>
 <p><img src="ebirdst-non-raster_files/figure-html/map_centroids-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="plotting-centroids-and-extent-of-analysis" class="section level1">
 <h1 class="hasAnchor">
 <a href="#plotting-centroids-and-extent-of-analysis" class="anchor"></a>Plotting Centroids and Extent of Analysis</h1>
 <p>Similarly, <code><a href="../reference/calc_effective_extent.html">calc_effective_extent()</a></code> will analyze a spatiotemporal subset of PIs or PDs and plot the selected stixel centroids, as well as a <code>RasterLayer</code> depicting where a majority of the information is coming from. The map ranges from 0 to 1, with pixels have a value of 1 meaning that 100% of the selected stixels are contributing information at that pixel. The function returns the <code>RasterLayer</code> in addition to mapping.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span>, <span class="dv">1</span>), <span class="dt">mar =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">6</span>))</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="kw"><a href="../reference/calc_effective_extent.html">calc_effective_extent</a></span>(sp_path, <span class="dt">ext =</span> lp_extent)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span>, <span class="dv">1</span>), <span class="dt">mar =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">6</span>))</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="kw"><a href="../reference/calc_effective_extent.html">calc_effective_extent</a></span>(sp_path, <span class="dt">ext =</span> lp_extent)</span></code></pre></div>
 <p><img src="ebirdst-non-raster_files/figure-html/plot_extents-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="plot-predictor-importance" class="section level1">
 <h1 class="hasAnchor">
 <a href="#plot-predictor-importance" class="anchor"></a>Plot Predictor Importance</h1>
 <p>Once predictive performance has been evaluated, exploring information about habitat association and/or avoidance can be done using the PIs and PDs. The <code><a href="../reference/plot_pis.html">plot_pis()</a></code> function generates a bar plot showing a rank of the most important predictors within a spatiotemporal subset. There is an option to show all predictors or to aggregate FRAGSTATS by the land cover types.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># with all classes</span></a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw"><a href="../reference/plot_pis.html">plot_pis</a></span>(pis, <span class="dt">ext =</span> lp_extent, <span class="dt">by_cover_class =</span> <span class="ot">FALSE</span>, <span class="dt">n_top_pred =</span> <span class="dv">15</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># with all classes</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="kw"><a href="../reference/plot_pis.html">plot_pis</a></span>(pis, <span class="dt">ext =</span> lp_extent, <span class="dt">by_cover_class =</span> <span class="ot">FALSE</span>, <span class="dt">n_top_pred =</span> <span class="dv">15</span>)</span></code></pre></div>
 <p><img src="ebirdst-non-raster_files/figure-html/plot_pis-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"></a>
-<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co"># aggregating fragstats for cover classes</span></a>
-<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="kw"><a href="../reference/plot_pis.html">plot_pis</a></span>(pis, <span class="dt">ext =</span> lp_extent, <span class="dt">by_cover_class =</span> <span class="ot">TRUE</span>, <span class="dt">n_top_pred =</span> <span class="dv">15</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="co"># aggregating fragstats for cover classes</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="kw"><a href="../reference/plot_pis.html">plot_pis</a></span>(pis, <span class="dt">ext =</span> lp_extent, <span class="dt">by_cover_class =</span> <span class="ot">TRUE</span>, <span class="dt">n_top_pred =</span> <span class="dv">15</span>)</span></code></pre></div>
 <p><img src="ebirdst-non-raster_files/figure-html/plot_pis-2.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="predictive-performance-metrics" class="section level1">
@@ -168,14 +168,14 @@
 <h2 class="hasAnchor">
 <a href="#binary-metrics-by-time" class="anchor"></a>Binary Metrics by Time</h2>
 <p>The <code><a href="../reference/plot_binary_by_time.html">plot_binary_by_time()</a></code> function analyzes a species’ entire range of data and plots predictive performance metrics by a custom time interval (typically either 52 for weeks or 12 for months).</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw"><a href="../reference/plot_binary_by_time.html">plot_binary_by_time</a></span>(<span class="dt">path =</span> sp_path, <span class="dt">metric =</span> <span class="st">"kappa"</span>, <span class="dt">n_time_periods =</span> <span class="dv">12</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw"><a href="../reference/plot_binary_by_time.html">plot_binary_by_time</a></span>(<span class="dt">path =</span> sp_path, <span class="dt">metric =</span> <span class="st">"kappa"</span>, <span class="dt">n_time_periods =</span> <span class="dv">12</span>)</span></code></pre></div>
 <p><img src="ebirdst-non-raster_files/figure-html/binary_by_time-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="all-metrics-for-spatiotemporal-extent" class="section level2">
 <h2 class="hasAnchor">
 <a href="#all-metrics-for-spatiotemporal-extent" class="anchor"></a>All Metrics for Spatiotemporal Extent</h2>
 <p>The <code><a href="../reference/plot_all_ppms.html">plot_all_ppms()</a></code> function provides all available predictive performance metrics and is important for determining predictive performance within a spatiotemporal subset region and season. This function is also useful in comparing the performance between subsets.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="../reference/plot_all_ppms.html">plot_all_ppms</a></span>(sp_path, lp_extent)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw"><a href="../reference/plot_all_ppms.html">plot_all_ppms</a></span>(sp_path, lp_extent)</span></code></pre></div>
 <p><img src="ebirdst-non-raster_files/figure-html/all_ppms-1.png" width="\textwidth" style="display: block; margin: auto;"></p>
 </div>
 <div id="references" class="section level2">
