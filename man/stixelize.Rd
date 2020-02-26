@@ -18,8 +18,8 @@ any other data frame with fields \code{lon}, \code{lat}, \code{stixel_width}, an
 \code{stixel_hight}.}
 }
 \value{
-\link{sf} object with geometry column storing polygons representing the s
-tixels boundaries.
+\link{sf} object with geometry column storing polygons representing the
+stixels boundaries.
 }
 \description{
 All predictor importance data are provided at the stixel level. In these

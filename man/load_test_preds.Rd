@@ -21,7 +21,7 @@ abundance.
 \description{
 Loads the model predictions for each checklist in the test dataset. Median,
 and upper and lower confidence intervals are provided for predicted
-occurrence, count, and relativce abundance.
+occurrence, count, and relative abundance.
 }
 \examples{
 \donttest{
