@@ -1,4 +1,5 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
 ebirdst: Access and Analyze eBird Status and Trends Data
 ========================================================
 
@@ -46,6 +47,7 @@ Kelling. 2020. eBird Status and Trends, Data Version: 2018; Released:
 2020. Cornell Lab of Ornithology, Ithaca, New York.
 <a href="https://doi.org/10.2173/ebirdst.2018" class="uri">https://doi.org/10.2173/ebirdst.2018</a>
 </blockquote>
+
 Vignettes
 ---------
 
