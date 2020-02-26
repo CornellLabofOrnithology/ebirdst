@@ -1,4 +1,8 @@
-# ebirdst 0.2.1
+# RESUBMISSION: ebirdst 0.2.0
+
+- `compute_ppms()` example had long run time, wrapped in \donttest{}
+
+# ebirdst 0.2.0
 
 - change maintainer to Matthew Strimas-Mackey
 - update to access 2019 status and trends data
@@ -21,4 +25,5 @@
 
 ## R CMD check results
 
-0 errors | 0 warnings | 0 note
+0 errors | 0 warnings | 1 note
+- NOTE: changed maintainer from Tom Auer <mta45@cornell.edu> to Matthew Strimas-Mackey <mes335@cornell.edu>
