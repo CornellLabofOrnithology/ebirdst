@@ -41,7 +41,7 @@ ranging from 0 to 1, on an eBird Traveling Count by a skilled eBirder
 starting at the optimal time of day with the optimal search duration and
 distance that maximizes detection of that species in a region.
 \item \code{count}: the expected count of a species, conditional on its occurrence at
-the given locatiion, on an eBird Traveling Count by a skilled eBirder
+the given location, on an eBird Traveling Count by a skilled eBirder
 starting at the optimal time of day with the optimal search duration and
 distance that maximizes detection of that species in a region.
 \item \code{abundance}: the expected relative abundance, computed as the product of

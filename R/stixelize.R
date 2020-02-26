@@ -9,8 +9,8 @@
 #'   any other data frame with fields `lon`, `lat`, `stixel_width`, and
 #'   `stixel_hight`.
 #'
-#' @return [sf] object with geometry column storing polygons representing the s
-#'   tixels boundaries.
+#' @return [sf] object with geometry column storing polygons representing the
+#'   stixels boundaries.
 #' @export
 #'
 #' @examples

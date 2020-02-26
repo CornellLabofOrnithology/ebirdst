@@ -244,8 +244,8 @@ compute_ppms <- function(path, ext) {
 #'
 #' @param path character; full path to directory containing the eBird Status and
 #'   Trends products for a single species.
-#' @param metric character; the PPM to plot, eith "kappa", "auc", "sensitivity",
-#'   or "specificity".
+#' @param metric character; the PPM to plot, either "kappa", "auc",
+#'   "sensitivity", or "specificity".
 #' @param ext [ebirdst_extent] object (optional); the spatiotemporal
 #'   extent to filter the data to. The temporal component will be ignored since
 #'   n_time_periods defines the temporal periods over which to calculate the

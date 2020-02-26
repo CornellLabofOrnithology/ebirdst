@@ -14,7 +14,7 @@ eBird Status and Trends products.}
 A list containing elements:
 \itemize{
 \item \code{custom_projection}: a custom projection optimized for the given species'
-full annyal cycle
+full annual cycle
 \item \code{fa_extent}: an \code{Extent} object storing the spatial extent of non-zero
 data for the given species in the custom projection
 \item \code{fa_extent_sinu}: the extent in sinusoidal projection
@@ -24,7 +24,7 @@ data for the given species in the custom projection
 \description{
 Get the map parameters used on the eBird Status and Trends website to
 optimally display the full annual cycle data. This includes bins for the
-abundace data, a projection, and an extent to map. The extent is the spatial
+abundance data, a projection, and an extent to map. The extent is the spatial
 extent of non-zero data across the full annual cycle and the projection is
 optimized for this extent.
 }

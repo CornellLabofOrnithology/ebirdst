@@ -210,7 +210,7 @@ get_species_path <- function(species,
 #' starting at the optimal time of day with the optimal search duration and
 #' distance that maximizes detection of that species in a region.
 #' - `count`: the expected count of a species, conditional on its occurrence at
-#' the given locatiion, on an eBird Traveling Count by a skilled eBirder
+#' the given location, on an eBird Traveling Count by a skilled eBirder
 #' starting at the optimal time of day with the optimal search duration and
 #' distance that maximizes detection of that species in a region.
 #' - `abundance`: the expected relative abundance, computed as the product of
@@ -574,7 +574,7 @@ load_test_data <- function(path, return_sf = FALSE) {
 #'
 #' Loads the model predictions for each checklist in the test dataset. Median,
 #' and upper and lower confidence intervals are provided for predicted
-#' occurrence, count, and relativce abundance.
+#' occurrence, count, and relative abundance.
 #'
 #' @param path character; full path to the directory containing single species
 #'   eBird Status and Trends products.
@@ -661,7 +661,7 @@ load_config <- function(path) {
 #'
 #' Get the map parameters used on the eBird Status and Trends website to
 #' optimally display the full annual cycle data. This includes bins for the
-#' abundace data, a projection, and an extent to map. The extent is the spatial
+#' abundance data, a projection, and an extent to map. The extent is the spatial
 #' extent of non-zero data across the full annual cycle and the projection is
 #' optimized for this extent.
 #'
@@ -670,7 +670,7 @@ load_config <- function(path) {
 #'
 #' @return A list containing elements:
 #' - `custom_projection`: a custom projection optimized for the given species'
-#'    full annyal cycle
+#'    full annual cycle
 #' - `fa_extent`: an `Extent` object storing the spatial extent of non-zero
 #'    data for the given species in the custom projection
 #' - `fa_extent_sinu`: the extent in sinusoidal projection
