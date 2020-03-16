@@ -4,7 +4,8 @@
 \name{ebirdst_runs}
 \alias{ebirdst_runs}
 \title{Data frame of available eBird Status and Trends species}
-\format{A data frame with 107 rows and 14 variables:
+\format{
+A data frame with 107 rows and 14 variables:
 \describe{
 \item{species_code}{Six letter eBird code in eBird Taxonomy v2016}
 \item{run_name}{Unique analysis identifier and the top level folder name
@@ -21,7 +22,8 @@ for all results}
 \item{prebreeding_migration_end_dt}{Pre-breeding season start date}
 \item{year_round_start_dt}{For resident species, the year-round start date}
 \item{year_round_end_dt}{For resident species, the year-round end date}
-}}
+}
+}
 \usage{
 ebirdst_runs
 }

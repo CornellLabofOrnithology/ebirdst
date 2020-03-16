@@ -1,0 +1,8 @@
+species_code,season,date,correct_date
+buthum,nonbreeding_end_dt,2018-03-06,2018-03-01
+sora,nonbreeding_start_dt,2018-11-24,2018-11-30
+comblh1,postbreeding_migration_end_dt,2018-10-25,2018-10-19
+phivir,postbreeding_migration_start_dt,2018-07-30,2018-08-03
+bktspa,breeding_start_dt,2018-05-25,2018-05-31
+boboli,postbreeding_migration_start_dt,2018-07-14,2018-07-20
+comyel,nonbreeding_start_dt,2018-01-14,2018-01-18

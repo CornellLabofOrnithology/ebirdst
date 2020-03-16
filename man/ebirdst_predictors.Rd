@@ -4,7 +4,8 @@
 \name{ebirdst_predictors}
 \alias{ebirdst_predictors}
 \title{eBird Status and Trends predictors}
-\format{A data frame with 69 rows and 5 columns:
+\format{
+A data frame with 69 rows and 5 columns:
 \describe{
 \item{predictor}{Predictor variable name.}
 \item{predictor_tidy}{Predictor variable name, tidied to only contain
@@ -19,7 +20,8 @@ landcover class.}
 \item{lc_class_label}{Similar to \code{predictor_label}; however, this variable
 gives the FRAGSTATS metrics a single name for the landcover
 class.}
-}}
+}
+}
 \usage{
 ebirdst_predictors
 }
