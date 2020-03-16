@@ -237,7 +237,8 @@ to_srd_date <- function(x) {
 }
 
 from_srd_date <- function(x) {
-  d2015 <- as.Date(x = paste(round(x * 366), 2015), format = "%j %Y")
+  stopifnot(all(x <= 1), all(x >= 0))
+  d2015 <- as.Date(x = paste(round(x * 364 + 1), 2015), format = "%j %Y")
   d2018 <- as.Date(format(d2015, format = "2018-%m-%d"), format = "%Y-%m-%d")
   # fix end dates
   d2018 <- dplyr::if_else(x == 0, as.Date("2018-01-01"), d2018)
