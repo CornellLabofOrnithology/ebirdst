@@ -28,6 +28,11 @@ matrix:
       r_build_args: '--no-build-vignettes'
       r_check_args: '--ignore-vignettes --no-examples'
 
+before_install:
+  - echo "TRAVIS_OS_NAME = $TRAVIS_OS_NAME"
+  - echo "options(repos = c(CRAN='http://cran.rstudio.com'))" > ~/.Rprofile
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install udunits; fi;
+
 after_success:
   - Rscript -e 'covr::codecov()'
 
