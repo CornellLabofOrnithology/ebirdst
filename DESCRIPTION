@@ -41,6 +41,7 @@ Imports:
     ggplot2,
     grDevices,
     gridExtra,
+    magrittr,
     methods,
     mgcv,
     PresenceAbsence,

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Changelog • ebirdst</title>
+<title>Pipe operator — %&gt;% • ebirdst</title>
 
 
 <!-- jquery -->
@@ -35,7 +35,9 @@
 
 
 
-<meta property="og:title" content="Changelog" />
+<meta property="og:title" content="Pipe operator — %&gt;%" />
+<meta property="og:description" content="See magrittr::%&amp;gt;% for details." />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -54,7 +56,7 @@
   </head>
 
   <body>
-    <div class="container template-news">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -109,55 +111,26 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Changelog <small></small></h1>
-      <small>Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
+    <h1>Pipe operator</h1>
+    <small class="dont-index">Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/R/utils-pipe.R'><code>R/utils-pipe.R</code></a></small>
+    <div class="hidden name"><code>pipe.Rd</code></div>
     </div>
 
-    <div id="ebirdst-021" class="section level1">
-<h1 class="page-header">
-<a href="#ebirdst-021" class="anchor"></a>ebirdst 0.2.1<small> Unreleased </small>
-</h1>
-<ul>
-<li>bug fix: corrected date types in seasonal definitions</li>
-<li>bug fix: fixed possibility that ebirdst_extent could produce invalid date (day 366 of 2015)</li>
-<li>added import of pipe operator</li>
-</ul>
-</div>
-    <div id="ebirdst-020" class="section level1">
-<h1 class="page-header">
-<a href="#ebirdst-020" class="anchor"></a>ebirdst 0.2.0<small> 2020-02-26 </small>
-</h1>
-<ul>
-<li>change maintainer to Matthew Strimas-Mackey</li>
-<li>update to access 2019 status and trends data</li>
-<li>partial dependence data no longer available, all references to PDs removed</li>
-<li>bug fix: <code><a href="../reference/load_raster.html">load_raster()</a></code> gave incorrect names to seasonal rasters</li>
-<li>bug fix: didn’t properly implement quantile binning</li>
-<li>
-<code><a href="../reference/date_to_st_week.html">date_to_st_week()</a></code> gets the status and trends week for a give vector of dates</li>
-</ul>
-</div>
-    <div id="ebirdst-010" class="section level1">
-<h1 class="page-header">
-<a href="#ebirdst-010" class="anchor"></a>ebirdst 0.1.0<small> 2019-04-04 </small>
-</h1>
-<ul>
-<li>first CRAN release</li>
-</ul>
-</div>
-  </div>
+    <div class="ref-description">
+    <p>See <code>magrittr::%&gt;%</code> for details.</p>
+    </div>
 
+    <pre class="usage"><span class='no'>lhs</span> <span class='kw'>%&gt;%</span> <span class='no'>rhs</span></pre>
+
+
+
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <div id="tocnav">
-      <h2>Contents</h2>
-      <ul class="nav nav-pills nav-stacked">
-        <li><a href="#ebirdst-021">0.2.1</a></li>
-        <li><a href="#ebirdst-020">0.2.0</a></li>
-        <li><a href="#ebirdst-010">0.1.0</a></li>
-      </ul>
-    </div>
-  </div>
+    <h2>Contents</h2>
+    <ul class="nav nav-pills nav-stacked">
+    </ul>
 
+  </div>
 </div>
 
 
