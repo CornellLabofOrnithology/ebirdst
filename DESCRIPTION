@@ -65,8 +65,7 @@ Suggests:
     rmarkdown,
     rnaturalearth,
     smoothr,
-    testthat,
-    velox
+    testthat
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
