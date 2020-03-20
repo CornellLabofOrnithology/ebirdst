@@ -76,7 +76,7 @@ compute_ppms <- function(path, ext, es_cutoff = 75) {
   # min count sample size within range
   count_min_ss <- 50
   count_min_mean <- 0.25
-  pat_cutoff = 1 / 20
+  pat_cutoff = 1 / 10
 
   # define ppms
   # binary / range ppms
