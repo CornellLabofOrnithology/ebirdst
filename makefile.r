@@ -3,8 +3,8 @@ unlink(file.path(rappdirs::user_data_dir("ebirdst"),
                  "yebsap-ERD2018-EBIRD_SCIENCE-20191030-3abe59ca-example"),
        recursive = TRUE)
 unlink(list.files("man", full.names = TRUE))
-devtools::clean_vignettes()
-pkgdown::clean_site()
+devtools::clean_vignettes(".")
+pkgdown::clean_site(".")
 
 # rebuild docs and install
 devtools::document()
