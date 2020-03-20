@@ -2,6 +2,7 @@
 
 - bug fix: corrected date types in seasonal definitions
 - bug fix: fixed possibility that ebirdst_extent could produce invalid date (day 366 of 2015)
+- added import of pipe operator
 
 ## Test environments
 
