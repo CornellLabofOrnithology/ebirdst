@@ -72,7 +72,7 @@ compute_ppms <- function(path, ext) {
   # min count sample size within range
   count_min_ss <- 50
   count_min_mean <- 0.25
-  pat_cutoff = 1 / 20
+  pat_cutoff = 1 / 10
 
   # define ppms
   # binary / range ppms
@@ -90,8 +90,8 @@ compute_ppms <- function(path, ext) {
 
   # compute monte carlo sample of ppms for spatiotemporal subset
   # split data into within range and out of range
-  ppm_data_zeroes <- ppm_data[ppm_data$pi_es < 93 | is.na(ppm_data$pi_es), ]
-  ppm_data <- ppm_data[ppm_data$pi_es >= 93, ]
+  ppm_data_zeroes <- ppm_data[ppm_data$pi_es < 95 | is.na(ppm_data$pi_es), ]
+  ppm_data <- ppm_data[ppm_data$pi_es >= 95, ]
 
   if (nrow(ppm_data) == 0) {
     warning("No predicted occurrences within spatiotemporal extent.")
