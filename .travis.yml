@@ -1,5 +1,4 @@
 language: r
-sudo: required
 dist: trusty
 
 branches:
@@ -16,7 +15,7 @@ os:
   - linux
   - osx
 
-matrix:
+jobs:
   exclude:
     - os: osx
       r: devel
