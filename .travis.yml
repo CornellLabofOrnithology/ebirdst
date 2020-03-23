@@ -13,12 +13,6 @@ r_build_args: --no-build-vignettes
 
 os:
   - linux
-  - osx
-
-jobs:
-  exclude:
-    - os: osx
-      r: devel
 
 env:
   global:
@@ -43,4 +37,4 @@ install:
   - R -e "install.packages(c('covr', 'rmarkdown', 'testthat'))"
 
 after_success:
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then Rscript -e 'covr::codecov()'; fi;
+  - Rscript -e 'covr::codecov()'

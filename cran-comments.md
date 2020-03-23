@@ -4,13 +4,13 @@
 - bug fix: fixed possibility that ebirdst_extent could produce invalid date (day 366 of 2015)
 - added import of pipe operator
 - `velox` was archived, removed dependency from Suggests
+- `fasterize` was archived, removed dependency from Imports
 
 ## Test environments
 
 - local OS X install, R 3.6.3
-- OS X (travis-ci), R 3.6.2
-- ubuntu 16.04 (travis-ci), R 3.6.2
-- Windows (appveyor), R 3.6.2
+- ubuntu 16.04 (travis-ci), R 3.6.3
+- Windows (appveyor), R 3.6.3
 - Rhub
   - Ubuntu Linux 16.04 LTS, R-release, GCC
   - Fedora Linux, R-devel, clang, gfortran

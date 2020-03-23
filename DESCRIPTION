@@ -37,7 +37,6 @@ Imports:
     car,
     data.table,
     dplyr (>= 0.7.0),
-    fasterize,
     ggplot2,
     grDevices,
     gridExtra,

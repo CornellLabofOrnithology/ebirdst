@@ -386,7 +386,7 @@ calc_effective_extent <- function(path, ext, plot = TRUE) {
 
   # summarize: % of stixels overlapping each cell
   r_stix <- raster::crop(
-    fasterize::fasterize(stixels, r_tmplt, fun = "count"),
+    raster::rasterize(stixels, r_tmplt, field = 1, fun = "count"),
     raster::extent(stixels))
   r_stix <- r_stix / nrow(stixels)
 
