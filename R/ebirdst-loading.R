@@ -389,11 +389,11 @@ parse_raster_dates <- function(x) {
 #' @return An integer vector of weeks numbers from 1-52.
 #' @export
 #' @examples
-#' d <- as.Date(c("2016-04-08", "2018-12-31", "2014-01-01"))
+#' d <- as.Date(c("2016-04-08", "2018-12-31", "2014-01-01", "2018-09-04"))
 #' date_to_st_week(d)
 date_to_st_week <- function(dates) {
   dv <- seq(from = 0, to = 1, length = 52 + 1)
-  days <- as.POSIXlt(dates)$yday / 366
+  days <- (as.POSIXlt(dates)$yday + 0.5) / 366
 
   check_d <- function(x) {
     which(x >= dv[-length(dv)] & x <= dv[-1])
