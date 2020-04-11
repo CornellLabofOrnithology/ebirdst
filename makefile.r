@@ -8,7 +8,7 @@ pkgdown::clean_site(".")
 
 # rebuild docs and install
 devtools::document()
-devtools::install_local(force = TRUE)
+devtools::build()
 
 # local tests and checks
 devtools::test()

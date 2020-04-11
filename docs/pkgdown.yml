@@ -1,9 +1,10 @@
 pandoc: 2.7.3
-pkgdown: 1.4.1
+pkgdown: 1.5.1
 pkgdown_sha: ~
 articles:
   ebirdst-advanced-mapping: ebirdst-advanced-mapping.html
   ebirdst-intro-mapping: ebirdst-intro-mapping.html
   ebirdst-introduction: ebirdst-introduction.html
   ebirdst-non-raster: ebirdst-non-raster.html
+last_built: 2020-04-11T02:24Z
 
