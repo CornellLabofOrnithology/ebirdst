@@ -157,7 +157,7 @@ integer EPSG code, or a <code>crs</code> object generated with <code><a href='ht
 <span class='no'>sinu</span> <span class='kw'>&lt;-</span> <span class='st'>"+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs"</span>
 <span class='fu'>project_extent</span>(<span class='no'>bb_ext</span>, <span class='kw'>crs</span> <span class='kw'>=</span> <span class='no'>sinu</span>)</div><div class='output co'>#&gt; eBird Status &amp; Trends extent: 
 #&gt;   Bounding box: xmin -6814428; ymin 4447802; xmax -5308439; ymax 5226167
-#&gt;   CRS: +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs 
+#&gt;   CRS: +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs  
 #&gt;   Temporal extent: 2018-01-01  -  2018-12-31 </div><div class='input'>
 <span class='co'># also works on polygon extents</span>
 <span class='no'>poly</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>sf</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sf/man/st_read.html'>read_sf</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"shape/nc.shp"</span>, <span class='kw'>package</span><span class='kw'>=</span><span class='st'>"sf"</span>))
@@ -165,7 +165,7 @@ integer EPSG code, or a <code>crs</code> object generated with <code><a href='ht
 <span class='fu'>project_extent</span>(<span class='no'>poly_ext</span>, <span class='kw'>crs</span> <span class='kw'>=</span> <span class='no'>sinu</span>)</div><div class='output co'>#&gt; eBird Status &amp; Trends extent: 
 #&gt;   Polygon: 1 MULTIPOLYGON features
 #&gt;   Bounding box: xmin -7681725; ymin 3767510; xmax -6777465; ymax 4068588
-#&gt;   CRS: +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs 
+#&gt;   CRS: +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs  
 #&gt;   Temporal extent: 2018-01-01  -  2018-12-31 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

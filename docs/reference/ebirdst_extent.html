@@ -213,35 +213,35 @@ or January.</p>
 <span class='no'>bb_vec</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='kw'>xmin</span> <span class='kw'>=</span> -<span class='fl'>80</span>, <span class='kw'>xmax</span> <span class='kw'>=</span> -<span class='fl'>70</span>, <span class='kw'>ymin</span> <span class='kw'>=</span> <span class='fl'>40</span>, <span class='kw'>ymax</span> <span class='kw'>=</span> <span class='fl'>47</span>)
 <span class='fu'>ebirdst_extent</span>(<span class='no'>bb_vec</span>)</div><div class='output co'>#&gt; eBird Status &amp; Trends extent: 
 #&gt;   Bounding box: xmin -80; ymin 40; xmax -70; ymax 47
-#&gt;   CRS: +proj=longlat +datum=WGS84 +no_defs 
+#&gt;   CRS: +proj=longlat +datum=WGS84 +no_defs  
 #&gt;   Temporal extent: 2018-01-01  -  2018-12-31 </div><div class='input'>
 <span class='co'># bbox object</span>
 <span class='no'>bb</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>sf</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sf/man/st_bbox.html'>st_bbox</a></span>(<span class='no'>bb_vec</span>, <span class='kw'>crs</span> <span class='kw'>=</span> <span class='fl'>4326</span>)
 <span class='fu'>ebirdst_extent</span>(<span class='no'>bb</span>)</div><div class='output co'>#&gt; eBird Status &amp; Trends extent: 
 #&gt;   Bounding box: xmin -80; ymin 40; xmax -70; ymax 47
-#&gt;   CRS: +proj=longlat +datum=WGS84 +no_defs 
+#&gt;   CRS: +proj=longlat +datum=WGS84 +no_defs  
 #&gt;   Temporal extent: 2018-01-01  -  2018-12-31 </div><div class='input'>
 <span class='co'># polygon imported from a shapefile</span>
 <span class='no'>poly</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>sf</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sf/man/st_read.html'>read_sf</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"shape/nc.shp"</span>, <span class='kw'>package</span><span class='kw'>=</span><span class='st'>"sf"</span>))
 <span class='fu'>ebirdst_extent</span>(<span class='no'>poly</span>)</div><div class='output co'>#&gt; eBird Status &amp; Trends extent: 
 #&gt;   Polygon: 1 MULTIPOLYGON features
 #&gt;   Bounding box: xmin -84.32385; ymin 33.88199; xmax -75.45698; ymax 36.58965
-#&gt;   CRS: +proj=longlat +datum=NAD27 +no_defs 
+#&gt;   CRS: +proj=longlat +datum=NAD27 +no_defs  
 #&gt;   Temporal extent: 2018-01-01  -  2018-12-31 </div><div class='input'>
 <span class='co'># subset to january</span>
 <span class='fu'>ebirdst_extent</span>(<span class='no'>bb</span>, <span class='kw'>t</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"2018-01-01"</span>, <span class='st'>"2018-01-31"</span>))</div><div class='output co'>#&gt; eBird Status &amp; Trends extent: 
 #&gt;   Bounding box: xmin -80; ymin 40; xmax -70; ymax 47
-#&gt;   CRS: +proj=longlat +datum=WGS84 +no_defs 
+#&gt;   CRS: +proj=longlat +datum=WGS84 +no_defs  
 #&gt;   Temporal extent: 2018-01-01  -  2018-02-01 </div><div class='input'>
 <span class='co'># dates can wrap around, e.g. to use dec-jan</span>
 <span class='fu'>ebirdst_extent</span>(<span class='no'>bb</span>, <span class='kw'>t</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"2018-12-01"</span>, <span class='st'>"2018-01-31"</span>))</div><div class='output co'>#&gt; eBird Status &amp; Trends extent: 
 #&gt;   Bounding box: xmin -80; ymin 40; xmax -70; ymax 47
-#&gt;   CRS: +proj=longlat +datum=WGS84 +no_defs 
+#&gt;   CRS: +proj=longlat +datum=WGS84 +no_defs  
 #&gt;   Temporal extent: 2018-11-30  -  2018-02-01 </div><div class='input'>
 <span class='co'># dates can also be given without an associated year</span>
 <span class='fu'>ebirdst_extent</span>(<span class='no'>bb</span>, <span class='kw'>t</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"12-01"</span>, <span class='st'>"01-31"</span>))</div><div class='output co'>#&gt; eBird Status &amp; Trends extent: 
 #&gt;   Bounding box: xmin -80; ymin 40; xmax -70; ymax 47
-#&gt;   CRS: +proj=longlat +datum=WGS84 +no_defs 
+#&gt;   CRS: +proj=longlat +datum=WGS84 +no_defs  
 #&gt;   Temporal extent: 2018-11-30  -  2018-02-01 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
