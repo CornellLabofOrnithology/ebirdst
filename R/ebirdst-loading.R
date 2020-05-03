@@ -91,6 +91,11 @@ ebirdst_download <- function(species,
                            grepl("band_dates", s3_files$file), ]
   }
 
+  dl_filter <- Sys.getenv("EBIRDST_DL_FILTER")
+  if (dl_filter != "") {
+    s3_files <- s3_files[grepl(dl_filter, s3_files$file), ]
+  }
+
   # human readable download size if we want to add a message
   #size_human <- utils:::format.object_size(sum(s3_files$size), "auto")
 
