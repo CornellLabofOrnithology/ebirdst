@@ -4,7 +4,7 @@
 \alias{compute_ppms}
 \title{Computes the Predictive Performance Metrics for a spatiotemporal extent}
 \usage{
-compute_ppms(path, ext)
+compute_ppms(path, ext, es_cutoff = 75)
 }
 \arguments{
 \item{path}{character; full path to directory containing the eBird Status and
@@ -12,6 +12,9 @@ Trends products for a single species.}
 
 \item{ext}{\link{ebirdst_extent} object (optional); the spatiotemporal extent to
 filter the data to.}
+
+\item{es_cutoff}{integer between 0-100; the ensemble support cutoff to use in
+distinguishing zero and non-zero predictions.}
 }
 \value{
 A list of three data frames: \code{binary_ppms}, \code{occ_ppms}, and
