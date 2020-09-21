@@ -19,7 +19,6 @@ Sys.setenv(BUILD_VIGNETTES = TRUE)
 devtools::build_vignettes()
 rmarkdown::render("README.Rmd")
 pkgdown::build_site()
-file.copy(list.files(".", "README.*png$", full.names = TRUE), "docs/")
 Sys.unsetenv("BUILD_VIGNETTES")
 
 # checks

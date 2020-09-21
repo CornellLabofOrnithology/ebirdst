@@ -131,7 +131,7 @@ metrics, or use <code><a href='plot_all_ppms.html'>plot_all_ppms()</a></code> or
 metrics.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>compute_ppms</span>(<span class='no'>path</span>, <span class='no'>ext</span>)</pre>
+    <pre class="usage"><span class='fu'>compute_ppms</span>(<span class='no'>path</span>, <span class='no'>ext</span>, <span class='kw'>es_cutoff</span> <span class='kw'>=</span> <span class='fl'>75</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -145,6 +145,11 @@ Trends products for a single species.</p></td>
       <th>ext</th>
       <td><p><a href='ebirdst_extent.html'>ebirdst_extent</a> object (optional); the spatiotemporal extent to
 filter the data to.</p></td>
+    </tr>
+    <tr>
+      <th>es_cutoff</th>
+      <td><p>integer between 0-100; the ensemble support cutoff to use in
+distinguishing zero and non-zero predictions.</p></td>
     </tr>
     </table>
 

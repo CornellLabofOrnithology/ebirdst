@@ -137,80 +137,81 @@
 <span id="cb4-18"><a href="#cb4-18"></a><span class="co"># use parse_raster_dates() to get actual date objects for each layer</span></span>
 <span id="cb4-19"><a href="#cb4-19"></a>date_vector &lt;-<span class="st"> </span><span class="kw">parse_raster_dates</span>(abunds)</span>
 <span id="cb4-20"><a href="#cb4-20"></a><span class="kw">print</span>(date_vector)</span>
-<span id="cb4-21"><a href="#cb4-21"></a><span class="co">#&gt;  [1] "2018-01-04" "2018-01-11" "2018-01-18" "2018-01-25" "2018-02-01" "2018-02-08" "2018-02-15" "2018-02-22"</span></span>
-<span id="cb4-22"><a href="#cb4-22"></a><span class="co">#&gt;  [9] "2018-03-01" "2018-03-08" "2018-03-15" "2018-03-22" "2018-03-29" "2018-04-05" "2018-04-12" "2018-04-19"</span></span>
-<span id="cb4-23"><a href="#cb4-23"></a><span class="co">#&gt; [17] "2018-04-26" "2018-05-03" "2018-05-10" "2018-05-17" "2018-05-24" "2018-05-31" "2018-06-07" "2018-06-14"</span></span>
-<span id="cb4-24"><a href="#cb4-24"></a><span class="co">#&gt; [25] "2018-06-21" "2018-06-28" "2018-07-06" "2018-07-13" "2018-07-20" "2018-07-27" "2018-08-03" "2018-08-10"</span></span>
-<span id="cb4-25"><a href="#cb4-25"></a><span class="co">#&gt; [33] "2018-08-17" "2018-08-24" "2018-08-31" "2018-09-07" "2018-09-14" "2018-09-21" "2018-09-28" "2018-10-05"</span></span>
-<span id="cb4-26"><a href="#cb4-26"></a><span class="co">#&gt; [41] "2018-10-12" "2018-10-19" "2018-10-26" "2018-11-02" "2018-11-09" "2018-11-16" "2018-11-23" "2018-11-30"</span></span>
-<span id="cb4-27"><a href="#cb4-27"></a><span class="co">#&gt; [49] "2018-12-07" "2018-12-14" "2018-12-21" "2018-12-28"</span></span>
-<span id="cb4-28"><a href="#cb4-28"></a></span>
-<span id="cb4-29"><a href="#cb4-29"></a><span class="co"># select a week in the summer</span></span>
-<span id="cb4-30"><a href="#cb4-30"></a>abund &lt;-<span class="st"> </span>abunds[[<span class="dv">26</span>]]</span>
-<span id="cb4-31"><a href="#cb4-31"></a><span class="kw">rm</span>(abunds)</span>
-<span id="cb4-32"><a href="#cb4-32"></a></span>
-<span id="cb4-33"><a href="#cb4-33"></a><span class="co"># project to mollweide for mapping</span></span>
-<span id="cb4-34"><a href="#cb4-34"></a><span class="co"># the nearest neighbor method preserves cell values across projections</span></span>
-<span id="cb4-35"><a href="#cb4-35"></a>mollweide &lt;-<span class="st"> "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"</span></span>
-<span id="cb4-36"><a href="#cb4-36"></a>abund_moll &lt;-<span class="st"> </span><span class="kw">projectRaster</span>(abund, <span class="dt">crs =</span> mollweide, <span class="dt">method =</span> <span class="st">"ngb"</span>)</span>
-<span id="cb4-37"><a href="#cb4-37"></a></span>
-<span id="cb4-38"><a href="#cb4-38"></a><span class="co"># get reference data from the rnaturalearth package</span></span>
-<span id="cb4-39"><a href="#cb4-39"></a><span class="co"># the example data currently shows only the US state of Michigan</span></span>
-<span id="cb4-40"><a href="#cb4-40"></a>wh_states &lt;-<span class="st"> </span><span class="kw">ne_states</span>(<span class="dt">country =</span> <span class="kw">c</span>(<span class="st">"United States of America"</span>, <span class="st">"Canada"</span>),</span>
-<span id="cb4-41"><a href="#cb4-41"></a>                    <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb4-42"><a href="#cb4-42"></a><span class="st">  </span><span class="kw">st_transform</span>(<span class="dt">crs =</span> mollweide) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb4-43"><a href="#cb4-43"></a><span class="st">  </span><span class="kw">st_geometry</span>()</span>
-<span id="cb4-44"><a href="#cb4-44"></a>  </span>
-<span id="cb4-45"><a href="#cb4-45"></a><span class="co"># calculate ideal color bins for abundance values for this week</span></span>
-<span id="cb4-46"><a href="#cb4-46"></a>week_bins &lt;-<span class="st"> </span><span class="kw">calc_bins</span>(abund_moll)</span>
-<span id="cb4-47"><a href="#cb4-47"></a></span>
-<span id="cb4-48"><a href="#cb4-48"></a><span class="co"># start plotting</span></span>
-<span id="cb4-49"><a href="#cb4-49"></a><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>), <span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">6</span>))</span>
-<span id="cb4-50"><a href="#cb4-50"></a></span>
-<span id="cb4-51"><a href="#cb4-51"></a><span class="co"># use raster bounding box to set the spatial extent for the plot</span></span>
-<span id="cb4-52"><a href="#cb4-52"></a>bb &lt;-<span class="st"> </span><span class="kw">st_as_sfc</span>(<span class="kw">st_bbox</span>(<span class="kw">trim</span>(abund_moll)))</span>
-<span id="cb4-53"><a href="#cb4-53"></a><span class="kw">plot</span>(bb, <span class="dt">col =</span> <span class="st">"white"</span>, <span class="dt">border =</span> <span class="st">"white"</span>)</span>
-<span id="cb4-54"><a href="#cb4-54"></a></span>
-<span id="cb4-55"><a href="#cb4-55"></a><span class="co"># add background reference data</span></span>
-<span id="cb4-56"><a href="#cb4-56"></a><span class="kw">plot</span>(wh_states, <span class="dt">col =</span> <span class="st">"#eeeeee"</span>, <span class="dt">border =</span> <span class="ot">NA</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb4-57"><a href="#cb4-57"></a></span>
-<span id="cb4-58"><a href="#cb4-58"></a><span class="co"># plot zeroes as gray</span></span>
-<span id="cb4-59"><a href="#cb4-59"></a><span class="kw">plot</span>(abund_moll <span class="op">==</span><span class="st"> </span><span class="dv">0</span>, <span class="dt">col =</span> <span class="st">"#dddddd"</span>, </span>
-<span id="cb4-60"><a href="#cb4-60"></a>     <span class="dt">maxpixels =</span> <span class="kw">ncell</span>(abund_moll),</span>
-<span id="cb4-61"><a href="#cb4-61"></a>     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb4-62"><a href="#cb4-62"></a></span>
-<span id="cb4-63"><a href="#cb4-63"></a><span class="co"># define color bins</span></span>
-<span id="cb4-64"><a href="#cb4-64"></a>qcol &lt;-<span class="st"> </span><span class="kw">abundance_palette</span>(<span class="kw">length</span>(week_bins<span class="op">$</span>bins) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="st">"weekly"</span>)</span>
-<span id="cb4-65"><a href="#cb4-65"></a></span>
-<span id="cb4-66"><a href="#cb4-66"></a><span class="co"># plot abundances</span></span>
-<span id="cb4-67"><a href="#cb4-67"></a><span class="kw">plot</span>(abund_moll, <span class="dt">col =</span> qcol, <span class="dt">breaks =</span> week_bins<span class="op">$</span>bins,</span>
-<span id="cb4-68"><a href="#cb4-68"></a>     <span class="dt">maxpixels =</span> <span class="kw">ncell</span>(abund_moll),</span>
-<span id="cb4-69"><a href="#cb4-69"></a>     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb4-70"><a href="#cb4-70"></a></span>
-<span id="cb4-71"><a href="#cb4-71"></a><span class="co"># for legend, create a smaller set of bin labels</span></span>
-<span id="cb4-72"><a href="#cb4-72"></a>bin_labels &lt;-<span class="st"> </span><span class="kw">format</span>(<span class="kw">round</span>(week_bins<span class="op">$</span>bins, <span class="dv">2</span>), <span class="dt">nsmall =</span> <span class="dv">2</span>)</span>
-<span id="cb4-73"><a href="#cb4-73"></a>bin_labels[<span class="op">!</span>(bin_labels <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(bin_labels[<span class="dv">1</span>],</span>
-<span id="cb4-74"><a href="#cb4-74"></a>                               bin_labels[<span class="kw">round</span>((<span class="kw">length</span>(bin_labels) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>)) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>],</span>
-<span id="cb4-75"><a href="#cb4-75"></a>                               bin_labels[<span class="kw">length</span>(bin_labels)]))] &lt;-<span class="st"> ""</span></span>
-<span id="cb4-76"><a href="#cb4-76"></a>bin_labels &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"0"</span>, bin_labels)</span>
-<span id="cb4-77"><a href="#cb4-77"></a></span>
-<span id="cb4-78"><a href="#cb4-78"></a><span class="co"># create colors that include gray for 0</span></span>
-<span id="cb4-79"><a href="#cb4-79"></a>lcol &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"#dddddd"</span>, qcol)</span>
-<span id="cb4-80"><a href="#cb4-80"></a></span>
-<span id="cb4-81"><a href="#cb4-81"></a><span class="co"># set legend such that color ramp appears linearly</span></span>
-<span id="cb4-82"><a href="#cb4-82"></a>ltq &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dt">from =</span> week_bins<span class="op">$</span>bins[<span class="dv">1</span>], <span class="dt">to =</span> week_bins<span class="op">$</span>bins[<span class="kw">length</span>(week_bins<span class="op">$</span>bins)],</span>
-<span id="cb4-83"><a href="#cb4-83"></a>           <span class="dt">length.out =</span> <span class="kw">length</span>(week_bins<span class="op">$</span>bins))</span>
-<span id="cb4-84"><a href="#cb4-84"></a>ltq &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, ltq)</span>
-<span id="cb4-85"><a href="#cb4-85"></a></span>
-<span id="cb4-86"><a href="#cb4-86"></a><span class="co"># plot legend</span></span>
-<span id="cb4-87"><a href="#cb4-87"></a><span class="kw">plot</span>(abund_moll <span class="op">^</span><span class="st"> </span>week_bins<span class="op">$</span>power, <span class="dt">legend.only =</span> <span class="ot">TRUE</span>,</span>
-<span id="cb4-88"><a href="#cb4-88"></a>     <span class="dt">col =</span> lcol,</span>
-<span id="cb4-89"><a href="#cb4-89"></a>     <span class="dt">breaks =</span> ltq <span class="op">^</span><span class="st"> </span>week_bins<span class="op">$</span>power, </span>
-<span id="cb4-90"><a href="#cb4-90"></a>     <span class="dt">lab.breaks =</span> bin_labels, <span class="dt">legend.shrink =</span> <span class="fl">0.97</span>,</span>
-<span id="cb4-91"><a href="#cb4-91"></a>     <span class="dt">legend.width =</span> <span class="dv">2</span>, <span class="dt">axis.args =</span> <span class="kw">list</span>(<span class="dt">cex.axis =</span> <span class="fl">0.9</span>, <span class="dt">lwd.ticks =</span> <span class="dv">0</span>))</span>
-<span id="cb4-92"><a href="#cb4-92"></a></span>
-<span id="cb4-93"><a href="#cb4-93"></a><span class="co"># add state boundaries on top</span></span>
-<span id="cb4-94"><a href="#cb4-94"></a><span class="kw">plot</span>(<span class="kw">st_geometry</span>(wh_states), <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="ot">NA</span>, <span class="dt">border =</span> <span class="st">"white"</span>, <span class="dt">lwd =</span> <span class="fl">1.5</span>)</span></code></pre></div>
+<span id="cb4-21"><a href="#cb4-21"></a><span class="co">#&gt;  [1] "2018-01-04" "2018-01-11" "2018-01-18" "2018-01-25" "2018-02-01" "2018-02-08" "2018-02-15"</span></span>
+<span id="cb4-22"><a href="#cb4-22"></a><span class="co">#&gt;  [8] "2018-02-22" "2018-03-01" "2018-03-08" "2018-03-15" "2018-03-22" "2018-03-29" "2018-04-05"</span></span>
+<span id="cb4-23"><a href="#cb4-23"></a><span class="co">#&gt; [15] "2018-04-12" "2018-04-19" "2018-04-26" "2018-05-03" "2018-05-10" "2018-05-17" "2018-05-24"</span></span>
+<span id="cb4-24"><a href="#cb4-24"></a><span class="co">#&gt; [22] "2018-05-31" "2018-06-07" "2018-06-14" "2018-06-21" "2018-06-28" "2018-07-06" "2018-07-13"</span></span>
+<span id="cb4-25"><a href="#cb4-25"></a><span class="co">#&gt; [29] "2018-07-20" "2018-07-27" "2018-08-03" "2018-08-10" "2018-08-17" "2018-08-24" "2018-08-31"</span></span>
+<span id="cb4-26"><a href="#cb4-26"></a><span class="co">#&gt; [36] "2018-09-07" "2018-09-14" "2018-09-21" "2018-09-28" "2018-10-05" "2018-10-12" "2018-10-19"</span></span>
+<span id="cb4-27"><a href="#cb4-27"></a><span class="co">#&gt; [43] "2018-10-26" "2018-11-02" "2018-11-09" "2018-11-16" "2018-11-23" "2018-11-30" "2018-12-07"</span></span>
+<span id="cb4-28"><a href="#cb4-28"></a><span class="co">#&gt; [50] "2018-12-14" "2018-12-21" "2018-12-28"</span></span>
+<span id="cb4-29"><a href="#cb4-29"></a></span>
+<span id="cb4-30"><a href="#cb4-30"></a><span class="co"># select a week in the summer</span></span>
+<span id="cb4-31"><a href="#cb4-31"></a>abund &lt;-<span class="st"> </span>abunds[[<span class="dv">26</span>]]</span>
+<span id="cb4-32"><a href="#cb4-32"></a><span class="kw">rm</span>(abunds)</span>
+<span id="cb4-33"><a href="#cb4-33"></a></span>
+<span id="cb4-34"><a href="#cb4-34"></a><span class="co"># project to mollweide for mapping</span></span>
+<span id="cb4-35"><a href="#cb4-35"></a><span class="co"># the nearest neighbor method preserves cell values across projections</span></span>
+<span id="cb4-36"><a href="#cb4-36"></a>mollweide &lt;-<span class="st"> "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"</span></span>
+<span id="cb4-37"><a href="#cb4-37"></a>abund_moll &lt;-<span class="st"> </span><span class="kw">projectRaster</span>(abund, <span class="dt">crs =</span> mollweide, <span class="dt">method =</span> <span class="st">"ngb"</span>)</span>
+<span id="cb4-38"><a href="#cb4-38"></a></span>
+<span id="cb4-39"><a href="#cb4-39"></a><span class="co"># get reference data from the rnaturalearth package</span></span>
+<span id="cb4-40"><a href="#cb4-40"></a><span class="co"># the example data currently shows only the US state of Michigan</span></span>
+<span id="cb4-41"><a href="#cb4-41"></a>wh_states &lt;-<span class="st"> </span><span class="kw">ne_states</span>(<span class="dt">country =</span> <span class="kw">c</span>(<span class="st">"United States of America"</span>, <span class="st">"Canada"</span>),</span>
+<span id="cb4-42"><a href="#cb4-42"></a>                    <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb4-43"><a href="#cb4-43"></a><span class="st">  </span><span class="kw">st_transform</span>(<span class="dt">crs =</span> mollweide) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb4-44"><a href="#cb4-44"></a><span class="st">  </span><span class="kw">st_geometry</span>()</span>
+<span id="cb4-45"><a href="#cb4-45"></a>  </span>
+<span id="cb4-46"><a href="#cb4-46"></a><span class="co"># calculate ideal color bins for abundance values for this week</span></span>
+<span id="cb4-47"><a href="#cb4-47"></a>week_bins &lt;-<span class="st"> </span><span class="kw">calc_bins</span>(abund_moll)</span>
+<span id="cb4-48"><a href="#cb4-48"></a></span>
+<span id="cb4-49"><a href="#cb4-49"></a><span class="co"># start plotting</span></span>
+<span id="cb4-50"><a href="#cb4-50"></a><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>), <span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">6</span>))</span>
+<span id="cb4-51"><a href="#cb4-51"></a></span>
+<span id="cb4-52"><a href="#cb4-52"></a><span class="co"># use raster bounding box to set the spatial extent for the plot</span></span>
+<span id="cb4-53"><a href="#cb4-53"></a>bb &lt;-<span class="st"> </span><span class="kw">st_as_sfc</span>(<span class="kw">st_bbox</span>(<span class="kw">trim</span>(abund_moll)))</span>
+<span id="cb4-54"><a href="#cb4-54"></a><span class="kw">plot</span>(bb, <span class="dt">col =</span> <span class="st">"white"</span>, <span class="dt">border =</span> <span class="st">"white"</span>)</span>
+<span id="cb4-55"><a href="#cb4-55"></a></span>
+<span id="cb4-56"><a href="#cb4-56"></a><span class="co"># add background reference data</span></span>
+<span id="cb4-57"><a href="#cb4-57"></a><span class="kw">plot</span>(wh_states, <span class="dt">col =</span> <span class="st">"#eeeeee"</span>, <span class="dt">border =</span> <span class="ot">NA</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb4-58"><a href="#cb4-58"></a></span>
+<span id="cb4-59"><a href="#cb4-59"></a><span class="co"># plot zeroes as gray</span></span>
+<span id="cb4-60"><a href="#cb4-60"></a><span class="kw">plot</span>(abund_moll <span class="op">==</span><span class="st"> </span><span class="dv">0</span>, <span class="dt">col =</span> <span class="st">"#dddddd"</span>, </span>
+<span id="cb4-61"><a href="#cb4-61"></a>     <span class="dt">maxpixels =</span> <span class="kw">ncell</span>(abund_moll),</span>
+<span id="cb4-62"><a href="#cb4-62"></a>     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb4-63"><a href="#cb4-63"></a></span>
+<span id="cb4-64"><a href="#cb4-64"></a><span class="co"># define color bins</span></span>
+<span id="cb4-65"><a href="#cb4-65"></a>qcol &lt;-<span class="st"> </span><span class="kw">abundance_palette</span>(<span class="kw">length</span>(week_bins<span class="op">$</span>bins) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="st">"weekly"</span>)</span>
+<span id="cb4-66"><a href="#cb4-66"></a></span>
+<span id="cb4-67"><a href="#cb4-67"></a><span class="co"># plot abundances</span></span>
+<span id="cb4-68"><a href="#cb4-68"></a><span class="kw">plot</span>(abund_moll, <span class="dt">col =</span> qcol, <span class="dt">breaks =</span> week_bins<span class="op">$</span>bins,</span>
+<span id="cb4-69"><a href="#cb4-69"></a>     <span class="dt">maxpixels =</span> <span class="kw">ncell</span>(abund_moll),</span>
+<span id="cb4-70"><a href="#cb4-70"></a>     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb4-71"><a href="#cb4-71"></a></span>
+<span id="cb4-72"><a href="#cb4-72"></a><span class="co"># for legend, create a smaller set of bin labels</span></span>
+<span id="cb4-73"><a href="#cb4-73"></a>bin_labels &lt;-<span class="st"> </span><span class="kw">format</span>(<span class="kw">round</span>(week_bins<span class="op">$</span>bins, <span class="dv">2</span>), <span class="dt">nsmall =</span> <span class="dv">2</span>)</span>
+<span id="cb4-74"><a href="#cb4-74"></a>bin_labels[<span class="op">!</span>(bin_labels <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(bin_labels[<span class="dv">1</span>],</span>
+<span id="cb4-75"><a href="#cb4-75"></a>                               bin_labels[<span class="kw">round</span>((<span class="kw">length</span>(bin_labels) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>)) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>],</span>
+<span id="cb4-76"><a href="#cb4-76"></a>                               bin_labels[<span class="kw">length</span>(bin_labels)]))] &lt;-<span class="st"> ""</span></span>
+<span id="cb4-77"><a href="#cb4-77"></a>bin_labels &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"0"</span>, bin_labels)</span>
+<span id="cb4-78"><a href="#cb4-78"></a></span>
+<span id="cb4-79"><a href="#cb4-79"></a><span class="co"># create colors that include gray for 0</span></span>
+<span id="cb4-80"><a href="#cb4-80"></a>lcol &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"#dddddd"</span>, qcol)</span>
+<span id="cb4-81"><a href="#cb4-81"></a></span>
+<span id="cb4-82"><a href="#cb4-82"></a><span class="co"># set legend such that color ramp appears linearly</span></span>
+<span id="cb4-83"><a href="#cb4-83"></a>ltq &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dt">from =</span> week_bins<span class="op">$</span>bins[<span class="dv">1</span>], <span class="dt">to =</span> week_bins<span class="op">$</span>bins[<span class="kw">length</span>(week_bins<span class="op">$</span>bins)],</span>
+<span id="cb4-84"><a href="#cb4-84"></a>           <span class="dt">length.out =</span> <span class="kw">length</span>(week_bins<span class="op">$</span>bins))</span>
+<span id="cb4-85"><a href="#cb4-85"></a>ltq &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, ltq)</span>
+<span id="cb4-86"><a href="#cb4-86"></a></span>
+<span id="cb4-87"><a href="#cb4-87"></a><span class="co"># plot legend</span></span>
+<span id="cb4-88"><a href="#cb4-88"></a><span class="kw">plot</span>(abund_moll <span class="op">^</span><span class="st"> </span>week_bins<span class="op">$</span>power, <span class="dt">legend.only =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb4-89"><a href="#cb4-89"></a>     <span class="dt">col =</span> lcol,</span>
+<span id="cb4-90"><a href="#cb4-90"></a>     <span class="dt">breaks =</span> ltq <span class="op">^</span><span class="st"> </span>week_bins<span class="op">$</span>power, </span>
+<span id="cb4-91"><a href="#cb4-91"></a>     <span class="dt">lab.breaks =</span> bin_labels, <span class="dt">legend.shrink =</span> <span class="fl">0.97</span>,</span>
+<span id="cb4-92"><a href="#cb4-92"></a>     <span class="dt">legend.width =</span> <span class="dv">2</span>, <span class="dt">axis.args =</span> <span class="kw">list</span>(<span class="dt">cex.axis =</span> <span class="fl">0.9</span>, <span class="dt">lwd.ticks =</span> <span class="dv">0</span>))</span>
+<span id="cb4-93"><a href="#cb4-93"></a></span>
+<span id="cb4-94"><a href="#cb4-94"></a><span class="co"># add state boundaries on top</span></span>
+<span id="cb4-95"><a href="#cb4-95"></a><span class="kw">plot</span>(<span class="kw">st_geometry</span>(wh_states), <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="ot">NA</span>, <span class="dt">border =</span> <span class="st">"white"</span>, <span class="dt">lwd =</span> <span class="fl">1.5</span>)</span></code></pre></div>
 <p><img src="README-quick_start-1.png" style="display: block; margin: auto;"></p>
 </div>
 </div>
