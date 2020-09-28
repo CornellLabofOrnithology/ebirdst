@@ -1,7 +1,7 @@
 library(tidyverse)
 
 e <- file.path("data-raw",
-               "yebsap-ERD2018-EBIRD_SCIENCE-20191030-3abe59ca_config.rds") %>%
+               "sprpip-ERD2019-STATUS-20200828-4287e712_config.rds") %>%
   readRDS()
 
 # predictors
@@ -10,10 +10,13 @@ ebirdst_predictors <- tibble(predictor = e$PREDICTOR_LIST) %>%
            str_replace_all("\\.", "_"),
          lc_class = str_replace(predictor_tidy, "_1500_[a-z]+$", ""),
          lc_class = if_else(str_detect(lc_class, "_fs_") |
-                              str_detect(lc_class, "ntl"),
+                              str_detect(lc_class, "ntl") |
+                              str_detect(lc_class, "gp_rtp"),
                             lc_class, NA_character_),
          lc_class = if_else(str_detect(lc_class, "ntl"),
-                            "ntl", lc_class)) %>%
+                            "ntl", lc_class),
+         lc_class = if_else(str_detect(lc_class, "gp_rtp_$"),
+                            "gp_rtp_$", lc_class)) %>%
   # assign labels
   dplyr::mutate(lc_class_label = dplyr::case_when(
     # umd landcover
@@ -94,19 +97,32 @@ ebirdst_predictors <- tibble(predictor = e$PREDICTOR_LIST) %>%
     lc_class == "esacci_lc_fs_c82" ~ "Tree cover, needleleaved, deciduous, open (15‐40%)",
     lc_class == "esacci_lc_fs_c90" ~ "Tree cover, mixed leaf type (broadleaved and needleleaved)",
     # water cover
-    lc_class == "mod44w_oic_fs_c1" ~ "Ocean",
-    lc_class == "mod44w_oic_fs_c2" ~ "Inland Water",
-    lc_class == "mod44w_oic_fs_c3" ~ "Coastal Water",
+    lc_class == "astwbd_fs_c1" ~ "Ocean",
+    lc_class == "astwbd_fs_c2" ~ "River",
+    lc_class == "astwbd_fs_c3" ~ "Lakes",
+    # roads
+    lc_class == "gp_rtp_1" ~ "Highways (m/km2)",
+    lc_class == "gp_rtp_2" ~ "Primary Roads (m/km2)",
+    lc_class == "gp_rtp_3" ~ "Secondary Roads (m/km2)",
+    lc_class == "gp_rtp_4" ~ "Tertiary Roads (m/km2)",
+    lc_class == "gp_rtp_5" ~ "Local Roads (m/km2)",
     # intertidal
     lc_class == "intertidal_fs_c1" ~ "Tidal Mudflats",
     # ntl
     lc_class == "ntl" ~ "Nighttime Lights",
     TRUE ~ NA_character_)) %>%
   mutate(predictor_label = if_else(is.na(lc_class_label),
+                                   # if
                                    str_replace_all(predictor_tidy, "_", " ") %>%
                                      str_to_title(),
+                                   # else
+                                   if_else(is.na(str_extract(predictor,
+                                                             "[A-Z]+$")),
+                                           # if
+                                           lc_class_label,
+                                           # else
                                    paste(lc_class_label,
-                                         str_extract(predictor, "[A-Z]+$"))),
+                                         str_extract(predictor, "[A-Z]+$")))),
          predictor_label = str_replace(predictor_label, "Km", "(km)"),
          predictor_label = str_replace(predictor_label, "Hrs", "Hours"),
          predictor_label = str_replace(predictor_label, "Elev", "Elevation"),
