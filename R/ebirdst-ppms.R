@@ -94,8 +94,8 @@ compute_ppms <- function(path, ext, es_cutoff = 75) {
 
   # compute monte carlo sample of ppms for spatiotemporal subset
   # split data into within range and out of range
-  ppm_data_zeroes <- ppm_data[ppm_data$pi_es < es_cutoff | is.na(ppm_data$pi_es), ]
-  ppm_data <- ppm_data[ppm_data$pi_es >= es_cutoff, ]
+  ppm_data_zeroes <- ppm_data[ppm_data$pi_es < 95 | is.na(ppm_data$pi_es), ]
+  ppm_data <- ppm_data[ppm_data$pi_es >= 95, ]
 
   if (nrow(ppm_data) == 0) {
     warning("No predicted occurrences within spatiotemporal extent.")
