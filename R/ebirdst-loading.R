@@ -445,7 +445,7 @@ load_summary <- function(path, return_sf = FALSE) {
   summary_df <- data.table::fread(summary_file,
                                   stringsAsFactors = FALSE,
                                   showProgress = FALSE)
-  summary_df <- summary_df[, c("stixel", "data_type") := NULL]
+  summary_df <- summary_df[, c("summary_hash", "stixel", "data_type") := NULL]
   summary_df <- summary_df[!is.na(summary_df$lon), ]
 
   summary_df <- as.data.frame(summary_df, stringsAsFactors = FALSE)
@@ -546,9 +546,11 @@ load_pis <- function(path, return_sf = FALSE) {
 #' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #' plot_pds(pds, ext = e, n_top_pred = 15, by_cover_class = TRUE)
-load_pds <- function(path, return_sf = FALSE) {
+load_pds <- function(path, model = c("occurrence", "abundance"),
+                     return_sf = FALSE) {
   stopifnot(dir.exists(path))
   stopifnot(is.logical(return_sf), length(return_sf) == 1)
+  stopifnot(model %in% c("occurrence", "abundance"))
 
   stixel_path <- file.path(path, "results", "stixels")
   pd_file <- file.path(stixel_path, "pd.txt")
@@ -562,9 +564,17 @@ load_pds <- function(path, return_sf = FALSE) {
                              stringsAsFactors = FALSE,
                              showProgress = FALSE)
 
+  # pick occ or abd pis
+  model <- match.arg(model)
+  if (model == "occurrence") {
+    pd_df <- pd_df[pd_df$model == "occ", ]
+  } else {
+    pd_df <- pd_df[pd_df$model == "abd", ]
+  }
+
   # summary file
   summary_df <- load_summary(path)
-  summary_df <- summary_df[, 1:12]
+  summary_df <- summary_df[, 1:5]
 
   # merge pis with summary
   pd_summary <- dplyr::inner_join(summary_df, pd_df, by = "stixel_id")
