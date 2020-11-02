@@ -49,8 +49,8 @@ compute_ppms <- function(path, ext, es_cutoff = 75) {
   ppm_data <- load_test_preds(path = path)
   ppm_data_raw <- load_test_data(path = path)
 
-  # add aditional rows from raw data file
-  # these are assumed zeros and therefore not in test prediciton data
+  # add additional rows from raw data file
+  # these are assumed zeros and therefore not in test prediction data
   ppm_data_raw <- ppm_data_raw[c("sampling_event_id", "lon", "lat", "day", "obs")]
   ppm_data_raw$date <- ppm_data_raw$day / 366
   ppm_data_raw$day <- NULL
@@ -94,8 +94,8 @@ compute_ppms <- function(path, ext, es_cutoff = 75) {
 
   # compute monte carlo sample of ppms for spatiotemporal subset
   # split data into within range and out of range
-  ppm_data_zeroes <- ppm_data[ppm_data$pi_es < 95 | is.na(ppm_data$pi_es), ]
-  ppm_data <- ppm_data[ppm_data$pi_es >= 95, ]
+  ppm_data_zeroes <- ppm_data[ppm_data$pi_es < es_cutoff | is.na(ppm_data$pi_es), ]
+  ppm_data <- ppm_data[ppm_data$pi_es >= es_cutoff, ]
 
   if (nrow(ppm_data) == 0) {
     warning("No predicted occurrences within spatiotemporal extent.")
