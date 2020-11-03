@@ -147,9 +147,9 @@ ebirdst_download <- function(species,
 #'   name or six-letter species code (e.g. woothr). The full list of valid
 #'   species is can be viewed in the [ebirdst_runs] data frame included in this
 #'   package. To return the path to the example data, use "example_data".
-#' @param path character; directory that the data were downloaded to. Defaults
-#'   to the suggested persistent data directory data directory:
-#'   rappdirs::user_data_dir("ebirdst")).
+#' @param path character; directory that the Status and Trends data for a given
+#'   species was downloaded to. Defaults to the suggested persistent data
+#'   directory data directory: `rappdirs::user_data_dir("ebirdst"))`.
 #'
 #' @return The path to the data package directory.
 #' @export
@@ -195,18 +195,23 @@ get_species_path <- function(species,
 }
 
 
-#' Load eBird Status and Trends raster data
+#' Load eBird Status and Trends raster data cubes
 #'
 #' Each of the eBird Status and Trends products is packaged as a GeoTIFF file
-#' with 52 bands, one for each week of the year. This function loads the data
-#' for a given product and species as a `RasterStack` object.
+#' (referred to as a "cube) with 52 bands, one for each week of the year. This
+#' function loads the cube for a given product and species as a `RasterStack`
+#' object.
 #'
-#' @param product character; status and trends product to load, options are
+#' @param path character; directory that the Status and Trends data for a given
+#'   species was downloaded to. This path is returned by `ebirdst_download()`
+#'   or `get_species_path()`.
+#' @param product character; Status and Trends product to load, options are
 #'   relative abundance, seasonal abundance, count, occurrence, and upper and
 #'   lower bounds on relative abundance. It is also possible to return a
 #'   template raster with no data.
-#' @param path character; full path to the directory containing single species
-#'   eBird Status and Trends products.
+#' @param resolution character; the resolution of the raster data to load. The
+#'   default is to load the native ~3 km resolution (`"hr"`); however, for some
+#'   applications 9 km (`"mr"`) or 27 km (`"lr"`) data may be suitable.
 #'
 #' @details The available raster layers are as follows:
 #'
@@ -234,12 +239,12 @@ get_species_path <- function(species,
 #' starting at the optimal time of day with the optimal search duration and
 #' distance that maximizes detection of that species in a region.
 #'
-#' @return A `RasterStack` with 52 layers for the given product, labelled by
+#' @return A `RasterStack` with 52 layers for the given product, labeled by
 #'   week. Seasonal abundance is the result of averaging the weekly abundance
 #'   raster layers for each season or across the whole year for resident
 #'   species. The date boundaries used for the seasonal definitions appear in
 #'   `ebirdst_runs` and if a season failed review no associated layer will be
-#'   included. There will be up to four layers labelled according to the
+#'   included. There will be up to four layers labeled according to the
 #'   seasons.
 #'
 #' @export
@@ -249,82 +254,90 @@ get_species_path <- function(species,
 #' sp_path <- ebirdst_download("example_data")
 #'
 #' # load data
-#' load_raster("abundance", sp_path)
-load_raster <- function(product = c("abundance",
+#' load_raster(sp_path, "abundance")
+load_raster <- function(path,
+                        product = c("abundance",
                                     "abundance_seasonal",
                                     "count",
                                     "occurrence",
                                     "abundance_lower",
                                     "abundance_upper",
                                     "template"),
-                        path) {
+                        resolution = c("hr", "mr", "lr")) {
+
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
   product <- match.arg(product)
+  resolution <- match.arg(resolution)
+
   if (product %in% c("abundance", "count", "occurrence")) {
     product <- paste0(product, "_median")
   }
 
   # load raster
   if (product == "template") {
+    if (resolution != "hr") {
+      stop("For the raster template, resolution must be 'hr'")
+    }
     # template raster
     tif_path <- list.files(file.path(path, "data"),
                            pattern = "srd_raster_template\\.tif$",
                            full.names = TRUE)
     if (length(tif_path) != 1 || !file.exists(tif_path)) {
-      stop(paste("Error locating GeoTIFF file for:", product))
+      stop("Error locating the raster template")
     }
-    return(raster::raster(tif_path))
+    return(suppressWarnings(raster::raster(tif_path)))
   } else if (product == "abundance_seasonal") {
     # seasonal abundance
-    tif_path <- list.files(file.path(path, "results", "tifs"),
-                           pattern = paste0(product, ".*\\.tif$"),
+    tif_path <- list.files(file.path(path, "results", "seasonal-abundance"),
+                           pattern = paste0("_", resolution, "_",
+                                            ".*_seasonal_.*tif$"),
                            full.names = TRUE)
-    if (length(tif_path) > 4 || !file.exists(tif_path)) {
-      stop(paste("Error locating GeoTIFF file for:", product))
+    if (any(!file.exists(tif_path))) {
+      stop("Error locating seasonal abundance GeoTIFFs")
     } else if (length(tif_path) == 0) {
-      stop(paste("No seasonal abundance GeoTIFFs for:", product))
+      stop("No seasonal abundance GeoTIFFs found")
     }
     seasons <- stringr::str_extract(tif_path,
                                     "(?<=abundance_seasonal_)[a-z_]+")
-    s <- raster::stack(tif_path)
-    names(s) <- seasons
-    return(s)
+    r <- suppressWarnings(raster::stack(tif_path))
+    names(r) <- seasons
+    return(r)
   } else {
     # 52 week stack
-    tif_path <- list.files(file.path(path, "results", "tifs"),
-                           pattern = paste0(product, "\\.tif$"),
+    tif_path <- list.files(file.path(path, "results", "cubes"),
+                           pattern = paste0("_", resolution, "_",
+                                            ".*", product, "\\.tif$"),
                            full.names = TRUE)
     if (length(tif_path) != 1 || !file.exists(tif_path)) {
       stop(paste("Error locating GeoTIFF file for:", product))
     }
-    return(label_raster_stack(raster::stack(tif_path)))
+    r <- suppressWarnings(raster::stack(tif_path))
+    return(label_raster_stack(r))
   }
 }
 
 
-#' Labels 52 week RasterStack with the dates for each band
+#' Label data cubes with the week date for each band
 #'
-#' The `raster` package does not allow layer names to be saved with the bands of
-#' a multi-band GeoTIFF. Accordingly, all eBird Status and Trends products
-#' raster results cover the entire 52 week temporal extent of analysis. For
-#' convenience, this function labels the RasterStack once it has been loaded
-#' with the dates for each band.
+#' The data cubes are saved as GeoTIFFs, which don't allow for band labels. For
+#' convenience, this function labels the layers of a data cube once it has been
+#' loaded with the week dates for each band.
 #'
 #' @param x `RasterStack` or `RasterBrick`; original eBird Status and Trends
-#'   product raster GeoTIFF with 52 bands, one for each week.
+#'   data cube with 52 bands, one for each week.
 #'
 #' @return A `RasterStack` or `RasterBrick` with names assigned for the dates in
-#'   the format of "XYYYY.MM.DD" per raster package constraints. The Raster*
+#'   the format of "XYYYY.MM.DD" per raster package constraints. The `Raster*`
 #'   objects do not allow the names to start with a number, nor are they allowed
 #'   to contain "-", so it is not possible to store the date in an ISO compliant
-#'   format.
+#'   format. Use `parse_raster_dates()` to convert the layer names to dates.
 #'
 #' @export
 #'
 #' @examples
 #' # download and load example abundance data
 #' sp_path <- ebirdst_download("example_data")
-#' abd <- load_raster("abundance", sp_path)
+#' abd <- load_raster(sp_path, "abundance")
 #'
 #' # label
 #' abd <- label_raster_stack(abd)
@@ -356,15 +369,14 @@ label_raster_stack <- function(x) {
 }
 
 
-#' Parses the names attached to a Raster from label_raster_stack()
+#' Parses the names data cube layer names into dates
 #'
-#' The [label_raster_stack()] function labels the dates of the estimate rasters
-#' in the format of "XYYYY.MM.DD", because of constraints in the `raster`
-#' package. This function converts that character vector into an ISO compliant
-#' Date vector.
+#' [label_raster_stack()] labels the layers of a data cubes with the associated
+#' week dates in the format of "XYYYY.MM.DD", because of constraints in the
+#' `raster` package. This function converts that character vector into an ISO
+#' compliant Date vector.
 #'
-#' @param x `Raster` object; full or subset of original eBird Status and
-#'   Trends product raster GeoTIFF.
+#' @param x `Raster` object; labeled Status and Trends data cube.
 #'
 #' @return Date vector.
 #'
@@ -373,7 +385,7 @@ label_raster_stack <- function(x) {
 #' @examples
 #' # download and load example abundance data
 #' sp_path <- ebirdst_download("example_data")
-#' abd <- load_raster("abundance", sp_path)
+#' abd <- load_raster(sp_path, "abundance")
 #'
 #' # parse dates
 #' parse_raster_dates(abd)
@@ -387,7 +399,7 @@ parse_raster_dates <- function(x) {
 }
 
 
-#' Get the status and trends week that a date falls into
+#' Get the Status and Trends week that a date falls into
 #'
 #' @param dates a vector of dates.
 #'
@@ -406,13 +418,15 @@ date_to_st_week <- function(dates) {
   vapply(days, check_d, FUN.VALUE = integer(length = 1))
 }
 
+
 #' Stixel summary file loader
 #'
 #' Internal function used by [load_pis()] to get the stixel summary information
 #' (from summary.txt).
 #'
-#' @param path character; full path to the directory containing single species
-#'   eBird Status and Trends products.
+#' @param path character; directory that the Status and Trends data for a given
+#'   species was downloaded to. This path is returned by `ebirdst_download()`
+#'   or `get_species_path()`.
 #' @param return_sf logical; whether to return an [sf] object of spatial points
 #'   rather then the default data frame.
 #'
@@ -461,8 +475,9 @@ load_summary <- function(path, return_sf = FALSE) {
 #' Loads the predictor importance data (from pi.txt), joins with stixel summary
 #' data, and cleans up the data.frame.
 #'
-#' @param path character; full path to the directory containing single species
-#'   eBird Status and Trends products.
+#' @param path character; directory that the Status and Trends data for a given
+#'   species was downloaded to. This path is returned by `ebirdst_download()`
+#'   or `get_species_path()`.
 #' @param return_sf logical; whether to return an [sf] object of spatial points
 #'   rather then the default data frame.
 #'
@@ -517,13 +532,17 @@ load_pis <- function(path, return_sf = FALSE) {
   return(pi_summary)
 }
 
-#' Load predictor dependcies for single species eBird Status and Trends products
+
+#' Load partial dependency data for the Status and Trends predictors
 #'
-#' Loads the predictor dependency data (from pd.txt), joins with stixel summary
-#' data, and cleans up the data.frame.
+#' Partial dependence (PD) plots depict the relationship between the modeled
+#' response (occurrence or relative abundance) and the predictor variables used
+#' in the model. Status and Trends provides the data to generate these plots for
+#' every stixel.
 #'
-#' @param path character; full path to the directory containing single species
-#'   eBird Status and Trends products.
+#' @param path character; directory that the Status and Trends data for a given
+#'   species was downloaded to. This path is returned by `ebirdst_download()`
+#'   or `get_species_path()`.
 #' @param return_sf logical; whether to return an [sf] object of spatial points
 #'   rather then the default data frame.
 #'
@@ -595,8 +614,9 @@ load_pds <- function(path, model = c("occurrence", "abundance"),
 #' counts and all predictor variables used for modeling for each checklist in
 #' the test dataset.
 #'
-#' @param path character; full path to the directory containing single species
-#'   eBird Status and Trends products.
+#' @param path character; directory that the Status and Trends data for a given
+#'   species was downloaded to. This path is returned by `ebirdst_download()`
+#'   or `get_species_path()`.
 #' @param return_sf logical; whether to return an [sf] object of spatial points
 #'   rather then the default data frame.
 #'
@@ -651,8 +671,9 @@ load_test_data <- function(path, return_sf = FALSE) {
 #' and upper and lower confidence intervals are provided for predicted
 #' occurrence, count, and relative abundance.
 #'
-#' @param path character; full path to the directory containing single species
-#'   eBird Status and Trends products.
+#' @param path character; directory that the Status and Trends data for a given
+#'   species was downloaded to. This path is returned by `ebirdst_download()`
+#'   or `get_species_path()`.
 #' @param return_sf logical; whether to return an [sf] object of spatial points
 #'   rather then the default data frame.
 #'
@@ -696,14 +717,16 @@ load_test_preds <- function(path, return_sf = FALSE) {
   return(td_df)
 }
 
-#' Config file loader
+
+#' Load configuration file
 #'
 #' Internal function used by load_summary(), load_pis(), and load_pds() to get
 #' configuration variables from STEM species run information
 #' (from *_config.RData).
 #'
-#' @param path character; full path to the directory containing single species
-#'   eBird Status and Trends products.
+#' @param path character; directory that the Status and Trends data for a given
+#'   species was downloaded to. This path is returned by `ebirdst_download()`
+#'   or `get_species_path()`.
 #'
 #' @return environment object containing all run parameters.
 #'
@@ -740,8 +763,9 @@ load_config <- function(path) {
 #' extent of non-zero data across the full annual cycle and the projection is
 #' optimized for this extent.
 #'
-#' @param path character; full path to the directory containing single species
-#'   eBird Status and Trends products.
+#' @param path character; directory that the Status and Trends data for a given
+#'   species was downloaded to. This path is returned by `ebirdst_download()`
+#'   or `get_species_path()`.
 #'
 #' @return A list containing elements:
 #' - `custom_projection`: a custom projection optimized for the given species'

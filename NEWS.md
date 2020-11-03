@@ -1,3 +1,7 @@
+# ebirdst 1.0.0
+
+- add support for new data structures used for Status and Trends 2020
+
 # ebirdst 0.2.2
 
 - add support for variable ensemble support in `compute_ppms()`
