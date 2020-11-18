@@ -7,8 +7,9 @@
 load_summary(path, return_sf = FALSE)
 }
 \arguments{
-\item{path}{character; full path to the directory containing single species
-eBird Status and Trends products.}
+\item{path}{character; directory that the Status and Trends data for a given
+species was downloaded to. This path is returned by \code{ebirdst_download()}
+or \code{get_species_path()}.}
 
 \item{return_sf}{logical; whether to return an \link{sf} object of spatial points
 rather then the default data frame.}

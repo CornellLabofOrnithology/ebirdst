@@ -5,7 +5,7 @@
 \alias{ebirdst_predictors}
 \title{eBird Status and Trends predictors}
 \format{
-A data frame with 69 rows and 5 columns:
+A data frame with 74 rows and 5 columns:
 \describe{
 \item{predictor}{Predictor variable name.}
 \item{predictor_tidy}{Predictor variable name, tidied to only contain
@@ -27,7 +27,7 @@ ebirdst_predictors
 }
 \description{
 A data frame of the predictors used in the eBird Status and Trends models.
-These include effort variables (e.g. distance travelled, number of observers,
+These include effort variables (e.g. distance traveled, number of observers,
 etc.) in addition to land and water cover variables. These landcover
 variables are derived from the MODIS MCD12Q1 500 m landcover product, and for
 each land cover class two FRAGSTATS metrics are calculated within a 1.5 km

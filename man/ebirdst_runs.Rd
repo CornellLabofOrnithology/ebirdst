@@ -5,23 +5,24 @@
 \alias{ebirdst_runs}
 \title{Data frame of available eBird Status and Trends species}
 \format{
-A data frame with 107 rows and 14 variables:
+A data frame with 15 variables:
 \describe{
-\item{species_code}{Six letter eBird code in eBird Taxonomy v2016}
 \item{run_name}{Unique analysis identifier and the top level folder name
 for all results}
-\item{scientific_name}{Scientific name from eBird Taxonomy v2016}
-\item{common_name}{English common name from eBird Taxonomy v2016}
-\item{breeding_start_dt}{Breeding season start date}
-\item{breeding_end_dt}{Breeding season start date}
-\item{nonbreeding_start_dt}{Non-breeding season start date}
-\item{nonbreeding_end_dt}{Non-breeding season start date}
-\item{postbreeding_migration_start_dt}{Post-breeding season start date}
-\item{postbreeding_migration_end_dt}{Post-breeding season start date}
-\item{prebreeding_migration_start_dt}{Pre-breeding season start date}
-\item{prebreeding_migration_end_dt}{Pre-breeding season start date}
-\item{year_round_start_dt}{For resident species, the year-round start date}
-\item{year_round_end_dt}{For resident species, the year-round end date}
+\item{species_code}{Six letter eBird code in eBird Taxonomy v2019}
+\item{scientific_name}{Scientific name from eBird Taxonomy v2019}
+\item{common_name}{English common name from eBird Taxonomy v2019}
+\item{resident}{Classifies this species a resident or a migrant}
+\item{breeding_start}{Breeding season start date}
+\item{breeding_end}{Breeding season start date}
+\item{nonbreeding_start}{Non-breeding season start date}
+\item{nonbreeding_end}{Non-breeding season start date}
+\item{postbreeding_migration_start}{Post-breeding season start date}
+\item{postbreeding_migration_end}{Post-breeding season start date}
+\item{prebreeding_migration_start}{Pre-breeding season start date}
+\item{prebreeding_migration_end}{Pre-breeding season start date}
+\item{resident_start}{For resident species, the year-round start date}
+\item{resident_end_dt}{For resident species, the year-round end date}
 }
 }
 \usage{

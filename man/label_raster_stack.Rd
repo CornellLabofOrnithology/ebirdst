@@ -2,32 +2,30 @@
 % Please edit documentation in R/ebirdst-loading.R
 \name{label_raster_stack}
 \alias{label_raster_stack}
-\title{Labels 52 week RasterStack with the dates for each band}
+\title{Label data cubes with the week date for each band}
 \usage{
 label_raster_stack(x)
 }
 \arguments{
 \item{x}{\code{RasterStack} or \code{RasterBrick}; original eBird Status and Trends
-product raster GeoTIFF with 52 bands, one for each week.}
+data cube with 52 bands, one for each week.}
 }
 \value{
 A \code{RasterStack} or \code{RasterBrick} with names assigned for the dates in
-the format of "XYYYY.MM.DD" per raster package constraints. The Raster*
+the format of "XYYYY.MM.DD" per raster package constraints. The \verb{Raster*}
 objects do not allow the names to start with a number, nor are they allowed
 to contain "-", so it is not possible to store the date in an ISO compliant
-format.
+format. Use \code{parse_raster_dates()} to convert the layer names to dates.
 }
 \description{
-The \code{raster} package does not allow layer names to be saved with the bands of
-a multi-band GeoTIFF. Accordingly, all eBird Status and Trends products
-raster results cover the entire 52 week temporal extent of analysis. For
-convenience, this function labels the RasterStack once it has been loaded
-with the dates for each band.
+The data cubes are saved as GeoTIFFs, which don't allow for band labels. For
+convenience, this function labels the layers of a data cube once it has been
+loaded with the week dates for each band.
 }
 \examples{
 # download and load example abundance data
 sp_path <- ebirdst_download("example_data")
-abd <- load_raster("abundance", sp_path)
+abd <- load_raster(sp_path, "abundance")
 
 # label
 abd <- label_raster_stack(abd)

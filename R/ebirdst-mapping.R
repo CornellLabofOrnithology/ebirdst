@@ -251,7 +251,7 @@ map_centroids <- function(path, ext) {
   pis <- load_pis(path = path)
   pis <- dplyr::distinct(pis[, c("lon", "lat", "date")])
   pis <- sf::st_as_sf(pis, coords = c("lon", "lat"), crs = 4326)
-  pis <- sf::st_transform(pis, crs = mollweide)
+  pis <- sf::st_transform(pis, crs = eck4)
   # bbox
   bb <- sf::st_as_sfc(sf::st_bbox(pis))
 
@@ -260,7 +260,7 @@ map_centroids <- function(path, ext) {
 
   # plot base map
   graphics::plot(bb, col = NA, border = NA)
-  graphics::plot(sf::st_geometry(ned_wh_co_moll),
+  graphics::plot(sf::st_geometry(ne_adm0_eck),
                  col = "#5a5a5a", border = "#222222", lwd = 1, add = TRUE)
   # label setup
   usr <- graphics::par("usr")
@@ -293,9 +293,9 @@ map_centroids <- function(path, ext) {
   }
 
   # plot reference data
-  graphics::plot(sf::st_geometry(ned_wh_co_moll),
+  graphics::plot(sf::st_geometry(ne_adm0_eck),
                  col = NA, border = "#222222", lwd = 1, add = TRUE)
-  graphics::plot(sf::st_geometry(ned_wh_st_moll),
+  graphics::plot(sf::st_geometry(ne_adm1_eck),
                  col = NA, border = "#222222", lwd = 0.75, add = TRUE)
 
   # label
@@ -392,15 +392,15 @@ calc_effective_extent <- function(path, ext, plot = TRUE) {
 
   # plot
   if (isTRUE(plot)) {
-    r_stix_moll <- suppressWarnings(raster::projectRaster(r_stix,
-                                                          crs = mollweide,
-                                                          method = "ngb"))
-    r_stix_moll[r_stix_moll >= 1] <- 1
-    stixels_moll <- sf::st_transform(stixels, crs = mollweide)
+    r_stix_eck <- suppressWarnings(raster::projectRaster(r_stix,
+                                                         crs = eck4,
+                                                         method = "ngb"))
+    r_stix_eck[r_stix_eck >= 1] <- 1
+    stixels_eck <- sf::st_transform(stixels, crs = eck4)
     pipd_sf <- sf::st_as_sf(pipd, coords = c("lon", "lat"), crs = 4326)
-    pipd_sf <- sf::st_transform(pipd_sf, mollweide)
+    pipd_sf <- sf::st_transform(pipd_sf, eck4)
 
-    # convert extent to polygon and mollweide for plotting
+    # convert extent to polygon and eck4 for plotting
     if (ext$type == "bbox") {
       ext_poly <- sf::st_as_sfc(ext$extent)
     } else if (ext$type == "polygon") {
@@ -408,24 +408,24 @@ calc_effective_extent <- function(path, ext, plot = TRUE) {
     } else {
       stop("Spatiotemporal extent type not accepted.")
     }
-    ext_poly_moll <- sf::st_transform(ext_poly, crs = mollweide)
+    ext_poly_eck <- sf::st_transform(ext_poly, crs = eck4)
 
     # plot
     p <- graphics::par(mar = c(0.25, 0.25, 0.25, 0.25), bg = "#ffffff")
 
-    raster::plot(r_stix_moll, ext = raster::extent(stixels_moll),
+    raster::plot(r_stix_eck, ext = raster::extent(stixels_eck),
                  breaks = c(0, seq(0.5, 1, by = 0.05)),
                  col = viridisLite::viridis(11), colNA = "#000000",
-                 maxpixels = raster::ncell(r_stix_moll),
+                 maxpixels = raster::ncell(r_stix_eck),
                  axis.args = list(at = c(0, seq(0.5, 1, by = 0.1)),
                                   labels = c(0, seq(0.5, 1, by = 0.1))),
                  axes = FALSE, box = FALSE, legend = TRUE)
 
-    graphics::plot(sf::st_geometry(ned_wh_co_moll),
+    graphics::plot(sf::st_geometry(ne_adm0_eck),
                    border = "#ffffff", col = NA, lwd = 1.5, add = TRUE)
-    graphics::plot(sf::st_geometry(ned_wh_st_moll),
+    graphics::plot(sf::st_geometry(ne_adm1_eck),
                    border = "#ffffff", col = NA, lwd = 1, add = TRUE)
-    graphics::plot(sf::st_geometry(ext_poly_moll),
+    graphics::plot(sf::st_geometry(ext_poly_eck),
                    border = "red", col = NA, lwd = 1.5, add = TRUE)
     graphics::plot(sf::st_geometry(pipd_sf),
                    col = "#000000", pch = 16, cex = 1 * graphics::par()$cex,

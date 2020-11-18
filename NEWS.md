@@ -1,6 +1,7 @@
 # ebirdst 1.0.0
 
-- add support for new data structures used for Status and Trends 2020
+- add support for new data structures used for 2020 eBird Status and Trends
+- overhaul of 
 
 # ebirdst 0.2.2
 

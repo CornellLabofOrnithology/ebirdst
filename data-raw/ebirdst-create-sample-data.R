@@ -1,101 +1,104 @@
-library(rnaturalearth)
-library(sp)
+library(raster)
+library(fs)
 library(sf)
-library(data.table)
-library(readr)
-library(dplyr)
+library(rnaturalearth)
+library(tidyverse)
+library(DBI)
+library(RSQLite)
+select <- dplyr::select
 
 # source data
 root_path <- rappdirs::user_data_dir("ebirdst")
-species <- "yebsap-ERD2018-EBIRD_SCIENCE-20191030-3abe59ca"
+species <- "yebsap-ERD2019-STATUS-20200930-8d36d265"
 sp_path <- file.path(root_path, species)
 
 # destination
 ex_species <- paste0(species, "-example")
-ex_data_dir <- file.path(root_path, ex_species, "data")
-ex_tif_dir <- file.path(root_path, ex_species, "results", "tifs")
-ex_pred_dir <- file.path(root_path, ex_species, "results", "preds")
-ex_stix_dir <- file.path(root_path, ex_species, "results", "stixels")
-dir.create(ex_data_dir, recursive = TRUE, showWarnings = FALSE)
-dir.create(ex_tif_dir, recursive = TRUE, showWarnings = FALSE)
-dir.create(ex_pred_dir, recursive = TRUE, showWarnings = FALSE)
-dir.create(ex_stix_dir, recursive = TRUE, showWarnings = FALSE)
+ex_dir <- file.path(root_path, ex_species)
+ex_cubes_dir <- file.path(ex_dir, "weekly_cubes")
+ex_seasonal_dir <- file.path(ex_dir, "abundance_seasonal")
+dir.create(ex_dir, recursive = TRUE, showWarnings = FALSE)
+dir.create(ex_cubes_dir, recursive = TRUE, showWarnings = FALSE)
+dir.create(ex_seasonal_dir, recursive = TRUE, showWarnings = FALSE)
 
-# copy rds file
-file.path(sp_path, "data", paste0(species, "_config.rds")) %>%
-  file.copy(file.path(ex_data_dir, paste0(species, "_config.rds")))
-
-# region for subsetting from rnaturalearth
-us_states <- ne_states(country = "United States of America")
-state_mi <- us_states[us_states$name == "Michigan", ]
-state_mi_sf <- st_as_sf(state_mi) %>%
-  st_transform(crs = 4326) %>%
-  st_geometry()
+# copy config file and databases
+dir_ls(sp_path, regexp = "(rds|db)$", recurse = FALSE, type = "file") %>%
+  file_copy(ex_dir)
 
 # raster template
-r_tmplt <- paste0(species, "_srd_raster_template.tif") %>%
-  file.path(sp_path, "data", .) %>%
-  raster::raster()
-ex_tmplt <-  paste0(ex_species, "_srd_raster_template.tif") %>%
-  file.path(ex_data_dir, .)
-sp_ss <- spTransform(state_mi, raster::projection(r_tmplt))
-r_tmplt_ex <- raster::crop(r_tmplt, sp_ss) %>%
-  raster::mask(sp_ss) %>%
-  raster::trim(values = NA) %>%
-  raster::writeRaster(filename = ex_tmplt, overwrite = TRUE)
+r_tmplt <- file.path(sp_path, "srd_raster_template.tif") %>%
+  raster()
 
-# subset tifs
-f_tifs <- c("abundance_lower", "abundance_median", "abundance_upper",
-            "abundance_seasonal_breeding", "abundance_seasonal_nonbreeding",
-            "abundance_seasonal_prebreeding_migration",
-            "abundance_seasonal_postbreeding_migration",
-            "count_median", "occurrence_median")
-for (f in f_tifs) {
-  r <- f %>%
-    paste0(species, "_hr_2018_", ., ".tif") %>%
-    file.path(sp_path, "results", "tifs", .) %>%
-    raster::stack()
-  f_ex <- f %>%
-    paste0(ex_species, "_hr_2018_", ., ".tif") %>%
-    file.path(ex_tif_dir, .)
-  r_ex <- raster::crop(r, r_tmplt_ex) %>%
-    raster::mask(r_tmplt_ex, filename = f_ex, overwrite = TRUE)
+# region for subsetting from rnaturalearth
+state_mi_ll <- ne_states(iso_a2 = "US", returnclass = "sf") %>%
+  filter(name == "Michigan") %>%
+  st_geometry()
+bb <- st_bbox(state_mi_ll)
+state_mi <- state_mi_ll %>%
+  st_transform(crs = projection(r_tmplt)) %>%
+  as_Spatial()
+
+# crop and mask rasters
+tifs <- dir_ls(sp_path, regexp = "tif$", recurse = TRUE, type = "file")
+for (f in tifs) {
+  f_out <- str_replace_all(f, species, paste0(species, "-example"))
+  r_ex <- f %>%
+    stack() %>%
+    crop(state_mi) %>%
+    mask(state_mi) %>%
+    writeRaster(filename = f_out, overwrite = TRUE,
+                options = c("COMPRESS=DEFLATE","TILED=YES"))
 }
-file.copy(file.path(sp_path, "results", "tifs", "band_dates.csv"),
-          file.path(ex_tif_dir, "band_dates.csv"))
+file_copy(file.path(sp_path, "weekly_cubes", "band_dates.csv"),
+          file.path(ex_cubes_dir, "band_dates.csv"))
 
-# subset function
+# database connections
+pipd_db <- file.path(ex_dir, "pi-pd.db")
+pred_db <- file.path(ex_dir, "predictions.db")
+pipd_con <- dbConnect(SQLite(), pipd_db)
+pred_con <- dbConnect(SQLite(), pred_db)
 
-subset_df <- function(f_in, f_out) {
-  x <- fread(file = f_in)
-  if ("LONGITUDE" %in% names(x)) {
-    x_sf <- dplyr::select(x, LONGITUDE, LATITUDE)
-    x_sf <- sf::st_as_sf(x, coords = c("LONGITUDE", "LATITUDE"), crs = 4326)
-  } else {
-    x_sf <- dplyr::select(x, lon, lat)
-    x_sf <- sf::st_as_sf(x, coords = c("lon", "lat"), crs = 4326)
-  }
-  is_in <- suppressMessages(
-    sf::st_intersects(x_sf, state_mi_sf, sparse = FALSE)
-  )
-  x <- x[is_in[, 1, drop = TRUE], ]
-  x[["SCORE"]] <- NULL
-  write_csv(x, f_out)
+# subset sqlite dbs to focal area
+# predictions
+sql <- str_glue("DELETE FROM predictions ",
+                "WHERE longitude < {bb['xmin']} OR  longitude > {bb['xmax']} ",
+                "OR latitude < {bb['ymin']} OR  latitude > {bb['ymax']};")
+dbSendStatement(pred_con, sql)
+# get sampling event ids cthat fall in polygon
+sid <- tbl(pred_con, "predictions") %>%
+  select(sampling_event_id, latitude, longitude) %>%
+  collect() %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>%
+  st_intersection(state_mi_ll) %>%
+  st_drop_geometry()
+copy_to(pred_con, sid)
+# drop rows from other tables out of bounds of
+sql <- str_glue("DELETE FROM predictions WHERE sampling_event_id NOT IN ",
+                "(SELECT sampling_event_id FROM sid);")
+dbSendStatement(pred_con, sql)
+dbSendStatement(pred_con, "DROP TABLE sid;")
+dbSendStatement(pred_con, "vacuum;")
+dbDisconnect(pred_con)
+
+# pipd
+sql <- str_glue("DELETE FROM stixel_summary ",
+                "WHERE lon < {bb['xmin']} OR  lon > {bb['xmax']} ",
+                "OR lat < {bb['ymin']} OR  lat > {bb['ymax']};")
+dbSendStatement(pipd_con, sql)
+# get stixels centroids that fall in polygon
+stixels <- tbl(pipd_con, "stixel_summary") %>%
+  select(stixel_id, lat, lon) %>%
+  collect() %>%
+  st_as_sf(coords = c("lon", "lat"), crs = 4326) %>%
+  st_intersection(state_mi_ll) %>%
+  st_drop_geometry()
+copy_to(pipd_con, stixels)
+# drop rows from other tables without out of bounds stixel centroids
+for (t in c("abd_pds", "abd_pis", "occ_pds", "occ_pis", "stixel_summary")) {
+  sql <- str_glue("DELETE FROM {t} WHERE stixel_id NOT IN ",
+                  "(SELECT stixel_id FROM stixels);")
+  dbSendStatement(pipd_con, sql)
 }
-# test data
-subset_df(file.path(sp_path, "data", paste0(species, "_test-data.csv")),
-          file.path(ex_data_dir, paste0(ex_species, "_test-data.csv")))
-# abundance predictions
-subset_df(file.path(sp_path, "results", "preds", "test_pred_ave.txt"),
-          file.path(ex_pred_dir, "test_pred_ave.txt"))
-# summary
-subset_df(file.path(sp_path, "results", "stixels", "summary.txt"),
-          file.path(ex_stix_dir, "summary.txt"))
-# pi
-f_sum <- file.path(ex_stix_dir, "summary.txt") %>%
-  fread() %>%
-  select(stixel_id)
-f_pi <- file.path(sp_path, "results", "stixels", "pi.txt") %>%
-  fread()
-inner_join(f_sum, f_pi, by = "stixel_id") %>%
-  write_csv(file.path(ex_stix_dir, "pi.txt"))
+dbSendStatement(pipd_con, "DROP TABLE stixels;")
+dbSendStatement(pipd_con, "vacuum;")
+dbDisconnect(pipd_con)
