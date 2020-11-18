@@ -2,13 +2,14 @@
 % Please edit documentation in R/ebirdst-loading.R
 \name{load_config}
 \alias{load_config}
-\title{Config file loader}
+\title{Load configuration file}
 \usage{
 load_config(path)
 }
 \arguments{
-\item{path}{character; full path to the directory containing single species
-eBird Status and Trends products.}
+\item{path}{character; directory that the Status and Trends data for a given
+species was downloaded to. This path is returned by \code{ebirdst_download()}
+or \code{get_species_path()}.}
 }
 \value{
 environment object containing all run parameters.

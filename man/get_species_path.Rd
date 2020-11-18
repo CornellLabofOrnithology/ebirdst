@@ -10,10 +10,12 @@ get_species_path(species, path = rappdirs::user_data_dir("ebirdst"))
 \item{species}{character; a single species given as a scientific name, common
 name or six-letter species code (e.g. woothr). The full list of valid
 species is can be viewed in the \link{ebirdst_runs} data frame included in this
-package. To return the path to the example data, use "example_data".}
+package. To download the example dataset, use "example_data".}
 
-\item{path}{character; directory that the data were downloaded to. Defaults
-to the suggested persistent data directory data directory:
+\item{path}{character; directory to download the data to. All downloaded
+files will be placed in a sub-directory of this directory named according
+to the unique run ID associated with this species. Defaults to a persistent
+data directory, which can be found by calling
 rappdirs::user_data_dir("ebirdst")).}
 }
 \value{
@@ -33,11 +35,9 @@ sp_path <- get_species_path("example_data")
 # use it to load data
 abd <- load_raster("abundance", sp_path)
 
-\dontrun{
 # get the path to the full data package for yellow-bellied sapsucker
 # common name, scientific name, or species code can be used
-get_species_path("Yellow-bellied Sapsucker")
-get_species_path("Sphyrapicus varius")
-get_species_path("yebsap")
-}
+sp_path <- get_species_path("Yellow-bellied Sapsucker")
+sp_path <- get_species_path("Sphyrapicus varius")
+sp_path <- get_species_path("yebsap")
 }

@@ -38,7 +38,7 @@ Path to the run-specific root of the downloaded files.
 Download an eBird Status and Trends data package for a single species, or for
 an example species, to a specified path. The example data consist of the
 results for Yellow-bellied Sapsucker subset to Michigan and are much smaller
-than the full dataset making these data quicker to download and process.
+than the full dataset, making these data quicker to download and process.
 }
 \examples{
 # download the example data

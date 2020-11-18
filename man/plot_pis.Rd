@@ -7,6 +7,7 @@
 plot_pis(
   pis,
   ext,
+  model = c("occurrence", "abundance"),
   by_cover_class = FALSE,
   n_top_pred = 50,
   pretty_names = TRUE,

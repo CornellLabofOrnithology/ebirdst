@@ -2,27 +2,26 @@
 % Please edit documentation in R/ebirdst-loading.R
 \name{parse_raster_dates}
 \alias{parse_raster_dates}
-\title{Parses the names attached to a Raster from label_raster_stack()}
+\title{Parses the names data cube layer names into dates}
 \usage{
 parse_raster_dates(x)
 }
 \arguments{
-\item{x}{\code{Raster} object; full or subset of original eBird Status and
-Trends product raster GeoTIFF.}
+\item{x}{\code{Raster} object; labeled Status and Trends data cube.}
 }
 \value{
 Date vector.
 }
 \description{
-The \code{\link[=label_raster_stack]{label_raster_stack()}} function labels the dates of the estimate rasters
-in the format of "XYYYY.MM.DD", because of constraints in the \code{raster}
-package. This function converts that character vector into an ISO compliant
-Date vector.
+\code{\link[=label_raster_stack]{label_raster_stack()}} labels the layers of a data cubes with the associated
+week dates in the format of "XYYYY.MM.DD", because of constraints in the
+\code{raster} package. This function converts that character vector into an ISO
+compliant Date vector.
 }
 \examples{
 # download and load example abundance data
 sp_path <- ebirdst_download("example_data")
-abd <- load_raster("abundance", sp_path)
+abd <- load_raster(sp_path, "abundance")
 
 # parse dates
 parse_raster_dates(abd)

@@ -3,7 +3,7 @@
 #' Download an eBird Status and Trends data package for a single species, or for
 #' an example species, to a specified path. The example data consist of the
 #' results for Yellow-bellied Sapsucker subset to Michigan and are much smaller
-#' than the full dataset making these data quicker to download and process.
+#' than the full dataset, making these data quicker to download and process.
 #'
 #' @param species character; a single species given as a scientific name, common
 #'   name or six-letter species code (e.g. woothr). The full list of valid
@@ -50,7 +50,7 @@ ebirdst_download <- function(species,
   # example data or a real run
   bucket_url <- "https://ebirdst-data.s3.amazonaws.com/"
   if (species == "example_data") {
-    run <- "yebsap-ERD2018-EBIRD_SCIENCE-20191030-3abe59ca-example"
+    run <- "yebsap-ERD2019-STATUS-20200930-8d36d265-example"
   } else {
     species <- get_species(species)
     row_id <- which(ebirdst::ebirdst_runs$species_code == species)
@@ -85,8 +85,7 @@ ebirdst_download <- function(species,
 
   # only dl rasters unless requested otherwise
   if (isTRUE(tifs_only)) {
-    s3_files <- s3_files[grepl("results/tifs", s3_files$file) |
-                           grepl("tif$", s3_files$file) |
+    s3_files <- s3_files[grepl("tif$", s3_files$file) |
                            grepl("rds$", s3_files$file) |
                            grepl("band_dates", s3_files$file), ]
   }
@@ -143,13 +142,7 @@ ebirdst_download <- function(species,
 #' This helper function can be used to get the path to a data package for a
 #' given species to be used by the various loading functions.
 #'
-#' @param species character; a single species given as a scientific name, common
-#'   name or six-letter species code (e.g. woothr). The full list of valid
-#'   species is can be viewed in the [ebirdst_runs] data frame included in this
-#'   package. To return the path to the example data, use "example_data".
-#' @param path character; directory that the Status and Trends data for a given
-#'   species was downloaded to. Defaults to the suggested persistent data
-#'   directory data directory: `rappdirs::user_data_dir("ebirdst"))`.
+#' @inheritParams ebirdst_download
 #'
 #' @return The path to the data package directory.
 #' @export
@@ -164,20 +157,18 @@ ebirdst_download <- function(species,
 #' # use it to load data
 #' abd <- load_raster("abundance", sp_path)
 #'
-#' \dontrun{
 #' # get the path to the full data package for yellow-bellied sapsucker
 #' # common name, scientific name, or species code can be used
-#' get_species_path("Yellow-bellied Sapsucker")
-#' get_species_path("Sphyrapicus varius")
-#' get_species_path("yebsap")
-#' }
+#' sp_path <- get_species_path("Yellow-bellied Sapsucker")
+#' sp_path <- get_species_path("Sphyrapicus varius")
+#' sp_path <- get_species_path("yebsap")
 get_species_path <- function(species,
                              path = rappdirs::user_data_dir("ebirdst")) {
   stopifnot(is.character(species), length(species) == 1)
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
 
   if (species == "example_data") {
-    run <- "yebsap-ERD2018-EBIRD_SCIENCE-20191030-3abe59ca-example"
+    run <- "yebsap-ERD2019-STATUS-20200930-8d36d265-example"
   } else {
     species <- get_species(species)
     row_id <- which(ebirdst::ebirdst_runs$species_code == species)
@@ -205,15 +196,14 @@ get_species_path <- function(species,
 #' @param path character; directory that the Status and Trends data for a given
 #'   species was downloaded to. This path is returned by `ebirdst_download()`
 #'   or `get_species_path()`.
-#' @param product character; Status and Trends product to load, options are
-#'   relative abundance, seasonal abundance, count, occurrence, and upper and
-#'   lower bounds on relative abundance. It is also possible to return a
-#'   template raster with no data.
+#' @param product character; Status and Trends product to load, see Details for
+#'   available products. It is also possible to return a template raster with no
+#'   data.
 #' @param resolution character; the resolution of the raster data to load. The
 #'   default is to load the native ~3 km resolution (`"hr"`); however, for some
 #'   applications 9 km (`"mr"`) or 27 km (`"lr"`) data may be suitable.
 #'
-#' @details The available raster layers are as follows:
+#' @details The available Status and Trends data cubes are as follows:
 #'
 #' - `occurrence`: the expected probability of occurrence of the species,
 #' ranging from 0 to 1, on an eBird Traveling Count by a skilled eBirder
@@ -228,8 +218,6 @@ get_species_path <- function(species,
 #' species on an eBird Traveling Count by a skilled eBirder starting at the
 #' optimal time of day with the optimal search duration and distance that
 #' maximizes detection of that species in a region.
-#' - `abundance_seasonal`: the expected relative abundance averaged across the
-#' weeks within each season.
 #' - `abundance_lower`: the lower 10th quantile of the expected relative
 #' abundance of the species on an eBird Traveling Count by a skilled eBirder
 #' starting at the optimal time of day with the optimal search duration and
@@ -239,19 +227,26 @@ get_species_path <- function(species,
 #' starting at the optimal time of day with the optimal search duration and
 #' distance that maximizes detection of that species in a region.
 #'
+#' In addition to these cubes with 52 layers (one for each week), it is possible
+#' to load:
+#' - `abundance_seasonal`: the expected relative abundance averaged across the
+#' weeks within each season. The date boundaries used for the seasonal
+#' definitions appear in `ebirdst_runs` and if a season failed review no
+#' associated layer will be included.
+#' - `template`: a template raster covering the whole Earth and without any
+#' data.
+#'
 #' @return A `RasterStack` with 52 layers for the given product, labeled by
-#'   week. Seasonal abundance is the result of averaging the weekly abundance
-#'   raster layers for each season or across the whole year for resident
-#'   species. The date boundaries used for the seasonal definitions appear in
-#'   `ebirdst_runs` and if a season failed review no associated layer will be
-#'   included. There will be up to four layers labeled according to the
-#'   seasons.
+#'   week. Seasonal abundance will have up to four layers labeled according to
+#'   the seasons. The template raster will be returned as a `RasterLayer`.
 #'
 #' @export
 #'
 #' @examples
 #' # download example data
 #' sp_path <- ebirdst_download("example_data")
+#' # or get the path if you already have the data downloaded
+#' sp_path <- get_species_path("example_data")
 #'
 #' # load data
 #' load_raster(sp_path, "abundance")
@@ -288,23 +283,26 @@ load_raster <- function(path,
     return(suppressWarnings(raster::raster(tif_path)))
   } else if (product == "abundance_seasonal") {
     # seasonal abundance
-    tif_path <- list.files(file.path(path, "results", "seasonal-abundance"),
+    tif_path <- list.files(file.path(path, "abundance_seasonal"),
                            pattern = paste0("_", resolution, "_",
-                                            ".*_seasonal_.*tif$"),
+                                            ".*_abundance-seasonal_.*tif$"),
                            full.names = TRUE)
     if (any(!file.exists(tif_path))) {
       stop("Error locating seasonal abundance GeoTIFFs")
     } else if (length(tif_path) == 0) {
       stop("No seasonal abundance GeoTIFFs found")
     }
+    season_order <- c("breeding", "postbreeding_migration",
+                      "nonbreeding", "prebreeding_migration",
+                      "resident")
     seasons <- stringr::str_extract(tif_path,
-                                    "(?<=abundance_seasonal_)[a-z_]+")
+                                    "(?<=abundance-seasonal_)[a-z_]+")
     r <- suppressWarnings(raster::stack(tif_path))
     names(r) <- seasons
-    return(r)
+    return(r[[intersect(season_order, seasons)]])
   } else {
     # 52 week stack
-    tif_path <- list.files(file.path(path, "results", "cubes"),
+    tif_path <- list.files(file.path(path, "weekly_cubes"),
                            pattern = paste0("_", resolution, "_",
                                             ".*", product, "\\.tif$"),
                            full.names = TRUE)
@@ -317,180 +315,28 @@ load_raster <- function(path,
 }
 
 
-#' Label data cubes with the week date for each band
+#' Load eBird Status and Trends predictor importance data
 #'
-#' The data cubes are saved as GeoTIFFs, which don't allow for band labels. For
-#' convenience, this function labels the layers of a data cube once it has been
-#' loaded with the week dates for each band.
+#' Loads the predictor importance (PI) data from the pi-pd.db sqlite database.
+#' PI estimates are provided for each stixel over which a model was run and are
+#' identified by a unique stixel ID in addition to the coordinates of the stixel
+#' centroid.
 #'
-#' @param x `RasterStack` or `RasterBrick`; original eBird Status and Trends
-#'   data cube with 52 bands, one for each week.
-#'
-#' @return A `RasterStack` or `RasterBrick` with names assigned for the dates in
-#'   the format of "XYYYY.MM.DD" per raster package constraints. The `Raster*`
-#'   objects do not allow the names to start with a number, nor are they allowed
-#'   to contain "-", so it is not possible to store the date in an ISO compliant
-#'   format. Use `parse_raster_dates()` to convert the layer names to dates.
-#'
-#' @export
-#'
-#' @examples
-#' # download and load example abundance data
-#' sp_path <- ebirdst_download("example_data")
-#' abd <- load_raster(sp_path, "abundance")
-#'
-#' # label
-#' abd <- label_raster_stack(abd)
-#' names(abd)
-label_raster_stack <- function(x) {
-  stopifnot(inherits(x, "Raster"))
-
-  # check length
-  if((raster::nlayers(x) != 52)) {
-    stop(paste("The input Raster* object must be full stack or brick of 52",
-               "layers as originally provided."))
-  }
-
-  srd_date_vec <- seq(from = 0, to = 1, length = 52 + 1)
-  srd_date_vec <- (srd_date_vec[1:52] + srd_date_vec[2:(52 + 1)]) / 2
-  srd_date_vec <- round(srd_date_vec, digits = 4)
-
-  year_seq <- 2015
-  p_time <- strptime(x = paste(round(srd_date_vec * 366), year_seq), "%j %Y")
-  date_names <- paste(formatC(p_time$mon + 1, width = 2, format = "d",
-                              flag = "0"),
-                      formatC(p_time$mday, width = 2, format = "d",
-                              flag = "0"),
-                      sep = "-")
-
-  names(x) <- paste(2018, date_names, sep = "-")
-
-  return(x)
-}
-
-
-#' Parses the names data cube layer names into dates
-#'
-#' [label_raster_stack()] labels the layers of a data cubes with the associated
-#' week dates in the format of "XYYYY.MM.DD", because of constraints in the
-#' `raster` package. This function converts that character vector into an ISO
-#' compliant Date vector.
-#'
-#' @param x `Raster` object; labeled Status and Trends data cube.
-#'
-#' @return Date vector.
-#'
-#' @export
-#'
-#' @examples
-#' # download and load example abundance data
-#' sp_path <- ebirdst_download("example_data")
-#' abd <- load_raster(sp_path, "abundance")
-#'
-#' # parse dates
-#' parse_raster_dates(abd)
-parse_raster_dates <- function(x) {
-  stopifnot(inherits(x, "Raster"))
-  if (!all(grepl("X[0-9]{4}\\.[0-9]{2}\\.[0-9]{2}", names(x)))) {
-    stop("Raster names not in correct format, call label_raster_stack() first.")
-  }
-
-  as.Date(names(x), format = "X%Y.%m.%d")
-}
-
-
-#' Get the Status and Trends week that a date falls into
-#'
-#' @param dates a vector of dates.
-#'
-#' @return An integer vector of weeks numbers from 1-52.
-#' @export
-#' @examples
-#' d <- as.Date(c("2016-04-08", "2018-12-31", "2014-01-01", "2018-09-04"))
-#' date_to_st_week(d)
-date_to_st_week <- function(dates) {
-  dv <- seq(from = 0, to = 1, length = 52 + 1)
-  days <- (as.POSIXlt(dates)$yday + 0.5) / 366
-
-  check_d <- function(x) {
-    which(x >= dv[-length(dv)] & x <= dv[-1])
-  }
-  vapply(days, check_d, FUN.VALUE = integer(length = 1))
-}
-
-
-#' Stixel summary file loader
-#'
-#' Internal function used by [load_pis()] to get the stixel summary information
-#' (from summary.txt).
-#'
-#' @param path character; directory that the Status and Trends data for a given
-#'   species was downloaded to. This path is returned by `ebirdst_download()`
-#'   or `get_species_path()`.
+#' @inheritParams load_raster
 #' @param return_sf logical; whether to return an [sf] object of spatial points
 #'   rather then the default data frame.
 #'
-#' @return data.frame containing stixel summary information about each stixel
-#'   centroid.
-#'
-#' @keywords internal
-#'
-#' @examples
-#' \donttest{
-#' # download example data
-#' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
-#'
-#' # stixel summaries
-#' summaries <- ebirdst:::load_summary(sp_path)
-#' dplyr::glimpse(summaries)
-#' }
-load_summary <- function(path, return_sf = FALSE) {
-  stopifnot(dir.exists(path))
-  stopifnot(is.logical(return_sf), length(return_sf) == 1)
-
-  stixel_path <- file.path(path, "results", "stixels")
-  summary_file <- file.path(stixel_path, "summary.txt")
-
-  if(!file.exists(summary_file)) {
-    stop(paste0("The file summary.txt does not exist at ", stixel_path))
-  }
-
-  # load stixel summary data
-  summary_df <- data.table::fread(summary_file,
-                                  stringsAsFactors = FALSE,
-                                  showProgress = FALSE)
-  summary_df <- summary_df[, c("summary_hash", "stixel", "data_type") := NULL]
-  summary_df <- summary_df[!is.na(summary_df$lon), ]
-
-  summary_df <- as.data.frame(summary_df, stringsAsFactors = FALSE)
-  if (isTRUE(return_sf)) {
-    summary_df <- sf::st_as_sf(summary_df, coords = c("lon", "lat"), crs = 4326)
-  }
-  return(summary_df)
-}
-
-
-#' Load predictor importances for single species eBird Status and Trends products
-#'
-#' Loads the predictor importance data (from pi.txt), joins with stixel summary
-#' data, and cleans up the data.frame.
-#'
-#' @param path character; directory that the Status and Trends data for a given
-#'   species was downloaded to. This path is returned by `ebirdst_download()`
-#'   or `get_species_path()`.
-#' @param return_sf logical; whether to return an [sf] object of spatial points
-#'   rather then the default data frame.
-#'
-#' @return data.frame containing predictor importance values for each stixel, as
-#'   well as stixel summary information.
-#'
-#' @import data.table
+#' @return data frame containing PI estimates for each stixel, as well as stixel
+#' summary information.
 #'
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # download example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
+#' # or get the path if you already have the data downloaded
+#' sp_path <- get_species_path("example_data")
 #'
 #' # load predictor importance
 #' pis <- load_pis(sp_path)
@@ -500,15 +346,15 @@ load_summary <- function(path, return_sf = FALSE) {
 #' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #' plot_pis(pis, ext = e, n_top_pred = 15, by_cover_class = TRUE)
-load_pis <- function(path, return_sf = FALSE) {
+#' }
+load_pis <- function(path, type = c("occurrence", "abundance"),
+                     return_sf = FALSE) {
   stopifnot(dir.exists(path))
   stopifnot(is.logical(return_sf), length(return_sf) == 1)
 
-  stixel_path <- file.path(path, "results", "stixels")
-  pi_file <- file.path(stixel_path, "pi.txt")
-
-  if(!file.exists(pi_file)) {
-    stop(paste("The file pi.txt does not exist at:", stixel_path))
+  db_file <- file.path(path, "pi-pd.db")
+  if(!file.exists(db_file)) {
+    stop("The file 'pi-pd.db' does not exist in: ", path)
   }
 
   # load pi file

@@ -2,39 +2,41 @@
 % Please edit documentation in R/ebirdst-loading.R
 \name{load_raster}
 \alias{load_raster}
-\title{Load eBird Status and Trends raster data}
+\title{Load eBird Status and Trends raster data cubes}
 \usage{
 load_raster(
+  path,
   product = c("abundance", "abundance_seasonal", "count", "occurrence",
     "abundance_lower", "abundance_upper", "template"),
-  path
+  resolution = c("hr", "mr", "lr")
 )
 }
 \arguments{
-\item{product}{character; status and trends product to load, options are
-relative abundance, seasonal abundance, count, occurrence, and upper and
-lower bounds on relative abundance. It is also possible to return a
-template raster with no data.}
+\item{path}{character; directory that the Status and Trends data for a given
+species was downloaded to. This path is returned by \code{ebirdst_download()}
+or \code{get_species_path()}.}
 
-\item{path}{character; full path to the directory containing single species
-eBird Status and Trends products.}
+\item{product}{character; Status and Trends product to load, see Details for
+available products. It is also possible to return a template raster with no
+data.}
+
+\item{resolution}{character; the resolution of the raster data to load. The
+default is to load the native ~3 km resolution (\code{"hr"}); however, for some
+applications 9 km (\code{"mr"}) or 27 km (\code{"lr"}) data may be suitable.}
 }
 \value{
-A \code{RasterStack} with 52 layers for the given product, labelled by
-week. Seasonal abundance is the result of averaging the weekly abundance
-raster layers for each season or across the whole year for resident
-species. The date boundaries used for the seasonal definitions appear in
-\code{ebirdst_runs} and if a season failed review no associated layer will be
-included. There will be up to four layers labelled according to the
-seasons.
+A \code{RasterStack} with 52 layers for the given product, labeled by
+week. Seasonal abundance will have up to four layers labeled according to
+the seasons. The template raster will be returned as a \code{RasterLayer}.
 }
 \description{
 Each of the eBird Status and Trends products is packaged as a GeoTIFF file
-with 52 bands, one for each week of the year. This function loads the data
-for a given product and species as a \code{RasterStack} object.
+(referred to as a "cube) with 52 bands, one for each week of the year. This
+function loads the cube for a given product and species as a \code{RasterStack}
+object.
 }
 \details{
-The available raster layers are as follows:
+The available Status and Trends data cubes are as follows:
 \itemize{
 \item \code{occurrence}: the expected probability of occurrence of the species,
 ranging from 0 to 1, on an eBird Traveling Count by a skilled eBirder
@@ -49,8 +51,6 @@ the probability of occurrence and the count conditional on occurrence, of the
 species on an eBird Traveling Count by a skilled eBirder starting at the
 optimal time of day with the optimal search duration and distance that
 maximizes detection of that species in a region.
-\item \code{abundance_seasonal}: the expected relative abundance averaged across the
-weeks within each season.
 \item \code{abundance_lower}: the lower 10th quantile of the expected relative
 abundance of the species on an eBird Traveling Count by a skilled eBirder
 starting at the optimal time of day with the optimal search duration and
@@ -60,11 +60,23 @@ abundance of the species on an eBird Traveling Count by a skilled eBirder
 starting at the optimal time of day with the optimal search duration and
 distance that maximizes detection of that species in a region.
 }
+
+In addition to these cubes with 52 layers (one for each week), it is possible
+to load:
+\itemize{
+\item \code{abundance_seasonal}: the expected relative abundance averaged across the
+weeks within each season. The date boundaries used for the seasonal
+definitions appear in \code{ebirdst_runs} and if a season failed review no
+associated layer will be included.
+\item \code{template}: a template raster covering the whole Earth and without any
+data.
+}
 }
 \examples{
 # download example data
-sp_path <- ebirdst_download("example_data")
+ebirdst_download("example_data")
 
 # load data
-load_raster("abundance", sp_path)
+get_species_path("example_data") \%>\%
+  load_raster("abundance")
 }
