@@ -21,13 +21,13 @@ ebirdst_extent(x, t, ...)
 \arguments{
 \item{x}{the spatial extent; either a rectangular bounding box (defined as a
 vector of numbers representing the coordinates of the boundaries or an
-\code{\link[sf:st_bbox]{sf::st_bbox()}} object) or a polygon (an \code{\link[sf:sf]{sf::sf()}} object). See Details
-for further explanation of the format of x.}
+\code{\link[=st_bbox]{st_bbox()}} object) or a polygon (an \link{sf} object). See Details for further
+explanation of the format of x.}
 
 \item{t}{the temporal extent; a 2-element vector of the start and end dates
-of the temporal extent, provided either as dates (Date objects or
-strings in ISO format "YYYY-MM-DD") or numbers between 0 and 1 representing
-the fraction of the year. Note that dates can wrap around the year, e.g.
+of the temporal extent, provided either as dates (Date objects or strings
+in ISO format "YYYY-MM-DD") or numbers between 0 and 1 representing the
+fraction of the year. Note that dates can wrap around the year, e.g.
 `c("2018-12-01", "2018-01-31") is acceptable. See Details for further
 explanation of the format of t. \strong{Leave the argument blank to include the
 full year of data.}}
@@ -35,9 +35,9 @@ full year of data.}}
 \item{...}{Additional arguments used by methods.}
 
 \item{crs}{coordinate reference system, provided as a \code{crs} object or
-argument to \code{\link[sf:st_crs]{sf::st_crs()}}. Defaults to unprojected, lat/long coordinates
-(crs = 4326). \strong{Only required if x is given as a numeric vector defining
-the bounding box, ignored in all other cases.}}
+argument to \code{\link[=st_crs]{st_crs()}}. Defaults to unprojected, lat/long coordinates (crs
+= 4326). \strong{Only required if x is given as a numeric vector defining the
+bounding box, ignored in all other cases.}}
 }
 \value{
 An \code{ebirdst_extent} object consisting of a list with three elements:
@@ -51,15 +51,15 @@ spatially and temporally. This function constructs these objects.
 \details{
 The spatial extent, \code{x}, can be either a rectangular bounding box or
 a set of spatial polygons. The bounding box can be defined either as an
-\code{sf::st_bbox()} object or by providing the coordinates of the rectangle
-edges directly as a named vector with elements xmin, xmax, ymin, and ymax
-(note that latitude and longitude correspond to y and x, respectively). In
-this latter case, a coordinate reference system must be provided explicitly
-via the \code{crs} argument (\code{crs = 4326} is the default and is a short form for
+\code{\link[=st_bbox]{st_bbox()}} object or by providing the coordinates of the rectangle edges
+directly as a named vector with elements xmin, xmax, ymin, and ymax (note
+that latitude and longitude correspond to y and x, respectively). In this
+latter case, a coordinate reference system must be provided explicitly via
+the \code{crs} argument (\code{crs = 4326} is the default and is a short form for
 unprojected lat/long coordinates). For a polygon spatial extent, \code{x} should
-be either an \code{sf} or \code{sfc} object (with feature type \code{POLYGON} or
+be either an \link{sf} or \link{sfc} object (with feature type \code{POLYGON} or
 \code{MULTIPOLYGON}) from the \code{sf} package. To import data from a Shapefile or
-GeoPackage into this format, use \code{sf::read_sf()}.
+GeoPackage into this format, use \code{\link[=read_sf]{read_sf()}}.
 
 The temporal extent defines the start and end dates of the time period.
 These are most easily provided as Date objects or date strings in ISO
@@ -72,17 +72,17 @@ or January.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bbox}: bounding box created with \code{\link[sf:st_bbox]{sf::st_bbox()}}
+\item \code{bbox}: bounding box created with \code{\link[=st_bbox]{st_bbox()}}
 
 \item \code{numeric}: bounding box given as edges
 
-\item \code{sfc}: polygons as \code{sf} spatial feature column
+\item \code{sfc}: polygons as \link{sfc} spatial feature column
 
-\item \code{sf}: polygons as \code{sf} object
+\item \code{sf}: polygons as \link{sf} object
 }}
 
 \examples{
-# bounding box of NE United States as a numeric vector
+# bounding box of the north eastern united stats as a numeric vector
 bb_vec <- c(xmin = -80, xmax = -70, ymin = 40, ymax = 47)
 ebirdst_extent(bb_vec)
 

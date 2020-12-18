@@ -1,72 +1,111 @@
-#' Computes the Predictive Performance Metrics for a spatiotemporal extent
+# ebirdst_ppms ----
+
+#' eBird Status and Trends predictive performance metrics (PPMs)
 #'
-#' Loads test data and ensemble support values and then calculates the
-#' predictive performance metrics (PPMs) within a spatiotemporal extent defined by an
-#' [ebirdst_extent] object. Use this function directly to access the computed
-#' metrics, or use `plot_all_ppms()` or `plot_binary_by_time()` to summarize the
-#' metrics.
+#' Calculate a suite of predictive performance metrics (PPMs) for the eBird
+#' Status and Trends model of a given species within a spatiotemporal extent.
 #'
-#' @param path character; full path to directory containing the eBird Status and
-#'   Trends products for a single species.
-#' @param ext [ebirdst_extent] object (optional); the spatiotemporal extent to
-#'   filter the data to.
+#' @inheritParams load_raster
+#' @param ext [ebirdst_extent] object (optional); the spatiotemporal extent over
+#'   which to calculate the PPMs.
 #' @param es_cutoff integer between 0-100; the ensemble support cutoff to use in
-#'   distinguishing zero and non-zero predictions.
+#'   distinguishing zero and non-zero predictions. Optimal ensemble support
+#'   cutoff values are calculated for each week during the modeling process and
+#'   stored in the data package for each species. **In general, you should not
+#'   specify a value for `es_cutoff` and instead allow the function to use the
+#'   species-specific model-base values.**
 #'
-#' @return A list of three data frames: `binary_ppms`, `occ_ppms`, and
-#'   `abd_ppms`. These data frames have 25 rows corresponding to 25 Monte Carlo
-#'   iterations each estimating the PPMs using a spatiotemporal subsample of the
-#'   test data. Columns correspond to the different PPMS. `binary_ppms` contains
-#'   binary or range-based PPMS, `occ_ppms` contains within-range occurrence
-#'   probability PPMS, and `abd_ppms` contains within-range abundance PPMs. In
-#'   some cases, PPMs may be missing, either because there isn't a large enough
-#'   test set within the spatiotemporal extent or because average occurrence or
-#'   abundance is too low. In these cases, try increasing the size of the
-#'   [ebirdst_extent] object.
+#' @details During the eBird Status and Trends modeling process, a subset of
+#'   observations (the "test data") are held out from model fitting to be used
+#'   for evaluating model performance. Model predictions are made for each of
+#'   these observations and this function calculates a suite of predictive
+#'   performance metrics (PPMs) by comparing the predictions with the observed
+#'   count on the eBird checklist.
+#'
+#'   Three types of PPMs are calculated: binary or range-based PPMs assess the
+#'   ability of model to predict range boundaries, occurrence PPMs assess the
+#'   occurrence probability predictions, and abundance PPMs assess the predicted
+#'   abundance. Both the occurrence and count PPMs are within-range metrics,
+#'   meaning the comparison between observations and predictions is only made
+#'   within the range where the species occurs.
+#'
+#'   Prior to calculating PPMS, the test dataset is subsampled spatiotemporally
+#'   using [ebirdst_subset()]. This process is performed for 25 monte carlo
+#'   iterations resulting in 25 estimates of each PPM.
+#'
+#' @return An `ebirdst_pppms` object containing a list of three data frames:
+#'   `binary_ppms`, `occ_ppms`, and `abd_ppms`. These data frames have 25 rows
+#'   corresponding to 25 Monte Carlo iterations each estimating the PPMs using a
+#'   spatiotemporal subsample of the test data. Columns correspond to the
+#'   different PPMS. `binary_ppms` contains binary or range-based PPMS,
+#'   `occ_ppms` contains within-range occurrence probability PPMs, and
+#'   `abd_ppms` contains within-range abundance PPMs. In some cases, PPMs may be
+#'   missing, either because there isn't a large enough test set within the
+#'   spatiotemporal extent or because average occurrence or abundance is too
+#'   low. In these cases, try increasing the size of the [ebirdst_extent]
+#'   object.
+#'
+#'   `plot()` can be called on the returned `ebirdst_ppms` object to produce a
+#'   boxplot of PPMs in all three categories: Binary Occurrence, Occurrence
+#'   Probability, and Abundance.
 #'
 #' @export
 #'
 #' @examples
-#' # download and load example data
-#' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
+#' \donttest{
+#' # download example data
+#' path <- ebirdst_download("example_data", tifs_only = FALSE)
+#' # or get the path if you already have the data downloaded
+#' path <- get_species_path("example_data")
 #'
-#' # define a spatiotemporal extent to plot
+#' # define a spatiotemporal extent to calculate ppms over
 #' bb_vec <- c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5)
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
-#' \dontrun{
+#'
 #' # compute predictive performance metrics
-#' ppms <- compute_ppms(path = sp_path, ext = e)
+#' ppms <- ebirdst_ppms(path = path, ext = e)
+#' plot(ppms)
 #' }
-compute_ppms <- function(path, ext, es_cutoff = 75) {
+ebirdst_ppms <- function(path, ext, es_cutoff) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
   if (!missing(ext)) {
     stopifnot(inherits(ext, "ebirdst_extent"))
   }
-  stopifnot(is.numeric(es_cutoff), length(es_cutoff) == 1,
-            es_cutoff > 0, es_cutoff < 100)
+  if (missing(es_cutoff)) {
+    # load configuration file
+    l <- load_config(path)
+    # get dynamic es cutoff
+    es_cutoff <- dplyr::coalesce(l[["ES_CUTOFF"]], 75)
+  } else {
+    stopifnot(is.numeric(es_cutoff), length(es_cutoff) == 1,
+              es_cutoff > 0, es_cutoff < 100)
+    es_cutoff <- rep(es_cutoff, times = 52)
+  }
 
   # load the test data and assign names
-  ppm_data <- load_test_preds(path = path)
-  ppm_data_raw <- load_test_data(path = path)
-
-  # add additional rows from raw data file
-  # these are assumed zeros and therefore not in test prediction data
-  ppm_data_raw <- ppm_data_raw[c("sampling_event_id", "lon", "lat", "day", "obs")]
-  ppm_data_raw$date <- ppm_data_raw$day / 366
-  ppm_data_raw$day <- NULL
-  ppm_data_raw <- ppm_data_raw[!(ppm_data_raw$sampling_event_id %in% ppm_data$sampling_event_id), ]
-
-  ppm_data <- dplyr::bind_rows(ppm_data, ppm_data_raw)
-  rm(ppm_data_raw)
+  preds <- load_predictions(path = path)
 
   # spatiotemporal subset
   if (!missing(ext)) {
-    ppm_data <- ebirdst_subset(ppm_data, ext = ext)
+    preds <- ebirdst_subset(preds, ext = ext)
   }
-  if (nrow(ppm_data) == 0) {
+  if (nrow(preds) == 0) {
     warning("No predicted occurrences within spatiotemporal extent.")
     return(list(binary_ppms = NULL, occ_ppms = NULL, abd_ppms = NULL))
   }
+
+  # add weekly es cutoffs
+  ws <- ebirdst_weeks$week_start
+  ws[1] <- -Inf
+  we <- ebirdst_weeks$week_end
+  we[length(we)] <- Inf
+  preds_week <- list()
+  for (i in seq_along(es_cutoff)) {
+    preds_week[[i]] <- preds[preds$date > ws[i] & preds$date <= we[i], ]
+    preds_week[[i]][["es_cutoff"]] <- es_cutoff[i]
+  }
+  preds <- dplyr::bind_rows(preds_week)
+  rm(preds_week)
 
   # static variables
   n_mc <- 25
@@ -76,7 +115,6 @@ compute_ppms <- function(path, ext, es_cutoff = 75) {
   # min count sample size within range
   count_min_ss <- 50
   count_min_mean <- 0.25
-  pat_cutoff = 1 / 10
 
   # define ppms
   # binary / range ppms
@@ -94,40 +132,30 @@ compute_ppms <- function(path, ext, es_cutoff = 75) {
 
   # compute monte carlo sample of ppms for spatiotemporal subset
   # split data into within range and out of range
-  ppm_data_zeroes <- ppm_data[ppm_data$pi_es < es_cutoff | is.na(ppm_data$pi_es), ]
-  ppm_data <- ppm_data[ppm_data$pi_es >= es_cutoff, ]
+  is_zero <- preds$pi_es < preds$es_cutoff | is.na(preds$pi_es)
+  zeroes <- preds[is_zero, ]
+  preds <- preds[!is_zero, ]
 
-  if (nrow(ppm_data) == 0) {
+  if (nrow(preds) == 0) {
     warning("No predicted occurrences within spatiotemporal extent.")
     return(list(binary_ppms = NULL, occ_ppms = NULL, abd_ppms = NULL))
   }
 
   # false discovery rate (fdr)
-  binom_test_p <- function(x) {
-    if (is.na(x["pat"]) | is.na(x["pi_es"])) {
-      return(NA)
-    }
-    pat_pi_es <- round(as.numeric(x["pat"]) * as.numeric(x["pi_es"]), 0)
-    p <- stats::binom.test(pat_pi_es, as.numeric(x["pi_es"]),
-                           p = pat_cutoff,
-                           alternative = "greater")
-    p <- p$p.value
-    return(p)
-  }
-  p_values <- apply(ppm_data, 1, binom_test_p)
+  p_values <- apply(preds, 1, binom_test_p)
   p_adj <- stats::p.adjust(p_values, "fdr")
   # add binary prediction
-  ppm_data$binary <- as.numeric(p_adj < 0.01)
+  preds$binary <- as.numeric(p_adj < 0.01)
   # treat test data out of range with binary = 0
-  if (nrow(ppm_data_zeroes) > 0) {
-    ppm_data_zeroes$binary <- 0
-    ppm_data <- rbind(ppm_data, ppm_data_zeroes)
+  if (nrow(zeroes) > 0) {
+    zeroes$binary <- 0
+    preds <- rbind(preds, zeroes)
   }
 
   # remove rows where binary is NA (inherited from pat = NA)
   # may no longer be needed
-  ppm_data <- ppm_data[!is.na(ppm_data$binary), ]
-  if (nrow(ppm_data) == 0) {
+  preds <- preds[!is.na(preds$binary), ]
+  if (nrow(preds) == 0) {
     warning("No predicted occurrences within spatiotemporal extent.")
     return(list(binary_ppms = NULL, occ_ppms = NULL, abd_ppms = NULL))
   }
@@ -148,7 +176,7 @@ compute_ppms <- function(path, ext, es_cutoff = 75) {
 
   for (i_mc in seq_len(n_mc)) {
     # case control sampling
-    sampled <- sample_case_control(ppm_data,
+    sampled <- sample_case_control(preds,
                                    res = c(3000, 3000),
                                    t_res = 7 / 365,
                                    n = 1,
@@ -156,7 +184,7 @@ compute_ppms <- function(path, ext, es_cutoff = 75) {
                                    replace = FALSE)
 
     # index back to full vector
-    data_i <- ppm_data[sampled, ]
+    data_i <- preds[sampled, ]
 
     # binary occurrence ppms
     bs$mc_iteration[i_mc] <- i_mc
@@ -235,167 +263,57 @@ compute_ppms <- function(path, ext, es_cutoff = 75) {
                                           method = "spearman")
     }
   }
-  return(list(binary_ppms = bs, occ_ppms = os, abd_ppms = cs))
+  structure(list(binary_ppms = dplyr::tibble(type = "binary", bs),
+                 occ_ppms = dplyr::tibble(type = "occurrence", os),
+                 abd_ppms = dplyr::tibble(type = "abundance", cs)),
+            class = "ebirdst_ppms")
 }
 
+#' @export
+print.ebirdst_ppms <- function(x, ...) {
+  ppm_types <- c(binary_ppms  = "Binary Range PPMs",
+                 occ_ppms = "Occurrence Probability PPMs",
+                 abd_ppms = "Abundance PPMs")
+  stopifnot(all(names(ppm_types) %in% names(x)))
 
-#' Plot binary occurrence metrics by time
-#'
-#' For a specified number of time periods (ideally weeks or months), plots one
-#' of four (Kappa, AUC, Sensitivity, Specificity) box plots. Provide an
-#' `ebirdst_extent` object to see performance within a spatiotemporal extent,
-#' otherwise rangewide performance will be shown.
-#'
-#' @param path character; full path to directory containing the eBird Status and
-#'   Trends products for a single species.
-#' @param metric character; the PPM to plot, either "kappa", "auc",
-#'   "sensitivity", or "specificity".
-#' @param ext [ebirdst_extent] object (optional); the spatiotemporal
-#'   extent to filter the data to. The temporal component will be ignored since
-#'   n_time_periods defines the temporal periods over which to calculate the
-#'   PPMs.
-#' @param n_time_periods integer; number of periods to divide the year into to
-#'   calculate the PPMs, e.g. use 52 to divide into weeks and 12 to divide into
-#'   months.
-#'
-#' @return Boxplot of PPM over time.
+  cat("eBird Status and Trends PPMs\n")
+  for (t in names(ppm_types)) {
+    cat(paste0(ppm_types[t], ":\n"))
+    print(x[[t]])
+    cat("\n")
+  }
+}
+
+#' @param x [ebirdst_ppms] object; PPMs as calculated by [ebirdst_ppms()].
+#' @param ... ignored.
 #'
 #' @export
-#'
-#' @examples
-#' # download and load example data
-#' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
-#'
-#' # define a spatiotemporal extent to plot data from
-#' bb_vec <- c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5)
-#' e <- ebirdst_extent(bb_vec, t = c("04-01", "06-30"))
-#' \donttest{
-#' # plot monthly kappa
-#' plot_binary_by_time(path = sp_path, metric = "kappa",
-#'                     ext = e, n_time_periods = 4)
-#' }
-plot_binary_by_time <- function(path,
-                                metric = c("kappa", "auc", "sensitivity",
-                                           "specificity"),
-                                ext, n_time_periods = 52) {
-  stopifnot(is.character(path), length(path) == 1, dir.exists(path))
-  metric <- match.arg(metric)
-  stopifnot(is_integer(n_time_periods), length(n_time_periods) == 1,
-            n_time_periods > 1)
-  n_time_periods <- round(n_time_periods)
-  if (missing(ext)) {
-    ext <- ebirdst_extent(x = c(xmin = -180, xmax = 180,
-                                ymin = -90, ymax = 90))
-  } else {
-    stopifnot(inherits(ext, "ebirdst_extent"))
-  }
-
-  # break into temporal units
-  t_breaks <- seq(0, 1, length.out = n_time_periods + 1)
-  t_dates <- t_breaks[-length(t_breaks)] + diff(t_breaks) / 2
-  t_dates <- from_srd_date(t_dates)
-
-  # calculate ppms for each
-  ppms <- list(NA)
-  for (i_t in seq_len(n_time_periods)) {
-    e <- ebirdst_extent(x = ext$extent, t = t_breaks[c(i_t, i_t + 1)])
-    ppms_i <- compute_ppms(path = path, ext = e)
-    ppms_i <- ppms_i[["binary_ppms"]]
-    ppms_i$date <- t_dates[[i_t]]
-    ppms[[i_t]] <- ppms_i
+#' @rdname ebirdst_ppms
+plot.ebirdst_ppms <- function(x, ...) {
+  # transform to long
+  ppms <- list()
+  for (t in names(x)) {
+    vars <- c("type", "auc", "pcc", "kappa", "bernoulli_dev",
+              "sensitivity", "specificity",
+              "poisson_dev_abd", "spearman_abd")
+    vars <- intersect(vars, names(x[[t]]))
+    if (t == "binary_ppms") {
+      vars <- setdiff(vars, "bernoulli_dev")
+    }
+    ppms[[t]] <- tidyr::pivot_longer(x[[t]][, vars],
+                                     cols = -"type",
+                                     names_to = "metric",
+                                     values_to = "value")
   }
   ppms <- dplyr::bind_rows(ppms)
+  ppms <- ppms[!is.na(ppms$value), ]
 
-  stopifnot(metric %in% names(ppms))
-
-  # plot
-  if (metric == "auc") {
-    metric_ylim <- c(0.5, 1)
-  } else {
-    metric_ylim <- c(0, 1)
-  }
-  metric_lab <- c(kappa = "Kappa", auc = "AUC",
-                  sensitivity = "Sensitivity",
-                  specificity = "Specificity")
-  date_limits <- as.Date(paste0(format(t_dates[1], "%Y"), c("-01-01", "-12-31")))
-  g <- ggplot2::ggplot(ppms) +
-    ggplot2::aes_string(x = "date", y = metric, group = "date") +
-    ggplot2::geom_boxplot() +
-    ggplot2::ylim(metric_ylim) +
-    ggplot2::labs(x = "Date", y = NULL, title = metric_lab[metric]) +
-    ggplot2::scale_x_date(date_labels = "%b",
-                          limits = date_limits,
-                          date_breaks = "1 month") +
-    ggplot2::theme_light()
-  suppressWarnings(print(g))
-  invisible(g)
-}
-
-#' Plot all predictive performance metrics
-#'
-#' For a spatiotemporal extent, plots bar plots for all available predictive
-#' performance metrics within three categories: Binary Occurrence, Occurrence
-#' Probability, and Abundance.
-#'
-#' @param path character; full path to directory containing the eBird Status and
-#'   Trends products for a single species.
-#' @param ext [ebirdst_extent] object; the spatiotemporal extent to filter the
-#'   data to.
-#'
-#' @return Plot of metric box plots by category
-#'
-#' @export
-#'
-#' @examples
-#' # download example data
-#' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
-#'
-#' # define a spatiotemporal extent to plot data from
-#' bb_vec <- c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5)
-#' e <- ebirdst_extent(bb_vec, t = c("04-01", "06-30"))
-#' \donttest{
-#' # plot ppms within extent
-#' plot_all_ppms(path = sp_path, ext = e)
-#' }
-plot_all_ppms <- function(path, ext) {
-  stopifnot(is.character(path), length(path) == 1, dir.exists(path))
-  stopifnot(inherits(ext, "ebirdst_extent"))
-  if (all(c(0, 1) == round(ext$t, 2))) {
-    stop("Must provide temporal limits for spatiotemporal extent.")
-  }
-
-  # prepare ppms
-  ppm_data <- compute_ppms(path = path, ext = ext)
-  ppm_data$binary_ppms$type <- "binary"
-  ppm_data$occ_ppms$type <- "occurrence"
-  ppm_data$abd_ppms$type <- "abundance"
-  ppm_data <- dplyr::bind_rows(ppm_data)
-  ppm_data <- dplyr::select(ppm_data,
-                            "type", "auc", "pcc", "kappa", "bernoulli_dev",
-                            "sensitivity", "specificity",
-                            "poisson_dev_abd", "spearman_abd")
-
-  # transform to long
-  ppm_data <- tidyr::pivot_longer(ppm_data,
-                                  cols = -"type",
-                                  names_to = "metric",
-                                  values_to = "value")
-  ppm_data <- ppm_data[!(ppm_data$type == "binary" &
-                           ppm_data$metric == "bernoulli_dev"), ]
-  ppm_data <- ppm_data[!is.na(ppm_data$value), ]
-
-  ppm_data$label <- dplyr::case_when(
-    ppm_data$metric == "auc" ~ "AUC",
-    ppm_data$metric == "pcc" ~ "PCC",
-    ppm_data$metric == "kappa" ~ "Kappa",
-    ppm_data$metric == "bernoulli_dev" ~ "Bernoulli\nDeviance",
-    ppm_data$metric == "sensitivity" ~ "Sensitivity",
-    ppm_data$metric == "specificity" ~ "Specificity",
-    ppm_data$metric == "poisson_dev_abd" ~ "Poisson\nDeviance",
-    ppm_data$metric == "spearman_abd" ~ "Spearman")
+  # apply nicer labels
+  ppms$label <- ppm_labels(ppms$metric)
+  ppms$label <- stringr::str_replace(ppms$label, " Deviance", "\nDeviance")
 
   # construct plot for binary ppms
-  ppm_b <- ppm_data[ppm_data$type == "binary", ]
+  ppm_b <- ppms[ppms$type == "binary", ]
   g_bin <- ggplot2::ggplot(ppm_b) +
     ggplot2::aes_string(x = "label", y = "value", group = "label") +
     ggplot2::stat_boxplot(geom = "errorbar", width = 0.25) +
@@ -407,7 +325,7 @@ plot_all_ppms <- function(path, ext) {
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
 
   # construct plot for occurrence ppms
-  ppm_o <- ppm_data[ppm_data$type == "occurrence", ]
+  ppm_o <- ppms[ppms$type == "occurrence", ]
   # negative check of bernoulli deviance
   medbde <- stats::median(ppm_o$value[ppm_o$metric == "bernoulli_dev"])
   bderep <- data.frame(type = "occurrence",
@@ -432,7 +350,7 @@ plot_all_ppms <- function(path, ext) {
   }
 
   # construct plot for abundance ppms
-  ppm_a <- ppm_data[ppm_data$type == "abundance", ]
+  ppm_a <- ppms[ppms$type == "abundance", ]
   # negative check of poisson deviance
   medpde <- stats::median(ppm_a$value[ppm_a$metric == "poisson_dev_abd"])
   pderep <- data.frame(type = "abundance",
@@ -449,7 +367,6 @@ plot_all_ppms <- function(path, ext) {
                   title = "Abundance PPMs") +
     ggplot2::theme_light() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
-
   # if the median poisson deviance value is below 0, put a red x
   if (is.finite(medpde) && medpde < 0) {
     g_abd <- g_abd +
@@ -462,6 +379,203 @@ plot_all_ppms <- function(path, ext) {
   invisible(three_plots)
 }
 
+
+# ebirdst_ppms_ts ----
+
+#' Time series of eBird Status and Trends PPMs summarized temporally
+#'
+#' Calculate a time series of predictive performance metrics (PPMs) for the
+#' eBird Status and Trends model. For each week or month of the year, PPMs will
+#' be summarized independently to produce a time series. For further details on
+#' eBird Status and Trends PPMs consult the help for [ebirdst_ppms].
+#'
+#' @inheritParams ebirdst_ppms
+#' @param ext [ebirdst_extent] object (optional); the spatial extent over which
+#'   to calculate the PPMs. Note that [ebirdst_extent] objects typically specify
+#'   both a spatial and temporal extent, however, **within this function only
+#'   the spatial component of the extent is used.**
+#' @param summarize_by character; periods over which to summarize PPMs. PPMs can
+#'   either be calculated for eBird Status and Trends weeks (as defined in
+#'   [ebirdst_weeks]) or for the months of the year.
+#' @param ... additional arguments passed to [ebirdst_ppms()].
+#'
+#' @return An `ebirdst_pppms_ts` object containing a list of three data frames:
+#'   `binary_ppms`, `occ_ppms`, and `abd_ppms`. Each row of these data frames
+#'   corresponds to the PPMs from one Monte Carlo iteration for a given time
+#'   period. Columns correspond to the different PPMS. `binary_ppms` contains
+#'   binary or range-based PPMS, `occ_ppms` contains within-range occurrence
+#'   probability PPMs, and `abd_ppms` contains within-range abundance PPMs. In
+#'   some cases, PPMs may be missing, either because there isn't a large enough
+#'   test set within the spatiotemporal extent or because average occurrence or
+#'   abundance is too low. In these cases, try increasing the size of the
+#'   [ebirdst_extent] object. `plot()` can be called on the returned
+#'   `ebirdst_pppms_ts` object to plot a time series of a single PPM.
+#'
+#' @export
+#'
+#' @examples
+#' \donttest{
+#' # download example data
+#' path <- ebirdst_download("example_data", tifs_only = FALSE)
+#' # or get the path if you already have the data downloaded
+#' path <- get_species_path("example_data")
+#'
+#' # define a spatial extent to calculate ppms over
+#' e <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5))
+#'
+#' # compute predictive performance metrics, summarized by months
+#' ppms <- ebirdst_ppms_ts(path = path, ext = e, summarize_by = "months")
+#'
+#' # plot time series
+#' # binary, kappa
+#' plot(ppms, type = "binary", metric = "kappa")
+#' # occurrence, sensitivity
+#' plot(ppms, type = "occurrence", metric = "sensitivity")
+#' #' # abundance, poisson deviance
+#' plot(ppms, type = "abundance", metric = "poisson_dev_abd")
+#' }
+ebirdst_ppms_ts <- function(path, ext, summarize_by = c("weeks", "months"),
+                            ...) {
+  stopifnot(is.character(path), length(path) == 1, dir.exists(path))
+  summarize_by <- match.arg(summarize_by)
+
+  # spatiotemporal extent
+  if (missing(ext)) {
+    ext <- ebirdst_extent(x = c(xmin = -180, xmax = 180,
+                                ymin = -90, ymax = 90))
+  } else {
+    stopifnot(inherits(ext, "ebirdst_extent"))
+  }
+
+  # set up start and end dates
+  if (summarize_by == "weeks") {
+    d <- ebirdst::ebirdst_weeks[, c("week_number", "date",
+                                    "week_start", "week_end")]
+    names(d) <- c("week_number", "date", "start", "end")
+  } else if (summarize_by == "months") {
+    y <- load_config(path)[["SRD_PRED_YEAR"]]
+    s <- as.Date(paste(y, 1:12, "01", sep = "-"), format = "%Y-%m-%d")
+    e <- s[c(2:length(s), 1)] - 1
+    e <- as.Date(format(e, format = paste0(y, "-%m-%d")), format = "%Y-%m-%d")
+    e <- ebirdst:::to_srd_date(e)
+    e[length(e)] <- 1
+    s <- c(0, e[-length(e)])
+    d <- data.frame(month = month.abb, start = s, end = e)
+  }
+
+  # calculate ppms for each period
+  ppms <- list(binary_ppms = NULL, occ_ppms = NULL, abd_ppms = NULL)
+  for (i in seq_len(nrow(d))) {
+    # define temporal boundaries
+    e <- ext
+    e[["t"]][1] <- d[["start"]][i]
+    e[["t"]][2] <- d[["end"]][i]
+
+    # compute ppms
+    p <- ebirdst_ppms(path = path, ext = e, ...)
+
+    # attach date to data frames
+    for (j in names(ppms)) {
+      if (summarize_by == "weeks") {
+        p[[j]][["week"]] <- d[["date"]][i]
+        p[[j]] <- dplyr::select(p[[j]], "week", dplyr::everything())
+      } else {
+        p[[j]][["month"]] <- d[["month"]][i]
+        p[[j]] <- dplyr::select(p[[j]], "month", dplyr::everything())
+      }
+      ppms[[j]] <- rbind(ppms[[j]], p[[j]])
+    }
+  }
+  if (summarize_by == "months") {
+    for (j in names(ppms)) {
+      ppms[[j]][["month"]] <- factor(ppms[[j]][["month"]], month.abb)
+    }
+  }
+  structure(ppms, class = "ebirdst_ppms_ts", summarize_by = summarize_by)
+}
+
+#' @export
+print.ebirdst_ppms_ts <- function(x, ...) {
+  ppm_types <- c(binary_ppms  = "Binary Range PPMs",
+                 occ_ppms = "Occurrence Probability PPMs",
+                 abd_ppms = "Abundance PPMs")
+  stopifnot(all(names(ppm_types) %in% names(x)))
+
+  cat("eBird Status and Trends PPMs, grouped by", attr(x, "summarize_by"), "\n")
+  for (t in names(ppm_types)) {
+    cat(paste0(ppm_types[t], ":\n"))
+    print(x[[t]])
+    cat("\n")
+  }
+}
+
+#' @param x [ebirdst_ppms_ts] object; PPMs summarized by weeks or months as
+#'   calculated by [ebirdst_ppms_ts()].
+#' @param type character; the PPM type to plot, either a binary, occurrence, or
+#'   abundance PPM can be plotted.
+#' @param metric character; the specific metric to plot, the list list of
+#'   possible metrics varies by PPM type:
+#'   - Binary or occurrence: `auc`, `ppc`, `kappa`, `bernoulli_dev`, `sensitivity`,
+#'   `specificity`
+#'   - Abundance: `poisson_dev_abd`, `poisson_dev_occ`, `spearman_abd`,
+#'   `spearman_occ`
+#' @param ... ignored.
+#'
+#' @export
+#' @rdname ebirdst_ppms_ts
+plot.ebirdst_ppms_ts <- function(x,
+                                 type = c("binary", "occurrence", "abundance"),
+                                 metric = "kappa",
+                                 ...) {
+  type <- match.arg(type)
+  stopifnot(is.character(metric), length(metric) == 1)
+
+  # select metric to plot
+  n <- dplyr::recode(type,
+                     binary = "binary_ppms",
+                     occurrence = "occ_ppms",
+                     abundance = "abd_ppms")
+  ppms <- x[[n]]
+  val <- setdiff(names(ppms), c("month", "type", "mc_iteration",
+                                "sample_size", "mean"))
+  if (!metric %in% val) {
+    stop(metric, " is not a valid ", type, " PPM. Choose one of:\n  ",
+         paste(val, collapse = ", "))
+  }
+  if (attr(x, "summarize_by") == "months") {
+    ppms <- ppms[, c("month", metric)]
+  } else {
+    ppms <- ppms[, c("week", metric)]
+  }
+  names(ppms) <- c("date", "metric")
+
+  # plot
+  if (metric == "auc") {
+    metric_ylim <- c(0.5, 1)
+  } else {
+    metric_ylim <- c(0, 1)
+  }
+  # apply nicer labels
+  lab <- ppm_labels(metric)
+  lab <- paste0(stringr::str_to_title(type), " PPM: ", lab)
+
+  g <- ggplot2::ggplot(ppms) +
+    ggplot2::aes_string(x = "date", y = "metric", group = "date") +
+    ggplot2::geom_boxplot() +
+    ggplot2::ylim(metric_ylim) +
+    ggplot2::labs(x = NULL, y = NULL, title = lab) +
+    ggplot2::theme_light()
+  if (attr(x, "summarize_by") == "weeks") {
+    g <- g +
+      ggplot2::scale_x_date(date_labels = "%b", date_breaks = "1 month")
+  }
+
+  suppressWarnings(print(g))
+  invisible(g)
+}
+
+
+# internal functions ----
 
 #' Poisson deviance
 #'
@@ -512,4 +626,41 @@ bernoulli_dev <- function(obs, pred) {
   d_exp <- 1 - d_mod / d_mean
 
   c(deviance_model = d_mod, deviance_mean = d_mean, deviance_explained = d_exp)
+}
+
+#' Binomial test for ensemble support
+#'
+#' @param x numeric; named numeric vector with values for `"pat"` and `"pi_es"`.
+#'
+#' @return A numeric p-value.
+#'
+#' @examples
+#' ebirdst:::binom_test_p(c(pat = 0.1, pi_es = 75))
+binom_test_p <- function(x, pat_cutoff = 1 / 10) {
+  if (is.na(x["pat"]) | is.na(x["pi_es"])) {
+    return(NA)
+  }
+  pat_pi_es <- round(as.numeric(x["pat"]) * as.numeric(x["pi_es"]), 0)
+  p <- stats::binom.test(pat_pi_es, as.numeric(x["pi_es"]),
+                         p = pat_cutoff,
+                         alternative = "greater")
+  p <- p$p.value
+  return(p)
+}
+
+# apply nicer labels
+ppm_labels <- function(x) {
+  dplyr::case_when(
+    x == "auc" ~ "AUC",
+    x == "pcc" ~ "PCC",
+    x == "kappa" ~ "Kappa",
+    x == "bernoulli_dev" ~ "Bernoulli Deviance",
+    x == "sensitivity" ~ "Sensitivity",
+    x == "specificity" ~ "Specificity",
+    x == "poisson_dev_abd" ~ "Poisson Deviance",
+    x == "poisson_dev_abd" ~ "Poisson Deviance",
+    x == "poisson_dev_occ" ~ "Poisson Deviance",
+    x == "spearman_abd" ~ "Spearman",
+    x == "spearman_occ" ~ "Spearman",
+    TRUE ~ x)
 }

@@ -1,20 +1,23 @@
-#' Spatial grid sampling methods
+#' Spatiotemporal sampling of points on a grid
 #'
-#' Methods for subsampling data to deal with spatiotemporal bias in
-#' observations. These functions define a grid in space and time, then sample
-#' the given number of points from each cell. [sample_case_control()]
-#' additionally samples presence and absence independently.
+#' Subsample points to deal with spatiotemporal bias in observations by defining
+#' a grid in space and time, then sampling the given number of points from each
+#' cell. [sample_case_control()] additionally samples presence and absence
+#' independently.
 #'
-#' @param x data frame or [sf] point object; the points to subsample
+#' @param x data frame or [sf] object; the points to subsample. If `x` is a data
+#'   frame the coordiantes should be provided as columns `lat` and `lon`. The
+#'   day of year should be expressed as a proportion from 0-1 and stored in the
+#'   column `date`.
 #' @param res numeric; the size in meters of the grid to sample from. This can
 #'   be a 2 element vector indicating the x and y dimensions of the cells.
 #' @param t_res numeric; the temporal resolution for sampling expressed as a
-#'   proportion of the year. For example, `7 / 375` would result in sampling
+#'   proportion of the year. For example, `7 / 365` would result in sampling
 #'   from each week.
 #' @param n integer; the number of points to sample from each grid cell.
 #' @param replace logical; whether to sample with replacement.
-#' @param jitter logical; to avoid always using the same grid for sampling,
-#'   the grid can be jittered so that the origin is different each time this
+#' @param jitter logical; to avoid always using the same grid for sampling, the
+#'   grid can be jittered so that the origin is different each time this
 #'   function is called.
 #'
 #' @return Logical vector indicating which rows are selected.
@@ -23,35 +26,34 @@
 #' @rdname ebirdst_sample
 #'
 #' @examples
+#' \donttest{
 #' # download example data
-#' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
+#' path <- ebirdst_download("example_data", tifs_only = FALSE)
+#' # or get the path if you already have the data downloaded
+#' path <- get_species_path("example_data")
 #'
 #' # test data to sample
-#' test_data <- load_test_preds(sp_path, return_sf = TRUE)
+#' preds <- load_predictions(path, return_sf = TRUE)
 #'
 #' # sample on a 100km, 1 month grid
-#' s <- sample_grid(test_data, res = 100000, t_res = 1 / 12)
-#' td_grid <- test_data[s, ]
+#' s <- sample_grid(preds, res = 100000, t_res = 1 / 12)
+#' preds_grid <- preds[s, ]
 #'
 #' # case control sampling independently samples presence and absence
-#' s <- sample_case_control(test_data, res = 100000, t_res = 1 / 12)
-#' td_cc <- test_data[s, ]
+#' s <- sample_case_control(preds, res = 100000, t_res = 1 / 12)
+#' preds_cc <- preds[s, ]
 #'
 #' # grid sampling preserves the presence/absence ratio
-#' table(test_data$obs > 0) / nrow(test_data)
-#' table(td_grid$obs > 0) / nrow(td_grid)
+#' table(preds$obs > 0) / nrow(preds)
+#' table(preds_grid$obs > 0) / nrow(preds_grid)
 #' # while case control sampling increases the prevelance of presences
-#' table(td_cc$obs > 0) / nrow(td_cc)
-#'
-#' \dontrun{
+#' table(preds_cc$obs > 0) / nrow(preds_cc)
 #'
 #' # plot
 #' library(sf)
 #' p <- par(mar = c(0, 0, 0, 0))
-#' plot(st_geometry(test_data), col = "black", pch = 19, cex = 0.2)
-#' plot(st_geometry(td_cc), col = "red", pch = 19, cex = 0.5, add = TRUE)
-#' par(p)
-#'
+#' plot(st_geometry(preds), col = "black", pch = 19, cex = 0.2)
+#' plot(st_geometry(preds_cc), col = "red", pch = 19, cex = 0.5, add = TRUE)
 #' }
 sample_grid <- function(x, res, t_res, n = 1, replace = FALSE,
                         jitter = TRUE) {
@@ -160,7 +162,6 @@ sample_case_control.sf <- function(x, res, t_res, n = 1, replace = FALSE,
 
   return(is_sampled)
 }
-
 
 #' @export
 sample_case_control.data.frame <- function(x, res, t_res, n = 1,

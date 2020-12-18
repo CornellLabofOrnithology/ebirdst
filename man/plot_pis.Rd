@@ -2,28 +2,30 @@
 % Please edit documentation in R/ebirdst-plotting.R
 \name{plot_pis}
 \alias{plot_pis}
-\title{Plot predictor importances boxplot}
+\title{Plot predictor importance (PI) box plots}
 \usage{
 plot_pis(
   pis,
   ext,
-  model = c("occurrence", "abundance"),
-  by_cover_class = FALSE,
-  n_top_pred = 50,
+  model = c("occ", "abd"),
+  by_cover_class = TRUE,
+  n_top_pred = 20,
   pretty_names = TRUE,
   plot = TRUE
 )
 }
 \arguments{
-\item{pis}{data.frame; predictor importance data from \code{\link[=load_pis]{load_pis()}}.}
+\item{pis}{data frame; predictor importance data from \code{\link[=load_pis]{load_pis()}}.}
 
-\item{ext}{\link{ebirdst_extent} object; the spatiotemporal extent to
-filter the data to. Required, since results are less meaningful over large
-spatiotemporal extents.}
+\item{ext}{\link{ebirdst_extent} object; the spatiotemporal extent over which to
+calculate PIs. This is required, since results are less meaningful over
+large spatiotemporal extents.}
 
-\item{by_cover_class}{logical; whether to aggregate the four FRAGSTATS
-metrics for the land cover classes into single values for the land cover
-classes.}
+\item{model}{character; whether to plot PIs for occurrence or abundance.}
+
+\item{by_cover_class}{logical; whether to aggregate the FRAGSTATS metrics
+(PLAND and ED) for the land cover classes into single values for the land
+cover classes.}
 
 \item{n_top_pred}{integer; how many predictors to show.}
 
@@ -39,15 +41,20 @@ vector of top predictors, and their median predictor importance, based on
 the \code{n_top_pred} parameter.
 }
 \description{
-For all of the available predictors in a single set of species eBird
-Status and Trends products, this function makes a bar plot of those relative
-importances, from highest to lowest. Many function parameters allow for
-customized plots.
+For a given eBird Status and Trends species, produce a box plot showing the
+predictor importance (PI) for each of the predictors used in the model.
+Predictors are plotted in order from highest to lowest importance. Many
+function parameters allow for customized plots.
 }
 \examples{
-# download and load example data
-sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
-pis <- load_pis(sp_path)
+\donttest{
+# download example data
+path <- ebirdst_download("example_data", tifs_only = FALSE)
+# or get the path if you already have the data downloaded
+path <- get_species_path("example_data")
+
+# load predictor importance
+pis <- load_pis(path)
 
 # define a spatiotemporal extent to plot data from
 bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
@@ -55,4 +62,5 @@ e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 
 top_pred <- plot_pis(pis, ext = e, by_cover_class = TRUE, n_top_pred = 10)
 top_pred
+}
 }

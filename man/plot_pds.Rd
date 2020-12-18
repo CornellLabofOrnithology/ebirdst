@@ -2,14 +2,12 @@
 % Please edit documentation in R/ebirdst-plotting.R
 \name{plot_pds}
 \alias{plot_pds}
-\title{Plot partial dependency line plots}
+\title{Plot partial dependency (PD) line plots}
 \usage{
 plot_pds(
-  path,
   pds,
   predictor,
   ext,
-  model = c("occurrence", "abundance"),
   bootstrap_smooth = TRUE,
   show_stixel_pds = FALSE,
   show_quantiles = FALSE,
@@ -23,42 +21,41 @@ plot_pds(
 )
 }
 \arguments{
-\item{pds}{data.frame; partial dependence data from \code{load_pds()}.}
+\item{pds}{data frame; partial dependence data from \code{\link[=load_pds]{load_pds()}}.}
 
 \item{predictor}{character; single predictor name to plot PD for. For a full
 list of predictors, and their associated definitions, see
 \link{ebirdst_predictors}.}
 
-\item{ext}{\link{ebirdst_extent} object; the spatiotemporal extent to
-filter the data to. Required, since results are less meaningful over large
-spatiotemporal extents.}
+\item{ext}{\link{ebirdst_extent} object; the spatiotemporal extent over which to
+calculate PDs. This is required, since results are less meaningful over
+large spatiotemporal extents.}
 
 \item{bootstrap_smooth}{logical; the ideal visualization of the PD data is a
 pointwise GAM smoothing of the individual stixel PD values. This argument
 specifies whether this should be done directly on the full PD dataset
 (\code{bootstrap_smooth = FALSE}) or by subsampling and bootstrapping. The
 latter approach deals with the randomness in the data and can be more
-efficient for large datasets. Defaults to TRUE.}
+efficient for large datasets.}
 
 \item{show_stixel_pds}{logical; whether to plot the individual stixel PD
-values as semi-transparent lines. Defaults to FALSE.}
+values as semi-transparent lines.}
 
 \item{show_quantiles}{logical; adds a band for the upper (90th) and lower
 (10th) quantiles of the individual stixel PD values. These are calculated
-using quantile regression. Defaults to FALSE.}
+using quantile regression.}
 
 \item{n_bs}{int; number of GAM bootstrap iterations when estimating PD
-confidence intervals. Ignored if \code{bootstrap_smooth = FALSE}.
-Default is 100.}
+confidence intervals. Ignored if \code{bootstrap_smooth = FALSE}.}
 
 \item{ss_equivalent}{int; when bootstrapping to estimate PD confidence
 intervals, this argument specifies the size of the subsample of the
 original data. In particular, \code{ss_equivalent} should be an integer
 representing the equivalent sampling size when averaging this number of PD
-estimates. Defaults to 10.}
+estimates.}
 
 \item{k}{integer; number of knots to use in the GAM when smooth the PD
-relationship. Default is 25.}
+relationship.}
 
 \item{ci_alpha}{numeric; alpha level of confidence intervals. Default is
 0.05.}
@@ -67,37 +64,38 @@ relationship. Default is 25.}
 quantiles. Ignored if \code{show_quantiles = FALSE}. Default is 500.}
 
 \item{ylim}{numeric; 2-element vector to pre-define the y-limits of plotting.
-In the format c(ymin, ymax).}
+In the format \code{c(ymin, ymax)}.}
 
 \item{plot}{logical; whether to plot the PD relationships or just return
 data.}
 }
 \value{
-Plots the smoothed partial dependence relationship and returns a data
-frame of the smoothed curve with confidence intervals.
+Plots the smoothed partial dependence relationship for the specified
+predictor and returns a data frame of the smoothed curve with confidence
+intervals.
 }
 \description{
-For all of the available predictors in a single species set of eBird Status
-and Trends products, this function makes a line plot of a single partial
-dependency (PD), with two options for smoothing.
+For a given eBird Status and Trends species, produce a line plot showing the
+partial dependence (PD) relationship for a given predictor. Two options for
+smoothing are provided.
 }
 \examples{
-# download and load example data
-sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
-pds <- load_pds(sp_path)
+\donttest{
+# download example data
+path <- ebirdst_download("example_data", tifs_only = FALSE)
+# or get the path if you already have the data downloaded
+path <- get_species_path("example_data")
+
+# load predictor dependence data
+pds <- load_pds(path)
 
 # define a spatiotemporal extent to plot data from
 bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
 e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 
-# for this example, run with 5 bootstrap iterations for speed
-pd_smooth <- plot_pds(pds, "time", ext = e, n_bs = 5)
+# for testing, run with 5 bootstrap iterations for speed
+# in practice, best to run with the default number of iterations (100)
+pd_smooth <- plot_pds(pds, "solar_noon_diff", ext = e, n_bs = 5)
 dplyr::glimpse(pd_smooth)
-
-\dontrun{
-
-# in practice, it's best to run with the default number of iterations (100)
-plot_pds(pds, predictor = "time", ext = e)
-
 }
 }
