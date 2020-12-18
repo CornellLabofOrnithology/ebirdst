@@ -1,6 +1,3 @@
-
-
-
 #' Label data cubes with the week date for each band
 #'
 #' The data cubes are saved as GeoTIFFs, which don't allow for band labels. For
@@ -104,6 +101,83 @@ date_to_st_week <- function(dates) {
 }
 
 
+#' Get eBird species code for a set of species
+#'
+#' Give a vector of species codes, common names, and/or scientific names, return
+#' a vector of 6-letter eBird species codes. This function will only look up
+#' codes for species for which eBird Status and Trends results exist.
+#'
+#' @param x character; vector of species codes, common names, and/or scientific
+#'   names.
+#'
+#' @return A character vector of eBird species codes.
+#' @export
+#'
+#' @examples
+#' get_species(c("Black-capped Chickadee", "Poecile gambeli", "carchi"))
+get_species <- function(x) {
+  stopifnot(is.character(x), all(!is.na(x)))
+  r <- ebirdst::ebirdst_runs
+  x <- tolower(trimws(x))
+
+  # species code
+  code <- match(x, tolower(r$species_code))
+  # scientific name
+  sci <- match(x, tolower(r$scientific_name))
+  # common names
+  com <- match(x, tolower(r$common_name))
+  # combine
+  r$species_code[dplyr::coalesce(code, sci, com)]
+}
+
+
+# internal functions ----
+
 ebirdst_version <- function() {
   c(data_version = 2019, release_year = 2020)
+}
+
+# convert from an iso date to a 0-1 srd date
+to_srd_date <- function(x) {
+  if (is.character(x)) {
+    if (all(grepl("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", x))) {
+      x <- as.Date(x)
+    } else if (all(grepl("^[0-9]{2}-[0-9]{2}$", x))) {
+      # use 2015 since it's not a leap year
+      year <- ifelse(x == "02-29", "2016-", "2015-")
+      x <- as.Date(paste0(year, x))
+    } else {
+      stop("Input is not a valid date.")
+    }
+  } else if (!inherits(x, "Date")) {
+    stop("Input is not a valid date.")
+  }
+
+  # convert to proportion of year
+  as.integer(format(x, format = "%j")) / 366
+}
+
+# convert from a 0-1 srd date to an iso date
+from_srd_date <- function(x, year, iso_date = TRUE) {
+  stopifnot(all(x <= 1), all(x >= 0))
+  stopifnot(is.logical(iso_date), length(iso_date) == 1)
+
+  if (missing(year)) {
+    y <- ebirdst:::ebirdst_version()["data_version"]
+  } else {
+    y <- year
+  }
+  doy <- round(x * 366)
+  doy <- pmin(pmax(doy, 1), 365)
+  d2015 <- as.Date(x = paste(doy, 2015), format = "%j %Y")
+  if (isTRUE(iso_date)) {
+    return(as.Date(format(d2015, format = paste0(y, "-%m-%d")),
+                   format = "%Y-%m-%d"))
+  } else {
+    return(format(d2015, format = "%m-%d"))
+  }
+}
+
+is_integer <- function(x) {
+  is.integer(x) || (is.numeric(x) && all(x == as.integer(x)))
 }

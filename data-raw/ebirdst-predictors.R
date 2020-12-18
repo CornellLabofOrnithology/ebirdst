@@ -7,7 +7,8 @@ pl <- file.path("data-raw", "config.rds") %>%
 # predictors
 ebirdst_predictors <- tibble(predictor = pl) %>%
   mutate(predictor_tidy = str_to_lower(predictor) %>%
-           str_replace_all("\\.", "_"),
+           str_replace_all("\\.", "_") %>%
+           str_replace("^i_", "is_"),
          lc_class = str_replace(predictor_tidy, "_1500_[a-z]+$", ""),
          lc_class = if_else(str_detect(lc_class, "_fs_") |
                               str_detect(lc_class, "ntl") |

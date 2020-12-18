@@ -1,7 +1,9 @@
 # ebirdst 1.0.0
 
 - add support for new data structures used for 2020 eBird Status and Trends
-- overhaul of 
+- functionality to handle partial dependence data added
+- overhaul of package API to be more intuitive and streamlined
+- all documentation and vignettes updated
 
 # ebirdst 0.2.2
 

@@ -2,56 +2,46 @@
 % Please edit documentation in R/ebirdst-mapping.R
 \name{calc_bins}
 \alias{calc_bins}
-\title{Calculates bins (breaks) based for mapping}
+\title{Calculates relative abundance bins (breaks) based for mapping}
 \usage{
-calc_bins(x, method = c("boxcox", "quantile"))
+calc_bins(abundance, count)
 }
 \arguments{
-\item{x}{RasterStack or RasterBrick; original eBird Status and Trends product
-raster GeoTIFF with 52 bands, one for each week.}
+\item{abundance}{\link{Raster} object; eBird Status and Trends relative abundance
+data cube, or a subset of the data cube.}
 
-\item{method}{character; method to calculate bins: \code{"boxcox"} for bins based
-on standard deviations of Box-Cox power-transformed data or \code{"quantile"}
-for quantile bins.}
+\item{count}{\link{Raster} object; eBird Status and Trends count data cube, or a
+subset of the data cube.}
 }
 \value{
-A list with two elements: \code{bins} is a vector containing the break
-points of the bins and \code{power} is the optimal power used to transform data
-when calculating bins. If \code{method = "quantile"} is used, \code{power} will be
-missing.
+A numeric vector defining the breaks of the relative abundance bins.
+In addition, the \code{labels} attribute of this vector provides the 5th, 50th,
+and 95th quantile of abundance, which can be used to label the bottom,
+middle, and top of a legend.
 }
 \description{
 Mapping species abundance across the full-annual cycle presents a challenge,
 in that patterns of concentration and dispersion in abundance change
 throughout the year, making it difficult to define color bins that suit all
 seasons and accurately reflect the detail of abundance predictions. To
-address this, we selected a method (described by Maciejewski et al. 2013)
-that first selects an optimal power (the Box-Cox method) for normalizing
-the data, then power transforms the entire year of non-zero data, constructs
-bins with the power-transformed data using standard-deviations, and then
-un-transforms the bins. To access a pre-calculated bins for the full annual
-cycle use \code{\link[=load_fac_map_parameters]{load_fac_map_parameters()}}.
-}
-\details{
-The Box-Cox method used in the online version of Status & Trends is
-used as the default for calculating bins; however, an alternative method
-using quantile-based bins can be used by setting \code{method = "quantile"}.
+address this, when mapping the relative abundance data, we recommend using
+quantile bins based on the underlying count distribution, adjusted
+according to the relative abundance distribution. To access pre-calculated
+bins for the full annual cycle use \code{\link[=load_fac_map_parameters]{load_fac_map_parameters()}}.
 }
 \examples{
 \donttest{
-# download and load example abundance data
-sp_path <- ebirdst_download("example_data")
-abd <- load_raster("abundance", sp_path)
+# download example data
+path <- ebirdst_download("example_data")
+# or get the path if you already have the data downloaded
+path <- get_species_path("example_data")
+
+# abundance data
+abd <- load_raster(path, "abundance")
+# count data
+cnt <- load_raster(path, "count")
 
 # calculate bins for a single week for this example
-bins_boxcox <- calc_bins(abd)
-# for some scenarios quantile bins may work better
-bins_quantile <- calc_bins(abd, method = "quantile")
+bins <- calc_bins(abd, cnt)
 }
-}
-\references{
-Ross Maciejewski, Avin Pattah, Sungahn Ko, Ryan Hafen, William S.
-Cleveland, David S. Ebert.  Automated Box-Cox Transformations for Improved
-Visual Encoding. IEEE Transactions on Visualization and Computer Graphics,
-19(1): 130-140, 2013.
 }

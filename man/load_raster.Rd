@@ -74,9 +74,10 @@ data.
 }
 \examples{
 # download example data
-ebirdst_download("example_data")
+path <- ebirdst_download("example_data")
+# or get the path if you already have the data downloaded
+path <- get_species_path("example_data")
 
 # load data
-get_species_path("example_data") \%>\%
-  load_raster("abundance")
+load_raster(path, "abundance")
 }

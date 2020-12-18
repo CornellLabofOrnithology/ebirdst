@@ -10,7 +10,7 @@ project_extent(x, crs)
 \item{x}{\link{ebirdst_extent} object; a spatiotemporal extent.}
 
 \item{crs}{coordinate references system, given either as a proj4string, an
-integer EPSG code, or a \code{crs} object generated with \code{\link[sf:st_crs]{sf::st_crs()}}.}
+integer EPSG code, or a \code{crs} object generated with \code{\link[=st_crs]{st_crs()}}.}
 }
 \value{
 An \link{ebirdst_extent} object in the new CRS.
@@ -27,7 +27,7 @@ bb <- sf::st_bbox(bb_vec, crs = 4326)
 bb_ext <- ebirdst_extent(bb)
 
 # transform to sinusoidal projection of rasters
-sinu <- "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs"
+sinu <- "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007 +b=6371007 +units=m +no_defs"
 project_extent(bb_ext, crs = sinu)
 
 # also works on polygon extents

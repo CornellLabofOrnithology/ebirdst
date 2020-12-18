@@ -30,14 +30,14 @@ given species to be used by the various loading functions.
 ebirdst_download("example_data")
 
 # get the path
-sp_path <- get_species_path("example_data")
+path <- get_species_path("example_data")
 
 # use it to load data
-abd <- load_raster("abundance", sp_path)
+abd <- load_raster("abundance", path)
 
 # get the path to the full data package for yellow-bellied sapsucker
 # common name, scientific name, or species code can be used
-sp_path <- get_species_path("Yellow-bellied Sapsucker")
-sp_path <- get_species_path("Sphyrapicus varius")
-sp_path <- get_species_path("yebsap")
+path <- get_species_path("Yellow-bellied Sapsucker")
+path <- get_species_path("Sphyrapicus varius")
+path <- get_species_path("yebsap")
 }

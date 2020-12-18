@@ -2,38 +2,58 @@
 % Please edit documentation in R/ebirdst-loading.R
 \name{load_pds}
 \alias{load_pds}
-\title{Load partial dependency data for the Status and Trends predictors}
+\title{Load eBird Status and Trends partial dependence data}
 \usage{
-load_pds(path, model = c("occurrence", "abundance"), return_sf = FALSE)
+load_pds(path, model = c("occ", "abd"), return_sf = FALSE)
 }
 \arguments{
 \item{path}{character; directory that the Status and Trends data for a given
 species was downloaded to. This path is returned by \code{ebirdst_download()}
 or \code{get_species_path()}.}
 
+\item{model}{character; whether to load occurrence or relative abundance PD
+data.}
+
 \item{return_sf}{logical; whether to return an \link{sf} object of spatial points
 rather then the default data frame.}
 }
 \value{
-data.frame containing predictor importance values for each stixel, as
-well as stixel summary information.
+Data frame, or \link{sf} object if \code{return_sf = TRUE}, containing PD
+estimates for each stixel for either the occurrence and relative model. The
+data frame will have the following columns:
+\itemize{
+\item \code{stixel_id}: unique stixel identifier
+\item \code{lat} and \code{lon}: stixel centroid
+\item \code{date}: day of year, expressed as a value from 0-1, of the stixel center
+\item \code{predictor}: name of the predictor that the PD data correspond to, for a
+full list of predictors consult the \link{ebirdst_predictors} data frame
+\item \code{predictor_value}: value of the predictor variable at which PD is
+evaluated
+\item \code{response}: predicted response, occurrence or relative abundance, at the
+given value of the predictor averaged across all the values of the other
+predictors
+}
 }
 \description{
 Partial dependence (PD) plots depict the relationship between the modeled
-response (occurrence or relative abundance) and the predictor variables used
-in the model. Status and Trends provides the data to generate these plots for
-every stixel.
+response (occurrence or relative abundance) and each of the predictor
+variables used in the model. Status and Trends provides the data to generate
+these plots for every stixel.
 }
 \examples{
+\donttest{
 # download example data
-sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
+path <- ebirdst_download("example_data", tifs_only = FALSE)
+# or get the path if you already have the data downloaded
+path <- get_species_path("example_data")
 
-# load predictor dependencies
-pds <- load_pds(sp_path)
+# load partial dependence data
+pds <- load_pds(path)
 
 # plot the top 15 predictor importances
 # define a spatiotemporal extent to plot data from
 bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
 e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 plot_pds(pds, ext = e, n_top_pred = 15, by_cover_class = TRUE)
+}
 }

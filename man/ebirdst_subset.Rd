@@ -16,14 +16,16 @@ ebirdst_subset(x, ext)
 \method{ebirdst_subset}{Raster}(x, ext)
 }
 \arguments{
-\item{x}{eBird Status and Trends data to subset; either a Raster object with
-52 layers (one for each week) or a \code{data.frame} with PI or PD data.}
+\item{x}{eBird Status and Trends data to subset; either a \link{RasterStack}
+object with 52 layers (one for each week) or a data frame with PI or PD
+data.}
 
-\item{ext}{\link{ebirdst_extent} object; the spatiotemporal extent to
-filter the data to.}
+\item{ext}{\link{ebirdst_extent} object; the spatiotemporal extent to filter the
+data to.}
 }
 \value{
-eBird Status and Trends data in the same format as the input data.
+eBird Status and Trends data in the same format as the input data,
+but subset in space and time.
 }
 \description{
 Spatiotemporally subset the raster or tabular eBird Status and Trends data.
@@ -39,16 +41,16 @@ The spatiotemporal extent should be defined using \code{\link[=ebirdst_extent]{e
 }}
 
 \examples{
+# download example data
+path <- ebirdst_download("example_data")
+# or get the path if you already have the data downloaded
+path <- get_species_path("example_data")
+
 # bbox for southern michigan in may
 bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
 e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 
-# download and load example data
-sp_path <- ebirdst_download("example_data")
-pis <- load_pis(sp_path)
-abd <- load_raster(product = "abundance", sp_path)
-
-# subset
+# load and subset raster data
+abd <- load_raster(path, product = "abundance")
 abd_ss <- ebirdst_subset(abd, ext = e)
-pis_ss <- ebirdst_subset(pis, ext = e)
 }

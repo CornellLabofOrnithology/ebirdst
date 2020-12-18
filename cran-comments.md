@@ -1,10 +1,9 @@
-# ebirdst 0.2.1
+# ebirdst 1.0.0
 
-- bug fix: corrected date types in seasonal definitions
-- bug fix: fixed possibility that ebirdst_extent could produce invalid date (day 366 of 2015)
-- added import of pipe operator
-- `velox` was archived, removed dependency from Suggests
-- `fasterize` was archived, removed dependency from Imports
+- add support for new data structures used for 2020 eBird Status and Trends
+- functionality to handle partial dependence data added
+- overhaul of package API to be more intuitive and streamlined
+- all documentation and vignettes updated
 
 ## Test environments
 

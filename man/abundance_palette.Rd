@@ -2,7 +2,7 @@
 % Please edit documentation in R/ebirdst-mapping.R
 \name{abundance_palette}
 \alias{abundance_palette}
-\title{eBird Status and Trends color palettes for abundance data}
+\title{eBird Status and Trends color palettes for mapping}
 \usage{
 abundance_palette(
   n,
@@ -17,10 +17,10 @@ abundance_palette(
 get the color palette used in the weekly abundance animations.}
 }
 \value{
-A character vector of color hex codes.
+A character vector of hex color codes.
 }
 \description{
-Generate the color palettes used in the eBird Status and Trends relative
+Generate the color palettes used for the eBird Status and Trends relative
 abundance maps.
 }
 \examples{

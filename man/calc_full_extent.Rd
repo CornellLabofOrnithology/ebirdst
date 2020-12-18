@@ -2,42 +2,52 @@
 % Please edit documentation in R/ebirdst-mapping.R
 \name{calc_full_extent}
 \alias{calc_full_extent}
-\title{Calculates spatial extent of non-zero data from Raster* object for plotting}
+\title{Calculate the spatial extent of non-zero data in a raster}
 \usage{
-calc_full_extent(x)
+calc_full_extent(x, aggregate = TRUE)
 }
 \arguments{
-\item{x}{Raster* object; either full RasterStack or subset.}
+\item{x}{\link{Raster} object; either a full 52-week data cube or a subset.}
+
+\item{aggregate}{logical; whether data should be aggregated by a factor of 3
+in each dimension prior to calculating the extent. When working with the
+high resolution cubes, data should be aggregated otherwise processing times
+will be extremely long.}
 }
 \value{
-raster Extent object
+The extent of occurrence as a \code{raster} \link{Extent} object.
 }
 \description{
-After loading a RasterStack of results, there are lots of NA values
-and plots of individual raster layers will display at the full extent of the
-study extent. To show an ideal extent, this function trims away 0 and NA
-values and checks to make sure it returns a reasonable extent for plotting.
-The returned Extent object can then be used for plotting. To access a
+eBird Status and Trends data cubes are defined over broad areas, filling in
+regions where the species doesn't occur with zeros (predicted absences) or
+NAs (regions where models weren't fit). When producing maps, it's best to
+only display the spatial extent where the species occurs. To show determine
+an ideal extent for mapping, this function trims away 0 and NA values. When
+called on a \link{RasterStack} (e.g., a data cube consisting of all 52 weeks),
+this function returns the extent of occurrence across all layers.To access a
 pre-calculated extent for the full annual cycle use
 \code{\link[=load_fac_map_parameters]{load_fac_map_parameters()}}.
 }
 \examples{
-\dontshow{
 # simple toy example
 r <- raster::raster(nrow = 100, ncol = 100)
 r[5025:5075] <- 1
 raster::extent(r)
 calc_full_extent(r)
-}
+
 \donttest{
-# download and load example abundance data
-sp_path <- ebirdst_download("example_data")
-abd <- load_raster("abundance", sp_path)
+# download example data
+path <- ebirdst_download("example_data")
+# or get the path if you already have the data downloaded
+path <- get_species_path("example_data")
+
+# load abundance data
+abd <- load_raster(path, "abundance")
 
 # calculate full extent
-plot_extent <- calc_full_extent(abd)
+map_extent <- calc_full_extent(abd)
 
 # plot
-raster::plot(abd[[1]], axes = FALSE, ext = plot_extent)
+raster::plot(abd[[20]], axes = FALSE, ext = map_extent)
 }
 }

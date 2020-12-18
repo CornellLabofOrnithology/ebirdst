@@ -34,7 +34,7 @@ recenter_sf <- function(x, crs) {
 }
 
 # countries with lakes removed
-ne_adm0_eck4 <- ne_download(scale = ne_scale, category = "cultural",
+ne_adm0_eck <- ne_download(scale = ne_scale, category = "cultural",
                             type = "admin_0_countries_lakes",
                             returnclass = "sf") %>%
   #clean_names() %>%

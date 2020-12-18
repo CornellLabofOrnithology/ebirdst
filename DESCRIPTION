@@ -25,8 +25,8 @@ Description: Tools to download, map, plot and analyze eBird
     (<https://ebird.org/science/status-and-trends>). eBird
     (<https://ebird.org>) is a global database of bird observations
     collected by citizen scientists. eBird Status and Trends uses these
-    data to model continental bird abundances, range boundaries,
-    habitat associations, and trends.
+    data to model continental bird abundances, range boundaries, habitat
+    associations, and trends.
 License: GPL-3
 URL: https://github.com/CornellLabofOrnithology/ebirdst
 BugReports: 
@@ -36,6 +36,7 @@ Depends:
 Imports: 
     car,
     data.table,
+    DBI,
     dplyr (>= 0.7.0),
     ggplot2,
     grDevices,
@@ -48,6 +49,7 @@ Imports:
     raster,
     rgdal,
     rlang,
+    RSQLite,
     scales,
     sf,
     stats,
@@ -56,7 +58,8 @@ Imports:
     tools,
     utils,
     viridisLite,
-    xml2
+    xml2,
+    fasterize
 Suggests: 
     covr,
     fields,

@@ -5,32 +5,32 @@
 #'
 #' @param x the spatial extent; either a rectangular bounding box (defined as a
 #'   vector of numbers representing the coordinates of the boundaries or an
-#'   [sf::st_bbox()] object) or a polygon (an [sf::sf()] object). See Details
-#'   for further explanation of the format of x.
+#'   [st_bbox()] object) or a polygon (an [sf] object). See Details for further
+#'   explanation of the format of x.
 #' @param t the temporal extent; a 2-element vector of the start and end dates
-#'   of the temporal extent, provided either as dates (Date objects or
-#'   strings in ISO format "YYYY-MM-DD") or numbers between 0 and 1 representing
-#'   the fraction of the year. Note that dates can wrap around the year, e.g.
+#'   of the temporal extent, provided either as dates (Date objects or strings
+#'   in ISO format "YYYY-MM-DD") or numbers between 0 and 1 representing the
+#'   fraction of the year. Note that dates can wrap around the year, e.g.
 #'   `c("2018-12-01", "2018-01-31") is acceptable. See Details for further
 #'   explanation of the format of t. **Leave the argument blank to include the
 #'   full year of data.**
 #' @param crs coordinate reference system, provided as a `crs` object or
-#'   argument to [sf::st_crs()]. Defaults to unprojected, lat/long coordinates
-#'   (crs = 4326). **Only required if x is given as a numeric vector defining
-#'   the bounding box, ignored in all other cases.**
+#'   argument to [st_crs()]. Defaults to unprojected, lat/long coordinates (crs
+#'   = 4326). **Only required if x is given as a numeric vector defining the
+#'   bounding box, ignored in all other cases.**
 #' @param ... Additional arguments used by methods.
 #'
 #' @details The spatial extent, `x`, can be either a rectangular bounding box or
 #'   a set of spatial polygons. The bounding box can be defined either as an
-#'   `sf::st_bbox()` object or by providing the coordinates of the rectangle
-#'   edges directly as a named vector with elements xmin, xmax, ymin, and ymax
-#'   (note that latitude and longitude correspond to y and x, respectively). In
-#'   this latter case, a coordinate reference system must be provided explicitly
-#'   via the `crs` argument (`crs = 4326` is the default and is a short form for
+#'   [st_bbox()] object or by providing the coordinates of the rectangle edges
+#'   directly as a named vector with elements xmin, xmax, ymin, and ymax (note
+#'   that latitude and longitude correspond to y and x, respectively). In this
+#'   latter case, a coordinate reference system must be provided explicitly via
+#'   the `crs` argument (`crs = 4326` is the default and is a short form for
 #'   unprojected lat/long coordinates). For a polygon spatial extent, `x` should
-#'   be either an `sf` or `sfc` object (with feature type `POLYGON` or
+#'   be either an [sf] or [sfc] object (with feature type `POLYGON` or
 #'   `MULTIPOLYGON`) from the `sf` package. To import data from a Shapefile or
-#'   GeoPackage into this format, use `sf::read_sf()`.
+#'   GeoPackage into this format, use [read_sf()].
 #'
 #'   The temporal extent defines the start and end dates of the time period.
 #'   These are most easily provided as Date objects or date strings in ISO
@@ -47,7 +47,7 @@
 #'
 #' @export
 #' @examples
-#' # bounding box of NE United States as a numeric vector
+#' # bounding box of the north eastern united stats as a numeric vector
 #' bb_vec <- c(xmin = -80, xmax = -70, ymin = 40, ymax = 47)
 #' ebirdst_extent(bb_vec)
 #'
@@ -72,7 +72,7 @@ ebirdst_extent <- function(x, t, ...) {
 }
 
 #' @export
-#' @describeIn ebirdst_extent bounding box created with [sf::st_bbox()]
+#' @describeIn ebirdst_extent bounding box created with [st_bbox()]
 ebirdst_extent.bbox <- function(x, t, ...) {
   if (is.na(sf::st_crs(x)$proj4string)) {
     stop("A CRS must be defined for the spatial extent x.")
@@ -103,7 +103,7 @@ ebirdst_extent.numeric <- function(x, t, crs = 4326, ...) {
 }
 
 #' @export
-#' @describeIn ebirdst_extent polygons as `sf` spatial feature column
+#' @describeIn ebirdst_extent polygons as [sfc] spatial feature column
 ebirdst_extent.sfc <- function(x, t, ...) {
   if (any(!sf::st_is(x, c("MULTIPOLYGON", "POLYGON")))) {
     stop("Spatial extent must consist of polygon features.")
@@ -127,7 +127,7 @@ ebirdst_extent.sfc <- function(x, t, ...) {
 
 
 #' @export
-#' @describeIn ebirdst_extent polygons as `sf` object
+#' @describeIn ebirdst_extent polygons as [sf] object
 ebirdst_extent.sf <- function(x, t, ...) {
   ebirdst_extent.sfc(x = sf::st_geometry(x), t = t)
 }
@@ -141,7 +141,7 @@ ebirdst_extent.sf <- function(x, t, ...) {
 #'
 #' @param x [ebirdst_extent] object; a spatiotemporal extent.
 #' @param crs coordinate references system, given either as a proj4string, an
-#'   integer EPSG code, or a `crs` object generated with [sf::st_crs()].
+#'   integer EPSG code, or a `crs` object generated with [st_crs()].
 #'
 #' @return An [ebirdst_extent] object in the new CRS.
 #' @export
@@ -153,7 +153,7 @@ ebirdst_extent.sf <- function(x, t, ...) {
 #' bb_ext <- ebirdst_extent(bb)
 #'
 #' # transform to sinusoidal projection of rasters
-#' sinu <- "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs"
+#' sinu <- "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007 +b=6371007 +units=m +no_defs"
 #' project_extent(bb_ext, crs = sinu)
 #'
 #' # also works on polygon extents
@@ -193,7 +193,7 @@ print.ebirdst_extent <- function(x, ...) {
   cat(paste("  CRS:", sf::st_crs(x$extent)$proj4string, "\n"))
 
   # temporal
-  t_date <- format(from_srd_date(x$t), format = "%Y-%m-%d")
+  t_date <- format(from_srd_date(x$t), format = "%m-%d")
   cat(paste("  Temporal extent:", t_date[1], " - ", t_date[2], "\n"))
   invisible(x)
 }
@@ -209,39 +209,4 @@ process_t_extent <- function(t) {
     stop("Unrecognized format for temporal extent t.")
   }
   return(t)
-}
-
-to_srd_date <- function(x) {
-  if (is.character(x)) {
-    if (all(grepl("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", x))) {
-      x <- as.Date(x)
-    } else if (all(grepl("^[0-9]{2}-[0-9]{2}$", x))) {
-      x <- as.Date(paste0("2016-", x))
-    } else {
-      stop("Input is not a valid date.")
-    }
-  } else if (!inherits(x, "Date")) {
-    stop("Input is not a valid date.")
-  }
-
-  # convert to a 2015 date since it's not a leap year
-  x <- as.Date(format(x, format = "2015-%m-%d"), format = "%Y-%m-%d")
-  # to proportion of year
-  j_date <- as.integer(format(x, format = "%j"))
-  #srd_date <- (as.integer(format(srd_date, format = "%j")) - 1) / (365 - 1)
-  srd_date <- round(0.0027359876 * j_date - 0.0006857383, digits = 4)
-  # fix end dates
-  srd_date <- dplyr::if_else(j_date == 1, 0, srd_date)
-  srd_date <- dplyr::if_else(j_date == 365, 1, srd_date)
-  return(srd_date)
-}
-
-from_srd_date <- function(x) {
-  stopifnot(all(x <= 1), all(x >= 0))
-  d2015 <- as.Date(x = paste(round(x * 364 + 1), 2015), format = "%j %Y")
-  d2018 <- as.Date(format(d2015, format = "2018-%m-%d"), format = "%Y-%m-%d")
-  # fix end dates
-  d2018 <- dplyr::if_else(x == 0, as.Date("2018-01-01"), d2018)
-  d2018 <- dplyr::if_else(x == 1,  as.Date("2018-12-31"), d2018)
-  return(d2018)
 }

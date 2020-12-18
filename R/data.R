@@ -56,3 +56,21 @@
 #'         class.}
 #' }
 "ebirdst_predictors"
+
+#' eBird Status and Trends weeks
+#'
+#' eBird Status and Trends predictions are made for each of 52 weeks of the
+#' year. This data frame provides the boundaries of the weeks.
+#'
+#' @format A data frame with 52 rows and 5 columns:
+#' \describe{
+#'   \item{week_number}{Integer week number from 1-52.}
+#'   \item{date}{Date of the midpoint of the week.}
+#'   \item{week_midpoint}{Date of the midpoint of the week expressed as a
+#'         fraction of the year, i.e. a number from 0-1.}
+#'   \item{week_start}{Date of the start of the week expressed as a fraction of
+#'         the year, i.e. a number from 0-1.}
+#'   \item{week_end}{Date of the end of the week expressed as a fraction of the
+#'         year, i.e. a number from 0-1.}
+#' }
+"ebirdst_weeks"
