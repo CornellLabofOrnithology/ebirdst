@@ -38,7 +38,7 @@ test_that("ebirdst_ppms_ts", {
   for (t in c("binary_ppms", "occ_ppms", "abd_ppms")) {
     expect_is(wk[[t]], "data.frame")
     expect_is(wk[[t]][["week"]], "Date")
-    expect_true(all(ebirdst_weeks$date %in% wk[[t]][["week"]]))
+    expect_true(all(ebirdst::ebirdst_weeks$date %in% wk[[t]][["week"]]))
   }
 
   # months

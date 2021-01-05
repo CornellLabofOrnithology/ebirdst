@@ -5,12 +5,12 @@
 #' NAs (regions where models weren't fit). When producing maps, it's best to
 #' only display the spatial extent where the species occurs. To show determine
 #' an ideal extent for mapping, this function trims away 0 and NA values. When
-#' called on a [RasterStack] (e.g., a data cube consisting of all 52 weeks),
+#' called on a `RasterStack` (e.g., a data cube consisting of all 52 weeks),
 #' this function returns the extent of occurrence across all layers.To access a
 #' pre-calculated extent for the full annual cycle use
 #' [load_fac_map_parameters()].
 #'
-#' @param x [Raster] object; either a full 52-week data cube or a subset.
+#' @param x `Raster` object; either a full 52-week data cube or a subset.
 #' @param aggregate logical; whether data should be aggregated by a factor of 3
 #'   in each dimension prior to calculating the extent. When working with the
 #'   high resolution cubes, data should be aggregated otherwise processing times
@@ -90,9 +90,9 @@ calc_full_extent <- function(x, aggregate = TRUE) {
 #' according to the relative abundance distribution. To access pre-calculated
 #' bins for the full annual cycle use [load_fac_map_parameters()].
 #'
-#' @param abundance [Raster] object; eBird Status and Trends relative abundance
+#' @param abundance `Raster` object; eBird Status and Trends relative abundance
 #'   data cube, or a subset of the data cube.
-#' @param count [Raster] object; eBird Status and Trends count data cube, or a
+#' @param count `Raster` object; eBird Status and Trends count data cube, or a
 #'   subset of the data cube.
 #'
 #' @return A numeric vector defining the breaks of the relative abundance bins.
@@ -134,21 +134,21 @@ calc_bins <- function(abundance, count) {
 
   # abundance
   v <- as.vector(raster::getValues(abundance))
-  v <- as.numeric(na.omit(v))
+  v <- as.numeric(stats::na.omit(v))
   v <- v[v > 0]
   if (length(v) <= 1) {
     stop("Raster must have at least 2 non-zero values to calculate bins")
   }
   abd_rng <- range(v, na.rm = TRUE)
-  abd_5th <- quantile(v, 0.05)
+  abd_5th <- stats::quantile(v, 0.05)
   rm(v)
 
   # count
   v <- as.vector(raster::getValues(count))
-  v <- as.numeric(na.omit(v))
+  v <- as.numeric(stats::na.omit(v))
   v <- v[v > 0]
   # quantile bins based on counts
-  b <- quantile(v, probs = seq(0, 1, by = 0.05), na.rm = TRUE)
+  b <- stats::quantile(v, probs = seq(0, 1, by = 0.05), na.rm = TRUE)
 
   # adjust for abundance
   b[1] <- abd_rng[1]
@@ -159,7 +159,7 @@ calc_bins <- function(abundance, count) {
   }
   b <- unname(b)
   # labels
-  attr(b, "labels") <- c(b[2], median(b), b[length(b) - 1])
+  attr(b, "labels") <- c(b[2], stats::median(b), b[length(b) - 1])
 
   return(b)
 }

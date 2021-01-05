@@ -163,7 +163,7 @@ from_srd_date <- function(x, year, iso_date = TRUE) {
   stopifnot(is.logical(iso_date), length(iso_date) == 1)
 
   if (missing(year)) {
-    y <- ebirdst:::ebirdst_version()["data_version"]
+    y <- ebirdst_version()["data_version"]
   } else {
     y <- year
   }

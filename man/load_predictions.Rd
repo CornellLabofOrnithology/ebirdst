@@ -10,6 +10,9 @@ load_predictions(path, return_sf = FALSE)
 \item{path}{character; directory that the Status and Trends data for a given
 species was downloaded to. This path is returned by \code{ebirdst_download()}
 or \code{get_species_path()}.}
+
+\item{return_sf}{logical; whether to return an \link{sf} object of spatial points
+rather then the default data frame.}
 }
 \value{
 Data frame, or \link{sf} object if \code{return_sf = TRUE}, containing
@@ -19,7 +22,7 @@ observed counts and model predictiosn for the test data.
 During eBird Status and Trends modeling, predictions are made for checklists
 in a test dataset that is not included in the model fitting process. This
 function loads these predictions in addition to the actual observed count on
-the associated checklist. These data are used by \code{\link[=compute_ppms]{compute_ppms()}} to get for
+the associated checklist. These data are used by \code{\link[=ebirdst_ppms]{ebirdst_ppms()}} to get for
 calculating predictive performance metrics.
 }
 \examples{

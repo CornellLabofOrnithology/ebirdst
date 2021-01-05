@@ -33,7 +33,7 @@ ebirdst_download("example_data")
 path <- get_species_path("example_data")
 
 # use it to load data
-abd <- load_raster("abundance", path)
+abd <- load_raster(path, "abundance")
 
 # get the path to the full data package for yellow-bellied sapsucker
 # common name, scientific name, or species code can be used

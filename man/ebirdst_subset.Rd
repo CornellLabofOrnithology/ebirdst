@@ -16,7 +16,7 @@ ebirdst_subset(x, ext)
 \method{ebirdst_subset}{Raster}(x, ext)
 }
 \arguments{
-\item{x}{eBird Status and Trends data to subset; either a \link{RasterStack}
+\item{x}{eBird Status and Trends data to subset; either a \code{RasterStack}
 object with 52 layers (one for each week) or a data frame with PI or PD
 data.}
 

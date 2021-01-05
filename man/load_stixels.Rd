@@ -13,9 +13,6 @@ or \code{get_species_path()}.}
 
 \item{return_sf}{logical; whether to return an \link{sf} object of spatial points
 rather then the default data frame.}
-
-\item{model}{character; whether to load occurrence or relative abundance PD
-data.}
 }
 \value{
 Data frame, or \link{sf} object if \code{return_sf = TRUE}, containing stixel

@@ -95,9 +95,9 @@ ebirdst_ppms <- function(path, ext, es_cutoff) {
   }
 
   # add weekly es cutoffs
-  ws <- ebirdst_weeks$week_start
+  ws <- ebirdst::ebirdst_weeks$week_start
   ws[1] <- -Inf
-  we <- ebirdst_weeks$week_end
+  we <- ebirdst::ebirdst_weeks$week_end
   we[length(we)] <- Inf
   preds_week <- list()
   for (i in seq_along(es_cutoff)) {
@@ -457,7 +457,7 @@ ebirdst_ppms_ts <- function(path, ext, summarize_by = c("weeks", "months"),
     s <- as.Date(paste(y, 1:12, "01", sep = "-"), format = "%Y-%m-%d")
     e <- s[c(2:length(s), 1)] - 1
     e <- as.Date(format(e, format = paste0(y, "-%m-%d")), format = "%Y-%m-%d")
-    e <- ebirdst:::to_srd_date(e)
+    e <- to_srd_date(e)
     e[length(e)] <- 1
     s <- c(0, e[-length(e)])
     d <- data.frame(month = month.abb, start = s, end = e)
@@ -631,6 +631,7 @@ bernoulli_dev <- function(obs, pred) {
 #' Binomial test for ensemble support
 #'
 #' @param x numeric; named numeric vector with values for `"pat"` and `"pi_es"`.
+#' @param pat_cutoff numeric; percent above threshold cutoff
 #'
 #' @return A numeric p-value.
 #'
