@@ -13,20 +13,25 @@
 #' \describe{
 #'   \item{run_name}{Unique analysis identifier and the top level folder name
 #'                   for all results}
-#'   \item{species_code}{Six letter eBird code in eBird Taxonomy v2019}
-#'   \item{scientific_name}{Scientific name from eBird Taxonomy v2019}
-#'   \item{common_name}{English common name from eBird Taxonomy v2019}
+#'   \item{species_code}{Six letter eBird code in eBird Taxonomy v2018}
+#'   \item{scientific_name}{Scientific name from eBird Taxonomy v2018}
+#'   \item{common_name}{English common name from eBird Taxonomy v2018}
 #'   \item{resident}{Classifies this species a resident or a migrant}
+#'   \item{breeding_quality}{Breeding season quality}
 #'   \item{breeding_start}{Breeding season start date}
 #'   \item{breeding_end}{Breeding season start date}
+#'   \item{nonbreeding_quality}{Non-breeding season quality}
 #'   \item{nonbreeding_start}{Non-breeding season start date}
 #'   \item{nonbreeding_end}{Non-breeding season start date}
+#'   \item{postbreeding_migration_quality}{Post-breeding season quality}
 #'   \item{postbreeding_migration_start}{Post-breeding season start date}
 #'   \item{postbreeding_migration_end}{Post-breeding season start date}
+#'   \item{prebreeding_migration_quality}{Pre-breeding season quality}
 #'   \item{prebreeding_migration_start}{Pre-breeding season start date}
 #'   \item{prebreeding_migration_end}{Pre-breeding season start date}
+#'   \item{resident_quality}{Resident quality}
 #'   \item{resident_start}{For resident species, the year-round start date}
-#'   \item{resident_end_dt}{For resident species, the year-round end date}
+#'   \item{resident_end}{For resident species, the year-round end date}
 #' }
 "ebirdst_runs"
 

@@ -8,6 +8,8 @@ binom_test_p(x, pat_cutoff = 1/10)
 }
 \arguments{
 \item{x}{numeric; named numeric vector with values for \code{"pat"} and \code{"pi_es"}.}
+
+\item{pat_cutoff}{numeric; percent above threshold cutoff}
 }
 \value{
 A numeric p-value.

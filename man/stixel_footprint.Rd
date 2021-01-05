@@ -23,7 +23,7 @@ data to.}
 \value{
 A \link{stixel_footprint} object consisting of a list with three elements:
 \itemize{
-\item \code{footprint}: a \link{RasterStack} giving the percentage of the selected
+\item \code{footprint}: a \code{RasterStack} giving the percentage of the selected
 stixels that are contributing to each grid cell.
 \item \code{centroids}: an \link{sf} object containing the stixel centroids points.
 \item \code{extent}: an \link{ebirdst_extent} object specifying the chosen spatiotemporal

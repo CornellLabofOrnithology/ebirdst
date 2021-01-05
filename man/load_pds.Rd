@@ -54,6 +54,6 @@ pds <- load_pds(path)
 # define a spatiotemporal extent to plot data from
 bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
 e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
-plot_pds(pds, ext = e, n_top_pred = 15, by_cover_class = TRUE)
+plot_pds(pds, "solar_noon_diff", ext = e, n_bs = 5)
 }
 }

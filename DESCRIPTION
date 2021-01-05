@@ -34,10 +34,10 @@ BugReports:
 Depends: 
     R (>= 3.3.0)
 Imports: 
-    car,
-    data.table,
     DBI,
     dplyr (>= 0.7.0),
+    fasterize,
+    gbm,
     ggplot2,
     grDevices,
     gridExtra,
@@ -48,9 +48,7 @@ Imports:
     rappdirs,
     raster,
     rgdal,
-    rlang,
     RSQLite,
-    scales,
     sf,
     stats,
     stringr,
@@ -58,8 +56,7 @@ Imports:
     tools,
     utils,
     viridisLite,
-    xml2,
-    fasterize
+    xml2
 Suggests: 
     covr,
     fields,

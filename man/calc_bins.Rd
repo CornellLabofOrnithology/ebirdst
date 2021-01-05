@@ -7,10 +7,10 @@
 calc_bins(abundance, count)
 }
 \arguments{
-\item{abundance}{\link{Raster} object; eBird Status and Trends relative abundance
+\item{abundance}{\code{Raster} object; eBird Status and Trends relative abundance
 data cube, or a subset of the data cube.}
 
-\item{count}{\link{Raster} object; eBird Status and Trends count data cube, or a
+\item{count}{\code{Raster} object; eBird Status and Trends count data cube, or a
 subset of the data cube.}
 }
 \value{

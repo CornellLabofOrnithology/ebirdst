@@ -155,7 +155,7 @@ ebirdst_download <- function(species,
 #' path <- get_species_path("example_data")
 #'
 #' # use it to load data
-#' abd <- load_raster("abundance", path)
+#' abd <- load_raster(path, "abundance")
 #'
 #' # get the path to the full data package for yellow-bellied sapsucker
 #' # common name, scientific name, or species code can be used
@@ -438,7 +438,7 @@ load_pis <- function(path, return_sf = FALSE) {
 #' # define a spatiotemporal extent to plot data from
 #' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
-#' plot_pds(pds, ext = e, n_top_pred = 15, by_cover_class = TRUE)
+#' plot_pds(pds, "solar_noon_diff", ext = e, n_bs = 5)
 #' }
 load_pds <- function(path, model = c("occ", "abd"), return_sf = FALSE) {
   stopifnot(dir.exists(path))
@@ -486,8 +486,6 @@ load_pds <- function(path, model = c("occ", "abd"), return_sf = FALSE) {
 #' stixels and the number of observations within each stixel.
 #'
 #' @inheritParams load_pis
-#' @param model character; whether to load occurrence or relative abundance PD
-#'   data.
 #'
 #' @return Data frame, or [sf] object if `return_sf = TRUE`, containing stixel
 #'   summary data. Data are organized with one stixel per row and each stixel
@@ -541,10 +539,10 @@ load_stixels <- function(path, return_sf = FALSE) {
 #' During eBird Status and Trends modeling, predictions are made for checklists
 #' in a test dataset that is not included in the model fitting process. This
 #' function loads these predictions in addition to the actual observed count on
-#' the associated checklist. These data are used by [compute_ppms()] to get for
+#' the associated checklist. These data are used by [ebirdst_ppms()] to get for
 #' calculating predictive performance metrics.
 #'
-#' @inheritParams load_raster
+#' @inheritParams load_pis
 #'
 #' @return Data frame, or [sf] object if `return_sf = TRUE`, containing
 #'   observed counts and model predictiosn for the test data.

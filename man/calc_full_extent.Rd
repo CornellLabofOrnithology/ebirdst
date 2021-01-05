@@ -7,7 +7,7 @@
 calc_full_extent(x, aggregate = TRUE)
 }
 \arguments{
-\item{x}{\link{Raster} object; either a full 52-week data cube or a subset.}
+\item{x}{\code{Raster} object; either a full 52-week data cube or a subset.}
 
 \item{aggregate}{logical; whether data should be aggregated by a factor of 3
 in each dimension prior to calculating the extent. When working with the
@@ -23,7 +23,7 @@ regions where the species doesn't occur with zeros (predicted absences) or
 NAs (regions where models weren't fit). When producing maps, it's best to
 only display the spatial extent where the species occurs. To show determine
 an ideal extent for mapping, this function trims away 0 and NA values. When
-called on a \link{RasterStack} (e.g., a data cube consisting of all 52 weeks),
+called on a \code{RasterStack} (e.g., a data cube consisting of all 52 weeks),
 this function returns the extent of occurrence across all layers.To access a
 pre-calculated extent for the full annual cycle use
 \code{\link[=load_fac_map_parameters]{load_fac_map_parameters()}}.

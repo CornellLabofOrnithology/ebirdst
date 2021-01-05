@@ -3,7 +3,7 @@
 #' Spatiotemporally subset the raster or tabular eBird Status and Trends data.
 #' The spatiotemporal extent should be defined using [ebirdst_extent()].
 #'
-#' @param x eBird Status and Trends data to subset; either a [RasterStack]
+#' @param x eBird Status and Trends data to subset; either a `RasterStack`
 #'   object with 52 layers (one for each week) or a data frame with PI or PD
 #'   data.
 #' @param ext [ebirdst_extent] object; the spatiotemporal extent to filter the

@@ -90,7 +90,7 @@ stixelize.sf <- function(x) {
 #'   data to.
 #'
 #' @return A [stixel_footprint] object consisting of a list with three elements:
-#'   - `footprint`: a [RasterStack] giving the percentage of the selected
+#'   - `footprint`: a `RasterStack` giving the percentage of the selected
 #'   stixels that are contributing to each grid cell.
 #'   - `centroids`: an [sf] object containing the stixel centroids points.
 #'   - `extent`: an [ebirdst_extent] object specifying the chosen spatiotemporal
@@ -177,9 +177,9 @@ plot.stixel_footprint <- function(x, ...) {
                                 labels = seq(0, 1, by = 0.25)),
                axes = FALSE, box = FALSE, legend = TRUE)
 
-  graphics::plot(sf::st_geometry(ebirdst:::ne_adm0_eck),
+  graphics::plot(sf::st_geometry(ne_adm0_eck),
                  border = "#ffffff", col = NA, lwd = 1.5, add = TRUE)
-  graphics::plot(sf::st_geometry(ebirdst:::ne_adm1_eck),
+  graphics::plot(sf::st_geometry(ne_adm1_eck),
                  border = "#ffffff", col = NA, lwd = 1, add = TRUE)
   graphics::plot(sf::st_geometry(ext_poly_eck),
                  border = "red", col = NA, lwd = 1.5, add = TRUE)
