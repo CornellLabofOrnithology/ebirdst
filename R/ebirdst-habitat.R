@@ -50,7 +50,7 @@
 #' habitat <- ebirdst_habitat(path = path, ext = e)
 #' plot(habitat)
 #' }
-ebirdst_habitat <- function(path, ext, n_predictors = 10, pland_only = TRUE) {
+ebirdst_habitat <- function(path, ext, n_predictors = 15, pland_only = TRUE) {
   stopifnot(is.logical(by_cover_class), length(by_cover_class) == 1)
   stopifnot(is.logical(pland_only), length(pland_only) == 1)
   if (missing(ext)) {

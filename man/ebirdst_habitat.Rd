@@ -5,7 +5,7 @@
 \alias{plot.ebirdst_habitat}
 \title{eBird Status and Trends predictive habitat associations}
 \usage{
-ebirdst_habitat(path, ext, n_predictors = 10, pland_only = TRUE)
+ebirdst_habitat(path, ext, n_predictors = 15, pland_only = TRUE)
 
 \method{plot}{ebirdst_habitat}(x, by_cover_class, ....)
 }
