@@ -48,6 +48,7 @@ Imports:
     rappdirs,
     raster,
     rgdal,
+    rlang,
     RSQLite,
     sf,
     stats,

@@ -4,7 +4,8 @@ library(sf)
 library(rnaturalearth)
 
 # natural earth reference data
-eck4 <- "+proj=eck4 +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
+prj_eck4 <- "+proj=eck4 +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
+prj_sinu <- "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +R=6371007.181 +units=m +no_defs"
 ne_scale <- 110
 
 # project and recenter
@@ -39,7 +40,7 @@ ne_adm0_eck <- ne_download(scale = ne_scale, category = "cultural",
                             returnclass = "sf") %>%
   #clean_names() %>%
   select(country_code = ISO_A2, country_name = NAME_EN) %>%
-  recenter_sf(crs = eck4) %>%
+  recenter_sf(crs = prj_eck4) %>%
   st_make_valid()
 
 # states, north america
@@ -50,9 +51,9 @@ ne_adm1_eck <- ne_download(scale = ne_scale, category = "cultural",
   select(country_code = iso_a2,
          state_code = iso_3166_2,
          state_name = gn_name) %>%
-  st_transform(crs = eck4) %>%
+  st_transform(crs = prj_eck4) %>%
   st_make_valid()
 
 # save as internal data files
-usethis::use_data(ne_adm0_eck, ne_adm1_eck, eck4,
+usethis::use_data(ne_adm0_eck, ne_adm1_eck, prj_eck4, prj_sinu,
                   internal = TRUE, overwrite = TRUE)

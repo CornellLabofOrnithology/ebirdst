@@ -162,10 +162,10 @@ plot.stixel_footprint <- function(x, ...) {
 
   # project to eck4
   stx_r_eck <- suppressWarnings(raster::projectRaster(x$footprint,
-                                                      crs = eck4,
+                                                      crs = prj_eck4,
                                                       method = "ngb"))
-  centroids <- sf::st_transform(x$centroids, eck4)
-  ext_poly_eck <- sf::st_transform(ext_poly, crs = eck4)
+  centroids <- sf::st_transform(x$centroids, prj_eck4)
+  ext_poly_eck <- sf::st_transform(ext_poly, crs = prj_eck4)
   # plot
   p <- graphics::par(mar = c(0.25, 0.25, 0.25, 0.25), bg = "#ffffff")
 
