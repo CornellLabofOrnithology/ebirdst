@@ -7,7 +7,7 @@
 \usage{
 ebirdst_habitat(path, ext, n_predictors = 15, pland_only = TRUE)
 
-\method{plot}{ebirdst_habitat}(x, by_cover_class, ....)
+\method{plot}{ebirdst_habitat}(x, date_range, by_cover_class = TRUE, ...)
 }
 \arguments{
 \item{path}{character; Full path to single species STEM results.}
@@ -28,9 +28,17 @@ associates. Use \code{pland_only = FALSE} to use both PLAND and ED metrics.}
 \item{x}{\link{ebirdst_habitat} object; habitat relationships as calculated by
 \code{\link[=ebirdst_habitat]{ebirdst_habitat()}}.}
 
+\item{date_range}{the range of dates for plotting; a 2-element vector of the
+start and end dates of the date range, provided either as dates (Date
+objects or strings in ISO format "YYYY-MM-DD") or numbers between 0 and 1
+representing the fraction of the year. When providing dates as a string,
+the year can be omitted (i.e. "MM-DD"). \strong{Leave the argument blank to plot
+the full year of data.}}
+
 \item{by_cover_class}{logical; whether to aggregate the FRAGSTATS metrics
 (PLAND and ED) for the land cover classes into single values for the land
-cover classes.}
+cover classes. This will also group the 5 types of roads into a single
+class.}
 
 \item{...}{ignored.}
 }
@@ -66,12 +74,14 @@ path <- ebirdst_download("example_data", tifs_only = FALSE)
 # or get the path if you already have the data downloaded
 path <- get_species_path("example_data")
 
-# define a spatiotemporal extent to calculate ppms over
+# define a spatial extent to calculate ppms over
 bb_vec <- c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5)
-e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
+e <- ebirdst_extent(bb_vec)
 
-# compute predictive performance metrics
+# compute habitat associations
 habitat <- ebirdst_habitat(path = path, ext = e)
+print(habitat)
+# produce a cake plot
 plot(habitat)
 }
 }
