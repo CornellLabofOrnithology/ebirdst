@@ -9,7 +9,7 @@ ebirdst_predictors <- tibble(predictor = pl) %>%
   mutate(predictor_tidy = str_to_lower(predictor) %>%
            str_replace_all("\\.", "_") %>%
            str_replace("^i_", "is_"),
-         lc_class = str_replace(predictor_tidy, "_1500_[a-z]+$", ""),
+         lc_class = str_remove_all(predictor_tidy, "_1500_[a-z]+$"),
          lc_class = if_else(str_detect(lc_class, "_fs_") |
                               str_detect(lc_class, "ntl") |
                               str_detect(lc_class, "gp_rtp"),
@@ -71,6 +71,10 @@ ebirdst_predictors <- tibble(predictor = pl) %>%
     predictor_label = str_replace(predictor_label, "Hrs", "Hours"),
     predictor_label = str_replace(predictor_label, "Elev", "Elevation"),
     predictor_label = str_replace(predictor_label, "Sd", "SD"),
+    lc_class = if_else(str_detect(lc_class, "gp_rtp"),
+                       "gp_rtp", lc_class),
+    lc_class_label =  if_else(str_detect(lc_class, "gp_rtp"),
+                              "Roads", lc_class_label),
     lc_class_label = dplyr::coalesce(lc_class_label, predictor_label)) %>%
   select(predictor, predictor_tidy, predictor_label, lc_class, lc_class_label)
 

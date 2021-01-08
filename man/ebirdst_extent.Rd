@@ -64,7 +64,7 @@ GeoPackage into this format, use \code{\link[=read_sf]{read_sf()}}.
 The temporal extent defines the start and end dates of the time period.
 These are most easily provided as Date objects or date strings in ISO
 format ("YYYY-MM-DD"). If dates are defined as strings, the year can be
-omitted (e.g. "MM-DD"). Alternatively, dates can be defined in terms of
+omitted (i.e. "MM-DD"). Alternatively, dates can be defined in terms of
 fractions of the year, e.g. \code{t = c(0.25, 0.5) } would subset to data within
 the second quarter of the year. In all cases, dates can wrap around the
 year, e.g. c("2018-12-01", "2018-01-31") would subset to data in December

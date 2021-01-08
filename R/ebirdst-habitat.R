@@ -42,17 +42,22 @@
 #' # or get the path if you already have the data downloaded
 #' path <- get_species_path("example_data")
 #'
-#' # define a spatiotemporal extent to calculate ppms over
+#' # define a spatial extent to calculate ppms over
 #' bb_vec <- c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5)
-#' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
+#' e <- ebirdst_extent(bb_vec)
 #'
-#' # compute predictive performance metrics
+#' # compute habitat associations
 #' habitat <- ebirdst_habitat(path = path, ext = e)
+#' print(habitat)
+#' # produce a cake plot
 #' plot(habitat)
 #' }
 ebirdst_habitat <- function(path, ext, n_predictors = 15, pland_only = TRUE) {
-  stopifnot(is.logical(by_cover_class), length(by_cover_class) == 1)
+  stopifnot(is.character(path), length(path) == 1, dir.exists(path))
+  stopifnot(is.numeric(n_predictors), length(n_predictors) == 1,
+            n_predictors > 0)
   stopifnot(is.logical(pland_only), length(pland_only) == 1)
+
   if (missing(ext)) {
     stop("A spatiotemporal extent must be provided.")
   } else {
@@ -112,11 +117,11 @@ ebirdst_habitat <- function(path, ext, n_predictors = 15, pland_only = TRUE) {
                              values_to = "importance")
 
   # subset to cover classes
-  preds <- ebirdst_predictors$predictor_tidy
+  preds <- ebirdst::ebirdst_predictors$predictor_tidy
   preds <- preds[stringr::str_detect(preds,
                                      "^(intertidal|mcd12q1|gp_rtp|astwbd|ntl)")]
   if (isTRUE(pland_only)) {
-    preds <- preds[!stringr::str_detect(preds, "_ed$")]
+    preds <- preds[!stringr::str_detect(preds, "_(ed|sd)$")]
   }
   pis <- pis[pis$predictor %in% preds, ]
   pds <- pds[pds$predictor %in% preds, ]
@@ -160,7 +165,7 @@ ebirdst_habitat <- function(path, ext, n_predictors = 15, pland_only = TRUE) {
   pd_smooth <- tidyr::nest(pd_smooth, data = -dplyr::all_of("predictor"))
   pd_smooth$smooth <- lapply(pd_smooth[["data"]],
                              FUN = loess_smooth,
-                             predict_to = ebirdst_weeks$week_midpoint,
+                             predict_to = ebirdst::ebirdst_weeks$week_midpoint,
                              na_value = NA_real_,
                              check_width = 7 / 366)
   pd_smooth$data <- NULL
@@ -183,7 +188,7 @@ ebirdst_habitat <- function(path, ext, n_predictors = 15, pland_only = TRUE) {
   pi_smooth <- tidyr::nest(pi_smooth, data = -dplyr::all_of("predictor"))
   pi_smooth$smooth <- lapply(pi_smooth[["data"]],
                              FUN = loess_smooth,
-                             predict_to = ebirdst_weeks$week_midpoint,
+                             predict_to = ebirdst::ebirdst_weeks$week_midpoint,
                              na_value = 0,
                              check_width = 7 / 366)
   pi_smooth$data <- NULL
@@ -201,125 +206,107 @@ ebirdst_habitat <- function(path, ext, n_predictors = 15, pland_only = TRUE) {
   # multiply importance and direction
   pipd <- dplyr::inner_join(pi_smooth, pd_smooth, by = c("predictor", "date"))
 
-  structure(pipd, class = "ebirdst_habitat")
+  structure(pipd,
+            class = c("ebirdst_habitat", class(pipd)),
+            extent = ext)
 }
 
 #' @param x [ebirdst_habitat] object; habitat relationships as calculated by
 #'   [ebirdst_habitat()].
+#' @param date_range the range of dates for plotting; a 2-element vector of the
+#'   start and end dates of the date range, provided either as dates (Date
+#'   objects or strings in ISO format "YYYY-MM-DD") or numbers between 0 and 1
+#'   representing the fraction of the year. When providing dates as a string,
+#'   the year can be omitted (i.e. "MM-DD"). **Leave the argument blank to plot
+#'   the full year of data.**
 #' @param by_cover_class logical; whether to aggregate the FRAGSTATS metrics
 #'   (PLAND and ED) for the land cover classes into single values for the land
-#'   cover classes.
+#'   cover classes. This will also group the 5 types of roads into a single
+#'   class.
 #' @param ... ignored.
 #'
 #' @export
 #' @rdname ebirdst_habitat
-plot.ebirdst_habitat <- function(x, by_cover_class, ....) {
-  # colors for aggregated water and land cover classes
-  agg_colors <- c("blue", "chartreuse", "cyan", "cyan3", "blue2", "blue4",
-                  "#48D8AE", "#FCF050", "#E28373", "#C289F3", "#E6E6E6",
-                  "#19AB81", "#88DA4A", "#5AB01A", "#A3B36B", "#D1BB7B",
-                  "#E1D4AC", "#DCA453", "#EACA57")
+plot.ebirdst_habitat <- function(x, date_range, by_cover_class = TRUE, ...) {
+  stopifnot(is.logical(by_cover_class), length(by_cover_class) == 1)
 
-  # If plotting the cover classes combined, not separately
-  if(by_cover_class == TRUE) {
-    # add column of class
+  # convert temporal extent
+  if (missing(date_range)) {
+    date_range <- c(0, 1)
+  }
+  date_range <- process_t_extent(date_range)
+  if (date_range[1] >= date_range[2]) {
+    stop("Dates in date_range must be sequential.")
+  }
+  date_range[1] <- max(date_range[1], min(x$date, na.rm = TRUE))
+  date_range[2] <- min(date_range[2], max(x$date, na.rm = TRUE))
+  date_range <- from_srd_date(date_range)
 
-    return_class <- function(x) {
-      y <- x["predictor"]
-      spls <- strsplit(y, "_")
+  # multiply importance and direction, fill with zeros
+  x$pi_direction <- dplyr::coalesce(x$importance * x$direction, 0)
 
-      return(paste(spls[[1]][1], spls[[1]][2], spls[[1]][3], sep = "_"))
-    }
+  # max weekly stack height
+  y_max <- dplyr::group_by(x, .data$date, .data$direction)
+  y_max <- dplyr::summarise(y_max,
+                            height = sum(.data$pi_direction, na.rm = TRUE),
+                            .groups = "drop")
+  y_max <- max(abs(y_max$height), na.rm = TRUE)
 
-    pipd$class <- apply(pipd, 1, return_class)
-
-    # sum pidir by class
-    pipd_agg <- stats::aggregate(pipd$pidir,
-                                 by = list(pipd$class, pipd$date),
-                                 FUN = sum,
-                                 na.rm = TRUE)
-    names(pipd_agg) <- c("predictor", "date", "pidir")
-
-    pipd <- pipd_agg
+  # combine cover classes, assign pretty names
+  lc <- dplyr::select(ebirdst::ebirdst_predictors,
+                      predictor = .data$predictor_tidy,
+                      .data$predictor_label,
+                      .data$lc_class,
+                      .data$lc_class_label)
+  x <- dplyr::inner_join(lc, x, by = "predictor")
+  if (isTRUE(by_cover_class)) {
+    x <- dplyr::group_by(x,
+                         predictor = .data$lc_class,
+                         label = .data$lc_class_label,
+                         .data$date)
+    x <- dplyr::summarise(x,
+                          pi_direction = sum(.data$pi_direction),
+                          .groups = "drop")
   } else {
-    agg_colors <- scales::hue_pal()(length(unique(pipd$predictor)))
+    x <- dplyr::select(x,
+                       predictor = .data$predictor,
+                       label = .data$predictor_label,
+                       .data$date,
+                       .data$pi_direction)
   }
 
-  # Currently, unused, but keeping it here for potential future calc
-  # calculate absolute maxes of
-  #absmax <- aggregate(pipd$pidir,
-  #                    by = list(pipd$predictor),
-  #                    FUN = function(x) { max(abs(x), na.rm = TRUE)})
+  # assign weeks
+  w <- ebirdst::ebirdst_weeks
+  x$iso_date <- w$date[match(x$date, w$week_midpoint)]
 
-  #short_set <- absmax[!is.infinite(absmax$x) & absmax$x > 0.01,]
-  #pipd_short <- pipd[pipd$predictor %in% short_set$Group.1, ]
+  # order by importance
+  x$label <- stats::reorder(x$label, x$pi_direction,
+                            FUN = function(x) {mean(abs(x))})
 
-  # set final plotting object and fill with zeroes for smoothness
-  pipd_short <- pipd
-  pipd_short$pidir[is.na(pipd_short$pidir)] <- 0
-  pipd_short$pidir[is.nan(pipd_short$pidir)] <- 0
-  rm(pipd)
-
-  # pretty the names
-  ccfun <- function(x, by_cover_class) {
-    convert_classes(x["predictor"],
-                    by_cover_class = by_cover_class,
-                    pretty = by_cover_class)
-  }
-  pipd_short$labels <- apply(pipd_short,
-                             1,
-                             FUN = ccfun,
-                             by_cover_class = by_cover_class)
-
-  if(return_data == TRUE) {
-    pipd_out <- pipd_short
-  }
-
-  pipd_short$Date <- apply(pipd_short, 1, FUN = function(x) {
-    strftime(as.Date(as.numeric(x["date"]) * 366,
-                     origin = as.Date('2013-01-01')),
-             format = "%Y-%m-%d")
-  })
-
-  pipd_short$Date <- as.Date(pipd_short$Date)
-  pipd_short$date <- NULL
-
-  # ggplot
-  wave <- ggplot2::ggplot(pipd_short, ggplot2::aes(x = pipd_short$Date,
-                                                   y = pipd_short$pidir,
-                                                   group = pipd_short$predictor,
-                                                   fill = pipd_short$predictor)) +
-    ggplot2::geom_area() +
-    ggplot2::geom_vline(xintercept = as.numeric(min_date)) +
-    ggplot2::geom_vline(xintercept = as.numeric(max_date)) +
-    ggplot2::geom_hline(yintercept = 0, size = 2) +
-    ggplot2::ylim(-1, 1) +
+  # cake plot
+  g <- ggplot2::ggplot(x) +
+    ggplot2::aes_string(x = "iso_date", y = "pi_direction",
+                        group = "label", fill = "label") +
+    ggplot2::geom_area(colour = "white", size = 0.1) +
+    ggplot2::geom_vline(xintercept = date_range[1], size = 0.25) +
+    ggplot2::geom_vline(xintercept = date_range[2], size = 0.25) +
+    ggplot2::geom_hline(yintercept = 0, size = 1) +
+    ggplot2::scale_x_date(limits = date_range,
+                          date_breaks = "1 month",
+                          date_labels = "%b") +
+    ggplot2::ylim(-y_max, y_max) +
+    ggplot2::scale_fill_hue() +
+    ggplot2::guides(fill = ggplot2::guide_legend(reverse = TRUE)) +
+    ggplot2::labs(x = NULL,
+                  y = "Habitat Associations (+/-)",
+                  fill = "Predictor") +
     ggplot2::theme_light() +
-    ggplot2::scale_x_date(date_labels = "%b",
-                          limits = c(as.Date("2013-01-01"),
-                                     as.Date("2013-12-31")),
-                          date_breaks = "1 month") +
-    ggplot2::xlab("Date") +
-    ggplot2::ylab("Association Direction (Positive/Negative)") +
-    ggplot2::labs(fill = "Predictor") +
     ggplot2::theme(legend.key.size = ggplot2::unit(1, "line"))
 
-  if(by_cover_class) {
-    wave <- wave + ggplot2::scale_fill_manual(values = agg_colors,
-                                              labels = pipd_short$labels,
-                                              name = "Predictor")
-  } else {
-    wave <- wave + ggplot2::scale_fill_manual(values = agg_colors,
-                                              labels = unique(pipd_short$labels),
-                                              name = "Predictor")
-  }
-
-  print(wave)
-
-  if(return_data == TRUE) {
-    return(pipd_out)
-  }
+  print(g)
+  invisible(g)
 }
+
 
 # internal functions ----
 
@@ -354,8 +341,8 @@ loess_smooth <- function(x, predict_to, na_value = NA_real_, check_width) {
   }
 
   # need at least 2 data points to smooth
-  if (sum(complete.cases(x), na.rm = TRUE) <= 1) {
-    p <- return(rep(na_value, length(predict_to)))
+  if (sum(stats::complete.cases(x), na.rm = TRUE) <= 1) {
+    p <- rep(na_value, length(predict_to))
     return(data.frame(x = predict_to, y = p))
 
   }
