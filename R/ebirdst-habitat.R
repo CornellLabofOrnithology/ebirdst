@@ -14,6 +14,8 @@
 #'   calculate the habitat associations. Note that **temporal component of `ext`
 #'   is ignored is this function**, habitat associations are always calculated
 #'   for the full year.
+#' @param model character; whether to calculate habitat associations for the
+#'   occurrence or count model.
 #' @param n_predictors integer; number of land cover classes to estimate habitat
 #'   associations for.
 #' @param pland_only logical; For each land cover class, two FRAGSTATS metrics
@@ -52,8 +54,10 @@
 #' # produce a cake plot
 #' plot(habitat)
 #' }
-ebirdst_habitat <- function(path, ext, n_predictors = 15, pland_only = TRUE) {
+ebirdst_habitat <- function(path, ext, model = c("occ", "count"),
+                            n_predictors = 15, pland_only = TRUE) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
+  model <- match.arg(model)
   stopifnot(is.numeric(n_predictors), length(n_predictors) == 1,
             n_predictors > 0)
   stopifnot(is.logical(pland_only), length(pland_only) == 1)
@@ -95,9 +99,9 @@ ebirdst_habitat <- function(path, ext, n_predictors = 15, pland_only = TRUE) {
 
   # load pis and pds, occurrence only
   pis <- load_pis(path = path)
-  pis <- pis[pis$model == "occ", ]
+  pis <- pis[pis$model == model, ]
   pis$model <- NULL
-  pds <- load_pds(path = path, model = "occ")
+  pds <- load_pds(path = path, model = model)
 
   # subset
   pis <- ebirdst_subset(pis, ext = ext)
@@ -152,12 +156,6 @@ ebirdst_habitat <- function(path, ext, n_predictors = 15, pland_only = TRUE) {
   pd_slope <- dplyr::inner_join(pd_slope, stixel_coverage, by = "stixel_id")
   rm(pds, sl)
 
-  # aggregate across stixels with same date for speed and stability of loess
-  pd_slope <- stats::aggregate(pd_slope[, c("coverage", "slope")],
-                               by = pd_slope[, c("date", "predictor")],
-                               FUN = mean,
-                               na.rm = TRUE)
-
   # temporal smoothing of pds
   pd_smooth <- dplyr::select(pd_slope, .data$predictor,
                              x = .data$date, y = .data$slope,
@@ -208,7 +206,7 @@ ebirdst_habitat <- function(path, ext, n_predictors = 15, pland_only = TRUE) {
 
   structure(pipd,
             class = c("ebirdst_habitat", class(pipd)),
-            extent = ext)
+            extent = ext, model = model)
 }
 
 #' @param x [ebirdst_habitat] object; habitat relationships as calculated by
@@ -229,6 +227,10 @@ ebirdst_habitat <- function(path, ext, n_predictors = 15, pland_only = TRUE) {
 #' @rdname ebirdst_habitat
 plot.ebirdst_habitat <- function(x, date_range, by_cover_class = TRUE, ...) {
   stopifnot(is.logical(by_cover_class), length(by_cover_class) == 1)
+
+  model_type <- dplyr::recode(attr(x, "model"),
+                              occ = "occurrence",
+                              count = "count")
 
   # convert temporal extent
   if (missing(date_range)) {
@@ -298,8 +300,10 @@ plot.ebirdst_habitat <- function(x, date_range, by_cover_class = TRUE, ...) {
     ggplot2::scale_fill_hue() +
     ggplot2::guides(fill = ggplot2::guide_legend(reverse = TRUE)) +
     ggplot2::labs(x = NULL,
-                  y = "Habitat Associations (+/-)",
-                  fill = "Predictor") +
+                  y = "Importance (+/-)",
+                  fill = "Predictor",
+                  title = stringr::str_glue("Habitat associations ",
+                                            "({model_type} model)")) +
     ggplot2::theme_light() +
     ggplot2::theme(legend.key.size = ggplot2::unit(1, "line"))
 

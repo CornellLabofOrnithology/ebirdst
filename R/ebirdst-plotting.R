@@ -9,7 +9,7 @@
 #' @param ext [ebirdst_extent] object; the spatiotemporal extent over which to
 #'   calculate PIs. This is required, since results are less meaningful over
 #'   large spatiotemporal extents.
-#' @param model character; whether to plot PIs for occurrence or abundance.
+#' @param model character; whether to plot PIs for occurrence or count
 #' @param by_cover_class logical; whether to aggregate the FRAGSTATS metrics
 #'   (PLAND and ED) for the land cover classes into single values for the land
 #'   cover classes.
@@ -43,7 +43,7 @@
 #' top_pred
 #' }
 plot_pis <- function(pis, ext,
-                     model = c("occ", "abd"),
+                     model = c("occ", "count"),
                      by_cover_class = TRUE,
                      n_top_pred = 20,
                      pretty_names = TRUE,
@@ -117,11 +117,13 @@ plot_pis <- function(pis, ext,
 
   # plot
   if (isTRUE(plot)) {
+    model_type <- dplyr::recode(model, occ = "Occurrence", count = "Count")
+    y_lab <- stringr::str_glue("Relative PI ({model_type} model)")
     g <- ggplot2::ggplot(pis_top) +
       ggplot2::aes_string(x = "predictor", y = "pi") +
       ggplot2::geom_boxplot() +
       ggplot2::coord_flip() +
-      ggplot2::labs(y = "Relative PI", x = NULL) +
+      ggplot2::labs(y = y_lab, x = NULL) +
       ggplot2::theme_light()
     print(g)
   }
