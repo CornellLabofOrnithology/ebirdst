@@ -32,7 +32,7 @@ label_raster_stack <- function(x) {
                "layers as originally provided."))
   }
 
-  srd_date_vec <- seq(from = 0, to = 1, length = 52 + 1)
+  srd_date_vec <- seq(from = 0, to = 1, length.out = 52 + 1)
   srd_date_vec <- (srd_date_vec[1:52] + srd_date_vec[2:(52 + 1)]) / 2
   srd_date_vec <- round(srd_date_vec, digits = 4)
 
@@ -91,7 +91,7 @@ parse_raster_dates <- function(x) {
 #' d <- as.Date(c("2016-04-08", "2018-12-31", "2014-01-01", "2018-09-04"))
 #' date_to_st_week(d)
 date_to_st_week <- function(dates) {
-  dv <- seq(from = 0, to = 1, length = 52 + 1)
+  dv <- seq(from = 0, to = 1, length.out = 52 + 1)
   days <- (as.POSIXlt(dates)$yday + 0.5) / 366
 
   check_d <- function(x) {

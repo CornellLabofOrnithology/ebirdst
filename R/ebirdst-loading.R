@@ -318,8 +318,7 @@ load_raster <- function(path,
 #' Loads the predictor importance (PI) data from the pi-pd.db sqlite database.
 #' PI estimates are provided for each stixel over which a model was run and are
 #' identified by a unique stixel ID in addition to the coordinates of the stixel
-#' centroid. PI estimates are provided for both the occurrence and relative
-#' abundance models.
+#' centroid. PI estimates are provided for both the occurrence and count models.
 #'
 #' @inheritParams load_raster
 #' @param return_sf logical; whether to return an [sf] object of spatial points
@@ -327,13 +326,13 @@ load_raster <- function(path,
 #'
 #' @return Data frame, or [sf] object if `return_sf = TRUE`, containing PI
 #'   estimates for each stixel for both the occurrence and relative abundance
-#'   models. The data are provided in a "wide" format, with each row
+#'   models. The data are provided in a 'wide' format, with each row
 #'   corresponding to the PI estimates for a give stixel for either the
-#'   occurrence or relative abundance model (identified by the `model` column),
-#'   and the relative importance of each predictor in columns. Stixels are
-#'   identified by a unique `stixel_id`, the centroid of the stixel in space and
-#'   time is specified by the `lat`, `lon`, and `date` column, which expresses
-#'   the day of year as a value from 0-1.
+#'   occurrence or count model (identified by the `model` column), and the
+#'   relative importance of each predictor in columns. Stixels are identified by
+#'   a unique `stixel_id`, the centroid of the stixel in space and time is
+#'   specified by the `lat`, `lon`, and `date` column, which expresses the day
+#'   of year as a value from 0-1.
 #'
 #' @export
 #'
@@ -373,9 +372,9 @@ load_pis <- function(path, return_sf = FALSE) {
   # occurrence
   occ_pi <- DBI::dbGetQuery(db, sprintf(sql, "occ", "occ"))
   # abundance
-  abd_pi <- DBI::dbGetQuery(db, sprintf(sql, "abd", "abd"))
+  cnt_pi <- DBI::dbGetQuery(db, sprintf(sql, "count", "abd"))
   # combined
-  pis <- dplyr::bind_rows(occ_pi, abd_pi)
+  pis <- dplyr::bind_rows(occ_pi, cnt_pi)
   DBI::dbDisconnect(db)
 
   # clean up
@@ -400,13 +399,12 @@ load_pis <- function(path, return_sf = FALSE) {
 #' Load eBird Status and Trends partial dependence data
 #'
 #' Partial dependence (PD) plots depict the relationship between the modeled
-#' response (occurrence or relative abundance) and each of the predictor
-#' variables used in the model. Status and Trends provides the data to generate
-#' these plots for every stixel.
+#' response (occurrence or count) and each of the predictor variables used in
+#' the model. Status and Trends provides the data to generate these plots for
+#' every stixel.
 #'
 #' @inheritParams load_pis
-#' @param model character; whether to load occurrence or relative abundance PD
-#'   data.
+#' @param model character; whether to load occurrence or count PD data.
 #'
 #' @return Data frame, or [sf] object if `return_sf = TRUE`, containing PD
 #'   estimates for each stixel for either the occurrence and relative model. The
@@ -440,10 +438,11 @@ load_pis <- function(path, return_sf = FALSE) {
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #' plot_pds(pds, "solar_noon_diff", ext = e, n_bs = 5)
 #' }
-load_pds <- function(path, model = c("occ", "abd"), return_sf = FALSE) {
+load_pds <- function(path, model = c("occ", "count"), return_sf = FALSE) {
   stopifnot(dir.exists(path))
   stopifnot(is.logical(return_sf), length(return_sf) == 1)
   model <- match.arg(model)
+  model <- ifelse(model == "count", "abd", model)
 
   db_file <- file.path(path, "pi-pd.db")
   if(!file.exists(db_file)) {

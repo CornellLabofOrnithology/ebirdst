@@ -7,7 +7,7 @@
 plot_pis(
   pis,
   ext,
-  model = c("occ", "abd"),
+  model = c("occ", "count"),
   by_cover_class = TRUE,
   n_top_pred = 20,
   pretty_names = TRUE,
@@ -21,7 +21,7 @@ plot_pis(
 calculate PIs. This is required, since results are less meaningful over
 large spatiotemporal extents.}
 
-\item{model}{character; whether to plot PIs for occurrence or abundance.}
+\item{model}{character; whether to plot PIs for occurrence or count}
 
 \item{by_cover_class}{logical; whether to aggregate the FRAGSTATS metrics
 (PLAND and ED) for the land cover classes into single values for the land

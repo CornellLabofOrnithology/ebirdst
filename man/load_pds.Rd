@@ -4,15 +4,14 @@
 \alias{load_pds}
 \title{Load eBird Status and Trends partial dependence data}
 \usage{
-load_pds(path, model = c("occ", "abd"), return_sf = FALSE)
+load_pds(path, model = c("occ", "count"), return_sf = FALSE)
 }
 \arguments{
 \item{path}{character; directory that the Status and Trends data for a given
 species was downloaded to. This path is returned by \code{ebirdst_download()}
 or \code{get_species_path()}.}
 
-\item{model}{character; whether to load occurrence or relative abundance PD
-data.}
+\item{model}{character; whether to load occurrence or count PD data.}
 
 \item{return_sf}{logical; whether to return an \link{sf} object of spatial points
 rather then the default data frame.}
@@ -36,9 +35,9 @@ predictors
 }
 \description{
 Partial dependence (PD) plots depict the relationship between the modeled
-response (occurrence or relative abundance) and each of the predictor
-variables used in the model. Status and Trends provides the data to generate
-these plots for every stixel.
+response (occurrence or count) and each of the predictor variables used in
+the model. Status and Trends provides the data to generate these plots for
+every stixel.
 }
 \examples{
 \donttest{

@@ -5,7 +5,13 @@
 \alias{plot.ebirdst_habitat}
 \title{eBird Status and Trends predictive habitat associations}
 \usage{
-ebirdst_habitat(path, ext, n_predictors = 15, pland_only = TRUE)
+ebirdst_habitat(
+  path,
+  ext,
+  model = c("occ", "count"),
+  n_predictors = 15,
+  pland_only = TRUE
+)
 
 \method{plot}{ebirdst_habitat}(x, date_range, by_cover_class = TRUE, ...)
 }
@@ -16,6 +22,9 @@ ebirdst_habitat(path, ext, n_predictors = 15, pland_only = TRUE)
 calculate the habitat associations. Note that \strong{temporal component of \code{ext}
 is ignored is this function}, habitat associations are always calculated
 for the full year.}
+
+\item{model}{character; whether to calculate habitat associations for the
+occurrence or count model.}
 
 \item{n_predictors}{integer; number of land cover classes to estimate habitat
 associations for.}
