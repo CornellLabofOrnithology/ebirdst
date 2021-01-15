@@ -99,7 +99,7 @@ occurrence, count, and relative abundance." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/CornellLabofOrnithology/ebirdst">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fas fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -127,7 +127,7 @@ and upper and lower confidence intervals are provided for predicted
 occurrence, count, and relative abundance.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>load_test_preds</span>(<span class='no'>path</span>, <span class='kw'>return_sf</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>load_test_preds</span><span class='op'>(</span><span class='va'>path</span>, return_sf <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -139,7 +139,7 @@ eBird Status and Trends products.</p></td>
     </tr>
     <tr>
       <th>return_sf</th>
-      <td><p>logical; whether to return an sf object of spatial points
+      <td><p>logical; whether to return an <a href='https://r-spatial.github.io/sf/reference/sf.html'>sf</a> object of spatial points
 rather then the default data frame.</p></td>
     </tr>
     </table>
@@ -151,34 +151,15 @@ intervals are provided for predicted occurrence, count, and relativce
 abundance.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># download example data</span>
-<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span>(<span class='st'>"example_data"</span>, <span class='kw'>tifs_only</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; <span class='message'>Data already exists, use force = TRUE to re-download.</span></div><div class='input'>
+<span class='va'>sp_path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span><span class='op'>(</span><span class='st'>"example_data"</span>, tifs_only <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+
 <span class='co'># test data</span>
-<span class='no'>test_preds</span> <span class='kw'>&lt;-</span> <span class='fu'>load_test_preds</span>(<span class='no'>sp_path</span>)
-<span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>glimpse</a></span>(<span class='no'>test_preds</span>)</div><div class='output co'>#&gt; Rows: 42,557
-#&gt; Columns: 20
-#&gt; $ sampling_event_id <span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> 19300692, 19778152, 21136092, 43067220, 31239121, 3…
-#&gt; $ lon               </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> -84.32520, -83.33005, -83.70724, -85.57344, -83.451…
-#&gt; $ lat               </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 46.50468, 42.48074, 42.25520, 42.08974, 42.52874, 4…
-#&gt; $ date              </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 0.57650270, 0.68579230, 0.98360660, 0.14207650, 0.6…
-#&gt; $ obs               </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, …
-#&gt; $ year              </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> 2014, 2014, 2014, 2018, 2016, 2017, 2016, 2018, 201…
-#&gt; $ pi_median         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 0.0111540500, 0.0217457100, 0.0242227200, 0.0069282…
-#&gt; $ pi_upper          </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 0.0131257644, 0.0252766555, 0.0399402517, 0.0072969…
-#&gt; $ pi_lower          </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 0.0097154097, 0.0190532351, 0.0196101869, 0.0067241…
-#&gt; $ pi_se             </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 0.0012771849, 0.0023254358, 0.0080939734, 0.0002593…
-#&gt; $ mu_median         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 1.3819165, 0.9229570, 0.5007788, 0.9220833, 0.97640…
-#&gt; $ mu_upper          </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 1.4236446, 0.9292306, 0.5486083, 0.9810156, 1.02780…
-#&gt; $ mu_lower          </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 1.3418318, 0.9057661, 0.4640106, 0.8406052, 0.94876…
-#&gt; $ mu_se             </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 0.032513986, 0.010291606, 0.029547008, 0.046075548,…
-#&gt; $ pi_mu_median      </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 0.0157289289, 0.0205929501, 0.0136928204, 0.0062755…
-#&gt; $ pi_mu_upper       </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 0.0195412812, 0.0231160369, 0.0154034033, 0.0072581…
-#&gt; $ pi_mu_lower       </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 0.0132323599, 0.0170529123, 0.0110360559, 0.0058412…
-#&gt; $ pi_mu_se          </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 0.0022193199, 0.0024380267, 0.0019564225, 0.0006456…
-#&gt; $ pat               </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.0…
-#&gt; $ pi_es             </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> 100, 100, 100, 100, 97, 87, 100, 98, 99, 98, 100, 8…</div><div class='input'># }
-</div></span></pre>
+<span class='va'>test_preds</span> <span class='op'>&lt;-</span> <span class='fu'>load_test_preds</span><span class='op'>(</span><span class='va'>sp_path</span><span class='op'>)</span>
+<span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://tibble.tidyverse.org/reference/glimpse.html'>glimpse</a></span><span class='op'>(</span><span class='va'>test_preds</span><span class='op'>)</span>
+<span class='op'>}</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -194,7 +175,7 @@ abundance.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

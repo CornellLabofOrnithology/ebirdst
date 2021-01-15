@@ -22,6 +22,7 @@ values, with an optional spatiotemporal subset using an \link{ebirdst_extent}
 object
 }
 \examples{
+\dontrun{
 # download and load example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
@@ -30,4 +31,5 @@ bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
 e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 
 map_centroids(path = sp_path, ext = e)
+}
 }

@@ -44,6 +44,7 @@ importances, from highest to lowest. Many function parameters allow for
 customized plots.
 }
 \examples{
+\dontrun{
 # download and load example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 pis <- load_pis(sp_path)
@@ -54,4 +55,5 @@ e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 
 top_pred <- plot_pis(pis, ext = e, by_cover_class = TRUE, n_top_pred = 10)
 top_pred
+}
 }

@@ -15,7 +15,7 @@
 <meta property="og:description" content="Tools to download, map, plot and analyze eBird
     Status and Trends data
     (&lt;https://ebird.org/science/status-and-trends&gt;). eBird
-    (&lt;https://ebird.org&gt;) is a global database of bird observations
+    (&lt;https://ebird.org/home&gt;) is a global database of bird observations
     collected by citizen scientists. eBird Status and Trends uses these
     data to analyze continental bird abundances, range boundaries,
     habitats, and trends.">
@@ -62,7 +62,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/CornellLabofOrnithology/ebirdst">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fas fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -86,13 +86,13 @@
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>Install <code>ebirdst</code> from CRAN with:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">install.packages</span>(<span class="st">"ebirdst"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"ebirdst"</span>)</span></code></pre></div>
 <p>Alternatively, you can install the development version from GitHub with:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># install.packages("remotes")</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"CornellLabofOrnithology/ebirdst"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("remotes")</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"CornellLabofOrnithology/ebirdst"</span>)</span></code></pre></div>
 <p>The current version of <code>ebirdst</code> is designed for working with the eBird Status and Trends data estimated for 2018. Older versions of the Status and Trends data can be accessed by installing the associated version of <code>ebirdst</code> from GitHub. For example, 2016 estimates, corresponding to v0.1.0 of this package, can be accessed with:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># install.packages("remotes")</span></span>
-<span id="cb3-2"><a href="#cb3-2"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"CornellLabofOrnithology/ebirdst@v0.1.0"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("remotes")</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"CornellLabofOrnithology/ebirdst@v0.1.0"</span>)</span></code></pre></div>
 </div>
 <div id="citation" class="section level2">
 <h2 class="hasAnchor">
@@ -117,101 +117,101 @@
 <a href="#quick-start" class="anchor"></a>Quick Start</h2>
 <p>This quick start guide shows how to download data and plot abundance values similar to how they are plotted for the <a href="https://ebird.org/science/status-and-trends/woothr/abundance-map-weekly">eBird Status and Trends Abundance animations</a>. In this guide, a simplified example dataset is used consisting of Yellow-bellied Sapsucker in Michigan. For a full list of the species available for download, look at the data frame <code>ebirst_runs</code>, which is included in this package.</p>
 <p><strong>Important note: after downloading the results, do not change the file structure.</strong> All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package. If you use this package to analyze the results, you do not ever need to interact with the files directly, outside of R.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">library</span>(ebirdst)</span>
-<span id="cb4-2"><a href="#cb4-2"></a><span class="kw">library</span>(viridis)</span>
-<span id="cb4-3"><a href="#cb4-3"></a><span class="kw">library</span>(raster)</span>
-<span id="cb4-4"><a href="#cb4-4"></a><span class="kw">library</span>(sf)</span>
-<span id="cb4-5"><a href="#cb4-5"></a><span class="kw">library</span>(rnaturalearth)</span>
-<span id="cb4-6"><a href="#cb4-6"></a></span>
-<span id="cb4-7"><a href="#cb4-7"></a><span class="co"># download data</span></span>
-<span id="cb4-8"><a href="#cb4-8"></a><span class="co"># download a simplified example dataset from aws s3</span></span>
-<span id="cb4-9"><a href="#cb4-9"></a><span class="co"># example data are for yellow-bellied sapsucker in michigan</span></span>
-<span id="cb4-10"><a href="#cb4-10"></a><span class="co"># by default files will be stored in a persistent data directory:</span></span>
-<span id="cb4-11"><a href="#cb4-11"></a><span class="co"># rappdirs::user_data_dir("ebirdst"))</span></span>
-<span id="cb4-12"><a href="#cb4-12"></a>sp_path &lt;-<span class="st"> </span><span class="kw">ebirdst_download</span>(<span class="dt">species =</span> <span class="st">"example_data"</span>)</span>
-<span id="cb4-13"><a href="#cb4-13"></a></span>
-<span id="cb4-14"><a href="#cb4-14"></a><span class="co"># load estimated relative abundance and label with dates</span></span>
-<span id="cb4-15"><a href="#cb4-15"></a><span class="co"># this raster stack has 52 layers, one for each week of the year</span></span>
-<span id="cb4-16"><a href="#cb4-16"></a>abunds &lt;-<span class="st"> </span><span class="kw">load_raster</span>(<span class="st">"abundance"</span>, <span class="dt">path =</span> sp_path)</span>
-<span id="cb4-17"><a href="#cb4-17"></a></span>
-<span id="cb4-18"><a href="#cb4-18"></a><span class="co"># use parse_raster_dates() to get actual date objects for each layer</span></span>
-<span id="cb4-19"><a href="#cb4-19"></a>date_vector &lt;-<span class="st"> </span><span class="kw">parse_raster_dates</span>(abunds)</span>
-<span id="cb4-20"><a href="#cb4-20"></a><span class="kw">print</span>(date_vector)</span>
-<span id="cb4-21"><a href="#cb4-21"></a><span class="co">#&gt;  [1] "2018-01-04" "2018-01-11" "2018-01-18" "2018-01-25" "2018-02-01" "2018-02-08" "2018-02-15"</span></span>
-<span id="cb4-22"><a href="#cb4-22"></a><span class="co">#&gt;  [8] "2018-02-22" "2018-03-01" "2018-03-08" "2018-03-15" "2018-03-22" "2018-03-29" "2018-04-05"</span></span>
-<span id="cb4-23"><a href="#cb4-23"></a><span class="co">#&gt; [15] "2018-04-12" "2018-04-19" "2018-04-26" "2018-05-03" "2018-05-10" "2018-05-17" "2018-05-24"</span></span>
-<span id="cb4-24"><a href="#cb4-24"></a><span class="co">#&gt; [22] "2018-05-31" "2018-06-07" "2018-06-14" "2018-06-21" "2018-06-28" "2018-07-06" "2018-07-13"</span></span>
-<span id="cb4-25"><a href="#cb4-25"></a><span class="co">#&gt; [29] "2018-07-20" "2018-07-27" "2018-08-03" "2018-08-10" "2018-08-17" "2018-08-24" "2018-08-31"</span></span>
-<span id="cb4-26"><a href="#cb4-26"></a><span class="co">#&gt; [36] "2018-09-07" "2018-09-14" "2018-09-21" "2018-09-28" "2018-10-05" "2018-10-12" "2018-10-19"</span></span>
-<span id="cb4-27"><a href="#cb4-27"></a><span class="co">#&gt; [43] "2018-10-26" "2018-11-02" "2018-11-09" "2018-11-16" "2018-11-23" "2018-11-30" "2018-12-07"</span></span>
-<span id="cb4-28"><a href="#cb4-28"></a><span class="co">#&gt; [50] "2018-12-14" "2018-12-21" "2018-12-28"</span></span>
-<span id="cb4-29"><a href="#cb4-29"></a></span>
-<span id="cb4-30"><a href="#cb4-30"></a><span class="co"># select a week in the summer</span></span>
-<span id="cb4-31"><a href="#cb4-31"></a>abund &lt;-<span class="st"> </span>abunds[[<span class="dv">26</span>]]</span>
-<span id="cb4-32"><a href="#cb4-32"></a><span class="kw">rm</span>(abunds)</span>
-<span id="cb4-33"><a href="#cb4-33"></a></span>
-<span id="cb4-34"><a href="#cb4-34"></a><span class="co"># project to mollweide for mapping</span></span>
-<span id="cb4-35"><a href="#cb4-35"></a><span class="co"># the nearest neighbor method preserves cell values across projections</span></span>
-<span id="cb4-36"><a href="#cb4-36"></a>mollweide &lt;-<span class="st"> "+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"</span></span>
-<span id="cb4-37"><a href="#cb4-37"></a>abund_moll &lt;-<span class="st"> </span><span class="kw">projectRaster</span>(abund, <span class="dt">crs =</span> mollweide, <span class="dt">method =</span> <span class="st">"ngb"</span>)</span>
-<span id="cb4-38"><a href="#cb4-38"></a></span>
-<span id="cb4-39"><a href="#cb4-39"></a><span class="co"># get reference data from the rnaturalearth package</span></span>
-<span id="cb4-40"><a href="#cb4-40"></a><span class="co"># the example data currently shows only the US state of Michigan</span></span>
-<span id="cb4-41"><a href="#cb4-41"></a>wh_states &lt;-<span class="st"> </span><span class="kw">ne_states</span>(<span class="dt">country =</span> <span class="kw">c</span>(<span class="st">"United States of America"</span>, <span class="st">"Canada"</span>),</span>
-<span id="cb4-42"><a href="#cb4-42"></a>                    <span class="dt">returnclass =</span> <span class="st">"sf"</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb4-43"><a href="#cb4-43"></a><span class="st">  </span><span class="kw">st_transform</span>(<span class="dt">crs =</span> mollweide) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb4-44"><a href="#cb4-44"></a><span class="st">  </span><span class="kw">st_geometry</span>()</span>
-<span id="cb4-45"><a href="#cb4-45"></a>  </span>
-<span id="cb4-46"><a href="#cb4-46"></a><span class="co"># calculate ideal color bins for abundance values for this week</span></span>
-<span id="cb4-47"><a href="#cb4-47"></a>week_bins &lt;-<span class="st"> </span><span class="kw">calc_bins</span>(abund_moll)</span>
-<span id="cb4-48"><a href="#cb4-48"></a></span>
-<span id="cb4-49"><a href="#cb4-49"></a><span class="co"># start plotting</span></span>
-<span id="cb4-50"><a href="#cb4-50"></a><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>), <span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">6</span>))</span>
-<span id="cb4-51"><a href="#cb4-51"></a></span>
-<span id="cb4-52"><a href="#cb4-52"></a><span class="co"># use raster bounding box to set the spatial extent for the plot</span></span>
-<span id="cb4-53"><a href="#cb4-53"></a>bb &lt;-<span class="st"> </span><span class="kw">st_as_sfc</span>(<span class="kw">st_bbox</span>(<span class="kw">trim</span>(abund_moll)))</span>
-<span id="cb4-54"><a href="#cb4-54"></a><span class="kw">plot</span>(bb, <span class="dt">col =</span> <span class="st">"white"</span>, <span class="dt">border =</span> <span class="st">"white"</span>)</span>
-<span id="cb4-55"><a href="#cb4-55"></a></span>
-<span id="cb4-56"><a href="#cb4-56"></a><span class="co"># add background reference data</span></span>
-<span id="cb4-57"><a href="#cb4-57"></a><span class="kw">plot</span>(wh_states, <span class="dt">col =</span> <span class="st">"#eeeeee"</span>, <span class="dt">border =</span> <span class="ot">NA</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb4-58"><a href="#cb4-58"></a></span>
-<span id="cb4-59"><a href="#cb4-59"></a><span class="co"># plot zeroes as gray</span></span>
-<span id="cb4-60"><a href="#cb4-60"></a><span class="kw">plot</span>(abund_moll <span class="op">==</span><span class="st"> </span><span class="dv">0</span>, <span class="dt">col =</span> <span class="st">"#dddddd"</span>, </span>
-<span id="cb4-61"><a href="#cb4-61"></a>     <span class="dt">maxpixels =</span> <span class="kw">ncell</span>(abund_moll),</span>
-<span id="cb4-62"><a href="#cb4-62"></a>     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb4-63"><a href="#cb4-63"></a></span>
-<span id="cb4-64"><a href="#cb4-64"></a><span class="co"># define color bins</span></span>
-<span id="cb4-65"><a href="#cb4-65"></a>qcol &lt;-<span class="st"> </span><span class="kw">abundance_palette</span>(<span class="kw">length</span>(week_bins<span class="op">$</span>bins) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="st">"weekly"</span>)</span>
-<span id="cb4-66"><a href="#cb4-66"></a></span>
-<span id="cb4-67"><a href="#cb4-67"></a><span class="co"># plot abundances</span></span>
-<span id="cb4-68"><a href="#cb4-68"></a><span class="kw">plot</span>(abund_moll, <span class="dt">col =</span> qcol, <span class="dt">breaks =</span> week_bins<span class="op">$</span>bins,</span>
-<span id="cb4-69"><a href="#cb4-69"></a>     <span class="dt">maxpixels =</span> <span class="kw">ncell</span>(abund_moll),</span>
-<span id="cb4-70"><a href="#cb4-70"></a>     <span class="dt">axes =</span> <span class="ot">FALSE</span>, <span class="dt">legend =</span> <span class="ot">FALSE</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb4-71"><a href="#cb4-71"></a></span>
-<span id="cb4-72"><a href="#cb4-72"></a><span class="co"># for legend, create a smaller set of bin labels</span></span>
-<span id="cb4-73"><a href="#cb4-73"></a>bin_labels &lt;-<span class="st"> </span><span class="kw">format</span>(<span class="kw">round</span>(week_bins<span class="op">$</span>bins, <span class="dv">2</span>), <span class="dt">nsmall =</span> <span class="dv">2</span>)</span>
-<span id="cb4-74"><a href="#cb4-74"></a>bin_labels[<span class="op">!</span>(bin_labels <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(bin_labels[<span class="dv">1</span>],</span>
-<span id="cb4-75"><a href="#cb4-75"></a>                               bin_labels[<span class="kw">round</span>((<span class="kw">length</span>(bin_labels) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>)) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>],</span>
-<span id="cb4-76"><a href="#cb4-76"></a>                               bin_labels[<span class="kw">length</span>(bin_labels)]))] &lt;-<span class="st"> ""</span></span>
-<span id="cb4-77"><a href="#cb4-77"></a>bin_labels &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"0"</span>, bin_labels)</span>
-<span id="cb4-78"><a href="#cb4-78"></a></span>
-<span id="cb4-79"><a href="#cb4-79"></a><span class="co"># create colors that include gray for 0</span></span>
-<span id="cb4-80"><a href="#cb4-80"></a>lcol &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"#dddddd"</span>, qcol)</span>
-<span id="cb4-81"><a href="#cb4-81"></a></span>
-<span id="cb4-82"><a href="#cb4-82"></a><span class="co"># set legend such that color ramp appears linearly</span></span>
-<span id="cb4-83"><a href="#cb4-83"></a>ltq &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dt">from =</span> week_bins<span class="op">$</span>bins[<span class="dv">1</span>], <span class="dt">to =</span> week_bins<span class="op">$</span>bins[<span class="kw">length</span>(week_bins<span class="op">$</span>bins)],</span>
-<span id="cb4-84"><a href="#cb4-84"></a>           <span class="dt">length.out =</span> <span class="kw">length</span>(week_bins<span class="op">$</span>bins))</span>
-<span id="cb4-85"><a href="#cb4-85"></a>ltq &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, ltq)</span>
-<span id="cb4-86"><a href="#cb4-86"></a></span>
-<span id="cb4-87"><a href="#cb4-87"></a><span class="co"># plot legend</span></span>
-<span id="cb4-88"><a href="#cb4-88"></a><span class="kw">plot</span>(abund_moll <span class="op">^</span><span class="st"> </span>week_bins<span class="op">$</span>power, <span class="dt">legend.only =</span> <span class="ot">TRUE</span>,</span>
-<span id="cb4-89"><a href="#cb4-89"></a>     <span class="dt">col =</span> lcol,</span>
-<span id="cb4-90"><a href="#cb4-90"></a>     <span class="dt">breaks =</span> ltq <span class="op">^</span><span class="st"> </span>week_bins<span class="op">$</span>power, </span>
-<span id="cb4-91"><a href="#cb4-91"></a>     <span class="dt">lab.breaks =</span> bin_labels, <span class="dt">legend.shrink =</span> <span class="fl">0.97</span>,</span>
-<span id="cb4-92"><a href="#cb4-92"></a>     <span class="dt">legend.width =</span> <span class="dv">2</span>, <span class="dt">axis.args =</span> <span class="kw">list</span>(<span class="dt">cex.axis =</span> <span class="fl">0.9</span>, <span class="dt">lwd.ticks =</span> <span class="dv">0</span>))</span>
-<span id="cb4-93"><a href="#cb4-93"></a></span>
-<span id="cb4-94"><a href="#cb4-94"></a><span class="co"># add state boundaries on top</span></span>
-<span id="cb4-95"><a href="#cb4-95"></a><span class="kw">plot</span>(<span class="kw">st_geometry</span>(wh_states), <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="ot">NA</span>, <span class="dt">border =</span> <span class="st">"white"</span>, <span class="dt">lwd =</span> <span class="fl">1.5</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ebirdst)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(viridis)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(raster)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rnaturalearth)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># download data</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># download a simplified example dataset from aws s3</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># example data are for yellow-bellied sapsucker in michigan</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># by default files will be stored in a persistent data directory:</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"># rappdirs::user_data_dir("ebirdst"))</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>sp_path <span class="ot">&lt;-</span> <span class="fu">ebirdst_download</span>(<span class="at">species =</span> <span class="st">"example_data"</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co"># load estimated relative abundance and label with dates</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># this raster stack has 52 layers, one for each week of the year</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>abunds <span class="ot">&lt;-</span> <span class="fu">load_raster</span>(<span class="st">"abundance"</span>, <span class="at">path =</span> sp_path)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co"># use parse_raster_dates() to get actual date objects for each layer</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>date_vector <span class="ot">&lt;-</span> <span class="fu">parse_raster_dates</span>(abunds)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(date_vector)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [1] "2018-01-04" "2018-01-11" "2018-01-18" "2018-01-25" "2018-02-01" "2018-02-08" "2018-02-15"</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [8] "2018-02-22" "2018-03-01" "2018-03-08" "2018-03-15" "2018-03-22" "2018-03-29" "2018-04-05"</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [15] "2018-04-12" "2018-04-19" "2018-04-26" "2018-05-03" "2018-05-10" "2018-05-17" "2018-05-24"</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [22] "2018-05-31" "2018-06-07" "2018-06-14" "2018-06-21" "2018-06-28" "2018-07-06" "2018-07-13"</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [29] "2018-07-20" "2018-07-27" "2018-08-03" "2018-08-10" "2018-08-17" "2018-08-24" "2018-08-31"</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [36] "2018-09-07" "2018-09-14" "2018-09-21" "2018-09-28" "2018-10-05" "2018-10-12" "2018-10-19"</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [43] "2018-10-26" "2018-11-02" "2018-11-09" "2018-11-16" "2018-11-23" "2018-11-30" "2018-12-07"</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [50] "2018-12-14" "2018-12-21" "2018-12-28"</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="co"># select a week in the summer</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>abund <span class="ot">&lt;-</span> abunds[[<span class="dv">26</span>]]</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(abunds)</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="co"># project to mollweide for mapping</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="co"># the nearest neighbor method preserves cell values across projections</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>mollweide <span class="ot">&lt;-</span> <span class="st">"+proj=moll +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>abund_moll <span class="ot">&lt;-</span> <span class="fu">projectRaster</span>(abund, <span class="at">crs =</span> mollweide, <span class="at">method =</span> <span class="st">"ngb"</span>)</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="co"># get reference data from the rnaturalearth package</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a><span class="co"># the example data currently shows only the US state of Michigan</span></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>wh_states <span class="ot">&lt;-</span> <span class="fu">ne_states</span>(<span class="at">country =</span> <span class="fu">c</span>(<span class="st">"United States of America"</span>, <span class="st">"Canada"</span>),</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>                    <span class="at">returnclass =</span> <span class="st">"sf"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> mollweide) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_geometry</span>()</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate ideal color bins for abundance values for this week</span></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>week_bins <span class="ot">&lt;-</span> <span class="fu">calc_bins</span>(abund_moll)</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a><span class="co"># start plotting</span></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">6</span>))</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="co"># use raster bounding box to set the spatial extent for the plot</span></span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>bb <span class="ot">&lt;-</span> <span class="fu">st_as_sfc</span>(<span class="fu">st_bbox</span>(<span class="fu">trim</span>(abund_moll)))</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(bb, <span class="at">col =</span> <span class="st">"white"</span>, <span class="at">border =</span> <span class="st">"white"</span>)</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="co"># add background reference data</span></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(wh_states, <span class="at">col =</span> <span class="st">"#eeeeee"</span>, <span class="at">border =</span> <span class="cn">NA</span>, <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a><span class="co"># plot zeroes as gray</span></span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(abund_moll <span class="sc">==</span> <span class="dv">0</span>, <span class="at">col =</span> <span class="st">"#dddddd"</span>, </span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>     <span class="at">maxpixels =</span> <span class="fu">ncell</span>(abund_moll),</span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>     <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">legend =</span> <span class="cn">FALSE</span>, <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a><span class="co"># define color bins</span></span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>qcol <span class="ot">&lt;-</span> <span class="fu">abundance_palette</span>(<span class="fu">length</span>(week_bins<span class="sc">$</span>bins) <span class="sc">-</span> <span class="dv">1</span>, <span class="st">"weekly"</span>)</span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a><span class="co"># plot abundances</span></span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(abund_moll, <span class="at">col =</span> qcol, <span class="at">breaks =</span> week_bins<span class="sc">$</span>bins,</span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a>     <span class="at">maxpixels =</span> <span class="fu">ncell</span>(abund_moll),</span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>     <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">legend =</span> <span class="cn">FALSE</span>, <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a><span class="co"># for legend, create a smaller set of bin labels</span></span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a>bin_labels <span class="ot">&lt;-</span> <span class="fu">format</span>(<span class="fu">round</span>(week_bins<span class="sc">$</span>bins, <span class="dv">2</span>), <span class="at">nsmall =</span> <span class="dv">2</span>)</span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>bin_labels[<span class="sc">!</span>(bin_labels <span class="sc">%in%</span> <span class="fu">c</span>(bin_labels[<span class="dv">1</span>],</span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a>                               bin_labels[<span class="fu">round</span>((<span class="fu">length</span>(bin_labels) <span class="sc">/</span> <span class="dv">2</span>)) <span class="sc">+</span> <span class="dv">1</span>],</span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>                               bin_labels[<span class="fu">length</span>(bin_labels)]))] <span class="ot">&lt;-</span> <span class="st">""</span></span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>bin_labels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"0"</span>, bin_labels)</span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a><span class="co"># create colors that include gray for 0</span></span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a>lcol <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#dddddd"</span>, qcol)</span>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a><span class="co"># set legend such that color ramp appears linearly</span></span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a>ltq <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="at">from =</span> week_bins<span class="sc">$</span>bins[<span class="dv">1</span>], <span class="at">to =</span> week_bins<span class="sc">$</span>bins[<span class="fu">length</span>(week_bins<span class="sc">$</span>bins)],</span>
+<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a>           <span class="at">length.out =</span> <span class="fu">length</span>(week_bins<span class="sc">$</span>bins))</span>
+<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a>ltq <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, ltq)</span>
+<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a><span class="co"># plot legend</span></span>
+<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(abund_moll <span class="sc">^</span> week_bins<span class="sc">$</span>power, <span class="at">legend.only =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> lcol,</span>
+<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a>     <span class="at">breaks =</span> ltq <span class="sc">^</span> week_bins<span class="sc">$</span>power, </span>
+<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a>     <span class="at">lab.breaks =</span> bin_labels, <span class="at">legend.shrink =</span> <span class="fl">0.97</span>,</span>
+<span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a>     <span class="at">legend.width =</span> <span class="dv">2</span>, <span class="at">axis.args =</span> <span class="fu">list</span>(<span class="at">cex.axis =</span> <span class="fl">0.9</span>, <span class="at">lwd.ticks =</span> <span class="dv">0</span>))</span>
+<span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a><span class="co"># add state boundaries on top</span></span>
+<span id="cb4-95"><a href="#cb4-95" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">st_geometry</span>(wh_states), <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">col =</span> <span class="cn">NA</span>, <span class="at">border =</span> <span class="st">"white"</span>, <span class="at">lwd =</span> <span class="fl">1.5</span>)</span></code></pre></div>
 <p><img src="README-quick_start-1.png" style="display: block; margin: auto;"></p>
 </div>
 </div>
@@ -281,7 +281,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

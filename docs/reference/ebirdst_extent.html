@@ -98,7 +98,7 @@ spatially and temporally. This function constructs these objects." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/CornellLabofOrnithology/ebirdst">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fas fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -125,19 +125,19 @@ spatially and temporally. This function constructs these objects." />
 spatially and temporally. This function constructs these objects.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>ebirdst_extent</span>(<span class='no'>x</span>, <span class='no'>t</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>ebirdst_extent</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>t</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for bbox</span>
-<span class='fu'>ebirdst_extent</span>(<span class='no'>x</span>, <span class='no'>t</span>, <span class='no'>...</span>)
+<span class='fu'>ebirdst_extent</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>t</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for numeric</span>
-<span class='fu'>ebirdst_extent</span>(<span class='no'>x</span>, <span class='no'>t</span>, <span class='kw'>crs</span> <span class='kw'>=</span> <span class='fl'>4326</span>, <span class='no'>...</span>)
+<span class='fu'>ebirdst_extent</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>t</span>, crs <span class='op'>=</span> <span class='fl'>4326</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for sfc</span>
-<span class='fu'>ebirdst_extent</span>(<span class='no'>x</span>, <span class='no'>t</span>, <span class='no'>...</span>)
+<span class='fu'>ebirdst_extent</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>t</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for sf</span>
-<span class='fu'>ebirdst_extent</span>(<span class='no'>x</span>, <span class='no'>t</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>ebirdst_extent</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>t</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -146,7 +146,7 @@ spatially and temporally. This function constructs these objects.</p>
       <th>x</th>
       <td><p>the spatial extent; either a rectangular bounding box (defined as a
 vector of numbers representing the coordinates of the boundaries or an
-<code><a href='https://rdrr.io/pkg/sf/man/st_bbox.html'>sf::st_bbox()</a></code> object) or a polygon (an <code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf::sf()</a></code> object). See Details
+<code><a href='https://r-spatial.github.io/sf/reference/st_bbox.html'>sf::st_bbox()</a></code> object) or a polygon (an <code><a href='https://r-spatial.github.io/sf/reference/sf.html'>sf::sf()</a></code> object). See Details
 for further explanation of the format of x.</p></td>
     </tr>
     <tr>
@@ -166,7 +166,7 @@ full year of data.</strong></p></td>
     <tr>
       <th>crs</th>
       <td><p>coordinate reference system, provided as a <code>crs</code> object or
-argument to <code><a href='https://rdrr.io/pkg/sf/man/st_crs.html'>sf::st_crs()</a></code>. Defaults to unprojected, lat/long coordinates
+argument to <code><a href='https://r-spatial.github.io/sf/reference/st_crs.html'>sf::st_crs()</a></code>. Defaults to unprojected, lat/long coordinates
 (crs = 4326). <strong>Only required if x is given as a numeric vector defining
 the bounding box, ignored in all other cases.</strong></p></td>
     </tr>
@@ -181,7 +181,7 @@ the spatial extent <code>extent</code>, the temporal extent <code>t</code>, and 
 
     <p>The spatial extent, <code>x</code>, can be either a rectangular bounding box or
 a set of spatial polygons. The bounding box can be defined either as an
-<code><a href='https://rdrr.io/pkg/sf/man/st_bbox.html'>sf::st_bbox()</a></code> object or by providing the coordinates of the rectangle
+<code><a href='https://r-spatial.github.io/sf/reference/st_bbox.html'>sf::st_bbox()</a></code> object or by providing the coordinates of the rectangle
 edges directly as a named vector with elements xmin, xmax, ymin, and ymax
 (note that latitude and longitude correspond to y and x, respectively). In
 this latter case, a coordinate reference system must be provided explicitly
@@ -189,7 +189,7 @@ via the <code>crs</code> argument (<code>crs = 4326</code> is the default and is
 unprojected lat/long coordinates). For a polygon spatial extent, <code>x</code> should
 be either an <code>sf</code> or <code>sfc</code> object (with feature type <code>POLYGON</code> or
 <code>MULTIPOLYGON</code>) from the <code>sf</code> package. To import data from a Shapefile or
-GeoPackage into this format, use <code><a href='https://rdrr.io/pkg/sf/man/st_read.html'>sf::read_sf()</a></code>.</p>
+GeoPackage into this format, use <code><a href='https://r-spatial.github.io/sf/reference/st_read.html'>sf::read_sf()</a></code>.</p>
 <p>The temporal extent defines the start and end dates of the time period.
 These are most easily provided as Date objects or date strings in ISO
 format ("YYYY-MM-DD"). If dates are defined as strings, the year can be
@@ -202,7 +202,7 @@ or January.</p>
 
     
 <ul>
-<li><p><code>bbox</code>: bounding box created with <code><a href='https://rdrr.io/pkg/sf/man/st_bbox.html'>sf::st_bbox()</a></code></p></li>
+<li><p><code>bbox</code>: bounding box created with <code><a href='https://r-spatial.github.io/sf/reference/st_bbox.html'>sf::st_bbox()</a></code></p></li>
 <li><p><code>numeric</code>: bounding box given as edges</p></li>
 <li><p><code>sfc</code>: polygons as <code>sf</code> spatial feature column</p></li>
 <li><p><code>sf</code>: polygons as <code>sf</code> object</p></li>
@@ -210,36 +210,42 @@ or January.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># bounding box of NE United States as a numeric vector</span>
-<span class='no'>bb_vec</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='kw'>xmin</span> <span class='kw'>=</span> -<span class='fl'>80</span>, <span class='kw'>xmax</span> <span class='kw'>=</span> -<span class='fl'>70</span>, <span class='kw'>ymin</span> <span class='kw'>=</span> <span class='fl'>40</span>, <span class='kw'>ymax</span> <span class='kw'>=</span> <span class='fl'>47</span>)
-<span class='fu'>ebirdst_extent</span>(<span class='no'>bb_vec</span>)</div><div class='output co'>#&gt; eBird Status &amp; Trends extent: 
+<span class='va'>bb_vec</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>xmin <span class='op'>=</span> <span class='op'>-</span><span class='fl'>80</span>, xmax <span class='op'>=</span> <span class='op'>-</span><span class='fl'>70</span>, ymin <span class='op'>=</span> <span class='fl'>40</span>, ymax <span class='op'>=</span> <span class='fl'>47</span><span class='op'>)</span>
+<span class='fu'>ebirdst_extent</span><span class='op'>(</span><span class='va'>bb_vec</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; eBird Status &amp; Trends extent: 
 #&gt;   Bounding box: xmin -80; ymin 40; xmax -70; ymax 47
 #&gt;   CRS: +proj=longlat +datum=WGS84 +no_defs 
 #&gt;   Temporal extent: 2018-01-01  -  2018-12-31 </div><div class='input'>
 <span class='co'># bbox object</span>
-<span class='no'>bb</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>sf</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sf/man/st_bbox.html'>st_bbox</a></span>(<span class='no'>bb_vec</span>, <span class='kw'>crs</span> <span class='kw'>=</span> <span class='fl'>4326</span>)
-<span class='fu'>ebirdst_extent</span>(<span class='no'>bb</span>)</div><div class='output co'>#&gt; eBird Status &amp; Trends extent: 
+<span class='va'>bb</span> <span class='op'>&lt;-</span> <span class='fu'>sf</span><span class='fu'>::</span><span class='fu'><a href='https://r-spatial.github.io/sf/reference/st_bbox.html'>st_bbox</a></span><span class='op'>(</span><span class='va'>bb_vec</span>, crs <span class='op'>=</span> <span class='fl'>4326</span><span class='op'>)</span>
+<span class='fu'>ebirdst_extent</span><span class='op'>(</span><span class='va'>bb</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; eBird Status &amp; Trends extent: 
 #&gt;   Bounding box: xmin -80; ymin 40; xmax -70; ymax 47
 #&gt;   CRS: +proj=longlat +datum=WGS84 +no_defs 
 #&gt;   Temporal extent: 2018-01-01  -  2018-12-31 </div><div class='input'>
 <span class='co'># polygon imported from a shapefile</span>
-<span class='no'>poly</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>sf</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sf/man/st_read.html'>read_sf</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"shape/nc.shp"</span>, <span class='kw'>package</span><span class='kw'>=</span><span class='st'>"sf"</span>))
-<span class='fu'>ebirdst_extent</span>(<span class='no'>poly</span>)</div><div class='output co'>#&gt; eBird Status &amp; Trends extent: 
+<span class='va'>poly</span> <span class='op'>&lt;-</span> <span class='fu'>sf</span><span class='fu'>::</span><span class='fu'><a href='https://r-spatial.github.io/sf/reference/st_read.html'>read_sf</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"shape/nc.shp"</span>, package<span class='op'>=</span><span class='st'>"sf"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'>ebirdst_extent</span><span class='op'>(</span><span class='va'>poly</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; eBird Status &amp; Trends extent: 
 #&gt;   Polygon: 1 MULTIPOLYGON features
 #&gt;   Bounding box: xmin -84.32385; ymin 33.88199; xmax -75.45698; ymax 36.58965
 #&gt;   CRS: +proj=longlat +datum=NAD27 +no_defs 
 #&gt;   Temporal extent: 2018-01-01  -  2018-12-31 </div><div class='input'>
 <span class='co'># subset to january</span>
-<span class='fu'>ebirdst_extent</span>(<span class='no'>bb</span>, <span class='kw'>t</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"2018-01-01"</span>, <span class='st'>"2018-01-31"</span>))</div><div class='output co'>#&gt; eBird Status &amp; Trends extent: 
+<span class='fu'>ebirdst_extent</span><span class='op'>(</span><span class='va'>bb</span>, t <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"2018-01-01"</span>, <span class='st'>"2018-01-31"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; eBird Status &amp; Trends extent: 
 #&gt;   Bounding box: xmin -80; ymin 40; xmax -70; ymax 47
 #&gt;   CRS: +proj=longlat +datum=WGS84 +no_defs 
 #&gt;   Temporal extent: 2018-01-01  -  2018-02-01 </div><div class='input'>
 <span class='co'># dates can wrap around, e.g. to use dec-jan</span>
-<span class='fu'>ebirdst_extent</span>(<span class='no'>bb</span>, <span class='kw'>t</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"2018-12-01"</span>, <span class='st'>"2018-01-31"</span>))</div><div class='output co'>#&gt; eBird Status &amp; Trends extent: 
+<span class='fu'>ebirdst_extent</span><span class='op'>(</span><span class='va'>bb</span>, t <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"2018-12-01"</span>, <span class='st'>"2018-01-31"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; eBird Status &amp; Trends extent: 
 #&gt;   Bounding box: xmin -80; ymin 40; xmax -70; ymax 47
 #&gt;   CRS: +proj=longlat +datum=WGS84 +no_defs 
 #&gt;   Temporal extent: 2018-11-30  -  2018-02-01 </div><div class='input'>
 <span class='co'># dates can also be given without an associated year</span>
-<span class='fu'>ebirdst_extent</span>(<span class='no'>bb</span>, <span class='kw'>t</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"12-01"</span>, <span class='st'>"01-31"</span>))</div><div class='output co'>#&gt; eBird Status &amp; Trends extent: 
+<span class='fu'>ebirdst_extent</span><span class='op'>(</span><span class='va'>bb</span>, t <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"12-01"</span>, <span class='st'>"01-31"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; eBird Status &amp; Trends extent: 
 #&gt;   Bounding box: xmin -80; ymin 40; xmax -70; ymax 47
 #&gt;   CRS: +proj=longlat +datum=WGS84 +no_defs 
 #&gt;   Temporal extent: 2018-11-30  -  2018-02-01 </div></pre>
@@ -258,7 +264,7 @@ or January.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

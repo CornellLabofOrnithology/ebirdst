@@ -23,7 +23,7 @@ Authors@R:
 Description: Tools to download, map, plot and analyze eBird
     Status and Trends data
     (<https://ebird.org/science/status-and-trends>). eBird
-    (<https://ebird.org>) is a global database of bird observations
+    (<https://ebird.org/home>) is a global database of bird observations
     collected by citizen scientists. eBird Status and Trends uses these
     data to analyze continental bird abundances, range boundaries,
     habitats, and trends.

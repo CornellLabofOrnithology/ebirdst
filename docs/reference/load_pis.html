@@ -98,7 +98,7 @@ data, and cleans up the data.frame." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/CornellLabofOrnithology/ebirdst">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fas fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -125,7 +125,7 @@ data, and cleans up the data.frame." />
 data, and cleans up the data.frame.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>load_pis</span>(<span class='no'>path</span>, <span class='kw'>return_sf</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>load_pis</span><span class='op'>(</span><span class='va'>path</span>, return_sf <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -137,7 +137,7 @@ eBird Status and Trends products.</p></td>
     </tr>
     <tr>
       <th>return_sf</th>
-      <td><p>logical; whether to return an sf object of spatial points
+      <td><p>logical; whether to return an <a href='https://r-spatial.github.io/sf/reference/sf.html'>sf</a> object of spatial points
 rather then the default data frame.</p></td>
     </tr>
     </table>
@@ -148,16 +148,20 @@ rather then the default data frame.</p></td>
 well as stixel summary information.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># download example data</span>
-<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span>(<span class='st'>"example_data"</span>, <span class='kw'>tifs_only</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; <span class='message'>Data already exists, use force = TRUE to re-download.</span></div><div class='input'>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># download example data</span>
+<span class='va'>sp_path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span><span class='op'>(</span><span class='st'>"example_data"</span>, tifs_only <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+
 <span class='co'># load predictor importance</span>
-<span class='no'>pis</span> <span class='kw'>&lt;-</span> <span class='fu'>load_pis</span>(<span class='no'>sp_path</span>)
+<span class='va'>pis</span> <span class='op'>&lt;-</span> <span class='fu'>load_pis</span><span class='op'>(</span><span class='va'>sp_path</span><span class='op'>)</span>
 
 <span class='co'># plot the top 15 predictor importances</span>
 <span class='co'># define a spatiotemporal extent to plot data from</span>
-<span class='no'>bb_vec</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='kw'>xmin</span> <span class='kw'>=</span> -<span class='fl'>86.6</span>, <span class='kw'>xmax</span> <span class='kw'>=</span> -<span class='fl'>82.2</span>, <span class='kw'>ymin</span> <span class='kw'>=</span> <span class='fl'>41.5</span>, <span class='kw'>ymax</span> <span class='kw'>=</span> <span class='fl'>43.5</span>)
-<span class='no'>e</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_extent.html'>ebirdst_extent</a></span>(<span class='no'>bb_vec</span>, <span class='kw'>t</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"05-01"</span>, <span class='st'>"05-31"</span>))
-<span class='fu'><a href='plot_pis.html'>plot_pis</a></span>(<span class='no'>pis</span>, <span class='kw'>ext</span> <span class='kw'>=</span> <span class='no'>e</span>, <span class='kw'>n_top_pred</span> <span class='kw'>=</span> <span class='fl'>15</span>, <span class='kw'>by_cover_class</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='img'><img src='load_pis-1.png' alt='' width='700' height='433' /></div></pre>
+<span class='va'>bb_vec</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>xmin <span class='op'>=</span> <span class='op'>-</span><span class='fl'>86.6</span>, xmax <span class='op'>=</span> <span class='op'>-</span><span class='fl'>82.2</span>, ymin <span class='op'>=</span> <span class='fl'>41.5</span>, ymax <span class='op'>=</span> <span class='fl'>43.5</span><span class='op'>)</span>
+<span class='va'>e</span> <span class='op'>&lt;-</span> <span class='fu'><a href='ebirdst_extent.html'>ebirdst_extent</a></span><span class='op'>(</span><span class='va'>bb_vec</span>, t <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"05-01"</span>, <span class='st'>"05-31"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='plot_pis.html'>plot_pis</a></span><span class='op'>(</span><span class='va'>pis</span>, ext <span class='op'>=</span> <span class='va'>e</span>, n_top_pred <span class='op'>=</span> <span class='fl'>15</span>, by_cover_class <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='op'>}</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -173,7 +177,7 @@ well as stixel summary information.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

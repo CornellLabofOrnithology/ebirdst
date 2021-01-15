@@ -22,7 +22,7 @@ Internal function used by \code{\link[=load_pis]{load_pis()}} to get the stixel 
 (from summary.txt).
 }
 \examples{
-\donttest{
+\dontrun{
 # download example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 

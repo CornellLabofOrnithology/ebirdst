@@ -1,5 +1,7 @@
 context("Mapping functions")
 skip_on_cran()
+options(warn = -1)
+
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 lp_extent <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 45),
                             t = c(0.5, 0.6))
@@ -7,7 +9,7 @@ lp_extent <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 45),
 context("calc_full_extent")
 
 test_that("ebirdst calc_full_extent", {
-  abund <- load_raster("abundance", sp_path)
+  abund <- suppressWarnings(load_raster("abundance", sp_path))
   abund <- ebirdst_subset(abund, lp_extent)
 
   # expected RasterStack
@@ -30,7 +32,7 @@ test_that("ebirdst calc_full_extent", {
 context("calc_bins")
 
 test_that("ebirdst calc_bins", {
-  abund <- load_raster("abundance", sp_path)
+  abund <- suppressWarnings(load_raster("abundance", sp_path))
   abund <- ebirdst_subset(abund, lp_extent)
 
   # expect a list greater than 1 for RasterStack

@@ -19,7 +19,7 @@ configuration variables from STEM species run information
 (from *_config.RData).
 }
 \examples{
-\donttest{
+\dontrun{
 # download example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 ebirdst:::load_config(sp_path)

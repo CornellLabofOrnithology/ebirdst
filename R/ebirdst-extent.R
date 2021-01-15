@@ -102,6 +102,7 @@ ebirdst_extent.numeric <- function(x, t, crs = 4326, ...) {
   ebirdst_extent.bbox(x = sf::st_bbox(obj = x, crs = crs), t = t)
 }
 
+
 #' @export
 #' @describeIn ebirdst_extent polygons as `sf` spatial feature column
 ebirdst_extent.sfc <- function(x, t, ...) {

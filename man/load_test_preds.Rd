@@ -24,7 +24,7 @@ and upper and lower confidence intervals are provided for predicted
 occurrence, count, and relative abundance.
 }
 \examples{
-\donttest{
+\dontrun{
 # download example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 

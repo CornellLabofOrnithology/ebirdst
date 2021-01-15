@@ -1,3 +1,8 @@
+# ebirdst 0.2.2
+
+- add support for variable ensemble support in `compute_ppms()`
+- wrap all examples in dontrun to avoid writing files when compiling package
+
 # ebirdst 0.2.1
 
 - bug fix: corrected date types in seasonal definitions
@@ -8,9 +13,9 @@
 
 ## Test environments
 
-- local OS X install, R 3.6.3
-- ubuntu 16.04 (travis-ci), R 3.6.3
-- Windows (appveyor), R 3.6.3
+- local OS X install, R 4.0.3
+- ubuntu 16.04 (travis-ci), R 4.0.3
+- Windows (appveyor), R 4.0.3
 - Rhub
   - Ubuntu Linux 16.04 LTS, R-release, GCC
   - Fedora Linux, R-devel, clang, gfortran

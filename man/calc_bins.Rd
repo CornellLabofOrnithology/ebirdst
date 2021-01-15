@@ -38,7 +38,7 @@ used as the default for calculating bins; however, an alternative method
 using quantile-based bins can be used by setting \code{method = "quantile"}.
 }
 \examples{
-\donttest{
+\dontrun{
 # download and load example abundance data
 sp_path <- ebirdst_download("example_data")
 abd <- load_raster("abundance", sp_path)

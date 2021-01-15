@@ -1,4 +1,6 @@
 context("Loading and subsetting functions")
+skip_on_cran()
+options(warn = -1)
 
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 lp_extent <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 45),
@@ -6,7 +8,7 @@ lp_extent <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 45),
 
 test_that("subset raster", {
   #skip_on_cran()
-  abunds <- load_raster("abundance", sp_path)
+  abunds <- suppressWarnings(load_raster("abundance", sp_path))
   #abunds <- raster::stack(f_dl)
   expect_is(abunds, "RasterStack")
 
@@ -38,7 +40,7 @@ test_that("subset raster", {
 
   expect_is(abund_sub, "RasterBrick")
   ### error tests
-  expect_error(load_raster("abundance", "/bad/path"))
+  expect_error(suppressWarnings(load_raster("abundance", "/bad/path")))
   # broken path
 
   # reversed min max
@@ -53,7 +55,7 @@ context("label_raster_stack and parse_raster_dates")
 
 test_that("ebirdst label_raster_stack", {
   skip_on_cran()
-  abunds <- load_raster("abundance", sp_path)
+  abunds <- suppressWarnings(load_raster("abundance", sp_path))
 
   # expected
   expect_equal(length(grep("X2018.", names(abunds)[1])), 1)
