@@ -118,7 +118,7 @@ plot_pis <- function(pis, ext,
   # plot
   if (isTRUE(plot)) {
     model_type <- dplyr::recode(model, occ = "Occurrence", count = "Count")
-    y_lab <- stringr::str_glue("Relative PI ({model_type} model)")
+    y_lab <- stringr::str_glue("Relative Importance ({model_type} model)")
     g <- ggplot2::ggplot(pis_top) +
       ggplot2::aes_string(x = "predictor", y = "pi") +
       ggplot2::geom_boxplot() +
