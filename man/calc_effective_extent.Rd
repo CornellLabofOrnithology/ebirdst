@@ -35,7 +35,7 @@ for reference. The legend shows, for each pixel, what percentage of the
 selected stixels are contributing information, ranging from 0 to 1.
 }
 \examples{
-\donttest{
+\dontrun{
 # download and load example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 

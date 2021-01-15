@@ -98,7 +98,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/CornellLabofOrnithology/ebirdst">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fas fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -125,7 +125,7 @@
 (from summary.txt).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>load_summary</span>(<span class='no'>path</span>, <span class='kw'>return_sf</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>load_summary</span><span class='op'>(</span><span class='va'>path</span>, return_sf <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -137,7 +137,7 @@ eBird Status and Trends products.</p></td>
     </tr>
     <tr>
       <th>return_sf</th>
-      <td><p>logical; whether to return an sf object of spatial points
+      <td><p>logical; whether to return an <a href='https://r-spatial.github.io/sf/reference/sf.html'>sf</a> object of spatial points
 rather then the default data frame.</p></td>
     </tr>
     </table>
@@ -148,38 +148,15 @@ rather then the default data frame.</p></td>
 centroid.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># download example data</span>
-<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span>(<span class='st'>"example_data"</span>, <span class='kw'>tifs_only</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; <span class='message'>Data already exists, use force = TRUE to re-download.</span></div><div class='input'>
+<span class='va'>sp_path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span><span class='op'>(</span><span class='st'>"example_data"</span>, tifs_only <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+
 <span class='co'># stixel summaries</span>
-<span class='no'>summaries</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>ebirdst</span><span class='kw ns'>:::</span><span class='fu'>load_summary</span>(<span class='no'>sp_path</span>)
-<span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>glimpse</a></span>(<span class='no'>summaries</span>)</div><div class='output co'>#&gt; Rows: 945
-#&gt; Columns: 24
-#&gt; $ stixel_id                <span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> "61-98.6-1205", "35-207.8-284", "99-166.8-32…
-#&gt; $ srd_n                    </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> 78104, 78252, 76112, 73404, 82496, 75540, 78…
-#&gt; $ lon                      </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> -84.76490, -83.29157, -84.34107, -84.39816, …
-#&gt; $ lat                      </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 42.70233, 43.19564, 45.36555, 44.68508, 44.0…
-#&gt; $ date                     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 0.31286320, 0.61416530, 0.49918690, 0.173991…
-#&gt; $ stixel_width             </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 4.69994, 5.99353, 5.73436, 5.84128, 4.64485,…
-#&gt; $ stixel_height            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 4.68954, 6.02181, 5.67542, 5.88858, 4.44974,…
-#&gt; $ stixel_area              </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> 171404, 171729, 167032, 161090, 181042, 1657…
-#&gt; $ train_n                  </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> 5000, 3977, 4629, 3768, 4437, 3808, 3855, 45…
-#&gt; $ positive_ob_n            </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> 1250, 227, 879, 18, 687, 58, 105, 759, 31, 1…
-#&gt; $ stixel_prevalence        </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 0.250000000, 0.057078200, 0.189889800, 0.004…
-#&gt; $ mean_non_zero_count      </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 1.558400, 1.405286, 1.732651, 1.111111, 1.72…
-#&gt; $ train_n_occ              </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> 5000, 3977, 4629, 3768, 4437, 3808, 3855, 45…
-#&gt; $ n_pos_occ                </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> 1250, 227, 879, 18, 687, 58, 105, 759, 31, 1…
-#&gt; $ train_n_abund            </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> 1792, 1414, 1738, 1281, 1654, 1353, 1385, 18…
-#&gt; $ n_pos_abund              </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> 1250, 1280, 1273, 1251, 1371, 1258, 1273, 15…
-#&gt; $ mean_occ_pred            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 0.3869277, 0.2180255, 0.3629538, 0.2881866, …
-#&gt; $ total_effort_hrs         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 5538.090, 4226.033, 5406.132, 2641.863, 5403…
-#&gt; $ total_effort_distance_km </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 7151.708, 6050.446, 7920.236, 3677.514, 6903…
-#&gt; $ total_number_observers   </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> 8709, 6015, 8150, 5417, 7115, 5631, 5737, 88…
-#&gt; $ occ_thresh               </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 0.38009700, 0.31261510, 0.34562460, 0.063066…
-#&gt; $ max_time                 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> -6.740797, -7.738237, -6.870217, 2.311691, -…
-#&gt; $ max_effort_hrs           </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 3.274174, 3.926348, 3.492304, 2.015522, 4.18…
-#&gt; $ max_effort_distance_km   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> 4.726421, 8.421053, 9.473684, 1.052632, 9.47…</div><div class='input'># }
-</div></span></pre>
+<span class='va'>summaries</span> <span class='op'>&lt;-</span> <span class='fu'>ebirdst</span><span class='fu'>:::</span><span class='fu'>load_summary</span><span class='op'>(</span><span class='va'>sp_path</span><span class='op'>)</span>
+<span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://tibble.tidyverse.org/reference/glimpse.html'>glimpse</a></span><span class='op'>(</span><span class='va'>summaries</span><span class='op'>)</span>
+<span class='op'>}</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -195,7 +172,7 @@ centroid.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

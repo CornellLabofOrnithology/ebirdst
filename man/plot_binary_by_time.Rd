@@ -37,13 +37,14 @@ of four (Kappa, AUC, Sensitivity, Specificity) box plots. Provide an
 otherwise rangewide performance will be shown.
 }
 \examples{
+\dontrun{
 # download and load example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
 # define a spatiotemporal extent to plot data from
 bb_vec <- c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5)
 e <- ebirdst_extent(bb_vec, t = c("04-01", "06-30"))
-\donttest{
+
 # plot monthly kappa
 plot_binary_by_time(path = sp_path, metric = "kappa",
                     ext = e, n_time_periods = 4)

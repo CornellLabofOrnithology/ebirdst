@@ -25,11 +25,10 @@
 #'
 #' @export
 #'
-#' @examples
+#' @examples \dontrun{
 #' # download the example data
 #' ebirdst_download("example_data")
 #'
-#' \dontrun{
 #' # download the full data package for wood thrush
 #' ebirdst_download("woothr")
 #' }
@@ -154,7 +153,7 @@ ebirdst_download <- function(species,
 #' @return The path to the data package directory.
 #' @export
 #'
-#' @examples
+#' @examples \dontrun{
 #' # download the example data
 #' ebirdst_download("example_data")
 #'
@@ -164,7 +163,6 @@ ebirdst_download <- function(species,
 #' # use it to load data
 #' abd <- load_raster("abundance", sp_path)
 #'
-#' \dontrun{
 #' # get the path to the full data package for yellow-bellied sapsucker
 #' # common name, scientific name, or species code can be used
 #' get_species_path("Yellow-bellied Sapsucker")
@@ -244,12 +242,13 @@ get_species_path <- function(species,
 #'
 #' @export
 #'
-#' @examples
+#' @examples \dontrun{
 #' # download example data
 #' sp_path <- ebirdst_download("example_data")
 #'
 #' # load data
 #' load_raster("abundance", sp_path)
+#' }
 load_raster <- function(product = c("abundance",
                                     "abundance_seasonal",
                                     "count",
@@ -321,7 +320,7 @@ load_raster <- function(product = c("abundance",
 #'
 #' @export
 #'
-#' @examples
+#' @examples \dontrun{
 #' # download and load example abundance data
 #' sp_path <- ebirdst_download("example_data")
 #' abd <- load_raster("abundance", sp_path)
@@ -329,6 +328,7 @@ load_raster <- function(product = c("abundance",
 #' # label
 #' abd <- label_raster_stack(abd)
 #' names(abd)
+#' }
 label_raster_stack <- function(x) {
   stopifnot(inherits(x, "Raster"))
 
@@ -371,12 +371,14 @@ label_raster_stack <- function(x) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # download and load example abundance data
 #' sp_path <- ebirdst_download("example_data")
 #' abd <- load_raster("abundance", sp_path)
 #'
 #' # parse dates
 #' parse_raster_dates(abd)
+#' }
 parse_raster_dates <- function(x) {
   stopifnot(inherits(x, "Raster"))
   if (!all(grepl("X[0-9]{4}\\.[0-9]{2}\\.[0-9]{2}", names(x)))) {
@@ -393,9 +395,10 @@ parse_raster_dates <- function(x) {
 #'
 #' @return An integer vector of weeks numbers from 1-52.
 #' @export
-#' @examples
+#' @examples \dontrun{
 #' d <- as.Date(c("2016-04-08", "2018-12-31", "2014-01-01", "2018-09-04"))
 #' date_to_st_week(d)
+#' }
 date_to_st_week <- function(dates) {
   dv <- seq(from = 0, to = 1, length = 52 + 1)
   days <- (as.POSIXlt(dates)$yday + 0.5) / 366
@@ -421,8 +424,7 @@ date_to_st_week <- function(dates) {
 #'
 #' @keywords internal
 #'
-#' @examples
-#' \donttest{
+#' @examples \dontrun{
 #' # download example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
@@ -473,7 +475,7 @@ load_summary <- function(path, return_sf = FALSE) {
 #'
 #' @export
 #'
-#' @examples
+#' @examples \dontrun{
 #' # download example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
@@ -485,6 +487,7 @@ load_summary <- function(path, return_sf = FALSE) {
 #' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #' plot_pis(pis, ext = e, n_top_pred = 15, by_cover_class = TRUE)
+#' }
 load_pis <- function(path, return_sf = FALSE) {
   stopifnot(dir.exists(path))
   stopifnot(is.logical(return_sf), length(return_sf) == 1)
@@ -535,8 +538,7 @@ load_pis <- function(path, return_sf = FALSE) {
 #'
 #' @keywords internal
 #'
-#' @examples
-#' \donttest{
+#' @examples \dontrun{
 #' # download example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
@@ -592,8 +594,7 @@ load_test_data <- function(path, return_sf = FALSE) {
 #'
 #' @export
 #'
-#' @examples
-#' \donttest{
+#' @examples \dontrun{
 #' # download example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
@@ -639,8 +640,7 @@ load_test_preds <- function(path, return_sf = FALSE) {
 #'
 #' @keywords internal
 #'
-#' @examples
-#' \donttest{
+#' @examples \dontrun{
 #' # download example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #' ebirdst:::load_config(sp_path)
@@ -683,8 +683,7 @@ load_config <- function(path) {
 #'
 #' @export
 #'
-#' @examples
-#' \donttest{
+#' @examples \dontrun{
 #' # download example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #' # get map parameters

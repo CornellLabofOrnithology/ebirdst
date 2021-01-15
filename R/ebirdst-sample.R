@@ -22,7 +22,7 @@
 #' @export
 #' @rdname ebirdst_sample
 #'
-#' @examples
+#' @examples \dontrun{
 #' # download example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
@@ -43,15 +43,12 @@
 #' # while case control sampling increases the prevelance of presences
 #' table(td_cc$obs > 0) / nrow(td_cc)
 #'
-#' \dontrun{
-#'
 #' # plot
 #' library(sf)
 #' p <- par(mar = c(0, 0, 0, 0))
 #' plot(st_geometry(test_data), col = "black", pch = 19, cex = 0.2)
 #' plot(st_geometry(td_cc), col = "red", pch = 19, cex = 0.5, add = TRUE)
 #' par(p)
-#'
 #' }
 sample_grid <- function(x, res, t_res, n = 1, replace = FALSE,
                         jitter = TRUE) {

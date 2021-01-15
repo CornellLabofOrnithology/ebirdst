@@ -16,6 +16,8 @@ An integer vector of weeks numbers from 1-52.
 Get the status and trends week that a date falls into
 }
 \examples{
+\dontrun{
 d <- as.Date(c("2016-04-08", "2018-12-31", "2014-01-01", "2018-09-04"))
 date_to_st_week(d)
+}
 }

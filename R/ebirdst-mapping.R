@@ -15,14 +15,12 @@
 #' @export
 #'
 #' @examples
-#' \dontshow{
 #' # simple toy example
 #' r <- raster::raster(nrow = 100, ncol = 100)
 #' r[5025:5075] <- 1
 #' raster::extent(r)
 #' calc_full_extent(r)
-#' }
-#' \donttest{
+#' \dontrun{
 #' # download and load example abundance data
 #' sp_path <- ebirdst_download("example_data")
 #' abd <- load_raster("abundance", sp_path)
@@ -101,8 +99,7 @@ calc_full_extent <- function(x) {
 #' Visual Encoding. IEEE Transactions on Visualization and Computer Graphics,
 #' 19(1): 130-140, 2013.
 #'
-#' @examples
-#' \donttest{
+#' @examples \dontrun{
 #' # download and load example abundance data
 #' sp_path <- ebirdst_download("example_data")
 #' abd <- load_raster("abundance", sp_path)
@@ -223,7 +220,7 @@ calc_bins <- function(x, method = c("boxcox", "quantile")) {
 #'
 #' @export
 #'
-#' @examples
+#' @examples \dontrun{
 #' # download and load example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
@@ -232,6 +229,7 @@ calc_bins <- function(x, method = c("boxcox", "quantile")) {
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #'
 #' map_centroids(path = sp_path, ext = e)
+#' }
 map_centroids <- function(path, ext) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
   if (missing(ext)) {
@@ -351,8 +349,7 @@ map_centroids <- function(path, ext) {
 #'
 #' @export
 #'
-#' @examples
-#' \donttest{
+#' @examples \dontrun{
 #' # download and load example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'

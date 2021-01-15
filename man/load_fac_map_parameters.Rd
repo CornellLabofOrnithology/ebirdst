@@ -29,7 +29,7 @@ extent of non-zero data across the full annual cycle and the projection is
 optimized for this extent.
 }
 \examples{
-\donttest{
+\dontrun{
 # download example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 # get map parameters

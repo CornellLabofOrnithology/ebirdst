@@ -98,7 +98,7 @@ given species to be used by the various loading functions." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/CornellLabofOrnithology/ebirdst">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fas fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -125,7 +125,7 @@ given species to be used by the various loading functions." />
 given species to be used by the various loading functions.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_species_path</span>(<span class='no'>species</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='kw pkg'>rappdirs</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/rappdirs/man/user_data_dir.html'>user_data_dir</a></span>(<span class='st'>"ebirdst"</span>))</pre>
+    <pre class="usage"><span class='fu'>get_species_path</span><span class='op'>(</span><span class='va'>species</span>, path <span class='op'>=</span> <span class='fu'>rappdirs</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/rappdirs/man/user_data_dir.html'>user_data_dir</a></span><span class='op'>(</span><span class='st'>"ebirdst"</span><span class='op'>)</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -150,21 +150,23 @@ rappdirs::user_data_dir("ebirdst")).</p></td>
     <p>The path to the data package directory.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># download the example data</span>
-<span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span>(<span class='st'>"example_data"</span>)</div><div class='output co'>#&gt; <span class='message'>Data already exists, use force = TRUE to re-download.</span></div><div class='input'>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># download the example data</span>
+<span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span><span class='op'>(</span><span class='st'>"example_data"</span><span class='op'>)</span>
+
 <span class='co'># get the path</span>
-<span class='no'>sp_path</span> <span class='kw'>&lt;-</span> <span class='fu'>get_species_path</span>(<span class='st'>"example_data"</span>)
+<span class='va'>sp_path</span> <span class='op'>&lt;-</span> <span class='fu'>get_species_path</span><span class='op'>(</span><span class='st'>"example_data"</span><span class='op'>)</span>
 
 <span class='co'># use it to load data</span>
-<span class='no'>abd</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='load_raster.html'>load_raster</a></span>(<span class='st'>"abundance"</span>, <span class='no'>sp_path</span>)
+<span class='va'>abd</span> <span class='op'>&lt;-</span> <span class='fu'><a href='load_raster.html'>load_raster</a></span><span class='op'>(</span><span class='st'>"abundance"</span>, <span class='va'>sp_path</span><span class='op'>)</span>
 
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='co'># get the path to the full data package for yellow-bellied sapsucker</span>
 <span class='co'># common name, scientific name, or species code can be used</span>
-<span class='fu'>get_species_path</span>(<span class='st'>"Yellow-bellied Sapsucker"</span>)
-<span class='fu'>get_species_path</span>(<span class='st'>"Sphyrapicus varius"</span>)
-<span class='fu'>get_species_path</span>(<span class='st'>"yebsap"</span>)
-}</div></pre>
+<span class='fu'>get_species_path</span><span class='op'>(</span><span class='st'>"Yellow-bellied Sapsucker"</span><span class='op'>)</span>
+<span class='fu'>get_species_path</span><span class='op'>(</span><span class='st'>"Sphyrapicus varius"</span><span class='op'>)</span>
+<span class='fu'>get_species_path</span><span class='op'>(</span><span class='st'>"yebsap"</span><span class='op'>)</span>
+<span class='op'>}</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -180,7 +182,7 @@ rappdirs::user_data_dir("ebirdst")).</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

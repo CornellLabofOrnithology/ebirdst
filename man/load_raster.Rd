@@ -62,9 +62,11 @@ distance that maximizes detection of that species in a region.
 }
 }
 \examples{
+\dontrun{
 # download example data
 sp_path <- ebirdst_download("example_data")
 
 # load data
 load_raster("abundance", sp_path)
+}
 }

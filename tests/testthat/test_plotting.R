@@ -1,4 +1,6 @@
 context("Plotting functions")
+skip_on_cran()
+options(warn = -1)
 
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 lp_extent <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 45),

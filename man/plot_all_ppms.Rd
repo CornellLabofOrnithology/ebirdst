@@ -22,13 +22,14 @@ performance metrics within three categories: Binary Occurrence, Occurrence
 Probability, and Abundance.
 }
 \examples{
+\dontrun{
 # download example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
 # define a spatiotemporal extent to plot data from
 bb_vec <- c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5)
 e <- ebirdst_extent(bb_vec, t = c("04-01", "06-30"))
-\donttest{
+
 # plot ppms within extent
 plot_all_ppms(path = sp_path, ext = e)
 }

@@ -24,7 +24,7 @@
 #'
 #' @export
 #'
-#' @examples
+#' @examples \dontrun{
 #' # download and load example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #' pis <- load_pis(sp_path)
@@ -35,6 +35,7 @@
 #'
 #' top_pred <- plot_pis(pis, ext = e, by_cover_class = TRUE, n_top_pred = 10)
 #' top_pred
+#' }
 plot_pis <- function(pis, ext,
                      by_cover_class = FALSE,
                      n_top_pred = 50,

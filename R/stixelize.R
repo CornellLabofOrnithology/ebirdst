@@ -13,7 +13,7 @@
 #'   stixels boundaries.
 #' @export
 #'
-#' @examples
+#' @examples \dontrun{
 #' # download example data
 #' sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 #'
@@ -25,6 +25,7 @@
 #' # also works on sf objects
 #' pis_sf <- sf::st_as_sf(pis, coords = c("lon", "lat"), crs = 4326)
 #' stixelize(pis_sf)
+#' }
 stixelize <- function(x) {
   UseMethod("stixelize")
 }

@@ -24,7 +24,7 @@ counts and all predictor variables used for modeling for each checklist in
 the test dataset.
 }
 \examples{
-\donttest{
+\dontrun{
 # download example data
 sp_path <- ebirdst_download("example_data", tifs_only = FALSE)
 
