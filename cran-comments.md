@@ -1,15 +1,11 @@
+# Resubmission
+
+Fixing link redirects. Removing unused dependencies.
+
 # ebirdst 0.2.2
 
 - add support for variable ensemble support in `compute_ppms()`
-- wrap all examples in dontrun to avoid writing files when compiling package
-
-# ebirdst 0.2.1
-
-- bug fix: corrected date types in seasonal definitions
-- bug fix: fixed possibility that ebirdst_extent could produce invalid date (day 366 of 2015)
-- added import of pipe operator
-- `velox` was archived, removed dependency from Suggests
-- `fasterize` was archived, removed dependency from Imports
+- wrap all examples in dontrun to avoid writing files locally when compiling package
 
 ## Test environments
 
@@ -24,4 +20,7 @@
 
 ## R CMD check results
 
-0 errors | 0 warnings | 0 notes
+0 errors | 0 warnings | 1 note
+
+- NOTE Namespaces in Imports field not imported from: ‘rappdirs’
+rappdirs is used as a function argument for ebirdst_download()
