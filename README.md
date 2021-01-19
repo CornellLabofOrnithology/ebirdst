@@ -3,16 +3,14 @@
 ebirdst: Access and Analyze eBird Status and Trends Data
 ========================================================
 
+<!-- badges: start -->
+
 [![License: GPL
 v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
-[![AppVeyor Build
-status](https://ci.appveyor.com/api/projects/status/v7cyxwquwrxxa5l6/branch/master?svg=true)](https://ci.appveyor.com/project/mstrimas/ebirdst/branch/master)
-[![Travis build
-status](https://travis-ci.org/CornellLabofOrnithology/ebirdst.svg?branch=master)](https://travis-ci.org/CornellLabofOrnithology/ebirdst)
-[![Coverage
-status](https://codecov.io/gh/CornellLabofOrnithology/ebirdst/branch/master/graph/badge.svg)](https://codecov.io/github/CornellLabofOrnithology/ebirdst?branch=master)
+[![R-CMD-check](https://github.com/CornellLabofOrnithology/ebirdst/workflows/R-CMD-check/badge.svg)](https://github.com/CornellLabofOrnithology/ebirdst/actions)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/ebirdst)](https://cran.r-project.org/package=ebirdst)
+<!-- badges: end -->
 
 Installation
 ------------
@@ -126,12 +124,14 @@ structure will cause errors with this package.
     # get a date vector specifying which week each raster layer corresponds to
     weeks <- parse_raster_dates(abd)
     print(weeks)
-    #>  [1] "2019-01-04" "2019-01-11" "2019-01-18" "2019-01-25" "2019-02-01" "2019-02-08" "2019-02-15" "2019-02-22"
-    #>  [9] "2019-03-01" "2019-03-08" "2019-03-15" "2019-03-22" "2019-03-29" "2019-04-05" "2019-04-12" "2019-04-19"
-    #> [17] "2019-04-26" "2019-05-03" "2019-05-10" "2019-05-17" "2019-05-24" "2019-05-31" "2019-06-07" "2019-06-14"
-    #> [25] "2019-06-21" "2019-06-28" "2019-07-06" "2019-07-13" "2019-07-20" "2019-07-27" "2019-08-03" "2019-08-10"
-    #> [33] "2019-08-17" "2019-08-24" "2019-08-31" "2019-09-07" "2019-09-14" "2019-09-21" "2019-09-28" "2019-10-05"
-    #> [41] "2019-10-12" "2019-10-19" "2019-10-26" "2019-11-02" "2019-11-09" "2019-11-16" "2019-11-23" "2019-11-30"
+    #>  [1] "2019-01-04" "2019-01-11" "2019-01-18" "2019-01-25" "2019-02-01" "2019-02-08"
+    #>  [7] "2019-02-15" "2019-02-22" "2019-03-01" "2019-03-08" "2019-03-15" "2019-03-22"
+    #> [13] "2019-03-29" "2019-04-05" "2019-04-12" "2019-04-19" "2019-04-26" "2019-05-03"
+    #> [19] "2019-05-10" "2019-05-17" "2019-05-24" "2019-05-31" "2019-06-07" "2019-06-14"
+    #> [25] "2019-06-21" "2019-06-28" "2019-07-06" "2019-07-13" "2019-07-20" "2019-07-27"
+    #> [31] "2019-08-03" "2019-08-10" "2019-08-17" "2019-08-24" "2019-08-31" "2019-09-07"
+    #> [37] "2019-09-14" "2019-09-21" "2019-09-28" "2019-10-05" "2019-10-12" "2019-10-19"
+    #> [43] "2019-10-26" "2019-11-02" "2019-11-09" "2019-11-16" "2019-11-23" "2019-11-30"
     #> [49] "2019-12-07" "2019-12-14" "2019-12-21" "2019-12-28"
 
     # select a week in the middle of the year
