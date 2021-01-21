@@ -3,23 +3,34 @@
 #' Combine the predictor importance (PI) and partial dependence (PD) data to
 #' provide an estimate of the importance and directionality of the land cover
 #' classes (i.e. habitat) used as covariates in the occurrence probability
-#' model. The `plot()` method can then be used to produce a cake plot, a stacked
-#' area chart showing habitat associations in which area indicates the
-#' importance of a given land cover class and the position above or below the
-#' x-axis indicates the direction of the relationship. **Note:** This is one of,
-#' if not the most, computationally expensive operations in the package.
+#' model. **Note:** This is one of, if not the most, computationally expensive
+#' operations in the package.
 #'
 #' @param path character; Full path to single species STEM results.
 #' @param ext [ebirdst_extent] object; the spatiotemporal extent over which to
 #'   calculate the habitat associations. Note that **temporal component of `ext`
 #'   is ignored is this function**, habitat associations are always calculated
 #'   for the full year.
-#' @param n_predictors integer; number of land cover classes to estimate habitat
-#'   associations for.
-#' @param pland_only logical; For each land cover class, two FRAGSTATS metrics
-#'   are used as covariates: the percent of land cover (PLAND) and the edge
-#'   density (ED). By default only PLAND covariates are used to estimate habitat
-#'   associates. Use `pland_only = FALSE` to use both PLAND and ED metrics.
+#'
+#' @details The Status and Trends models use both effort (e.g. number of
+#'   observers, length of checklist) and habitat (e.g. elevation, percent forest
+#'   cover) covariates; for the full list consult [ebirdst_predictors]. This
+#'   function calculates habitat associations only for the following covariates
+#'   that most closely represent metrics of available habitat. In all cases
+#'   these are calculated within a 1.5 km radius of each checklist:
+#'
+#'    - Land cover: percent of each landcover class
+#'    - Water cover: percent of each watercover class
+#'    - Intertidal: percent cover of intertidal mudflats
+#'    - Nighttime lights: total refelctance of nighttime lights
+#'    - Roads: road density. There are 5 covariates distinguishing between
+#'    different road types; however, these are grouped together for the sake of
+#'    the habitat associations.
+#'
+#' The `plot()` method can be used to produce a cake plot, a stacked area chart
+#' showing habitat associations in which area indicates the importance of a
+#' given land cover class and the position above or below the x-axis indicates
+#' the direction of the relationship.
 #'
 #' @return An `ebirdst_habitat` object, consisting of a data frame giving the
 #'   predictor importance and directionality for each predictor for each week of
@@ -52,11 +63,8 @@
 #' # produce a cake plot
 #' plot(habitat)
 #' }
-ebirdst_habitat <- function(path, ext, n_predictors = 15, pland_only = TRUE) {
+ebirdst_habitat <- function(path, ext) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
-  stopifnot(is.numeric(n_predictors), length(n_predictors) == 1,
-            n_predictors > 0)
-  stopifnot(is.logical(pland_only), length(pland_only) == 1)
 
   if (missing(ext)) {
     stop("A spatiotemporal extent must be provided.")
@@ -118,24 +126,10 @@ ebirdst_habitat <- function(path, ext, n_predictors = 15, pland_only = TRUE) {
   preds <- ebirdst::ebirdst_predictors$predictor_tidy
   preds <- preds[stringr::str_detect(preds,
                                      "^(intertidal|mcd12q1|gp_rtp|astwbd|ntl)")]
-  if (isTRUE(pland_only)) {
-    preds <- preds[!stringr::str_detect(preds, "_(ed|sd)$")]
-  }
+  # drop variation metrics
+  preds <- preds[!stringr::str_detect(preds, "_(ed|sd)$")]
   pis <- pis[pis$predictor %in% preds, ]
   pds <- pds[pds$predictor %in% preds, ]
-
-  # pick top predictors
-  top_pis <- dplyr::group_by(pis, .data$predictor)
-  top_pis <- dplyr::summarise(top_pis,
-                              importance = sum(.data$importance),
-                              .groups = "drop")
-  top_pis <- dplyr::top_n(top_pis,
-                          n = min(n_predictors, nrow(top_pis)),
-                          wt = .data$importance)
-
-  # subset to top predictors
-  pis <- pis[pis$predictor %in% top_pis$predictor, ]
-  pds <- pds[pds$predictor %in% top_pis$predictor, ]
 
   # calculate pd slopes
   pd_slope <- pds[, c("stixel_id", "date", "predictor",
@@ -154,6 +148,7 @@ ebirdst_habitat <- function(path, ext, n_predictors = 15, pland_only = TRUE) {
   pd_smooth <- dplyr::select(pd_slope, .data$predictor,
                              x = .data$date, y = .data$slope,
                              weight = .data$coverage)
+  pd_smooth <- tidyr::drop_na(pd_smooth)
   pd_smooth <- tidyr::nest(pd_smooth, data = -dplyr::all_of("predictor"))
   pd_smooth$smooth <- lapply(pd_smooth[["data"]],
                              FUN = loess_smooth,
@@ -205,58 +200,58 @@ ebirdst_habitat <- function(path, ext, n_predictors = 15, pland_only = TRUE) {
 
 #' @param x [ebirdst_habitat] object; habitat relationships as calculated by
 #'   [ebirdst_habitat()].
+#' @param n_predictors number of predictors to include in the cake plot. The
+#'   most important set of predictors will be chosen based on the maximum weekly
+#'   importance value across the whole year.
 #' @param date_range the range of dates for plotting; a 2-element vector of the
 #'   start and end dates of the date range, provided either as dates (Date
 #'   objects or strings in ISO format "YYYY-MM-DD") or numbers between 0 and 1
 #'   representing the fraction of the year. When providing dates as a string,
-#'   the year can be omitted (i.e. "MM-DD"). **Leave the argument blank to plot
-#'   the full year of data.**
-#' @param by_cover_class logical; whether to aggregate the FRAGSTATS metrics
-#'   (PLAND and ED) for the land cover classes into single values for the land
-#'   cover classes. This will also group the 5 types of roads into a single
-#'   class.
+#'   the year can be omitted (i.e. "MM-DD"). By default the full year of data
+#'   are plotted.
+#' @param group_roads logical; whether to aggregate the the 5 types of roads
+#'   into a single class prior to plotting.
 #' @param ... ignored.
 #'
 #' @export
 #' @rdname ebirdst_habitat
-plot.ebirdst_habitat <- function(x, date_range, by_cover_class = TRUE, ...) {
-  stopifnot(is.logical(by_cover_class), length(by_cover_class) == 1)
+plot.ebirdst_habitat <- function(x, n_predictors = 15,
+                                 date_range = c(0, 1),
+                                 group_roads = TRUE,
+                                 ...) {
+  stopifnot(is.numeric(n_predictors), length(n_predictors) == 1,
+            n_predictors > 0)
+  stopifnot(is.logical(group_roads), length(group_roads) == 1)
 
   # convert temporal extent
-  if (missing(date_range)) {
-    date_range <- c(0, 1)
-  }
   date_range <- process_t_extent(date_range)
+  data_date_range <- range(x$date, na.rm = TRUE)
   if (date_range[1] >= date_range[2]) {
     stop("Dates in date_range must be sequential.")
   }
-  date_range[1] <- max(date_range[1], min(x$date, na.rm = TRUE))
-  date_range[2] <- min(date_range[2], max(x$date, na.rm = TRUE))
+  date_range[1] <- max(date_range[1], data_date_range[1])
+  date_range[2] <- min(date_range[2], data_date_range[2])
   date_range <- from_srd_date(date_range)
 
-  # multiply importance and direction, fill with zeros
-  x$pi_direction <- dplyr::coalesce(x$importance * x$direction, 0)
-
-  # max weekly stack height
-  y_max <- dplyr::group_by(x, .data$date, .data$direction)
-  y_max <- dplyr::summarise(y_max,
-                            height = sum(.data$pi_direction, na.rm = TRUE),
-                            .groups = "drop")
-  y_max <- max(abs(y_max$height), na.rm = TRUE)
-
-  # combine cover classes, assign pretty names
+  # bring in pretty names
   lc <- dplyr::select(ebirdst::ebirdst_predictors,
                       predictor = .data$predictor_tidy,
                       .data$predictor_label,
                       .data$lc_class,
                       .data$lc_class_label)
   x <- dplyr::inner_join(lc, x, by = "predictor")
-  if (isTRUE(by_cover_class)) {
+
+  # multiply importance and direction, fill with zeros
+  x$pi_direction <- dplyr::coalesce(x$importance * x$direction, 0)
+
+  # group roads
+  if (isTRUE(group_roads)) {
     x <- dplyr::group_by(x,
                          predictor = .data$lc_class,
                          label = .data$lc_class_label,
                          .data$date)
     x <- dplyr::summarise(x,
+                          importance = sum(.data$importance),
                           pi_direction = sum(.data$pi_direction),
                           .groups = "drop")
   } else {
@@ -264,8 +259,29 @@ plot.ebirdst_habitat <- function(x, date_range, by_cover_class = TRUE, ...) {
                        predictor = .data$predictor,
                        label = .data$predictor_label,
                        .data$date,
+                       .data$importance,
                        .data$pi_direction)
   }
+
+  # pick top predictors based on max importance across weeks
+  top_pis <- dplyr::group_by(x, .data$predictor)
+  top_pis <- dplyr::summarise(top_pis,
+                              importance = max(.data$importance),
+                              .groups = "drop")
+  top_pis <- dplyr::top_n(top_pis,
+                          n = min(n_predictors, nrow(top_pis)),
+                          wt = .data$importance)
+
+  # subset to top predictors
+  x <- x[x$predictor %in% top_pis$predictor, ]
+
+  # max weekly stack height
+  y_max <- dplyr::group_by(x, .data$date,
+                           direction = sign(.data$pi_direction))
+  y_max <- dplyr::summarise(y_max,
+                            height = sum(.data$pi_direction, na.rm = TRUE),
+                            .groups = "drop")
+  y_max <- max(abs(y_max$height), na.rm = TRUE)
 
   # assign weeks
   w <- ebirdst::ebirdst_weeks
@@ -307,7 +323,7 @@ plot.ebirdst_habitat <- function(x, date_range, by_cover_class = TRUE, ...) {
 lm_slope <- function(data) {
   stopifnot(is.data.frame(data), ncol(data) == 2)
   names(data) <- c("x", "y")
-  if (all(is.na(data[["y"]]))) {
+  if (all(is.na(data[["y"]])) || nrow(data) < 3) {
     return(NA_real_)
   }
   stats::coef(stats::lm(y ~ x, data = data))[[2]]
@@ -319,6 +335,13 @@ loess_smooth <- function(x, predict_to, na_value = NA_real_, check_width) {
   stopifnot(is.numeric(na_value), length(na_value) == 1)
   if (!"weight" %in% names(x)) {
     x$weight <- rep(1, times = nrow(x))
+  }
+
+  # need at least 3 data points to smooth
+  if (sum(stats::complete.cases(x), na.rm = TRUE) < 3) {
+    p <- rep(na_value, length(predict_to))
+    return(data.frame(x = predict_to, y = p))
+
   }
 
   # safety check to make sure input x range is as wide as predict range
@@ -334,18 +357,14 @@ loess_smooth <- function(x, predict_to, na_value = NA_real_, check_width) {
     }
   }
 
-  # need at least 2 data points to smooth
-  if (sum(stats::complete.cases(x), na.rm = TRUE) <= 1) {
-    p <- rep(na_value, length(predict_to))
-    return(data.frame(x = predict_to, y = p))
-
-  }
   # fit and predict
   w <- x$weight
-  m <- stats::loess(formula = y ~ x,
-                    degree = 1,
-                    data = x,
-                    weights = w)
+  suppressWarnings({
+    m <- stats::loess(formula = y ~ x,
+                      degree = 1,
+                      data = x,
+                      weights = w)
+  })
   p <- stats::predict(m, predict_to)
   r <- data.frame(x = predict_to, y = p)
 
