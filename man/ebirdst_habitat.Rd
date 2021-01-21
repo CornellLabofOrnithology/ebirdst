@@ -5,9 +5,9 @@
 \alias{plot.ebirdst_habitat}
 \title{eBird Status and Trends predictive habitat associations}
 \usage{
-ebirdst_habitat(path, ext, n_predictors = 15, pland_only = TRUE)
+ebirdst_habitat(path, ext)
 
-\method{plot}{ebirdst_habitat}(x, date_range, by_cover_class = TRUE, ...)
+\method{plot}{ebirdst_habitat}(x, n_predictors = 15, date_range = c(0, 1), group_roads = TRUE, ...)
 }
 \arguments{
 \item{path}{character; Full path to single species STEM results.}
@@ -17,28 +17,22 @@ calculate the habitat associations. Note that \strong{temporal component of \cod
 is ignored is this function}, habitat associations are always calculated
 for the full year.}
 
-\item{n_predictors}{integer; number of land cover classes to estimate habitat
-associations for.}
-
-\item{pland_only}{logical; For each land cover class, two FRAGSTATS metrics
-are used as covariates: the percent of land cover (PLAND) and the edge
-density (ED). By default only PLAND covariates are used to estimate habitat
-associates. Use \code{pland_only = FALSE} to use both PLAND and ED metrics.}
-
 \item{x}{\link{ebirdst_habitat} object; habitat relationships as calculated by
 \code{\link[=ebirdst_habitat]{ebirdst_habitat()}}.}
+
+\item{n_predictors}{number of predictors to include in the cake plot. The
+most important set of predictors will be chosen based on the maximum weekly
+importance value across the whole year.}
 
 \item{date_range}{the range of dates for plotting; a 2-element vector of the
 start and end dates of the date range, provided either as dates (Date
 objects or strings in ISO format "YYYY-MM-DD") or numbers between 0 and 1
 representing the fraction of the year. When providing dates as a string,
-the year can be omitted (i.e. "MM-DD"). \strong{Leave the argument blank to plot
-the full year of data.}}
+the year can be omitted (i.e. "MM-DD"). By default the full year of data
+are plotted.}
 
-\item{by_cover_class}{logical; whether to aggregate the FRAGSTATS metrics
-(PLAND and ED) for the land cover classes into single values for the land
-cover classes. This will also group the 5 types of roads into a single
-class.}
+\item{group_roads}{logical; whether to aggregate the the 5 types of roads
+into a single class prior to plotting.}
 
 \item{...}{ignored.}
 }
@@ -61,11 +55,30 @@ the relationship is not significant.
 Combine the predictor importance (PI) and partial dependence (PD) data to
 provide an estimate of the importance and directionality of the land cover
 classes (i.e. habitat) used as covariates in the occurrence probability
-model. The \code{plot()} method can then be used to produce a cake plot, a stacked
-area chart showing habitat associations in which area indicates the
-importance of a given land cover class and the position above or below the
-x-axis indicates the direction of the relationship. \strong{Note:} This is one of,
-if not the most, computationally expensive operations in the package.
+model. \strong{Note:} This is one of, if not the most, computationally expensive
+operations in the package.
+}
+\details{
+The Status and Trends models use both effort (e.g. number of
+observers, length of checklist) and habitat (e.g. elevation, percent forest
+cover) covariates; for the full list consult \link{ebirdst_predictors}. This
+function calculates habitat associations only for the following covariates
+that most closely represent metrics of available habitat. In all cases
+these are calculated within a 1.5 km radius of each checklist:
+\itemize{
+\item Land cover: percent of each landcover class
+\item Water cover: percent of each watercover class
+\item Intertidal: percent cover of intertidal mudflats
+\item Nighttime lights: total refelctance of nighttime lights
+\item Roads: road density. There are 5 covariates distinguishing between
+different road types; however, these are grouped together for the sake of
+the habitat associations.
+}
+
+The \code{plot()} method can be used to produce a cake plot, a stacked area chart
+showing habitat associations in which area indicates the importance of a
+given land cover class and the position above or below the x-axis indicates
+the direction of the relationship.
 }
 \examples{
 \donttest{
