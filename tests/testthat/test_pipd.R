@@ -9,7 +9,7 @@ path <- ebirdst_download("example_data", tifs_only = FALSE)
 test_that("load_pis", {
   pis <- load_pis(path)
   expect_is(pis, "data.frame")
-  expect_equal(ncol(pis), 79)
+  expect_equal(ncol(pis), 78)
   expect_gt(nrow(pis), 0)
 
   # predictors
@@ -21,7 +21,7 @@ test_that("load_pis", {
   # return sf object
   pis <- load_pis(path, return_sf = TRUE)
   expect_is(pis, "sf")
-  expect_equal(ncol(pis), 78)
+  expect_equal(ncol(pis), 77)
   expect_gt(nrow(pis), 0)
   expect_true(all(ebirdst_predictors$predictor_tidy %in% names(pis)))
 

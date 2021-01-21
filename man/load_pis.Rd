@@ -18,18 +18,17 @@ rather then the default data frame.}
 Data frame, or \link{sf} object if \code{return_sf = TRUE}, containing PI
 estimates for each stixel for both the occurrence and relative abundance
 models. The data are provided in a 'wide' format, with each row
-corresponding to the PI estimates for a give stixel for either the
-occurrence or count model (identified by the \code{model} column), and the
-relative importance of each predictor in columns. Stixels are identified by
-a unique \code{stixel_id}, the centroid of the stixel in space and time is
-specified by the \code{lat}, \code{lon}, and \code{date} column, which expresses the day
-of year as a value from 0-1.
+corresponding to the PI estimates for a give stixel for the occurrence
+count model, and the relative importance of each predictor in columns.
+Stixels are identified by a unique \code{stixel_id}, the centroid of the stixel
+in space and time is specified by the \code{lat}, \code{lon}, and \code{date} column,
+which expresses the day of year as a value from 0-1.
 }
 \description{
 Loads the predictor importance (PI) data from the pi-pd.db sqlite database.
 PI estimates are provided for each stixel over which a model was run and are
 identified by a unique stixel ID in addition to the coordinates of the stixel
-centroid. PI estimates are provided for both the occurrence and count models.
+centroid. PI estimates are for the occurrence model only.
 }
 \examples{
 \donttest{
