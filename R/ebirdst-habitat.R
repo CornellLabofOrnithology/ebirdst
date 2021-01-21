@@ -2,20 +2,18 @@
 #'
 #' Combine the predictor importance (PI) and partial dependence (PD) data to
 #' provide an estimate of the importance and directionality of the land cover
-#' classes (i.e. habitat) used as model covariates. The `plot()` method can then
-#' be used to produce a cake plot, a stacked area chart showing habitat
-#' associations in which area indicates the importance of a given land cover
-#' class and the position above or below the x-axis indicates the direction of
-#' the relationship. **Note:** This is one of, if not the most, computationally
-#' expensive operations in the package.
+#' classes (i.e. habitat) used as covariates in the occurrence probability
+#' model. The `plot()` method can then be used to produce a cake plot, a stacked
+#' area chart showing habitat associations in which area indicates the
+#' importance of a given land cover class and the position above or below the
+#' x-axis indicates the direction of the relationship. **Note:** This is one of,
+#' if not the most, computationally expensive operations in the package.
 #'
 #' @param path character; Full path to single species STEM results.
 #' @param ext [ebirdst_extent] object; the spatiotemporal extent over which to
 #'   calculate the habitat associations. Note that **temporal component of `ext`
 #'   is ignored is this function**, habitat associations are always calculated
 #'   for the full year.
-#' @param model character; whether to calculate habitat associations for the
-#'   occurrence or count model.
 #' @param n_predictors integer; number of land cover classes to estimate habitat
 #'   associations for.
 #' @param pland_only logical; For each land cover class, two FRAGSTATS metrics
@@ -54,10 +52,8 @@
 #' # produce a cake plot
 #' plot(habitat)
 #' }
-ebirdst_habitat <- function(path, ext, model = c("occ", "count"),
-                            n_predictors = 15, pland_only = TRUE) {
+ebirdst_habitat <- function(path, ext, n_predictors = 15, pland_only = TRUE) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
-  model <- match.arg(model)
   stopifnot(is.numeric(n_predictors), length(n_predictors) == 1,
             n_predictors > 0)
   stopifnot(is.logical(pland_only), length(pland_only) == 1)
@@ -99,9 +95,7 @@ ebirdst_habitat <- function(path, ext, model = c("occ", "count"),
 
   # load pis and pds, occurrence only
   pis <- load_pis(path = path)
-  pis <- pis[pis$model == model, ]
-  pis$model <- NULL
-  pds <- load_pds(path = path, model = model)
+  pds <- load_pds(path = path)
 
   # subset
   pis <- ebirdst_subset(pis, ext = ext)
@@ -206,7 +200,7 @@ ebirdst_habitat <- function(path, ext, model = c("occ", "count"),
 
   structure(pipd,
             class = c("ebirdst_habitat", class(pipd)),
-            extent = ext, model = model)
+            extent = ext)
 }
 
 #' @param x [ebirdst_habitat] object; habitat relationships as calculated by
@@ -227,10 +221,6 @@ ebirdst_habitat <- function(path, ext, model = c("occ", "count"),
 #' @rdname ebirdst_habitat
 plot.ebirdst_habitat <- function(x, date_range, by_cover_class = TRUE, ...) {
   stopifnot(is.logical(by_cover_class), length(by_cover_class) == 1)
-
-  model_type <- dplyr::recode(attr(x, "model"),
-                              occ = "occurrence",
-                              count = "count")
 
   # convert temporal extent
   if (missing(date_range)) {
@@ -303,7 +293,7 @@ plot.ebirdst_habitat <- function(x, date_range, by_cover_class = TRUE, ...) {
                   y = "Importance (+/-)",
                   fill = "Predictor",
                   title = stringr::str_glue("Habitat associations ",
-                                            "({model_type} model)")) +
+                                            "(occurrence model)")) +
     ggplot2::theme_light() +
     ggplot2::theme(legend.key.size = ggplot2::unit(1, "line"))
 

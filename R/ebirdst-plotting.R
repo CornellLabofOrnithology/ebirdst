@@ -1,15 +1,14 @@
 #' Plot predictor importance (PI) box plots
 #'
 #' For a given eBird Status and Trends species, produce a box plot showing the
-#' predictor importance (PI) for each of the predictors used in the model.
-#' Predictors are plotted in order from highest to lowest importance. Many
-#' function parameters allow for customized plots.
+#' predictor importance (PI) for each of the predictors used in the occurrence
+#' model. Predictors are plotted in order from highest to lowest importance.
+#' Many function parameters allow for customized plots.
 #'
 #' @param pis data frame; predictor importance data from [load_pis()].
 #' @param ext [ebirdst_extent] object; the spatiotemporal extent over which to
 #'   calculate PIs. This is required, since results are less meaningful over
 #'   large spatiotemporal extents.
-#' @param model character; whether to plot PIs for occurrence or count
 #' @param by_cover_class logical; whether to aggregate the FRAGSTATS metrics
 #'   (PLAND and ED) for the land cover classes into single values for the land
 #'   cover classes.
@@ -43,7 +42,6 @@
 #' top_pred
 #' }
 plot_pis <- function(pis, ext,
-                     model = c("occ", "count"),
                      by_cover_class = TRUE,
                      n_top_pred = 20,
                      pretty_names = TRUE,
@@ -59,10 +57,6 @@ plot_pis <- function(pis, ext,
   if (all(c(0, 1) == round(ext$t, 2))) {
     stop("Must subset temporally, results not meaningful for full year.")
   }
-
-  # pick occ or abd pis
-  model <- match.arg(model)
-  pis <- pis[pis$model == model, ]
 
   # subset
   pis <- ebirdst_subset(pis, ext = ext)
@@ -117,8 +111,7 @@ plot_pis <- function(pis, ext,
 
   # plot
   if (isTRUE(plot)) {
-    model_type <- dplyr::recode(model, occ = "Occurrence", count = "Count")
-    y_lab <- stringr::str_glue("Relative Importance ({model_type} model)")
+    y_lab <- stringr::str_glue("Relative Importance (occurrence model)")
     g <- ggplot2::ggplot(pis_top) +
       ggplot2::aes_string(x = "predictor", y = "pi") +
       ggplot2::geom_boxplot() +

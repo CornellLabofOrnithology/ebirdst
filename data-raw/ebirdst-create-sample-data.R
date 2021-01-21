@@ -64,7 +64,7 @@ sql <- str_glue("DELETE FROM predictions ",
                 "WHERE longitude < {bb['xmin']} OR  longitude > {bb['xmax']} ",
                 "OR latitude < {bb['ymin']} OR  latitude > {bb['ymax']};")
 dbSendStatement(pred_con, sql)
-# get sampling event ids cthat fall in polygon
+# get sampling event ids that fall in polygon
 sid <- tbl(pred_con, "predictions") %>%
   select(sampling_event_id, latitude, longitude) %>%
   collect() %>%
@@ -94,7 +94,7 @@ stixels <- tbl(pipd_con, "stixel_summary") %>%
   st_drop_geometry()
 copy_to(pipd_con, stixels)
 # drop rows from other tables without out of bounds stixel centroids
-for (t in c("abd_pds", "abd_pis", "occ_pds", "occ_pis", "stixel_summary")) {
+for (t in c("occ_pds", "occ_pis", "stixel_summary")) {
   sql <- str_glue("DELETE FROM {t} WHERE stixel_id NOT IN ",
                   "(SELECT stixel_id FROM stixels);")
   dbSendStatement(pipd_con, sql)

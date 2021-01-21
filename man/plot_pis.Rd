@@ -7,7 +7,6 @@
 plot_pis(
   pis,
   ext,
-  model = c("occ", "count"),
   by_cover_class = TRUE,
   n_top_pred = 20,
   pretty_names = TRUE,
@@ -20,8 +19,6 @@ plot_pis(
 \item{ext}{\link{ebirdst_extent} object; the spatiotemporal extent over which to
 calculate PIs. This is required, since results are less meaningful over
 large spatiotemporal extents.}
-
-\item{model}{character; whether to plot PIs for occurrence or count}
 
 \item{by_cover_class}{logical; whether to aggregate the FRAGSTATS metrics
 (PLAND and ED) for the land cover classes into single values for the land
@@ -42,9 +39,9 @@ the \code{n_top_pred} parameter.
 }
 \description{
 For a given eBird Status and Trends species, produce a box plot showing the
-predictor importance (PI) for each of the predictors used in the model.
-Predictors are plotted in order from highest to lowest importance. Many
-function parameters allow for customized plots.
+predictor importance (PI) for each of the predictors used in the occurrence
+model. Predictors are plotted in order from highest to lowest importance.
+Many function parameters allow for customized plots.
 }
 \examples{
 \donttest{

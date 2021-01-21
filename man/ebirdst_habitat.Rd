@@ -5,13 +5,7 @@
 \alias{plot.ebirdst_habitat}
 \title{eBird Status and Trends predictive habitat associations}
 \usage{
-ebirdst_habitat(
-  path,
-  ext,
-  model = c("occ", "count"),
-  n_predictors = 15,
-  pland_only = TRUE
-)
+ebirdst_habitat(path, ext, n_predictors = 15, pland_only = TRUE)
 
 \method{plot}{ebirdst_habitat}(x, date_range, by_cover_class = TRUE, ...)
 }
@@ -22,9 +16,6 @@ ebirdst_habitat(
 calculate the habitat associations. Note that \strong{temporal component of \code{ext}
 is ignored is this function}, habitat associations are always calculated
 for the full year.}
-
-\item{model}{character; whether to calculate habitat associations for the
-occurrence or count model.}
 
 \item{n_predictors}{integer; number of land cover classes to estimate habitat
 associations for.}
@@ -69,12 +60,12 @@ the relationship is not significant.
 \description{
 Combine the predictor importance (PI) and partial dependence (PD) data to
 provide an estimate of the importance and directionality of the land cover
-classes (i.e. habitat) used as model covariates. The \code{plot()} method can then
-be used to produce a cake plot, a stacked area chart showing habitat
-associations in which area indicates the importance of a given land cover
-class and the position above or below the x-axis indicates the direction of
-the relationship. \strong{Note:} This is one of, if not the most, computationally
-expensive operations in the package.
+classes (i.e. habitat) used as covariates in the occurrence probability
+model. The \code{plot()} method can then be used to produce a cake plot, a stacked
+area chart showing habitat associations in which area indicates the
+importance of a given land cover class and the position above or below the
+x-axis indicates the direction of the relationship. \strong{Note:} This is one of,
+if not the most, computationally expensive operations in the package.
 }
 \examples{
 \donttest{
