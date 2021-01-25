@@ -6,11 +6,18 @@
 #' model. **Note:** This is one of, if not the most, computationally expensive
 #' operations in the package.
 #'
-#' @param path character; Full path to single species STEM results.
+#' @inheritParams load_pis
 #' @param ext [ebirdst_extent] object; the spatiotemporal extent over which to
 #'   calculate the habitat associations. Note that **temporal component of `ext`
 #'   is ignored is this function**, habitat associations are always calculated
 #'   for the full year.
+#' @param pis,pds,stixels as an alternative to providing the `path` argument
+#'   specifying the location of the data package, the data required to calculate
+#'   habitat associations can be provided explicitly. PI, PD, and stixel data
+#'   frames can provided, which come from the `load_pis()`, `load_pds()`, and
+#'   `load_stixels()` functions, respectively. Ignored if `path` is provided.
+#'   **In most cases, users will want to avoid using these arguments and simply
+#'   provide `path` instead.**
 #'
 #' @details The Status and Trends models use both effort (e.g. number of
 #'   observers, length of checklist) and habitat (e.g. elevation, percent forest
@@ -63,8 +70,14 @@
 #' # produce a cake plot
 #' plot(habitat)
 #' }
-ebirdst_habitat <- function(path, ext) {
-  stopifnot(is.character(path), length(path) == 1, dir.exists(path))
+ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
+  if (missing(path)) {
+    stopifnot(is.data.frame(pis))
+    stopifnot(is.data.frame(pds))
+    stopifnot(is.data.frame(stixels))
+  } else {
+    stopifnot(is.character(path), length(path) == 1, dir.exists(path))
+  }
 
   if (missing(ext)) {
     stop("A spatiotemporal extent must be provided.")
@@ -81,8 +94,17 @@ ebirdst_habitat <- function(path, ext) {
   ext_poly <- sf::st_transform(ext_poly, crs = prj_sinu)
 
   # generate stixel polygons
-  stixels <- load_stixels(path = path)
+  if (!missing(path)) {
+    stixels <- load_stixels(path = path)
+  }
   stixels <- ebirdst_subset(stixels, ext = ext)
+
+  if (nrow(stixels) == 0) {
+    warning("No stixels within the provided extent.")
+    return(NULL)
+  }
+
+
   stixels <- stixelize(stixels)
   stixels <- sf::st_transform(stixels, crs = prj_sinu)
   stixels$area <- sf::st_area(stixels)
@@ -102,8 +124,10 @@ ebirdst_habitat <- function(path, ext) {
   stixel_coverage <- stixel_coverage[stixel_coverage$coverage >= 0.10, ]
 
   # load pis and pds, occurrence only
-  pis <- load_pis(path = path)
-  pds <- load_pds(path = path)
+  if (!missing(path)) {
+    pis <- load_pis(path = path)
+    pds <- load_pds(path = path)
+  }
 
   # subset
   pis <- ebirdst_subset(pis, ext = ext)
@@ -114,6 +138,11 @@ ebirdst_habitat <- function(path, ext) {
   # drop stixels covering less than 10% of focal area, bring in % coverage
   pis <- dplyr::inner_join(pis, stixel_coverage, by = "stixel_id")
   pds <- dplyr::inner_join(pds, stixel_coverage, by = "stixel_id")
+
+  if (nrow(pis) == 0 || nrow(pds) == 0) {
+    warning("No stixels within the provided extent.")
+    return(NULL)
+  }
 
   # pivot pis to long format
   stix_cols <- c("stixel_id", "lat", "lon", "date", "coverage")
