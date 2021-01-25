@@ -30,6 +30,7 @@ for (s in seasons) {
 ebirdst_runs <- inner_join(runs, ebird_taxonomy, by = "species_code") %>%
   arrange(taxon_order) %>%
   mutate_at(vars(ends_with("start")), ~ ymd(paste0("2019-", .))) %>%
+  mutate_at(vars(ends_with("end")), ~ ymd(paste0("2019-", .))) %>%
   select(run_name, species_code, scientific_name, common_name, resident,
          breeding_quality, breeding_start, breeding_end,
          nonbreeding_quality, nonbreeding_start, nonbreeding_end,
