@@ -5,17 +5,27 @@
 \alias{plot.ebirdst_habitat}
 \title{eBird Status and Trends predictive habitat associations}
 \usage{
-ebirdst_habitat(path, ext)
+ebirdst_habitat(path, ext, pis = NULL, pds = NULL, stixels = NULL)
 
 \method{plot}{ebirdst_habitat}(x, n_predictors = 15, date_range = c(0, 1), group_roads = TRUE, ...)
 }
 \arguments{
-\item{path}{character; Full path to single species STEM results.}
+\item{path}{character; directory that the Status and Trends data for a given
+species was downloaded to. This path is returned by \code{ebirdst_download()}
+or \code{get_species_path()}.}
 
 \item{ext}{\link{ebirdst_extent} object; the spatiotemporal extent over which to
 calculate the habitat associations. Note that \strong{temporal component of \code{ext}
 is ignored is this function}, habitat associations are always calculated
 for the full year.}
+
+\item{pis, pds, stixels}{as an alternative to providing the \code{path} argument
+specifying the location of the data package, the data required to calculate
+habitat associations can be provided explicitly. PI, PD, and stixel data
+frames can provided, which come from the \code{load_pis()}, \code{load_pds()}, and
+\code{load_stixels()} functions, respectively. Ignored if \code{path} is provided.
+\strong{In most cases, users will want to avoid using these arguments and simply
+provide \code{path} instead.}}
 
 \item{x}{\link{ebirdst_habitat} object; habitat relationships as calculated by
 \code{\link[=ebirdst_habitat]{ebirdst_habitat()}}.}
