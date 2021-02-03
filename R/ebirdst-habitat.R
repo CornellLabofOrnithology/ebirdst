@@ -104,7 +104,6 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
     return(NULL)
   }
 
-
   stixels <- stixelize(stixels)
   stixels <- sf::st_transform(stixels, crs = prj_sinu)
   stixels$area <- sf::st_area(stixels)
@@ -262,47 +261,10 @@ plot.ebirdst_habitat <- function(x, n_predictors = 15,
   date_range[2] <- min(date_range[2], data_date_range[2])
   date_range <- from_srd_date(date_range)
 
-  # bring in pretty names
-  lc <- dplyr::select(ebirdst::ebirdst_predictors,
-                      predictor = .data$predictor_tidy,
-                      .data$predictor_label,
-                      .data$lc_class,
-                      .data$lc_class_label)
-  x <- dplyr::inner_join(lc, x, by = "predictor")
-
-  # multiply importance and direction, fill with zeros
-  x$pi_direction <- dplyr::coalesce(x$importance * x$direction, 0)
-
-  # group roads
-  if (isTRUE(group_roads)) {
-    x <- dplyr::group_by(x,
-                         predictor = .data$lc_class,
-                         label = .data$lc_class_label,
-                         .data$date)
-    x <- dplyr::summarise(x,
-                          importance = sum(.data$importance),
-                          pi_direction = sum(.data$pi_direction),
-                          .groups = "drop")
-  } else {
-    x <- dplyr::select(x,
-                       predictor = .data$predictor,
-                       label = .data$predictor_label,
-                       .data$date,
-                       .data$importance,
-                       .data$pi_direction)
-  }
-
-  # pick top predictors based on max importance across weeks
-  top_pis <- dplyr::group_by(x, .data$predictor)
-  top_pis <- dplyr::summarise(top_pis,
-                              importance = max(.data$importance),
-                              .groups = "drop")
-  top_pis <- dplyr::top_n(top_pis,
-                          n = min(n_predictors, nrow(top_pis)),
-                          wt = .data$importance)
-
   # subset to top predictors
-  x <- x[x$predictor %in% top_pis$predictor, ]
+  x <- subset_top_predictors(x,
+                             n_predictors = n_predictors,
+                             group_roads = group_roads)
 
   # max weekly stack height
   y_max <- dplyr::group_by(x, .data$date,
@@ -337,8 +299,7 @@ plot.ebirdst_habitat <- function(x, n_predictors = 15,
     ggplot2::labs(x = NULL,
                   y = "Importance (+/-)",
                   fill = "Predictor",
-                  title = stringr::str_glue("Habitat associations ",
-                                            "(occurrence model)")) +
+                  title = "Habitat associations (occurrence model)") +
     ggplot2::theme_light() +
     ggplot2::theme(legend.key.size = ggplot2::unit(1, "line"))
 
@@ -419,4 +380,48 @@ train_check <- function(x, x_train, x_range, check_width) {
       any(x_train < x & x_train >= (x - check_width))
   }
   return(pass)
+}
+
+subset_top_predictors <- function(x, n_predictors = 15, group_roads = TRUE) {
+  # bring in pretty names
+  lc <- dplyr::select(ebirdst::ebirdst_predictors,
+                      predictor = .data$predictor_tidy,
+                      .data$predictor_label,
+                      .data$lc_class,
+                      .data$lc_class_label)
+  x <- dplyr::inner_join(lc, x, by = "predictor")
+
+  # multiply importance and direction, fill with zeros
+  x$pi_direction <- dplyr::coalesce(x$importance * x$direction, 0)
+
+  # group roads
+  if (isTRUE(group_roads)) {
+    x <- dplyr::group_by(x,
+                         predictor = .data$lc_class,
+                         label = .data$lc_class_label,
+                         .data$date)
+    x <- dplyr::summarise(x,
+                          importance = sum(.data$importance, na.rm = TRUE),
+                          pi_direction = sum(.data$pi_direction, na.rm = TRUE),
+                          .groups = "drop")
+  } else {
+    x <- dplyr::select(x,
+                       predictor = .data$predictor,
+                       label = .data$predictor_label,
+                       .data$date,
+                       .data$importance,
+                       .data$pi_direction)
+  }
+
+  # pick top predictors based on max importance across weeks
+  top_pis <- dplyr::group_by(x, .data$predictor)
+  top_pis <- dplyr::summarise(top_pis,
+                              importance = max(.data$importance),
+                              .groups = "drop")
+  top_pis <- dplyr::top_n(top_pis,
+                          n = min(n_predictors, nrow(top_pis)),
+                          wt = .data$importance)
+
+  # subset to top predictors
+  x[x$predictor %in% top_pis$predictor, ]
 }
