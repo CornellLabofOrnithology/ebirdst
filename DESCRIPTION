@@ -57,7 +57,8 @@ Imports:
     tools,
     utils,
     viridisLite,
-    xml2
+    xml2,
+    fs
 Suggests: 
     covr,
     fields,

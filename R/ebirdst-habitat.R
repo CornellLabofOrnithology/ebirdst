@@ -156,6 +156,8 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
                                      "^(intertidal|mcd12q1|gp_rtp|astwbd|ntl)")]
   # drop variation metrics
   preds <- preds[!stringr::str_detect(preds, "_(ed|sd)$")]
+  # drop unclassified
+  preds <- preds[!stringr::str_detect(preds, "mcd12q1_lccs1_fs_c255")]
   pis <- pis[pis$predictor %in% preds, ]
   pds <- pds[pds$predictor %in% preds, ]
 
@@ -279,13 +281,18 @@ plot.ebirdst_habitat <- function(x, n_predictors = 15,
   x$iso_date <- w$date[match(x$date, w$week_midpoint)]
 
   # order by importance
-  x$label <- stats::reorder(x$label, x$pi_direction,
-                            FUN = function(x) {mean(abs(x))})
+  x$predictor <- stats::reorder(x$predictor, x$pi_direction,
+                                FUN = function(x) {mean(abs(x))})
+  # get colors
+  hc <- habitat_colors[habitat_colors$habitat_code %in% x$predictor, ]
+  hc$habitat_code <- factor(hc$habitat_code, levels = rev(levels(x$predictor)))
+  hc <- dplyr::arrange(hc, .data$habitat_code)
 
   # cake plot
   g <- ggplot2::ggplot(x) +
     ggplot2::aes_string(x = "iso_date", y = "pi_direction",
-                        group = "label", fill = "label") +
+                        fill = "predictor",
+                        group = "predictor", order = "predictor") +
     ggplot2::geom_area(colour = "white", size = 0.1) +
     ggplot2::geom_vline(xintercept = date_range[1], size = 0.25) +
     ggplot2::geom_vline(xintercept = date_range[2], size = 0.25) +
@@ -294,8 +301,9 @@ plot.ebirdst_habitat <- function(x, n_predictors = 15,
                           date_breaks = "1 month",
                           date_labels = "%b") +
     ggplot2::ylim(-y_max, y_max) +
-    ggplot2::scale_fill_hue() +
-    ggplot2::guides(fill = ggplot2::guide_legend(reverse = TRUE)) +
+    ggplot2::scale_fill_manual(values = hc$habitat_color,
+                               breaks = hc$habitat_code,
+                               label = hc$habitat_description) +
     ggplot2::labs(x = NULL,
                   y = "Importance (+/-)",
                   fill = "Predictor",
