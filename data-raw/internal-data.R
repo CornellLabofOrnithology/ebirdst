@@ -1,7 +1,10 @@
 library(dplyr)
 library(stringr)
+library(readr)
 library(sf)
 library(rnaturalearth)
+
+# spatial ----
 
 # natural earth reference data
 prj_eck4 <- "+proj=eck4 +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
@@ -54,6 +57,12 @@ ne_adm1_eck <- ne_download(scale = ne_scale, category = "cultural",
   st_transform(crs = prj_eck4) %>%
   st_make_valid()
 
-# save as internal data files
+
+# spatial ----
+
+habitat_colors <- read_csv("data-raw/habitat-colors.csv")
+
+# save ----
 usethis::use_data(ne_adm0_eck, ne_adm1_eck, prj_eck4, prj_sinu,
+                  habitat_colors,
                   internal = TRUE, overwrite = TRUE)

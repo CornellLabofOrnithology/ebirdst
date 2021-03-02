@@ -1,0 +1,29 @@
+habitat_code,habitat_description,habitat_color
+intertidal_fs_c1,Tidal Mudflats,#C6DBEF
+mcd12q1_lccs1_fs_c1,Barren,#FFFBD1
+mcd12q1_lccs1_fs_c2,Permanent Snow and Ice,#807DBA
+mcd12q1_lccs1_fs_c11,Evergreen Needleleaf Forests,#48D8AE
+mcd12q1_lccs1_fs_c12,Evergreen Broadleaf Forests,#19AB81
+mcd12q1_lccs1_fs_c13,Deciduous Needleleaf Forests,#88DA4A
+mcd12q1_lccs1_fs_c14,Deciduous Broadleaf Forests,#5AB01A
+mcd12q1_lccs1_fs_c15,Mixed Broadleaf/Needleleaf Forests,#0F7D70
+mcd12q1_lccs1_fs_c16,Mixed Broadleaf Evergreen/Deciduous Forests,#0E772B
+mcd12q1_lccs1_fs_c21,Open Forests,#9DB216
+mcd12q1_lccs1_fs_c22,Sparse Forests,#C6DD2F
+mcd12q1_lccs1_fs_c255,Unclassified,
+mcd12q1_lccs1_fs_c31,Dense Herbaceous,#CEC608
+mcd12q1_lccs1_fs_c32,Sparse Herbaceous,#F6ED15
+mcd12q1_lccs1_fs_c41,Dense Shrublands,#CE9708
+mcd12q1_lccs1_fs_c42,Shrubland/Grassland Mosaics,#DBBE92
+mcd12q1_lccs1_fs_c43,Sparse Shrublands,#F6B715
+mcd12q1_lccs2_fs_c25,Forest/Cropland Mosaics,#EB9565
+mcd12q1_lccs2_fs_c35,Natural Herbaceous/Croplands Mosaics,#E66EB6
+mcd12q1_lccs2_fs_c36,Herbaceous Croplands,#F16363
+mcd12q1_lccs3_fs_c27,Woody Wetlands,#901174
+mcd12q1_lccs3_fs_c50,Herbaceous Wetlands,#9F35B9
+mcd12q1_lccs3_fs_c51,Tundra,#BCBDDC
+gp_rtp,Roads,#858585
+astwbd_fs_c1,Ocean,#084594
+astwbd_fs_c2,River,#6BAED6
+astwbd_fs_c3,Lakes,#2171B5
+ntl,Nighttime Lights,#000000
