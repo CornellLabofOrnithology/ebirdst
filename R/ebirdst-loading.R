@@ -387,6 +387,15 @@ load_pis <- function(path, return_sf = FALSE) {
   if (isTRUE(return_sf)) {
     pis <- sf::st_as_sf(pis, coords = c("lon", "lat"), crs = 4326)
   }
+
+  # check for missing stixels centroid
+  has_centroid <- complete.cases(pis[, c("lat", "lon", "date")])
+  if (any(!has_centroid)) {
+    warning("Removing ", sum(!has_centroid),
+            " stixels with missing centroids data.")
+    pis <- pis[has_centroid, ]
+  }
+
   return(pis)
 }
 
@@ -462,6 +471,15 @@ load_pds <- function(path, return_sf = FALSE) {
   if (isTRUE(return_sf)) {
     pds <- sf::st_as_sf(pds, coords = c("lon", "lat"), crs = 4326)
   }
+
+  # check for missing stixels centroid
+  has_centroid <- complete.cases(pds[, c("lat", "lon", "date")])
+  if (any(!has_centroid)) {
+    warning("Removing ", sum(!has_centroid),
+            " stixels with missing centroids data.")
+    pds <- pds[has_centroid, ]
+  }
+
   return(pds)
 }
 
@@ -520,6 +538,15 @@ load_stixels <- function(path, return_sf = FALSE) {
   if (isTRUE(return_sf)) {
     stx <- sf::st_as_sf(stx, coords = c("lon", "lat"), crs = 4326)
   }
+
+  # check for missing stixels centroid
+  has_centroid <- complete.cases(stx[, c("lat", "lon", "date")])
+  if (any(!has_centroid)) {
+    warning("Removing ", sum(!has_centroid),
+            " stixels with missing centroids data.")
+    stx <- stx[has_centroid, ]
+  }
+
   return(stx)
 }
 
