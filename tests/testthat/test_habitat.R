@@ -42,5 +42,4 @@ test_that("ebirdst_habitat pland_only", {
 test_that("plot ebirdst_habitat", {
   expect_silent({g <- plot(habitat)})
   expect_is(g, "gg")
-  expect_silent({g <- plot(habitat, group_roads = FALSE)})
 })
