@@ -7,7 +7,7 @@
 \usage{
 ebirdst_habitat(path, ext, pis = NULL, pds = NULL, stixels = NULL)
 
-\method{plot}{ebirdst_habitat}(x, n_predictors = 15, date_range = c(0, 1), group_roads = TRUE, ...)
+\method{plot}{ebirdst_habitat}(x, n_predictors = 15, date_range = c(0, 1), ...)
 }
 \arguments{
 \item{path}{character; directory that the Status and Trends data for a given
@@ -40,9 +40,6 @@ objects or strings in ISO format "YYYY-MM-DD") or numbers between 0 and 1
 representing the fraction of the year. When providing dates as a string,
 the year can be omitted (i.e. "MM-DD"). By default the full year of data
 are plotted.}
-
-\item{group_roads}{logical; whether to aggregate the the 5 types of roads
-into a single class prior to plotting.}
 
 \item{...}{ignored.}
 }

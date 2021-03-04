@@ -37,6 +37,10 @@ ebirdst_subset.data.frame <- function(x, ext) {
   stopifnot(is.numeric(x$date), all(x$date >= 0), all(x$date <= 1))
   stopifnot(inherits(ext, "ebirdst_extent"))
 
+  if (nrow(x) == 0) {
+    return(x)
+  }
+
   # temporal filtering
   if (!identical(ext$t, c(0, 1))) {
     if (ext$t[1] <= ext$t[2]) {

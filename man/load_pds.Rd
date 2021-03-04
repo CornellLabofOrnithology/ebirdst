@@ -4,12 +4,16 @@
 \alias{load_pds}
 \title{Load eBird Status and Trends partial dependence data}
 \usage{
-load_pds(path, return_sf = FALSE)
+load_pds(path, ext, return_sf = FALSE)
 }
 \arguments{
 \item{path}{character; directory that the Status and Trends data for a given
 species was downloaded to. This path is returned by \code{ebirdst_download()}
 or \code{get_species_path()}.}
+
+\item{ext}{\link{ebirdst_extent} object; the spatiotemporal extent to filter the
+data to. The spatial component of the extent object must be provided in
+unprojected, latitude-longitude coordinates.}
 
 \item{return_sf}{logical; whether to return an \link{sf} object of spatial points
 rather then the default data frame.}

@@ -95,15 +95,18 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
 
   # generate stixel polygons
   if (!missing(path)) {
-    stixels <- load_stixels(path = path)
+    stixels <- load_stixels(path = path, ext = ext)
+  } else {
+    stixels <- ebirdst_subset(stixels, ext = ext)
   }
-  stixels <- ebirdst_subset(stixels, ext = ext)
+
 
   if (nrow(stixels) == 0) {
     warning("No stixels within the provided extent.")
     return(NULL)
   }
 
+  # convert stixels to polygons
   stixels <- stixelize(stixels)
   stixels <- sf::st_transform(stixels, crs = prj_sinu)
   stixels$area <- sf::st_area(stixels)
@@ -124,14 +127,13 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
 
   # load pis and pds, occurrence only
   if (!missing(path)) {
-    pis <- load_pis(path = path)
-    pds <- load_pds(path = path)
+    pis <- load_pis(path = path, ext = ext)
+    pds <- load_pds(path = path, ext = ext)
+  } else {
+    pis <- ebirdst_subset(pis, ext = ext)
+    pds <- ebirdst_subset(pds, ext = ext)
   }
-
-  # subset
-  pis <- ebirdst_subset(pis, ext = ext)
   pis <- tidyr::drop_na(pis)
-  pds <- ebirdst_subset(pds, ext = ext)
   pds <- tidyr::drop_na(pds)
 
   # drop stixels covering less than 10% of focal area, bring in % coverage
@@ -164,6 +166,7 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
   # calculate pd slopes
   pd_slope <- pds[, c("stixel_id", "date", "predictor",
                       "predictor_value", "response")]
+  rm(pds)
   pd_slope <- tidyr::nest(pd_slope, data = -dplyr::all_of(c("stixel_id",
                                                             "date",
                                                             "predictor")))
@@ -172,12 +175,13 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
   pd_slope$slope <- as.numeric(sl > 0)
   pd_slope$data <- NULL
   pd_slope <- dplyr::inner_join(pd_slope, stixel_coverage, by = "stixel_id")
-  rm(pds, sl)
+  rm(sl)
 
   # temporal smoothing of pds
   pd_smooth <- dplyr::select(pd_slope, .data$predictor,
                              x = .data$date, y = .data$slope,
                              weight = .data$coverage)
+  rm(pd_slope)
   pd_smooth <- tidyr::drop_na(pd_smooth)
   pd_smooth <- tidyr::nest(pd_smooth, data = -dplyr::all_of("predictor"))
   pd_smooth$smooth <- lapply(pd_smooth[["data"]],
@@ -188,7 +192,6 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
   pd_smooth$data <- NULL
   pd_smooth <- tidyr::unnest(pd_smooth, .data$smooth)
   names(pd_smooth) <- c("predictor", "date", "slope")
-  rm(pd_slope)
 
   # categorize positive and negative directionalities
   pd_smooth$direction <- NA
@@ -222,7 +225,7 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
 
   # multiply importance and direction
   pipd <- dplyr::inner_join(pi_smooth, pd_smooth, by = c("predictor", "date"))
-
+  rm(pi_smooth, pd_smooth)
   structure(pipd,
             class = c("ebirdst_habitat", class(pipd)),
             extent = ext)
@@ -239,19 +242,15 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
 #'   representing the fraction of the year. When providing dates as a string,
 #'   the year can be omitted (i.e. "MM-DD"). By default the full year of data
 #'   are plotted.
-#' @param group_roads logical; whether to aggregate the the 5 types of roads
-#'   into a single class prior to plotting.
 #' @param ... ignored.
 #'
 #' @export
 #' @rdname ebirdst_habitat
 plot.ebirdst_habitat <- function(x, n_predictors = 15,
                                  date_range = c(0, 1),
-                                 group_roads = TRUE,
                                  ...) {
   stopifnot(is.numeric(n_predictors), length(n_predictors) == 1,
             n_predictors > 0)
-  stopifnot(is.logical(group_roads), length(group_roads) == 1)
 
   # convert temporal extent
   date_range <- process_t_extent(date_range)
@@ -264,9 +263,7 @@ plot.ebirdst_habitat <- function(x, n_predictors = 15,
   date_range <- from_srd_date(date_range)
 
   # subset to top predictors
-  x <- subset_top_predictors(x,
-                             n_predictors = n_predictors,
-                             group_roads = group_roads)
+  x <- subset_top_predictors(x, n_predictors = n_predictors)
 
   # max weekly stack height
   y_max <- dplyr::group_by(x, .data$date,

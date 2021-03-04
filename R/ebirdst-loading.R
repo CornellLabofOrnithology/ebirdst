@@ -321,6 +321,9 @@ load_raster <- function(path,
 #' centroid. PI estimates are for the occurrence model only.
 #'
 #' @inheritParams load_raster
+#' @param ext [ebirdst_extent] object; the spatiotemporal extent to filter the
+#'   data to. The spatial component of the extent object must be provided in
+#'   unprojected, latitude-longitude coordinates.
 #' @param return_sf logical; whether to return an [sf] object of spatial points
 #'   rather then the default data frame.
 #'
@@ -351,9 +354,12 @@ load_raster <- function(path,
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #' plot_pis(pis, ext = e, n_top_pred = 15, by_cover_class = TRUE)
 #' }
-load_pis <- function(path, return_sf = FALSE) {
+load_pis <- function(path, ext, return_sf = FALSE) {
   stopifnot(dir.exists(path))
   stopifnot(is.logical(return_sf), length(return_sf) == 1)
+  if (!missing(ext)) {
+    stopifnot(inherits(ext, "ebirdst_extent"))
+  }
 
   db_file <- file.path(path, "pi-pd.db")
   if(!file.exists(db_file)) {
@@ -364,12 +370,21 @@ load_pis <- function(path, return_sf = FALSE) {
   db <- DBI::dbConnect(RSQLite::SQLite(), db_file)
 
   # query
-  sql <- paste("SELECT p.*, s.lat, s.lon, s.date",
-               "FROM occ_pis AS p INNER JOIN stixel_summary AS s",
-               "ON p.stixel_id = s.stixel_id;")
+  if (missing(ext)) {
+    sql <- paste("SELECT p.*, s.lat, s.lon, s.date",
+                 "FROM occ_pis AS p INNER JOIN stixel_summary AS s",
+                 "ON p.stixel_id = s.stixel_id;")
+  } else {
+    sql <- stringr::str_glue("SELECT p.*, s.lat, s.lon, s.date ",
+                             "FROM occ_pis AS p ",
+                             "INNER JOIN stixel_summary AS s ",
+                             "ON p.stixel_id = s.stixel_id ",
+                             "{sql_extent_subset(ext)};")
+  }
 
-  # occurrence
+  # extract from database
   pis <- DBI::dbGetQuery(db, sql)
+  pis <- dplyr::tibble(pis)
   DBI::dbDisconnect(db)
 
   # clean up
@@ -384,16 +399,21 @@ load_pis <- function(path, return_sf = FALSE) {
     }
   }
 
-  if (isTRUE(return_sf)) {
-    pis <- sf::st_as_sf(pis, coords = c("lon", "lat"), crs = 4326)
-  }
-
   # check for missing stixels centroid
-  has_centroid <- complete.cases(pis[, c("lat", "lon", "date")])
+  has_centroid <- stats::complete.cases(pis[, c("lat", "lon", "date")])
   if (any(!has_centroid)) {
     warning("Removing ", sum(!has_centroid),
             " stixels with missing centroids data.")
     pis <- pis[has_centroid, ]
+  }
+
+  # subset to polygon if one was provided
+  if (!missing(ext) && ext$type == "polygon") {
+    pis <- ebirdst_subset(pis, ext = ext)
+  }
+
+  if (isTRUE(return_sf)) {
+    pis <- sf::st_as_sf(pis, coords = c("lon", "lat"), crs = 4326)
   }
 
   return(pis)
@@ -440,9 +460,12 @@ load_pis <- function(path, return_sf = FALSE) {
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #' plot_pds(pds, "solar_noon_diff", ext = e, n_bs = 5)
 #' }
-load_pds <- function(path, return_sf = FALSE) {
+load_pds <- function(path, ext, return_sf = FALSE) {
   stopifnot(dir.exists(path))
   stopifnot(is.logical(return_sf), length(return_sf) == 1)
+  if (!missing(ext)) {
+    stopifnot(inherits(ext, "ebirdst_extent"))
+  }
 
   db_file <- file.path(path, "pi-pd.db")
   if(!file.exists(db_file)) {
@@ -453,10 +476,19 @@ load_pds <- function(path, return_sf = FALSE) {
   db <- DBI::dbConnect(RSQLite::SQLite(), db_file)
 
   # query
-  sql <- paste("SELECT p.stixel_id, s.lat, s.lon, s.date,",
-               "p.covariate, p.predictor_value, p.response",
-               "FROM occ_pds AS p INNER JOIN stixel_summary AS s",
-               "ON p.stixel_id = s.stixel_id;")
+  if (missing(ext)) {
+    sql <- paste("SELECT p.*, s.lat, s.lon, s.date",
+                 "FROM occ_pds AS p INNER JOIN stixel_summary AS s",
+                 "ON p.stixel_id = s.stixel_id;")
+  } else {
+    sql <- stringr::str_glue("SELECT p.*, s.lat, s.lon, s.date ",
+                             "FROM occ_pds AS p ",
+                             "INNER JOIN stixel_summary AS s ",
+                             "ON p.stixel_id = s.stixel_id ",
+                             "{sql_extent_subset(ext)};")
+  }
+
+  # extract from database
   pds <- DBI::dbGetQuery(db, sql)
   pds <- dplyr::tibble(pds)
   DBI::dbDisconnect(db)
@@ -468,16 +500,21 @@ load_pds <- function(path, return_sf = FALSE) {
   pds <- pds[, c("stixel_id", "lat", "lon", "date",
                  "predictor", "predictor_value", "response")]
 
-  if (isTRUE(return_sf)) {
-    pds <- sf::st_as_sf(pds, coords = c("lon", "lat"), crs = 4326)
-  }
-
   # check for missing stixels centroid
-  has_centroid <- complete.cases(pds[, c("lat", "lon", "date")])
+  has_centroid <- stats::complete.cases(pds[, c("lat", "lon", "date")])
   if (any(!has_centroid)) {
     warning("Removing ", sum(!has_centroid),
             " stixels with missing centroids data.")
     pds <- pds[has_centroid, ]
+  }
+
+  # subset to polygon if one was provided
+  if (!missing(ext) && ext$type == "polygon") {
+    pds <- ebirdst_subset(pds, ext = ext)
+  }
+
+  if (isTRUE(return_sf)) {
+    pds <- sf::st_as_sf(pds, coords = c("lon", "lat"), crs = 4326)
   }
 
   return(pds)
@@ -513,9 +550,12 @@ load_pds <- function(path, return_sf = FALSE) {
 #' stixels <- load_stixels(path)
 #' dplyr::glimpse(stixels)
 #' }
-load_stixels <- function(path, return_sf = FALSE) {
+load_stixels <- function(path, ext, return_sf = FALSE) {
   stopifnot(dir.exists(path))
   stopifnot(is.logical(return_sf), length(return_sf) == 1)
+  if (!missing(ext)) {
+    stopifnot(inherits(ext, "ebirdst_extent"))
+  }
 
   db_file <- file.path(path, "pi-pd.db")
   if(!file.exists(db_file)) {
@@ -526,7 +566,15 @@ load_stixels <- function(path, return_sf = FALSE) {
   db <- DBI::dbConnect(RSQLite::SQLite(), db_file)
 
   # query
-  stx <- DBI::dbGetQuery(db, "SELECT * FROM stixel_summary;")
+  if (missing(ext)) {
+    sql <- "SELECT * FROM stixel_summary AS s;"
+  } else {
+    sql <- stringr::str_glue("SELECT * FROM stixel_summary AS s ",
+                             "{sql_extent_subset(ext)};")
+  }
+
+  # extract from database
+  stx <- DBI::dbGetQuery(db, sql)
   stx <- dplyr::tibble(stx)
   DBI::dbDisconnect(db)
 
@@ -535,18 +583,22 @@ load_stixels <- function(path, return_sf = FALSE) {
     stx[[col]] <- NULL
   }
 
-  if (isTRUE(return_sf)) {
-    stx <- sf::st_as_sf(stx, coords = c("lon", "lat"), crs = 4326)
-  }
-
   # check for missing stixels centroid
-  has_centroid <- complete.cases(stx[, c("lat", "lon", "date")])
+  has_centroid <- stats::complete.cases(stx[, c("lat", "lon", "date")])
   if (any(!has_centroid)) {
     warning("Removing ", sum(!has_centroid),
             " stixels with missing centroids data.")
     stx <- stx[has_centroid, ]
   }
 
+  # subset to polygon if one was provided
+  if (!missing(ext) && ext$type == "polygon") {
+    stx <- ebirdst_subset(stx, ext = ext)
+  }
+
+  if (isTRUE(return_sf)) {
+    stx <- sf::st_as_sf(stx, coords = c("lon", "lat"), crs = 4326)
+  }
   return(stx)
 }
 
@@ -754,4 +806,33 @@ ebirdst_copy <- function(species, tifs_only = TRUE,
   }
 
   return(invisible(normalizePath(file.path(path, run))))
+}
+
+sql_extent_subset <- function(ext) {
+  stopifnot(inherits(ext, "ebirdst_extent"))
+  if (!sf::st_is_longlat(ext$extent)) {
+    stop("Load functions can only subset to spatial extents defined in ",
+         "unprojected, latitude-longitude coordinates. Considering loading ",
+         "then subsetting with ebirdst_subset().")
+  }
+
+  # spatial filtering
+  b <- sf::st_bbox(ext$extent)
+  sql <- stringr::str_glue("WHERE ",
+                           "s.lon > {b['xmin']} AND s.lon <= {b['xmax']} AND ",
+                           "s.lat > {b['ymin']} AND s.lat <= {b['ymax']}")
+
+
+  # temporal filtering
+  t <- ext$t
+  if (!identical(t, c(0, 1))) {
+    if (t[1] <= t[2]) {
+      t_sql <- stringr::str_glue("AND s.date > {t[1]} AND s.date <= {t[2]}")
+      sql <- paste(sql, t_sql)
+    } else {
+      t_sql <- stringr::str_glue("AND (s.date > {t[1]} OR s.date <= {t[2]})")
+      sql <- paste(sql, t_sql)
+    }
+  }
+  return(sql)
 }
