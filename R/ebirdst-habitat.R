@@ -396,6 +396,9 @@ subset_top_predictors <- function(x, n_predictors = 15, group_roads = TRUE) {
                       .data$lc_class_label)
   x <- dplyr::inner_join(lc, x, by = "predictor")
 
+  # drop predictors that are not significant
+  x <- x[!is.na(x$direction), ]
+
   # multiply importance and direction, fill with zeros
   x$pi_direction <- dplyr::coalesce(x$importance * x$direction, 0)
 
