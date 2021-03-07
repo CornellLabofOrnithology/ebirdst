@@ -58,7 +58,7 @@ ne_adm1_eck <- ne_download(scale = ne_scale, category = "cultural",
   st_make_valid()
 
 
-# spatial ----
+# colors ----
 
 habitat_colors <- read_csv("data-raw/habitat-colors.csv")
 
