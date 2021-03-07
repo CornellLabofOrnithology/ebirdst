@@ -282,8 +282,8 @@ plot.ebirdst_habitat <- function(x, n_predictors = 15,
                                 FUN = function(x) {mean(abs(x))})
   # get colors
   hc <- habitat_colors[habitat_colors$habitat_code %in% x$predictor, ]
-  hc$habitat_code <- factor(hc$habitat_code, levels = rev(levels(x$predictor)))
-  hc <- dplyr::arrange(hc, .data$habitat_code)
+  #hc$habitat_code <- factor(hc$habitat_code, levels = rev(levels(x$predictor)))
+  hc <- dplyr::arrange(hc, .data$legend_order)
 
   # cake plot
   g <- ggplot2::ggplot(x) +
@@ -387,7 +387,7 @@ train_check <- function(x, x_train, x_range, check_width) {
   return(pass)
 }
 
-subset_top_predictors <- function(x, n_predictors = 15, group_roads = TRUE) {
+subset_top_predictors <- function(x, n_predictors = 15) {
   # bring in pretty names
   lc <- dplyr::select(ebirdst::ebirdst_predictors,
                       predictor = .data$predictor_tidy,
@@ -396,33 +396,21 @@ subset_top_predictors <- function(x, n_predictors = 15, group_roads = TRUE) {
                       .data$lc_class_label)
   x <- dplyr::inner_join(lc, x, by = "predictor")
 
-  # drop predictors that are not significant
-  x <- x[!is.na(x$direction), ]
-
   # multiply importance and direction, fill with zeros
   x$pi_direction <- dplyr::coalesce(x$importance * x$direction, 0)
 
   # group roads
-  if (isTRUE(group_roads)) {
-    x <- dplyr::group_by(x,
-                         predictor = .data$lc_class,
-                         label = .data$lc_class_label,
-                         .data$date)
-    x <- dplyr::summarise(x,
-                          importance = sum(.data$importance, na.rm = TRUE),
-                          pi_direction = sum(.data$pi_direction, na.rm = TRUE),
-                          .groups = "drop")
-  } else {
-    x <- dplyr::select(x,
-                       predictor = .data$predictor,
-                       label = .data$predictor_label,
-                       .data$date,
-                       .data$importance,
-                       .data$pi_direction)
-  }
+  x <- dplyr::group_by(x,
+                       predictor = .data$lc_class,
+                       label = .data$lc_class_label,
+                       .data$date)
+  x <- dplyr::summarise(x,
+                        importance = sum(.data$importance, na.rm = TRUE),
+                        pi_direction = sum(.data$pi_direction, na.rm = TRUE),
+                        .groups = "drop")
 
   # pick top predictors based on max importance across weeks
-  top_pis <- dplyr::group_by(x, .data$predictor)
+  top_pis <- dplyr::group_by(x[abs(x$pi_direction) > 0, ], .data$predictor)
   top_pis <- dplyr::summarise(top_pis,
                               importance = max(.data$importance),
                               .groups = "drop")
