@@ -417,6 +417,9 @@ subset_top_predictors <- function(x, n_predictors = 15) {
   top_pis <- dplyr::top_n(top_pis,
                           n = min(n_predictors, nrow(top_pis)),
                           wt = .data$importance)
+  # ensure there's always 15 at most
+  top_pis <- dplyr::arrange(top_pis, -.data$importance)
+  top_pis <- head(top_pis, 15)
 
   # subset to top predictors
   x[x$predictor %in% top_pis$predictor, ]
