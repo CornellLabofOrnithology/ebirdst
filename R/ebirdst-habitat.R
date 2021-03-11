@@ -136,9 +136,11 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
   # remove intertidal if it's missing for any stixels
   if (any(is.na(pis[["intertidal_fs_c1_1500_pland"]]))) {
     pis[["intertidal_fs_c1_1500_pland"]] <- NULL
+    pds <- pds[pds$predictor != "intertidal_fs_c1_1500_pland", ]
   }
   if (any(is.na(pis[["intertidal_fs_c1_1500_ed"]]))) {
     pis[["intertidal_fs_c1_1500_ed"]] <- NULL
+    pds <- pds[pds$predictor != "intertidal_fs_c1_1500_ed", ]
   }
   pis <- tidyr::drop_na(pis)
   pds <- tidyr::drop_na(pds)
