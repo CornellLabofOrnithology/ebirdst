@@ -860,7 +860,7 @@ ebirdst_download_s3 <- function(species,
 
   # aws s3 download commands
   s3_dl_cmd <- stringr::str_glue("aws s3 sync {bucket_url}{run_names} ",
-                                 "'{path}/{run_names}'")
+                                 "'{file.path(path, run_names)}'")
   for(cmd in s3_dl_cmd) {
     system(cmd)
   }
