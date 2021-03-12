@@ -418,6 +418,12 @@ subset_top_predictors <- function(x, n_predictors = 15) {
                         pi_direction = sum(.data$pi_direction, na.rm = TRUE),
                         .groups = "drop")
 
+  # no significant associations
+  if (all(is.na(x$pi_direction))) {
+    warning("No significant habitat associations")
+    return(x[NULL, ])
+  }
+
   # pick top predictors based on max importance across weeks
   top_pis <- dplyr::group_by(x[abs(x$pi_direction) > 0, ], .data$predictor)
   top_pis <- dplyr::summarise(top_pis,

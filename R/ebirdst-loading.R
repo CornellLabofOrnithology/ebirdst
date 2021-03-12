@@ -836,3 +836,34 @@ sql_extent_subset <- function(ext) {
   }
   return(sql)
 }
+
+ebirdst_download_s3 <- function(species,
+                                path = rappdirs::user_data_dir("ebirdst")) {
+  stopifnot(is.character(species), length(species) >= 1)
+  stopifnot(is.character(path), length(path) == 1)
+  species <- tolower(species)
+
+  if (!dir.exists(path)) {
+    dir.create(path, recursive = TRUE)
+  }
+  path <- normalizePath(path)
+
+  # runs to download
+  bucket_url <- "s3://da-ebirdst-results/"
+  species_code <- ebirdst::get_species(species)
+  if (any(is.na(species_code))) {
+    stop("The following species are invalid: ",
+         paste(species[is.na(species_code)], collapse = ", "))
+  }
+  row_id <- which(ebirdst::ebirdst_runs$species_code %in% species_code)
+  run_names <- ebirdst::ebirdst_runs$run_name[row_id]
+
+  # aws s3 download commands
+  s3_dl_cmd <- stringr::str_glue("aws s3 sync {bucket_url}{run_names} ",
+                                 "'{path}/{run_names}'")
+  for(cmd in s3_dl_cmd) {
+    system(cmd)
+  }
+
+  return(invisible(normalizePath(file.path(path, run_names))))
+}
