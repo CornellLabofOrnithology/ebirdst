@@ -15,8 +15,8 @@ sp_path <- file.path(root_path, species)
 # destination
 ex_species <- paste0(species, "-example")
 ex_dir <- file.path(root_path, ex_species)
-ex_cubes_dir <- file.path(ex_dir, "weekly_cubes")
-ex_seasonal_dir <- file.path(ex_dir, "abundance_seasonal")
+ex_cubes_dir <- file.path(ex_dir, "cubes")
+ex_seasonal_dir <- file.path(ex_dir, "seasonal")
 dir.create(ex_dir, recursive = TRUE, showWarnings = FALSE)
 dir.create(ex_cubes_dir, recursive = TRUE, showWarnings = FALSE)
 dir.create(ex_seasonal_dir, recursive = TRUE, showWarnings = FALSE)
@@ -49,7 +49,7 @@ for (f in tifs) {
     writeRaster(filename = f_out, overwrite = TRUE,
                 options = c("COMPRESS=DEFLATE","TILED=YES"))
 }
-file_copy(file.path(sp_path, "weekly_cubes", "band_dates.csv"),
+file_copy(file.path(sp_path, "cubes", "band_dates.csv"),
           file.path(ex_cubes_dir, "band_dates.csv"))
 
 # database connections

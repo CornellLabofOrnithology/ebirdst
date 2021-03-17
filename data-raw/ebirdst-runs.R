@@ -40,4 +40,9 @@ ebirdst_runs <- inner_join(runs, ebird_taxonomy, by = "species_code") %>%
          prebreeding_migration_start, prebreeding_migration_end,
          resident_quality, resident_start, resident_end)
 
+# 2020
+ebirdst_runs <- ebirdst_runs %>%
+  filter(species_code == "woothr") %>%
+  mutate(run_name = "woothr-ERD2019-WEATHER_TEST-20210316-7bd55aa1")
+
 usethis::use_data(ebirdst_runs, overwrite = TRUE)

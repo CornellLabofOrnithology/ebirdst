@@ -281,7 +281,7 @@ load_raster <- function(path,
     return(suppressWarnings(raster::raster(tif_path)))
   } else if (product == "abundance_seasonal") {
     # seasonal abundance
-    tif_path <- list.files(file.path(path, "abundance_seasonal"),
+    tif_path <- list.files(file.path(path, "seasonal"),
                            pattern = paste0("_", resolution, "_",
                                             ".*_abundance-seasonal_.*tif$"),
                            full.names = TRUE)
@@ -300,7 +300,7 @@ load_raster <- function(path,
     return(r[[intersect(season_order, seasons)]])
   } else {
     # 52 week stack
-    tif_path <- list.files(file.path(path, "weekly_cubes"),
+    tif_path <- list.files(file.path(path, "cubes"),
                            pattern = paste0("_", resolution, "_",
                                             ".*", product, "\\.tif$"),
                            full.names = TRUE)
@@ -387,17 +387,12 @@ load_pis <- function(path, ext, return_sf = FALSE) {
   pis <- dplyr::tibble(pis)
   DBI::dbDisconnect(db)
 
-  # clean up
-  p <- ebirdst::ebirdst_predictors
-  preds <- intersect(names(pis), p$predictor)
-  pis <- pis[, c("stixel_id", "lat", "lon", "date", preds)]
-  pis <- dplyr::tibble(pis)
-  matches <- match(names(pis), p$predictor)
-  for (i in seq_along(matches)) {
-    if (!is.na(matches[i])) {
-      names(pis)[i] <- p$predictor_tidy[matches[i]]
-    }
-  }
+  # clean up names
+  preds <- ebirdst::ebirdst_predictors[, c("predictor", "predictor_tidy")]
+  names(preds) <- c("covariate", "predictor")
+  pis <- dplyr::inner_join(pis, preds, by = "covariate")
+  pis <- pis[, c("stixel_id", "lat", "lon", "date", "predictor", "pi")]
+  pis <- dplyr::rename(pis, importance = "pi")
 
   # check for missing stixels centroid
   has_centroid <- stats::complete.cases(pis[, c("lat", "lon", "date")])

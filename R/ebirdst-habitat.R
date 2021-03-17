@@ -108,7 +108,7 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
 
   # convert stixels to polygons
   stixels <- stixelize(stixels)
-  stixels <- sf::st_transform(stixels, crs = prj_sinu)
+  stixels <- sf::st_transform(stixels, crs = ebirdst:::prj_sinu)
   stixels$area <- sf::st_area(stixels)
   stixels <- dplyr::select(stixels, .data$stixel_id, .data$area)
 
@@ -134,12 +134,14 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
     pds <- ebirdst_subset(pds, ext = ext)
   }
   # remove intertidal if it's missing for any stixels
-  if (any(is.na(pis[["intertidal_fs_c1_1500_pland"]]))) {
-    pis[["intertidal_fs_c1_1500_pland"]] <- NULL
+  it <- pis[pis$predictor == "intertidal_fs_c1_1500_pland", ]$importance
+  if (any(is.na(it))) {
+    pis <- pis[pis$predictor != "intertidal_fs_c1_1500_pland", ]
     pds <- pds[pds$predictor != "intertidal_fs_c1_1500_pland", ]
   }
-  if (any(is.na(pis[["intertidal_fs_c1_1500_ed"]]))) {
-    pis[["intertidal_fs_c1_1500_ed"]] <- NULL
+  it <- pis[pis$predictor == "intertidal_fs_c1_1500_ed", ]$importance
+  if (any(is.na(it))) {
+    pis <- pis[pis$predictor != "intertidal_fs_c1_1500_ed", ]
     pds <- pds[pds$predictor != "intertidal_fs_c1_1500_ed", ]
   }
   pis <- tidyr::drop_na(pis)
@@ -153,13 +155,6 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
     warning("No stixels within the provided extent.")
     return(NULL)
   }
-
-  # pivot pis to long format
-  stix_cols <- c("stixel_id", "lat", "lon", "date", "coverage")
-  piv_cols <- setdiff(names(pis), stix_cols)
-  pis <- tidyr::pivot_longer(pis, cols = dplyr::all_of(piv_cols),
-                             names_to = "predictor",
-                             values_to = "importance")
 
   # subset to cover classes
   preds <- ebirdst::ebirdst_predictors$predictor_tidy
