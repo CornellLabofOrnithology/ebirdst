@@ -83,6 +83,9 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
     stop("A spatiotemporal extent must be provided.")
   } else {
     stopifnot(inherits(ext, "ebirdst_extent"))
+    if (!sf::st_is_longlat(ext$extent)) {
+      stop("Extent must provided in WGS84 lon-lat coordinates.")
+    }
   }
   # remove temporal component of extent
   ext$t <- c(0, 1)
@@ -91,7 +94,7 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
   if (ext$type == "bbox") {
     ext_poly <- sf::st_as_sfc(ext_poly)
   }
-  ext_poly <- sf::st_transform(ext_poly, crs = prj_sinu)
+  ext_poly <- sf::st_transform(ext_poly, crs = 4326)
 
   # generate stixel polygons
   if (!missing(path)) {
@@ -108,7 +111,6 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
 
   # convert stixels to polygons
   stixels <- stixelize(stixels)
-  stixels <- sf::st_transform(stixels, crs = prj_sinu)
   stixels$area <- sf::st_area(stixels)
   stixels <- dplyr::select(stixels, .data$stixel_id, .data$area)
 
