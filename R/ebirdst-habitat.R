@@ -103,7 +103,6 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
     stixels <- ebirdst_subset(stixels, ext = ext)
   }
 
-
   if (nrow(stixels) == 0) {
     warning("No stixels within the provided extent.")
     return(NULL)
@@ -115,7 +114,9 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
   stixels <- dplyr::select(stixels, .data$stixel_id, .data$area)
 
   # calculate % of stixel within focal extent
-  stixels <- suppressWarnings(sf::st_intersection(stixels, ext_poly))
+  stixels <- suppressWarnings(suppressMessages(
+    sf::st_intersection(stixels, ext_poly)
+    ))
   stixels$area_in_extent <- sf::st_area(stixels)
   stixels$coverage <- as.numeric(stixels$area_in_extent / stixels$area)
   stixel_coverage <- sf::st_drop_geometry(stixels)

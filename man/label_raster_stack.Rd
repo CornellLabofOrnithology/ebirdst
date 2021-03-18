@@ -4,11 +4,15 @@
 \alias{label_raster_stack}
 \title{Label data cubes with the week date for each band}
 \usage{
-label_raster_stack(x)
+label_raster_stack(x, weeks = NULL)
 }
 \arguments{
-\item{x}{\code{RasterStack} or \code{RasterBrick}; original eBird Status and Trends
-data cube with 52 bands, one for each week.}
+\item{x}{\code{RasterStack} or \code{RasterBrick}; eBird Status and Trends data cube,
+typically with 52 bands, one for each week.}
+
+\item{weeks}{vector of dates corresponding to the weeks of each layer in \code{x}.
+This argument should be used only rarely, when you're labelling a cube with
+fewer that the usual 52 weeks of predictions.}
 }
 \value{
 A \code{RasterStack} or \code{RasterBrick} with names assigned for the dates in

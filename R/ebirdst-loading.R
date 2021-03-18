@@ -299,7 +299,7 @@ load_raster <- function(path,
     names(r) <- seasons
     return(r[[intersect(season_order, seasons)]])
   } else {
-    # 52 week stack
+    # weekly stack
     tif_path <- list.files(file.path(path, "cubes"),
                            pattern = paste0("_", resolution, "_",
                                             ".*", product, "\\.tif$"),
@@ -308,7 +308,17 @@ load_raster <- function(path,
       stop(paste("Error locating GeoTIFF file for:", product))
     }
     r <- suppressWarnings(raster::stack(tif_path))
-    return(label_raster_stack(r))
+
+    # label
+    if (raster::nlayers(r) == 52) {
+      r <- label_raster_stack(r)
+    } else {
+      l <- load_config(path)
+      weeks <- paste0(l$SRD_PRED_YEAR, "-", l$DATE_NAMES)
+      weeks <- as.Date(weeks, "%Y-%m-%d")
+      r <- label_raster_stack(r, weeks = weeks)
+    }
+    return(r)
   }
 }
 
