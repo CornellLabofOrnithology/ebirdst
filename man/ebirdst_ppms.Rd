@@ -17,7 +17,7 @@ or \code{get_species_path()}.}
 \item{ext}{\link{ebirdst_extent} object (optional); the spatiotemporal extent over
 which to calculate the PPMs.}
 
-\item{es_cutoff}{integer between 0-100; the ensemble support cutoff to use in
+\item{es_cutoff}{fraction between 0-1; the ensemble support cutoff to use in
 distinguishing zero and non-zero predictions. Optimal ensemble support
 cutoff values are calculated for each week during the modeling process and
 stored in the data package for each species. \strong{In general, you should not

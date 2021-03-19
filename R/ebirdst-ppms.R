@@ -8,7 +8,7 @@
 #' @inheritParams load_raster
 #' @param ext [ebirdst_extent] object (optional); the spatiotemporal extent over
 #'   which to calculate the PPMs.
-#' @param es_cutoff integer between 0-100; the ensemble support cutoff to use in
+#' @param es_cutoff fraction between 0-1; the ensemble support cutoff to use in
 #'   distinguishing zero and non-zero predictions. Optimal ensemble support
 #'   cutoff values are calculated for each week during the modeling process and
 #'   stored in the data package for each species. **In general, you should not
@@ -71,15 +71,18 @@ ebirdst_ppms <- function(path, ext, es_cutoff) {
   if (!missing(ext)) {
     stopifnot(inherits(ext, "ebirdst_extent"))
   }
+
+  # load configuration file
+  l <- load_config(path)
+
   if (missing(es_cutoff)) {
-    # load configuration file
-    l <- load_config(path)
     # get dynamic es cutoff
-    es_cutoff <- dplyr::coalesce(l[["ES_CUTOFF"]], 75)
+    es_cutoff <- dplyr::coalesce(l[["ES_CUTOFF"]], 0.75)
   } else {
     stopifnot(is.numeric(es_cutoff), length(es_cutoff) == 1,
-              es_cutoff > 0, es_cutoff < 100)
+              es_cutoff > 0, es_cutoff < 1)
     es_cutoff <- rep(es_cutoff, times = 52)
+    names(es_cutoff) <- format(ebirdst::ebirdst_weeks$date, "%m-%d")
   }
 
   # load the test data and assign names
@@ -95,10 +98,14 @@ ebirdst_ppms <- function(path, ext, es_cutoff) {
   }
 
   # add weekly es cutoffs
-  ws <- ebirdst::ebirdst_weeks$week_start
-  ws[1] <- -Inf
-  we <- ebirdst::ebirdst_weeks$week_end
-  we[length(we)] <- Inf
+  weeks <- ebirdst::ebirdst_weeks
+  weeks <- weeks[format(weeks$date, "%m-%d") %in% names(es_cutoff), ]
+  ws <- weeks$week_start
+  we <- weeks$week_end
+  if (length(es_cutoff) == 52) {
+    ws[1] <- -Inf
+    we[length(we)] <- Inf
+  }
   preds_week <- list()
   for (i in seq_along(es_cutoff)) {
     preds_week[[i]] <- preds[preds$date > ws[i] & preds$date <= we[i], ]
@@ -132,7 +139,7 @@ ebirdst_ppms <- function(path, ext, es_cutoff) {
 
   # compute monte carlo sample of ppms for spatiotemporal subset
   # split data into within range and out of range
-  is_zero <- preds$pi_es < preds$es_cutoff | is.na(preds$pi_es)
+  is_zero <- (preds$pi_es / l$FOLD_N) < preds$es_cutoff | is.na(preds$pi_es)
   zeroes <- preds[is_zero, ]
   preds <- preds[!is_zero, ]
 
