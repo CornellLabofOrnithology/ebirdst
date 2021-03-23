@@ -14,6 +14,7 @@
 #'   stored in the data package for each species. **In general, you should not
 #'   specify a value for `es_cutoff` and instead allow the function to use the
 #'   species-specific model-base values.**
+#' @param pat_cutoff numeric between 0-1; percent above threshold.
 #'
 #' @details During the eBird Status and Trends modeling process, a subset of
 #'   observations (the "test data") are held out from model fitting to be used
@@ -66,8 +67,10 @@
 #' ppms <- ebirdst_ppms(path = path, ext = e)
 #' plot(ppms)
 #' }
-ebirdst_ppms <- function(path, ext, es_cutoff) {
+ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 10) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
+  stopifnot(is.numeric(pat_cutoff), length(pat_cutoff) == 1,
+            pat_cutoff > 0, pat_cutoff < 1)
   if (!missing(ext)) {
     stopifnot(inherits(ext, "ebirdst_extent"))
   }
@@ -149,7 +152,7 @@ ebirdst_ppms <- function(path, ext, es_cutoff) {
   }
 
   # false discovery rate (fdr)
-  p_values <- apply(preds, 1, binom_test_p)
+  p_values <- apply(preds, 1, binom_test_p, pat_cutoff = pat_cutoff)
   p_adj <- stats::p.adjust(p_values, "fdr")
   # add binary prediction
   preds$binary <- as.numeric(p_adj < 0.01)

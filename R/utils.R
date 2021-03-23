@@ -30,7 +30,7 @@ label_raster_stack <- function(x, weeks = NULL) {
   stopifnot(inherits(x, "Raster"))
 
   if (is.null(weeks)) {
-    if((raster::nlayers(x) == 52)) {
+    if((raster::nlayers(x) != 52)) {
       stop("The input Raster* object must be a full cube of 52 weeks unless ",
            "a weeks argument is provided to label_raster_stack().")
     }
