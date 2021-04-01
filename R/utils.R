@@ -95,7 +95,7 @@ date_to_st_week <- function(dates) {
   days <- (as.POSIXlt(dates)$yday + 0.5) / 366
 
   check_d <- function(x) {
-    which(x >= dv[-length(dv)] & x <= dv[-1])
+    which(x >= dv[-length(dv)] & x < dv[-1])
   }
   vapply(days, check_d, FUN.VALUE = integer(length = 1))
 }
