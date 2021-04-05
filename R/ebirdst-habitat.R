@@ -204,13 +204,12 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
                              check_width = 7 / 366)
   pd_smooth$data <- NULL
   pd_smooth <- tidyr::unnest(pd_smooth, .data$smooth)
-  names(pd_smooth) <- c("predictor", "date", "slope")
+  names(pd_smooth) <- c("predictor", "date", "probability_positive")
 
   # categorize positive and negative directionalities
   pd_smooth$direction <- NA
-  pd_smooth$direction[pd_smooth$slope >= 0.7] <- 1
-  pd_smooth$direction[pd_smooth$slope <= 0.3] <- -1
-  pd_smooth$slope <- NULL
+  pd_smooth$direction[pd_smooth$probability_positive >= 0.7] <- 1
+  pd_smooth$direction[pd_smooth$probability_positive <= 0.3] <- -1
 
   # temporal smoothing of pis
   pi_smooth <- dplyr::select(pis, .data$predictor,
