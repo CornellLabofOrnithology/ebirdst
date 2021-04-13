@@ -30,6 +30,7 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' # download example data
 #' path <- ebirdst_download("example_data")
 #' # or get the path if you already have the data downloaded
@@ -40,6 +41,7 @@
 #'
 #' # convert to ranges
 #' range_polygons <- generate_range(abd)
+#' }
 generate_range <- function(x, smooth = TRUE) {
   stopifnot(inherits(x, "Raster"))
   stopifnot(is.logical(smooth), length(smooth) == 1, !is.na(smooth))

@@ -77,10 +77,12 @@ ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 10) {
 
   # load configuration file
   l <- load_config(path)
+  l_es_cutoff <- setNames(l[["es_cutoff"]][["cutoff"]],
+                          l[["es_cutoff"]][["week"]])
 
   if (missing(es_cutoff)) {
     # get dynamic es cutoff
-    es_cutoff <- dplyr::coalesce(l[["ES_CUTOFF"]], 0.75)
+    es_cutoff <- dplyr::coalesce(l_es_cutoff, 0.75)
   } else {
     stopifnot(is.numeric(es_cutoff), length(es_cutoff) == 1,
               es_cutoff > 0, es_cutoff < 1)

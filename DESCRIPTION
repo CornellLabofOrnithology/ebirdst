@@ -58,7 +58,9 @@ Imports:
     utils,
     viridisLite,
     xml2,
-    units
+    units,
+    exactextractr,
+    jsonlite
 Suggests: 
     covr,
     fields,

@@ -39,6 +39,7 @@ resolution abundance data will take an extremely long time, it's best to use
 the medium or low resolution data.
 }
 \examples{
+\donttest{
 # download example data
 path <- ebirdst_download("example_data")
 # or get the path if you already have the data downloaded
@@ -49,4 +50,5 @@ abd <- load_raster(path, product = "abundance_seasonal", resolution = "lr")
 
 # convert to ranges
 range_polygons <- generate_range(abd)
+}
 }

@@ -281,9 +281,9 @@ load_raster <- function(path,
     return(suppressWarnings(raster::raster(tif_path)))
   } else if (product == "abundance_seasonal") {
     # seasonal abundance
+    pat <- stringr::str_glue("abundance.*{resolution}.*\\.tif$")
     tif_path <- list.files(file.path(path, "seasonal"),
-                           pattern = paste0("_", resolution, "_",
-                                            ".*_abundance-seasonal_.*tif$"),
+                           pattern = pat,
                            full.names = TRUE)
     if (any(!file.exists(tif_path))) {
       stop("Error locating seasonal abundance GeoTIFFs")
@@ -294,15 +294,16 @@ load_raster <- function(path,
                       "nonbreeding", "prebreeding_migration",
                       "resident")
     seasons <- stringr::str_extract(tif_path,
-                                    "(?<=abundance-seasonal_)[a-z_]+")
+                                    "(?<=_abundance_)[-a-z]+")
+    seasons <- stringr::str_replace_all(seasons, "-", "_")
     r <- suppressWarnings(raster::stack(tif_path))
     names(r) <- seasons
     return(r[[intersect(season_order, seasons)]])
   } else {
     # weekly stack
+    pat <- stringr::str_glue("{product}_{resolution}.*\\.tif$")
     tif_path <- list.files(file.path(path, "cubes"),
-                           pattern = paste0("_", resolution, "_",
-                                            ".*", product, "\\.tif$"),
+                           pattern = pat,
                            full.names = TRUE)
     if (length(tif_path) != 1 || !file.exists(tif_path)) {
       stop(paste("Error locating GeoTIFF file for:", product))
@@ -686,12 +687,12 @@ load_predictions <- function(path, return_sf = FALSE) {
 #' cfg <- load_config(path)
 load_config <- function(path) {
   stopifnot(dir.exists(path))
-  cfg_file <- file.path(path, "config.rds")
+  cfg_file <- file.path(path, "config.json")
   if(!file.exists(cfg_file)) {
     stop("The file 'config.rds' does not exist in: ", path)
   }
   # load configuration file
-  readRDS(cfg_file)
+  jsonlite::read_json(cfg_file, simplifyVector = TRUE)
 }
 
 
@@ -731,86 +732,13 @@ load_fac_map_parameters <- function(path) {
   stopifnot(dir.exists(path))
 
   # load configuration file
-  l <- load_config(path)
+  p <- load_config(path)
 
-  list(custom_projection = l$FA_PROJECTION$crs,
-       fa_extent = l$FA_PROJECTION$extent,
-       res = l$FA_PROJECTION$res,
-       fa_extent_sinu = l$SINU_EXTENT,
-       abundance_bins = l$bins$hr$quantile)
-}
-
-#' Copy eBird Status and Trends data from the mount to your local drive
-#' @inheritParams ebirdst_download
-#' @export
-ebirdst_copy <- function(species, tifs_only = TRUE,
-                         path = rappdirs::user_data_dir("ebirdst")) {
-  stopifnot(is.character(species), length(species) >= 1)
-  stopifnot(is.character(path), length(path) == 1)
-  stopifnot(is.logical(tifs_only), length(tifs_only) == 1)
-  species <- tolower(species)
-
-  if (!dir.exists(path)) {
-    dir.create(path, recursive = TRUE)
-  }
-
-  # find run directory
-  species <- get_species(species)
-  row_id <- match(species, ebirdst::ebirdst_runs$species_code)
-  if (any(is.na(row_id))) {
-    stop(sprintf("species = %s does not uniquely identify a species.",
-                 species[is.na(row_id)]))
-  }
-  run <- ebirdst::ebirdst_runs$run_name[row_id]
-
-  # list of files to download
-  mount_path <- "/Volumes/STResults/ST2020/ebirdst/"
-  if (!file.exists(mount_path)) {
-    stop("Can't find Status and Trends shared directory: ", mount_path)
-  }
-  run_dirs <- file.path(mount_path, run)
-  dl_files <- lapply(run_dirs, list.files, recursive = TRUE)
-  dl_files <- mapply(file.path, run, dl_files, SIMPLIFY = FALSE)
-  if (isTRUE(tifs_only)) {
-    get_tifs_only <- function(x) {
-      x[!grepl(".db$", x)]
-    }
-    dl_files <- lapply(dl_files, get_tifs_only)
-  }
-  names(dl_files) <- run
-
-  # create download directory structure
-  dirs <- lapply(dl_files, function(x) file.path(path, x))
-  dirs <- unique(dirname(unlist(dirs)))
-  for (d in dirs) {
-    dir.create(d, showWarnings = FALSE, recursive = TRUE)
-  }
-
-  # files to download
-  n_files <- length(unlist(dl_files))
-  message(stringr::str_glue("Downloading data for {length(run)} species, ",
-                            "{n_files} total files"))
-
-  # download
-  for (r in names(dl_files)) {
-    message(stringr::str_glue("Processing {r}"))
-    f_src <- file.path(mount_path, dl_files[[r]])
-    f_dst <- file.path(path, dl_files[[r]])
-    e <- file.exists(f_dst)
-    if (any(e)) {
-      message(stringr::str_glue("  {sum(e)} files already exist, skipping"))
-      f_src <- f_src[!e]
-      f_dst <- f_dst[!e]
-    }
-    message(stringr::str_glue("  Downloading {length(f_src)} files:"))
-    for (i in seq_along(f_src)) {
-      message(stringr::str_glue("  {basename(f_src[i])}, ",
-                                "{fs::file_size(f_src[i])}"))
-      file.copy(f_src[i], f_dst[i])
-    }
-  }
-
-  return(invisible(normalizePath(file.path(path, run))))
+  list(custom_projection = p$projection$crs,
+       fa_extent = raster::extent(p$projection$extent),
+       res = p$projection$res,
+       fa_extent_sinu = raster::extent(p$extent_sinu),
+       abundance_bins = p$bins$hr$breaks)
 }
 
 sql_extent_subset <- function(ext) {
