@@ -838,9 +838,13 @@ sql_extent_subset <- function(ext) {
 }
 
 ebirdst_download_s3 <- function(species,
-                                path = rappdirs::user_data_dir("ebirdst")) {
+                                path = rappdirs::user_data_dir("ebirdst"),
+                                tifs_only = TRUE,
+                                profile = "default") {
   stopifnot(is.character(species), length(species) >= 1)
   stopifnot(is.character(path), length(path) == 1)
+  stopifnot(is.logical(tifs_only), length(tifs_only) == 1)
+  stopifnot(is.character(profile), length(profile) == 1)
   species <- tolower(species)
 
   if (!dir.exists(path)) {
@@ -860,7 +864,11 @@ ebirdst_download_s3 <- function(species,
 
   # aws s3 download commands
   s3_dl_cmd <- stringr::str_glue("aws s3 sync {bucket_url}{run_names} ",
-                                 "'{file.path(path, run_names)}'")
+                                 "'{file.path(path, run_names)}' ",
+                                 "--profile {profile}")
+  if (isTRUE(tifs_only)) {
+    s3_dl_cmd <- paste(s3_dl_cmd, "--exclude '*.db'")
+  }
   for(cmd in s3_dl_cmd) {
     system(cmd)
   }
