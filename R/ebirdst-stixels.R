@@ -40,10 +40,15 @@ stixelize <- function(x) {
 stixelize.data.frame <- function(x) {
   stopifnot(all(c("lon", "lat", "stixel_width", "stixel_height") %in% names(x)))
 
+  # drop empty stixels
+  x <- x[x$stixel_width > 0 & x$stixel_height > 0, ]
+
   # function to make a single stixel
   f <- function(lon, lat, w, h) {
-    bb <- sf::st_bbox(c(xmin = lon - w / 2, xmax = lon + w / 2,
-                        ymin = lat - h / 2, ymax = lat + h / 2))
+    bb <- sf::st_bbox(c(xmin = max(lon - w / 2, -180),
+                        xmax = min(lon + w / 2, 180),
+                        ymin = max(lat - h / 2, -90),
+                        ymax = min(lat + h / 2, 90)))
     sf::st_as_sfc(bb)
   }
   stx <- sf::st_sfc(mapply(f, x$lon, x$lat, x$stixel_width, x$stixel_height),
