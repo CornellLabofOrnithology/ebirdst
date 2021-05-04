@@ -375,7 +375,7 @@ load_pis <- function(path, ext, response = c("occ", "count"),
     stopifnot(inherits(ext, "ebirdst_extent"))
   }
   response <- match.arg(response)
-  table <- ifelse(response == "occ", "occ_pds", "abd_pds")
+  table <- ifelse(response == "occ", "occ_pis", "abd_pis")
 
   db_file <- file.path(path, "pi-pd.db")
   if(!file.exists(db_file)) {
