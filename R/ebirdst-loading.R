@@ -335,6 +335,8 @@ load_raster <- function(path,
 #' @param ext [ebirdst_extent] object; the spatiotemporal extent to filter the
 #'   data to. The spatial component of the extent object must be provided in
 #'   unprojected, latitude-longitude coordinates.
+#' @param model character; whether to make estimates for the occurrence or count
+#'   model.
 #' @param return_sf logical; whether to return an [sf] object of spatial points
 #'   rather then the default data frame.
 #'
@@ -365,12 +367,15 @@ load_raster <- function(path,
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #' plot_pis(pis, ext = e, n_top_pred = 15, by_cover_class = TRUE)
 #' }
-load_pis <- function(path, ext, return_sf = FALSE) {
+load_pis <- function(path, ext, response = c("occ", "count"),
+                     return_sf = FALSE) {
   stopifnot(dir.exists(path))
   stopifnot(is.logical(return_sf), length(return_sf) == 1)
   if (!missing(ext)) {
     stopifnot(inherits(ext, "ebirdst_extent"))
   }
+  response <- match.arg(response)
+  table <- ifelse(response == "occ", "occ_pds", "abd_pds")
 
   db_file <- file.path(path, "pi-pd.db")
   if(!file.exists(db_file)) {
@@ -382,12 +387,12 @@ load_pis <- function(path, ext, return_sf = FALSE) {
 
   # query
   if (missing(ext)) {
-    sql <- paste("SELECT p.*, s.lat, s.lon, s.date",
-                 "FROM occ_pis AS p INNER JOIN stixel_summary AS s",
-                 "ON p.stixel_id = s.stixel_id;")
+    sql <- stringr::str_glue("SELECT p.*, s.lat, s.lon, s.date",
+                             "FROM {table} AS p INNER JOIN stixel_summary AS s",
+                             "ON p.stixel_id = s.stixel_id;")
   } else {
     sql <- stringr::str_glue("SELECT p.*, s.lat, s.lon, s.date ",
-                             "FROM occ_pis AS p ",
+                             "FROM {table} AS p ",
                              "INNER JOIN stixel_summary AS s ",
                              "ON p.stixel_id = s.stixel_id ",
                              "{sql_extent_subset(ext)};")
@@ -466,12 +471,15 @@ load_pis <- function(path, ext, return_sf = FALSE) {
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #' plot_pds(pds, "solar_noon_diff", ext = e, n_bs = 5)
 #' }
-load_pds <- function(path, ext, return_sf = FALSE) {
+load_pds <- function(path, ext, response = c("occ", "count"),
+                     return_sf = FALSE) {
   stopifnot(dir.exists(path))
   stopifnot(is.logical(return_sf), length(return_sf) == 1)
   if (!missing(ext)) {
     stopifnot(inherits(ext, "ebirdst_extent"))
   }
+  response <- match.arg(response)
+  table <- ifelse(response == "occ", "occ_pds", "abd_pds")
 
   db_file <- file.path(path, "pi-pd.db")
   if(!file.exists(db_file)) {
@@ -483,12 +491,12 @@ load_pds <- function(path, ext, return_sf = FALSE) {
 
   # query
   if (missing(ext)) {
-    sql <- paste("SELECT p.*, s.lat, s.lon, s.date",
-                 "FROM occ_pds AS p INNER JOIN stixel_summary AS s",
-                 "ON p.stixel_id = s.stixel_id;")
+    sql <- stringr::str_glue("SELECT p.*, s.lat, s.lon, s.date",
+                             "FROM {table} AS p INNER JOIN stixel_summary AS s",
+                             "ON p.stixel_id = s.stixel_id;")
   } else {
     sql <- stringr::str_glue("SELECT p.*, s.lat, s.lon, s.date ",
-                             "FROM occ_pds AS p ",
+                             "FROM {table} AS p ",
                              "INNER JOIN stixel_summary AS s ",
                              "ON p.stixel_id = s.stixel_id ",
                              "{sql_extent_subset(ext)};")
