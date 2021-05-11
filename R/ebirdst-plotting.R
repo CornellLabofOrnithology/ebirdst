@@ -58,62 +58,63 @@ plot_pis <- function(pis, ext,
     stop("Must subset temporally, results not meaningful for full year.")
   }
 
+  # were these occurrence or count pis
+  m <- attr(pis, "model")
+
   # subset
   pis <- ebirdst_subset(pis, ext = ext)
-  pis <- pis[, ebirdst::ebirdst_predictors$predictor_tidy]
 
   # if aggregating by cover class aggregate the fragstats metrics
+  lc <- dplyr::tibble(predictor = unique(pis$predictor))
+  lc$predictor_class <- convert_classes(lc$predictor,
+                                        by_cover_class = by_cover_class,
+                                        pretty = pretty_names)
+  pis <- dplyr::inner_join(pis, lc, by = "predictor")
+  pis$predictor <- pis$predictor_class
+  pis$predictor_class <- NULL
   if (isTRUE(by_cover_class)) {
-    # find landcover classes
-    lc <- convert_classes(names(pis), by_cover_class = TRUE,
-                          pretty = pretty_names)
-    lc_groups <- unique(lc)
-    # aggregate over classes
-    m <- matrix(nrow = nrow(pis), ncol = length(lc_groups))
-    colnames(m) <- lc_groups
-    for (i in lc_groups) {
-      if (sum(lc == i) == 1) {
-        m[, i] <- pis[[which(lc == i)]]
-      } else {
-        m[, i] <- apply(pis[, lc == i], 1, FUN = mean, na.rm = TRUE)
-      }
-    }
-    pis <- as.data.frame(m, stringsAsFactors = FALSE)
-  } else {
-    names(pis) <- convert_classes(names(pis), by_cover_class = FALSE,
-                                  pretty = pretty_names)
+    pis <- dplyr::group_by(pis, .data$stixel_id, .data$predictor)
+    pis <- dplyr::summarise(pis, importance = mean(importance, na.rm = TRUE),
+                            .groups = "drop")
   }
 
   # compute median predictor importance across stixels
-  pi_median <- apply(pis, 2, stats::median, na.rm = TRUE)
-  pi_median <- sort(pi_median, decreasing = TRUE)
+  pi_median <- dplyr::group_by(pis, .data$predictor)
+  pi_median <- dplyr::summarise(pi_median,
+                                importance = stats::median(importance,
+                                                           na.rm = TRUE),
+                                .groups = "drop")
+  pi_median <- dplyr::arrange(pi_median, dplyr::desc(.data$importance))
 
   # find the top preds based on function variable n_top_pred
-  top_names <- names(pi_median)[1:min(round(n_top_pred), length(pi_median))]
-  top_names <- stats::na.omit(top_names)
+  pi_median <- dplyr::arrange(pi_median, dplyr::desc(.data$importance))
+  top_names <- dplyr::top_n(pi_median, n = n_top_pred, wt = .data$importance)
 
   # subset all values based on top_names
-  pis_top <- pis[, top_names]
-
-  # gather to long format from wide
-  pis_top <- tidyr::pivot_longer(pis_top, dplyr::everything(),
-                                 names_to = "predictor", values_to = "pi")
+  pi_median <- dplyr::filter(pi_median,
+                             .data$predictor %in% top_names$predictor)
+  pis_top <- dplyr::filter(pis, .data$predictor %in% top_names$predictor)
 
   # pis have have spurious large values, NAs and NaNs
   # so clean up, trim, and check for complete cases
-  pis_top$pi <- as.numeric(pis_top$pi)
-  p98 <- stats::quantile(pis_top$pi, probs = 0.98, na.rm = TRUE)
-  pis_top <- pis_top[pis_top$pi < p98, ]
+  p98 <- stats::quantile(pis_top$importance, probs = 0.98, na.rm = TRUE)
+  pis_top <- pis_top[pis_top$importance < p98, ]
   pis_top <- pis_top[stats::complete.cases(pis_top), ]
   pis_top$predictor <- stats::reorder(pis_top$predictor,
-                                      pis_top$pi,
+                                      pis_top$importance,
                                       FUN = stats::median)
 
   # plot
   if (isTRUE(plot)) {
-    y_lab <- stringr::str_glue("Relative Importance (occurrence model)")
+    if (m == "occ") {
+      y_lab <- "Relative Importance (occurrence model)"
+    } else if (m == "count") {
+      y_lab <- "Relative Importance (count model)"
+    } else {
+      y_lab <- "Relative Importance"
+    }
     g <- ggplot2::ggplot(pis_top) +
-      ggplot2::aes_string(x = "predictor", y = "pi") +
+      ggplot2::aes_string(x = "predictor", y = "importance") +
       ggplot2::geom_boxplot() +
       ggplot2::coord_flip() +
       ggplot2::labs(y = y_lab, x = NULL) +
@@ -121,7 +122,7 @@ plot_pis <- function(pis, ext,
     print(g)
   }
 
-  invisible(pi_median[top_names])
+  invisible(pi_median)
 }
 
 

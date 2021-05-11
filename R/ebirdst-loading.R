@@ -367,15 +367,14 @@ load_raster <- function(path,
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #' plot_pis(pis, ext = e, n_top_pred = 15, by_cover_class = TRUE)
 #' }
-load_pis <- function(path, ext, response = c("occ", "count"),
-                     return_sf = FALSE) {
+load_pis <- function(path, ext, model = c("occ", "count"), return_sf = FALSE) {
   stopifnot(dir.exists(path))
   stopifnot(is.logical(return_sf), length(return_sf) == 1)
   if (!missing(ext)) {
     stopifnot(inherits(ext, "ebirdst_extent"))
   }
-  response <- match.arg(response)
-  table <- ifelse(response == "occ", "occ_pis", "abd_pis")
+  model <- match.arg(model)
+  table <- ifelse(model == "occ", "occ_pis", "abd_pis")
 
   db_file <- file.path(path, "pi-pd.db")
   if(!file.exists(db_file)) {
@@ -427,6 +426,7 @@ load_pis <- function(path, ext, response = c("occ", "count"),
     pis <- sf::st_as_sf(pis, coords = c("lon", "lat"), crs = 4326)
   }
 
+  attr(pis, "model") <- model
   return(pis)
 }
 
@@ -471,15 +471,15 @@ load_pis <- function(path, ext, response = c("occ", "count"),
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #' plot_pds(pds, "solar_noon_diff", ext = e, n_bs = 5)
 #' }
-load_pds <- function(path, ext, response = c("occ", "count"),
+load_pds <- function(path, ext, model = c("occ", "count"),
                      return_sf = FALSE) {
   stopifnot(dir.exists(path))
   stopifnot(is.logical(return_sf), length(return_sf) == 1)
   if (!missing(ext)) {
     stopifnot(inherits(ext, "ebirdst_extent"))
   }
-  response <- match.arg(response)
-  table <- ifelse(response == "occ", "occ_pds", "abd_pds")
+  model <- match.arg(model)
+  table <- ifelse(model == "occ", "occ_pds", "abd_pds")
 
   db_file <- file.path(path, "pi-pd.db")
   if(!file.exists(db_file)) {
@@ -531,6 +531,7 @@ load_pds <- function(path, ext, response = c("occ", "count"),
     pds <- sf::st_as_sf(pds, coords = c("lon", "lat"), crs = 4326)
   }
 
+  attr(pds, "model") <- model
   return(pds)
 }
 
