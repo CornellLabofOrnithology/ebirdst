@@ -491,8 +491,8 @@ load_pds <- function(path, ext, model = c("occ", "count"),
 
   # query
   if (missing(ext)) {
-    sql <- stringr::str_glue("SELECT p.*, s.lat, s.lon, s.date",
-                             "FROM {table} AS p INNER JOIN stixel_summary AS s",
+    sql <- stringr::str_glue("SELECT p.*, s.lat, s.lon, s.date ",
+                             "FROM {table} AS p INNER JOIN stixel_summary AS s ",
                              "ON p.stixel_id = s.stixel_id;")
   } else {
     sql <- stringr::str_glue("SELECT p.*, s.lat, s.lon, s.date ",
