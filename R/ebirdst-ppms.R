@@ -261,8 +261,6 @@ ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 10) {
       cs$poisson_dev_abd[i_mc] <- poisson_dev(obs = data_i$obs,
                                               pred = data_i$pi_mu_median)[3]
 
-      pdev <- as.numeric(poisson_dev(obs = data_i$obs,
-                                     pred = data_i$pi_median))
       cs$poisson_dev_occ[i_mc] <- poisson_dev(obs = data_i$obs,
                                               pred = data_i$pi_median)[3]
 
