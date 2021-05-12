@@ -18,9 +18,9 @@
 #' @param plot logical; whether to plot predictor importance or just return top
 #'   predictors.
 #'
-#' @return Plots a boxplot of predictor importance and invisibly returns a named
-#'   vector of top predictors, and their median predictor importance, based on
-#'   the `n_top_pred` parameter.
+#' @return Plots a boxplot of predictor importance and invisibly returns the PI
+#' data subset to just the top predictors, grouped and renamed according to
+#' `by_cover_class` and `pretty_names`.
 #'
 #' @export
 #'
@@ -43,7 +43,7 @@
 #' }
 plot_pis <- function(pis, ext,
                      by_cover_class = TRUE,
-                     n_top_pred = 20,
+                     n_top_pred = 15,
                      pretty_names = TRUE,
                      plot = TRUE) {
   stopifnot(is.data.frame(pis))
@@ -122,7 +122,7 @@ plot_pis <- function(pis, ext,
     print(g)
   }
 
-  invisible(pi_median)
+  invisible(pis_top)
 }
 
 
