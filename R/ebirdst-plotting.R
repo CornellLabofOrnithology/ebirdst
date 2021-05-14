@@ -222,6 +222,9 @@ plot_pds <- function(pds, predictor, ext,
     stopifnot(is.numeric(ylim), length(ylim) == 2, ylim[1] < ylim[2])
   }
 
+  # were these occurrence or count pds
+  m <- attr(pds, "model")
+
   # match predictor
   p <- ebirdst::ebirdst_predictors
   predictor <- stringr::str_to_lower(predictor)
@@ -373,6 +376,13 @@ plot_pds <- function(pds, predictor, ext,
     }
 
     # main plot
+    if (m == "occ") {
+      y_lab <- "Deviation E(Logit Occurrence)"
+    } else if (m == "count") {
+      y_lab <- "Deviation E(Count)"
+    } else {
+      y_lab <- "Response"
+    }
     g <- ggplot2::ggplot(pd_ci) +
       ggplot2::aes_string(x = "x", y = "pd_median") +
       ggplot2::geom_hline(yintercept = 0, lwd = 0.5, col = "#000000") +
@@ -387,8 +397,7 @@ plot_pds <- function(pds, predictor, ext,
       # smoothed line
       ggplot2::geom_line(col = "#fa6900", lwd = 1.5) +
       ggplot2::ylim(ylim) +
-      ggplot2::labs(x = NULL, y = "Deviation E(Logit Occurrence)",
-                    title = predictor_label) +
+      ggplot2::labs(x = NULL, y = y_lab, title = predictor_label) +
       ggplot2::theme_light()
 
     suppressWarnings(print(g))
