@@ -326,7 +326,7 @@ load_raster <- function(path,
 
 #' Load eBird Status and Trends predictor importance data
 #'
-#' Loads the predictor importance (PI) data from the pi-pd.db sqlite database.
+#' Loads the predictor importance (PI) data from the stixel_summary.db sqlite database.
 #' PI estimates are provided for each stixel over which a model was run and are
 #' identified by a unique stixel ID in addition to the coordinates of the stixel
 #' centroid. PI estimates are for the occurrence model only.
@@ -367,18 +367,19 @@ load_raster <- function(path,
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #' plot_pis(pis, ext = e, n_top_pred = 15, by_cover_class = TRUE)
 #' }
-load_pis <- function(path, ext, model = c("occ", "count"), return_sf = FALSE) {
+load_pis <- function(path, ext, model = c("occurrence", "count"),
+                     return_sf = FALSE) {
   stopifnot(dir.exists(path))
   stopifnot(is.logical(return_sf), length(return_sf) == 1)
   if (!missing(ext)) {
     stopifnot(inherits(ext, "ebirdst_extent"))
   }
   model <- match.arg(model)
-  table <- ifelse(model == "occ", "occ_pis", "abd_pis")
+  table <- ifelse(model == "occ", "occurrence_pis", "count_pis")
 
-  db_file <- file.path(path, "pi-pd.db")
+  db_file <- file.path(path, "stixel_summary.db")
   if(!file.exists(db_file)) {
-    stop("The file 'pi-pd.db' does not exist in: ", path)
+    stop("The file 'stixel_summary.db' does not exist in: ", path)
   }
 
   # connect to db
@@ -471,7 +472,7 @@ load_pis <- function(path, ext, model = c("occ", "count"), return_sf = FALSE) {
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #' plot_pds(pds, "solar_noon_diff", ext = e, n_bs = 5)
 #' }
-load_pds <- function(path, ext, model = c("occ", "count"),
+load_pds <- function(path, ext, model = c("occurrence", "count"),
                      return_sf = FALSE) {
   stopifnot(dir.exists(path))
   stopifnot(is.logical(return_sf), length(return_sf) == 1)
@@ -479,11 +480,11 @@ load_pds <- function(path, ext, model = c("occ", "count"),
     stopifnot(inherits(ext, "ebirdst_extent"))
   }
   model <- match.arg(model)
-  table <- ifelse(model == "occ", "occ_pds", "abd_pds")
+  table <- ifelse(model == "occ", "occurrence_pds", "count_pds")
 
-  db_file <- file.path(path, "pi-pd.db")
+  db_file <- file.path(path, "stixel_summary.db")
   if(!file.exists(db_file)) {
-    stop("The file 'pi-pd.db' does not exist in: ", path)
+    stop("The file 'stixel_summary.db' does not exist in: ", path)
   }
 
   # connect to db
@@ -543,7 +544,8 @@ load_pds <- function(path, ext, model = c("occ", "count"),
 #' performed many times and the prediction at any given point is the median of
 #' the predictions from all the stixels that that point falls in. This function
 #' loads summary statistics for each stixel, for example, the size of the
-#' stixels and the number of observations within each stixel.
+#' stixels, the number of observations within each stixel, and a suite of
+#' predictive performance metrics (PPMs) for the model fit within that stixel.
 #'
 #' @inheritParams load_pis
 #'
@@ -572,9 +574,9 @@ load_stixels <- function(path, ext, return_sf = FALSE) {
     stopifnot(inherits(ext, "ebirdst_extent"))
   }
 
-  db_file <- file.path(path, "pi-pd.db")
+  db_file <- file.path(path, "stixel_summary.db")
   if(!file.exists(db_file)) {
-    stop("The file 'pi-pd.db' does not exist in: ", path)
+    stop("The file 'stixel_summary.db' does not exist in: ", path)
   }
 
   # connect to db
