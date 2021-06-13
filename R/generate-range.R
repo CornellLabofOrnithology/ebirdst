@@ -23,8 +23,7 @@
 #'   prediction area will each be encoded as a single feature distinguished by
 #'   the `type` attribute. In addition, if `smooth = TRUE`, smoothed versions
 #'   of these features will be generated and distinguished by the `smoothed`
-#'   attribute. The `sf` object will be in unprojected, WGS84 latitude-longitude
-#'   coordinates. The `layer` attribute will contain the name of the raster
+#'   attribute. The `layer` attribute will contain the name of the raster
 #'   layer that has been converted to polygons.
 #'
 #' @export
@@ -58,12 +57,8 @@ generate_range <- function(x, smooth = TRUE) {
   rng$smoothed <- FALSE
   pa$smoothed <- FALSE
 
-  # project to wgs84
-  rng_pa <- rbind(rng, pa)
-  rng_pa <- sf::st_transform(rng_pa, crs = 4326)
-  rng_pa <- sf::st_make_valid(rng_pa)
-
   # clean & smooth
+  rng_pa <- rbind(rng, pa)
   if (isTRUE(smooth)) {
     # drop holes and polygons smaller than 1.5 times the cell size
     ca <- units::set_units(1.5 * prod(raster::res(x)), "m^2")
@@ -79,6 +74,7 @@ generate_range <- function(x, smooth = TRUE) {
     rng_smooth$smoothed <- TRUE
     rng_pa <- rbind(rng_pa, rng_smooth)
   }
+
   return(rng_pa)
 }
 

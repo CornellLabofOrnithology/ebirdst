@@ -4,7 +4,7 @@
 \alias{load_pds}
 \title{Load eBird Status and Trends partial dependence data}
 \usage{
-load_pds(path, ext, model = c("occ", "count"), return_sf = FALSE)
+load_pds(path, ext, model = c("occurrence", "count"), return_sf = FALSE)
 }
 \arguments{
 \item{path}{character; directory that the Status and Trends data for a given

@@ -4,7 +4,7 @@
 \alias{load_pis}
 \title{Load eBird Status and Trends predictor importance data}
 \usage{
-load_pis(path, ext, model = c("occ", "count"), return_sf = FALSE)
+load_pis(path, ext, model = c("occurrence", "count"), return_sf = FALSE)
 }
 \arguments{
 \item{path}{character; directory that the Status and Trends data for a given
@@ -32,7 +32,7 @@ in space and time is specified by the \code{lat}, \code{lon}, and \code{date} co
 which expresses the day of year as a value from 0-1.
 }
 \description{
-Loads the predictor importance (PI) data from the pi-pd.db sqlite database.
+Loads the predictor importance (PI) data from the stixel_summary.db sqlite database.
 PI estimates are provided for each stixel over which a model was run and are
 identified by a unique stixel ID in addition to the coordinates of the stixel
 centroid. PI estimates are for the occurrence model only.

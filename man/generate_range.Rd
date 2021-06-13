@@ -19,8 +19,7 @@ An \code{sf} object containing the polygons defining the range. The range
 prediction area will each be encoded as a single feature distinguished by
 the \code{type} attribute. In addition, if \code{smooth = TRUE}, smoothed versions
 of these features will be generated and distinguished by the \code{smoothed}
-attribute. The \code{sf} object will be in unprojected, WGS84 latitude-longitude
-coordinates. The \code{layer} attribute will contain the name of the raster
+attribute. The \code{layer} attribute will contain the name of the raster
 layer that has been converted to polygons.
 }
 \description{
