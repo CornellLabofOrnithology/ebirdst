@@ -375,7 +375,7 @@ load_pis <- function(path, ext, model = c("occurrence", "count"),
     stopifnot(inherits(ext, "ebirdst_extent"))
   }
   model <- match.arg(model)
-  table <- ifelse(model == "occ", "occurrence_pis", "count_pis")
+  table <- paste0(model, "_pis")
 
   db_file <- file.path(path, "stixel_summary.db")
   if(!file.exists(db_file)) {
