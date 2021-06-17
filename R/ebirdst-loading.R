@@ -480,7 +480,7 @@ load_pds <- function(path, ext, model = c("occurrence", "count"),
     stopifnot(inherits(ext, "ebirdst_extent"))
   }
   model <- match.arg(model)
-  table <- ifelse(model == "occ", "occurrence_pds", "count_pds")
+  table <- paste0(model, "_pds")
 
   db_file <- file.path(path, "stixel_summary.db")
   if(!file.exists(db_file)) {
