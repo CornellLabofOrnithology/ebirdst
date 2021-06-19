@@ -595,11 +595,6 @@ load_stixels <- function(path, ext, return_sf = FALSE) {
   stx <- dplyr::tibble(stx)
   DBI::dbDisconnect(db)
 
-  # clean up
-  for (col in c("summary_hash", "stixel", "data_type", "srd_n")) {
-    stx[[col]] <- NULL
-  }
-
   # check for missing stixels centroid
   has_centroid <- stats::complete.cases(stx[, c("lat", "lon", "date")])
   if (any(!has_centroid)) {
