@@ -1,19 +1,19 @@
 ---
-output: md_document
+output: github_document
 editor_options: 
   chunk_output_type: console
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r, echo = FALSE, message = FALSE}
+```{r, include = FALSE}
 knitr::opts_chunk$set(
   warning = FALSE, 
   message = FALSE,
   collapse = TRUE,
   comment = "#>",
-  fig.path = "README-",
-  fig.align = "center"
+  fig.path = "man/figures/README-",
+  out.width = "100%"
 )
 ```
 
@@ -40,7 +40,7 @@ Alternatively, you can install the development version from GitHub with:
 remotes::install_github("CornellLabofOrnithology/ebirdst")
 ```
 
-The current version of `ebirdst` is designed for working with the eBird Status and Trends data products released in December 2020, with abundance estimates made for 2019. **Users are strongly discouraged from comparing Status and Trends results between years.**
+The current version of `ebirdst` is designed for working with the eBird Status and Trends data products released in December 2020, with abundance estimates made for 2019. **Users are strongly discouraged from comparing Status and Trends results between years due to methodological differences between versions.** To request access to previous versions, please contact ebird@cornell.edu.
 
 ## Citation
 
