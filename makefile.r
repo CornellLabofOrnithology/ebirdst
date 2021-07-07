@@ -5,7 +5,7 @@ pkgdown::clean_site()
 
 # rebuild docs and install
 devtools::document()
-devtools::build()
+devtools::install()
 
 # local tests and checks
 devtools::test()
@@ -21,4 +21,6 @@ Sys.unsetenv("BUILD_VIGNETTES")
 # checks
 devtools::check_win_devel()
 devtools::check_win_release()
-rhub::check_for_cran()
+rhub::check_for_cran(platforms = "solaris-x86-patched")
+rhub::check_for_cran(platforms = "debian-gcc-release")
+

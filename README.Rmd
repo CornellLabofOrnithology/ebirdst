@@ -40,12 +40,7 @@ Alternatively, you can install the development version from GitHub with:
 remotes::install_github("CornellLabofOrnithology/ebirdst")
 ```
 
-The current version of `ebirdst` is designed for working with the eBird Status and Trends data products released in December 2020, with estimate made for 2019. Older versions of the Status and Trends data can be accessed by installing the associated version of `ebirdst` from GitHub. For example, 2016 estimates, corresponding to v0.1.0 of this package, can be accessed with:
-
-```{r gh-installation-old, eval = FALSE}
-# install.packages("remotes")
-remotes::install_github("CornellLabofOrnithology/ebirdst@v0.1.0")
-```
+The current version of `ebirdst` is designed for working with the eBird Status and Trends data products released in December 2020, with abundance estimates made for 2019. **Users are strongly discouraged from comparing Status and Trends results between years.**
 
 ## Citation
 
@@ -74,7 +69,6 @@ This quick start guide shows how to download data and plot abundance values simi
 
 ```{r quick_start}
 library(ebirdst)
-library(viridis)
 library(raster)
 library(sf)
 library(fields)
@@ -122,7 +116,7 @@ plot(bb, col = "white", border = "white")
 # add background reference data
 plot(wh_states, col = "#cfcfcf", border = NA, add = TRUE)
 
-# plot zeroes as gray
+# plot zeroes as light gray
 plot(abd_prj, col = "#e6e6e6", maxpixels = ncell(abd_prj),
      axes = FALSE, legend = FALSE, add = TRUE)
 

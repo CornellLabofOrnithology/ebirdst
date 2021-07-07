@@ -1,8 +1,6 @@
 context("Habitat associations")
 
 skip_on_cran()
-skip_on_appveyor()
-skip_on_travis()
 
 path <- ebirdst_download("example_data", tifs_only = FALSE)
 e <- ebirdst_extent(c(xmin = -86, xmax = -85, ymin = 42, ymax = 43))
@@ -12,7 +10,8 @@ test_that("ebirdst_habitat", {
   # expected
   expect_is(habitat, "ebirdst_habitat")
   expect_is(habitat, "data.frame")
-  expect_named(habitat, c("predictor", "date", "importance", "direction"))
+  expect_named(habitat, c("predictor", "date", "importance",  "prob_pos_slope",
+                          "direction"))
   expect_is(habitat$predictor, "character")
   expect_is(habitat$date, "numeric")
   expect_is(habitat$importance, "numeric")

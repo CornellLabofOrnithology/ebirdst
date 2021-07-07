@@ -10,23 +10,23 @@ select <- dplyr::select
 # source data
 root_path <- rappdirs::user_data_dir("ebirdst")
 species <- "yebsap-ERD2019-STATUS-20200930-8d36d265"
-sp_path <- file.path(root_path, species)
+sp_path <- path(root_path, species)
 
 # destination
 ex_species <- paste0(species, "-example")
-ex_dir <- file.path(root_path, ex_species)
-ex_cubes_dir <- file.path(ex_dir, "weekly_cubes")
-ex_seasonal_dir <- file.path(ex_dir, "abundance_seasonal")
-dir.create(ex_dir, recursive = TRUE, showWarnings = FALSE)
-dir.create(ex_cubes_dir, recursive = TRUE, showWarnings = FALSE)
-dir.create(ex_seasonal_dir, recursive = TRUE, showWarnings = FALSE)
+ex_dir <- path(root_path, ex_species)
+ex_cubes_dir <- path(ex_dir, "weekly_cubes")
+ex_seasonal_dir <- path(ex_dir, "abundance_seasonal")
+dir_create(ex_dir)
+dir_create(ex_cubes_dir)
+dir_create(ex_seasonal_dir)
 
 # copy config file and databases
 dir_ls(sp_path, regexp = "(rds|db)$", recurse = FALSE, type = "file") %>%
   file_copy(ex_dir)
 
 # raster template
-r_tmplt <- file.path(sp_path, "srd_raster_template.tif") %>%
+r_tmplt <- path(sp_path, "srd_raster_template.tif") %>%
   raster()
 
 # region for subsetting from rnaturalearth
@@ -49,12 +49,12 @@ for (f in tifs) {
     writeRaster(filename = f_out, overwrite = TRUE,
                 options = c("COMPRESS=DEFLATE","TILED=YES"))
 }
-file_copy(file.path(sp_path, "weekly_cubes", "band_dates.csv"),
-          file.path(ex_cubes_dir, "band_dates.csv"))
+file_copy(path(sp_path, "weekly_cubes", "band_dates.csv"),
+          path(ex_cubes_dir, "band_dates.csv"))
 
 # database connections
-pipd_db <- file.path(ex_dir, "pi-pd.db")
-pred_db <- file.path(ex_dir, "predictions.db")
+pipd_db <- path(ex_dir, "pi-pd.db")
+pred_db <- path(ex_dir, "predictions.db")
 pipd_con <- dbConnect(SQLite(), pipd_db)
 pred_con <- dbConnect(SQLite(), pred_db)
 
