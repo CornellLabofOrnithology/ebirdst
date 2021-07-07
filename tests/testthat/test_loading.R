@@ -2,6 +2,12 @@ context("Loading functions")
 
 path <- ebirdst_download("example_data", tifs_only = TRUE)
 
+test_that("get_species_path", {
+  p <- get_species_path("example_data")
+  expect_equal(path, p)
+  expect_error(get_species_path("not-a-real-species"))
+})
+
 test_that("load_config", {
   l <- load_config(path)
   expect_is(l, "list")

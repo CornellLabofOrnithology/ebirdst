@@ -32,7 +32,8 @@ predictive performance metrics.}
 fresh copy be downloaded anyway.}
 }
 \value{
-Path to the run-specific root of the downloaded files.
+Path to the folder containing the downloaded data package for the
+given species.
 }
 \description{
 Download an eBird Status and Trends data package for a single species, or for
@@ -45,7 +46,9 @@ than the full dataset, making these data quicker to download and process.
 ebirdst_download("example_data")
 
 \dontrun{
-# download the full data package for wood thrush
+# download the data package for wood thrush, geotiffs only
 ebirdst_download("woothr")
+# download the data package for wood thrush, all data
+ebirdst_download("woothr", tifs_only = FALSE)
 }
 }

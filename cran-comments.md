@@ -7,14 +7,12 @@
 
 ## Test environments
 
-- local OS X install, R 3.6.3
-- ubuntu 16.04 (travis-ci), R 3.6.3
-- Windows (appveyor), R 3.6.3
-- Rhub
-  - Ubuntu Linux 16.04 LTS, R-release, GCC
-  - Fedora Linux, R-devel, clang, gfortran
-  - Windows Server 2008 R2 SP1, R-devel, 32/64 bit
+- local OS X install, R 4.1
+- OS X (github actions), R 4.1
+- Windows (github actions), R 4.1
+- ubuntu 14.04 (github actions), R 4.1
 - win-builder (devel and release)
+- R-hub (Solaris), R 4.1
 
 ## R CMD check results
 

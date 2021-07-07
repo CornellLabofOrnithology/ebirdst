@@ -1,8 +1,6 @@
 context("PPM functions")
 
 skip_on_cran()
-skip_on_appveyor()
-skip_on_travis()
 
 path <- ebirdst_download("example_data", tifs_only = FALSE)
 e <- ebirdst_extent(c(xmin = -86, xmax = -85, ymin = 42, ymax = 43),

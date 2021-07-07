@@ -1,7 +1,6 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-ebirdst: Access and Analyze eBird Status and Trends Data
-========================================================
+# ebirdst: Access and Analyze eBird Status and Trends Data
 
 <!-- badges: start -->
 
@@ -12,8 +11,7 @@ v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/
 status](https://www.r-pkg.org/badges/version/ebirdst)](https://cran.r-project.org/package=ebirdst)
 <!-- badges: end -->
 
-Installation
-------------
+## Installation
 
 Install `ebirdst` from CRAN with:
 
@@ -25,17 +23,11 @@ Alternatively, you can install the development version from GitHub with:
     remotes::install_github("CornellLabofOrnithology/ebirdst")
 
 The current version of `ebirdst` is designed for working with the eBird
-Status and Trends data products released in December 2020, with estimate
-made for 2019. Older versions of the Status and Trends data can be
-accessed by installing the associated version of `ebirdst` from GitHub.
-For example, 2016 estimates, corresponding to v0.1.0 of this package,
-can be accessed with:
+Status and Trends data products released in December 2020, with
+abundance estimates made for 2019. **Users are strongly discouraged from
+comparing Status and Trends results between years.**
 
-    # install.packages("remotes")
-    remotes::install_github("CornellLabofOrnithology/ebirdst@v0.1.0")
-
-Citation
---------
+## Citation
 
 If you use the the eBird Status & Trends data please cite it with:
 
@@ -47,8 +39,7 @@ of Ornithology, Ithaca, New York.
 <a href="https://doi.org/10.2173/ebirdst.2019" class="uri">https://doi.org/10.2173/ebirdst.2019</a>
 </blockquote>
 
-Vignettes
----------
+## Vignettes
 
 For full package documentation, including a series of vignettes covering
 the full spectrum from introductory to advanced usage, please see the
@@ -82,8 +73,7 @@ version of the data you want to work with. Opening the file
 `docs/index.html` will open the package website for this version, which
 gives access to all the documentation and vignettes.
 
-Quick Start
------------
+## Quick Start
 
 This quick start guide shows how to download data and plot abundance
 values similar to how they are plotted for the [eBird Status and Trends
@@ -100,7 +90,6 @@ inherent in the delivered results. Changing the folder and file
 structure will cause errors with this package.
 
     library(ebirdst)
-    library(viridis)
     library(raster)
     library(sf)
     library(fields)
@@ -124,13 +113,12 @@ structure will cause errors with this package.
     # get a date vector specifying which week each raster layer corresponds to
     weeks <- parse_raster_dates(abd)
     print(weeks)
-    #>  [1] "2019-01-04" "2019-01-11" "2019-01-18" "2019-01-25" "2019-02-01" "2019-02-08" "2019-02-15" "2019-02-22"
-    #>  [9] "2019-03-01" "2019-03-08" "2019-03-15" "2019-03-22" "2019-03-29" "2019-04-05" "2019-04-12" "2019-04-19"
-    #> [17] "2019-04-26" "2019-05-03" "2019-05-10" "2019-05-17" "2019-05-24" "2019-05-31" "2019-06-07" "2019-06-14"
-    #> [25] "2019-06-21" "2019-06-28" "2019-07-06" "2019-07-13" "2019-07-20" "2019-07-27" "2019-08-03" "2019-08-10"
-    #> [33] "2019-08-17" "2019-08-24" "2019-08-31" "2019-09-07" "2019-09-14" "2019-09-21" "2019-09-28" "2019-10-05"
-    #> [41] "2019-10-12" "2019-10-19" "2019-10-26" "2019-11-02" "2019-11-09" "2019-11-16" "2019-11-23" "2019-11-30"
-    #> [49] "2019-12-07" "2019-12-14" "2019-12-21" "2019-12-28"
+    #>  [1] "2019-01-04" "2019-01-11" "2019-01-18" "2019-01-25" "2019-02-01" "2019-02-08" "2019-02-15" "2019-02-22" "2019-03-01"
+    #> [10] "2019-03-08" "2019-03-15" "2019-03-22" "2019-03-29" "2019-04-05" "2019-04-12" "2019-04-19" "2019-04-26" "2019-05-03"
+    #> [19] "2019-05-10" "2019-05-17" "2019-05-24" "2019-05-31" "2019-06-07" "2019-06-14" "2019-06-21" "2019-06-28" "2019-07-06"
+    #> [28] "2019-07-13" "2019-07-20" "2019-07-27" "2019-08-03" "2019-08-10" "2019-08-17" "2019-08-24" "2019-08-31" "2019-09-07"
+    #> [37] "2019-09-14" "2019-09-21" "2019-09-28" "2019-10-05" "2019-10-12" "2019-10-19" "2019-10-26" "2019-11-02" "2019-11-09"
+    #> [46] "2019-11-16" "2019-11-23" "2019-11-30" "2019-12-07" "2019-12-14" "2019-12-21" "2019-12-28"
 
     # select a week in the middle of the year
     abd <- abd[[26]]
@@ -155,7 +143,7 @@ structure will cause errors with this package.
     # add background reference data
     plot(wh_states, col = "#cfcfcf", border = NA, add = TRUE)
 
-    # plot zeroes as gray
+    # plot zeroes as light gray
     plot(abd_prj, col = "#e6e6e6", maxpixels = ncell(abd_prj),
          axes = FALSE, legend = FALSE, add = TRUE)
 
