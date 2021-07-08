@@ -34,6 +34,18 @@ comparing Status and Trends results between years due to methodological
 differences between versions.** To request access to previous versions,
 please contact <ebird@cornell.edu>.
 
+## Data access
+
+As of July 2021, data access is now granted through a Access Request
+Form at: <https://ebird.org/st/request>. Access with this form generates
+a key to be used with this R package and is provided immediately (as
+long as commercial use is not requested). Our terms of use have been
+updated to be more permissive in many cases, particularly academic and
+research use. When requesting data access, please be sure to carefully
+read the terms of use and ensure that your intended use is not
+restricted. Data are no longer publicly available via AWS, aside from an
+example dataset.
+
 ## Citation
 
 If you use the the eBird Status & Trends data please cite it with:
@@ -70,15 +82,6 @@ There are four available vignettes are:
     packages, including exploring **predictor importance**, plotting
     **partial dependence** curves for model predictors, and assessing
     model quality with **predictive performance metrics**.
-
-To access old versions of the vignettes suitable for working with
-previous eBird Status and Trends releases go to the [versions page of
-the GitHub
-repository](https://github.com/CornellLabofOrnithology/ebirdst/releases).
-Download and unzip the source code for the release associated with the
-version of the data you want to work with. Opening the file
-`docs/index.html` will open the package website for this version, which
-gives access to all the documentation and vignettes.
 
 ## Quick Start
 

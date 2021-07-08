@@ -4,11 +4,10 @@ citEntry(
   entry        = "Manual",
   title        = "ebirdst: Tools for loading, plotting, mapping and analysis of eBird Status and Trends data products",
   author       = personList(
-                   as.person("Matthew Strimas-Mackey")
+                   as.person("Matthew Strimas-Mackey"),
                    as.person("Shawn Ligocki"),
                    as.person("Tom Auer"),
-                   as.person("Daniel Fink"),
-
+                   as.person("Daniel Fink")
                  ),
   year         = "2021",
   note         = "R package version 1.0.0",
