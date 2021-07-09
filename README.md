@@ -28,11 +28,12 @@ remotes::install_github("CornellLabofOrnithology/ebirdst")
 ```
 
 The current version of `ebirdst` is designed for working with the eBird
-Status and Trends data products released in December 2020, with
-abundance estimates made for 2019. **Users are strongly discouraged from
-comparing Status and Trends results between years due to methodological
-differences between versions.** To request access to previous versions,
-please contact <ebird@cornell.edu>.
+Status and Trends data products that make estimates for 2019, with
+visualizations being released on the web in December 2020, and data
+access being made available in August 2021. **Users are strongly
+discouraged from comparing Status and Trends results between years due
+to methodological differences between versions.** To request access to
+previous versions, please contact <ebird@cornell.edu>.
 
 ## Data access
 
@@ -67,7 +68,7 @@ There are four available vignettes are:
 
 -   [Introduction](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-introduction.html):
     details data access and the structure of the results.
--   [Introductary
+-   [Introductory
     mapping](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html):
     covers the basic of making abundance maps using the eBird Status and
     Trends data.
@@ -124,12 +125,17 @@ labels <- attr(breaks, "labels")
 # get a date vector specifying which week each raster layer corresponds to
 weeks <- parse_raster_dates(abd)
 print(weeks)
-#>  [1] "2019-01-04" "2019-01-11" "2019-01-18" "2019-01-25" "2019-02-01" "2019-02-08" "2019-02-15" "2019-02-22" "2019-03-01"
-#> [10] "2019-03-08" "2019-03-15" "2019-03-22" "2019-03-29" "2019-04-05" "2019-04-12" "2019-04-19" "2019-04-26" "2019-05-03"
-#> [19] "2019-05-10" "2019-05-17" "2019-05-24" "2019-05-31" "2019-06-07" "2019-06-14" "2019-06-21" "2019-06-28" "2019-07-06"
-#> [28] "2019-07-13" "2019-07-20" "2019-07-27" "2019-08-03" "2019-08-10" "2019-08-17" "2019-08-24" "2019-08-31" "2019-09-07"
-#> [37] "2019-09-14" "2019-09-21" "2019-09-28" "2019-10-05" "2019-10-12" "2019-10-19" "2019-10-26" "2019-11-02" "2019-11-09"
-#> [46] "2019-11-16" "2019-11-23" "2019-11-30" "2019-12-07" "2019-12-14" "2019-12-21" "2019-12-28"
+#>  [1] "2019-01-04" "2019-01-11" "2019-01-18" "2019-01-25" "2019-02-01"
+#>  [6] "2019-02-08" "2019-02-15" "2019-02-22" "2019-03-01" "2019-03-08"
+#> [11] "2019-03-15" "2019-03-22" "2019-03-29" "2019-04-05" "2019-04-12"
+#> [16] "2019-04-19" "2019-04-26" "2019-05-03" "2019-05-10" "2019-05-17"
+#> [21] "2019-05-24" "2019-05-31" "2019-06-07" "2019-06-14" "2019-06-21"
+#> [26] "2019-06-28" "2019-07-06" "2019-07-13" "2019-07-20" "2019-07-27"
+#> [31] "2019-08-03" "2019-08-10" "2019-08-17" "2019-08-24" "2019-08-31"
+#> [36] "2019-09-07" "2019-09-14" "2019-09-21" "2019-09-28" "2019-10-05"
+#> [41] "2019-10-12" "2019-10-19" "2019-10-26" "2019-11-02" "2019-11-09"
+#> [46] "2019-11-16" "2019-11-23" "2019-11-30" "2019-12-07" "2019-12-14"
+#> [51] "2019-12-21" "2019-12-28"
 
 # select a week in the middle of the year
 abd <- abd[[26]]
