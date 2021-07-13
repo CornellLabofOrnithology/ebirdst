@@ -1,9 +1,12 @@
 #' Download eBird Status and Trends Data
 #'
 #' Download an eBird Status and Trends data package for a single species, or for
-#' an example species, to a specified path. The example data consist of the
-#' results for Yellow-bellied Sapsucker subset to Michigan and are much smaller
-#' than the full dataset, making these data quicker to download and process.
+#' an example species, to a specified path. Accessing Status and Trends data
+#' requires an API key, consult [set_ebirdst_api_key()] for instructions on how
+#' to obtain and store this key. The example data consist of the results for
+#' Yellow-bellied Sapsucker subset to Michigan and are much smaller
+#' than the full dataset, making these data quicker to download and process. In
+#' addition, the example data are accessible without an API key.
 #'
 #' @param species character; a single species given as a scientific name, common
 #'   name or six-letter species code (e.g. woothr). The full list of valid
@@ -20,6 +23,7 @@
 #'   predictive performance metrics.
 #' @param force logical; if the data have already been downloaded, should a
 #'   fresh copy be downloaded anyway.
+#' @param show_progress logical; whether to print download progress information.
 #'
 #' @return Path to the folder containing the downloaded data package for the
 #'   given species.
@@ -39,11 +43,13 @@
 ebirdst_download <- function(species,
                              path = rappdirs::user_data_dir("ebirdst"),
                              tifs_only = TRUE,
-                             force = FALSE) {
+                             force = FALSE,
+                             show_progress = TRUE) {
   stopifnot(is.character(species), length(species) == 1)
   stopifnot(is.character(path), length(path) == 1)
   stopifnot(is.logical(tifs_only), length(tifs_only) == 1)
   stopifnot(is.logical(force), length(force) == 1)
+  stopifnot(is.logical(show_progress), length(show_progress) == 1)
   species <- tolower(species)
 
   if (!dir.exists(path)) {
@@ -51,91 +57,95 @@ ebirdst_download <- function(species,
   }
 
   # example data or a real run
-  bucket_url <- "https://ebirdst-data.s3.amazonaws.com/"
   if (species == "example_data") {
+    api_url <- "https://ebirdst-data.s3.amazonaws.com/"
     run <- "yebsap-ERD2019-STATUS-20200930-8d36d265-example"
-  } else {
-    species <- get_species(species)
-    row_id <- which(ebirdst::ebirdst_runs$species_code == species)
-    if (length(row_id) != 1) {
-      stop(sprintf("species = %s does not uniquely identify a species.",
-                   species))
+    bucket_url_sp <- paste0(api_url, "?prefix=", run)
+
+    # get bucket contents
+    s3_contents <- xml2::xml_ns_strip(xml2::read_xml(bucket_url_sp))
+    s3_contents <- xml2::xml_find_all(s3_contents, ".//Contents")
+    if (length(s3_contents) == 0) {
+      stop(sprintf("Files not found on AWS S3 for species = %s", species))
     }
-    run <- ebirdst::ebirdst_runs$run_name[row_id]
+
+    # store filename and size
+    files <- data.frame(
+      file = xml2::xml_text(xml2::xml_find_all(s3_contents, ".//Key")),
+      size = xml2::xml_text(xml2::xml_find_all(s3_contents, ".//Size")))
+    files$size <- as.numeric(files$size)
+
+    # filter to desired run/species
+    files <- files[as.numeric(files$size) > 0 & grepl(run, files$file), ,
+                   drop = FALSE]
+  } else {
+    key <- get_ebirdst_api_key()
+    species <- get_species(species)
+    api_url <- "https://test.st-download.ebird.org/v1/"
+
+    # get file list for this species
+    list_obj_url <- stringr::str_glue("{api_url}/list-obj/{species}?key={key}")
+    files <- tryCatch(suppressWarnings({
+      jsonlite::read_json(list_obj_url, simplifyVector = TRUE)
+    }), error = function(e) NULL)
+    if (is.null(files)) {
+      stop("Cannot access Status and Trends data URL. Ensure that you have ",
+           "a working internet connection and a valid API key for the Status ",
+           "and Trends data.")
+    }
+    files <- data.frame(file = files)
   }
-  bucket_url_sp <- paste0(bucket_url, "?prefix=", run)
-
-  # get bucket contents
-  s3_contents <- xml2::xml_ns_strip(xml2::read_xml(bucket_url_sp))
-  s3_contents <- xml2::xml_find_all(s3_contents, ".//Contents")
-  if (length(s3_contents) == 0) {
-    stop(sprintf("Files not found on AWS S3 for species = %s", species))
+  if (nrow(files) == 0) {
+    stop("No data found for species ", species)
   }
 
-  # store filename and size
-  s3_files <- data.frame(
-    file = xml2::xml_text(xml2::xml_find_all(s3_contents, ".//Key")),
-    size = xml2::xml_text(xml2::xml_find_all(s3_contents, ".//Size")),
-    stringsAsFactors = FALSE)
-  s3_files$size <- as.numeric(s3_files$size)
-
-  # filter to desired run/species
-  s3_files <- s3_files[as.numeric(s3_files$size) > 0 &
-                         grepl(run, s3_files$file), ]
-  if (nrow(s3_files) == 0) {
-    stop(sprintf("Files not found on AWS S3 for species = %s", species))
-  }
-
-  # only dl rasters unless requested otherwise
+  # only download databases when explicitly requested
   if (isTRUE(tifs_only)) {
-    s3_files <- s3_files[grepl("tif$", s3_files$file) |
-                           grepl("rds$", s3_files$file) |
-                           grepl("band_dates", s3_files$file), ]
+    files <- files[!stringr::str_detect(files$file, "\\.db$"), , drop = FALSE]
   }
-
-  dl_filter <- Sys.getenv("EBIRDST_DL_FILTER")
-  if (dl_filter != "") {
-    s3_files <- s3_files[grepl(dl_filter, s3_files$file), ]
-  }
-
-  # human readable download size if we want to add a message
-  #size_human <- utils:::format.object_size(sum(s3_files$size), "auto")
 
   # prepare download paths
-  s3_files$s3_path <- paste0(bucket_url, s3_files$file)
-  s3_files$local_path <- file.path(path, s3_files$file)
-  s3_files$exists <- file.exists(s3_files$local_path)
+  if (species == "example_data") {
+    files$src_path <- paste0(api_url, files$file)
+  } else {
+    files$src_path <- stringr::str_glue("{api_url}fetch?objKey={files$file}",
+                                        "&key={key}")
+  }
+  files$dest_path <- file.path(path, files$file)
+  files$exists <- file.exists(files$dest_path)
   # create necessary directories
-  dirs <- unique(dirname(s3_files$local_path))
+  dirs <- unique(dirname(files$dest_path))
   for (d in dirs) {
     dir.create(d, showWarnings = FALSE, recursive = TRUE)
   }
 
   # check if already exists
-  if (all(s3_files$exists)) {
-    if (!force) {
+  if (all(files$exists)) {
+    if (!isTRUE(force)) {
       message("Data already exists, use force = TRUE to re-download.")
       return(invisible(normalizePath(file.path(path, run))))
     }
-  } else if (any(s3_files$exists)) {
+  } else if (any(files$exists)) {
     if (!force) {
       message(paste("Some files already exist, only downloading new files.",
                     "\nUse force = TRUE to re-download all files."))
-      s3_files <- s3_files[!s3_files$exists, ]
+      files <- files[!files$exists, ]
     }
   }
 
   # download
-  for(i in seq_len(nrow(s3_files))) {
-    dl_response <- utils::download.file(s3_files$s3_path[i],
-                                        s3_files$local_path[i],
-                                        quiet = TRUE,
+  old_timeout <- getOption("timeout")
+  options(timeout = max(3000, old_timeout))
+  for(i in seq_len(nrow(files))) {
+    dl_response <- utils::download.file(files$src_path[i],
+                                        files$dest_path[i],
+                                        quiet = !show_progress,
                                         mode = "wb")
     if (dl_response != 0) {
-      stop("Error downloading files from AWS S3")
+      stop("Error downloading file: ", files$file[i])
     }
   }
-
+  options(timeout = old_timeout)
   return(invisible(normalizePath(file.path(path, run))))
 }
 
