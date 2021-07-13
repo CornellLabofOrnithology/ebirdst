@@ -43,6 +43,7 @@ Imports:
     gbm,
     ggplot2,
     grDevices,
+    jsonlite,
     gridExtra,
     magrittr,
     methods,
