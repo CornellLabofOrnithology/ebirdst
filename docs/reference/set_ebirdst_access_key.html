@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Download eBird Status and Trends Data — ebirdst_download • ebirdst</title>
+<title>Store the eBird Status and Trends access key — set_ebirdst_access_key • ebirdst</title>
 
 
 <!-- jquery -->
@@ -39,14 +39,16 @@
 
 
 
-<meta property="og:title" content="Download eBird Status and Trends Data — ebirdst_download" />
-<meta property="og:description" content="Download an eBird Status and Trends data package for a single species, or for
-an example species, to a specified path. Accessing Status and Trends data
-requires an access key, consult set_ebirdst_access_key() for instructions
-on how to obtain and store this key. The example data consist of the results
-for Yellow-bellied Sapsucker subset to Michigan and are much smaller than the
-full dataset, making these data quicker to download and process. In addition,
-the example data are accessible without an access key." />
+<meta property="og:title" content="Store the eBird Status and Trends access key — set_ebirdst_access_key" />
+<meta property="og:description" content="Accessing eBird Status and Trends data requires an access key, which can be
+obtained by visiting https://ebird.org/st/request. This key must be
+stored as the environment variable EBIRDST_KEY in order for
+ebirdst_download() to use it. The easiest approach is to store the key in
+your .Renviron file so it can always be accessed in your R sessions. Use
+this function to set EBIRDST_KEY in your .Renviron file provided that it
+is located in the standard location in your home directory. It is also
+possible to manually edit the .Renviron file. The access key is specific
+to you and should never be shared or made publicly accessible." />
 
 
 
@@ -120,79 +122,48 @@ the example data are accessible without an access key." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Download eBird Status and Trends Data</h1>
-    <small class="dont-index">Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/R/ebirdst-loading.R'><code>R/ebirdst-loading.R</code></a></small>
-    <div class="hidden name"><code>ebirdst_download.Rd</code></div>
+    <h1>Store the eBird Status and Trends access key</h1>
+    <small class="dont-index">Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/R/access-key.R'><code>R/access-key.R</code></a></small>
+    <div class="hidden name"><code>set_ebirdst_access_key.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Download an eBird Status and Trends data package for a single species, or for
-an example species, to a specified path. Accessing Status and Trends data
-requires an access key, consult <code><a href='set_ebirdst_access_key.html'>set_ebirdst_access_key()</a></code> for instructions
-on how to obtain and store this key. The example data consist of the results
-for Yellow-bellied Sapsucker subset to Michigan and are much smaller than the
-full dataset, making these data quicker to download and process. In addition,
-the example data are accessible without an access key.</p>
+    <p>Accessing eBird Status and Trends data requires an access key, which can be
+obtained by visiting https://ebird.org/st/request. This key must be
+stored as the environment variable <code>EBIRDST_KEY</code> in order for
+<code><a href='ebirdst_download.html'>ebirdst_download()</a></code> to use it. The easiest approach is to store the key in
+your <code>.Renviron</code> file so it can always be accessed in your R sessions. Use
+this function to set <code>EBIRDST_KEY</code> in your <code>.Renviron</code> file provided that it
+is located in the standard location in your home directory. It is also
+possible to manually edit the <code>.Renviron</code> file. <strong>The access key is specific
+to you and should never be shared or made publicly accessible.</strong></p>
     </div>
 
-    <pre class="usage"><span class='fu'>ebirdst_download</span><span class='op'>(</span>
-  <span class='va'>species</span>,
-  path <span class='op'>=</span> <span class='fu'>rappdirs</span><span class='fu'>::</span><span class='fu'><a href='https://rappdirs.r-lib.org/reference/user_data_dir.html'>user_data_dir</a></span><span class='op'>(</span><span class='st'>"ebirdst"</span><span class='op'>)</span>,
-  tifs_only <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  force <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  show_progress <span class='op'>=</span> <span class='cn'>TRUE</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>set_ebirdst_access_key</span><span class='op'>(</span><span class='va'>key</span>, overwrite <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>species</th>
-      <td><p>character; a single species given as a scientific name, common
-name or six-letter species code (e.g. woothr). The full list of valid
-species is can be viewed in the <a href='ebirdst_runs.html'>ebirdst_runs</a> data frame included in this
-package. To download the example dataset, use "example_data".</p></td>
+      <th>key</th>
+      <td><p>character; API key obtained by filling out the form at
+https://ebird.org/st/request.</p></td>
     </tr>
     <tr>
-      <th>path</th>
-      <td><p>character; directory to download the data to. All downloaded
-files will be placed in a sub-directory of this directory named according
-to the unique run ID associated with this species. Defaults to a persistent
-data directory, which can be found by calling
-rappdirs::user_data_dir("ebirdst")).</p></td>
-    </tr>
-    <tr>
-      <th>tifs_only</th>
-      <td><p>logical; whether to only download the GeoTIFFs for
-abundance and occurrence (the default), or download the entire data
-package, including data for predictor importance, partial dependence, and
-predictive performance metrics.</p></td>
-    </tr>
-    <tr>
-      <th>force</th>
-      <td><p>logical; if the data have already been downloaded, should a
-fresh copy be downloaded anyway.</p></td>
-    </tr>
-    <tr>
-      <th>show_progress</th>
-      <td><p>logical; whether to print download progress information.</p></td>
+      <th>overwrite</th>
+      <td><p>logical; should the existing <code>EBIRDST_KEY</code> be overwritten if
+it has already been set in .Renviron.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Path to the folder containing the downloaded data package for the
-given species.</p>
+    <p>Edits .Renviron, then returns the path to this file invisibly.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># download the example data</span>
-<span class='fu'>ebirdst_download</span><span class='op'>(</span><span class='st'>"example_data"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Data already exists, use force = TRUE to re-download.</span></div><div class='input'>
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='co'># download the data package for wood thrush, geotiffs only</span>
-<span class='fu'>ebirdst_download</span><span class='op'>(</span><span class='st'>"woothr"</span><span class='op'>)</span>
-<span class='co'># download the data package for wood thrush, all data</span>
-<span class='fu'>ebirdst_download</span><span class='op'>(</span><span class='st'>"woothr"</span>, tifs_only <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># save the api key, replace XXXXXX with your actual key</span>
+<span class='fu'>set_ebirdst_access_key</span><span class='op'>(</span><span class='st'>"XXXXXX"</span><span class='op'>)</span>
 <span class='op'>}</span>
 </div></pre>
   </div>

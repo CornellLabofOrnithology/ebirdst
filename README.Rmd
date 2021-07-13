@@ -46,6 +46,8 @@ The current version of `ebirdst` is designed for working with the eBird Status a
 
 As of July 2021, data access is now granted through a Access Request Form at: https://ebird.org/st/request. Access with this form generates a key to be used with this R package and is provided immediately (as long as commercial use is not requested). Our terms of use have been updated to be more permissive in many cases, particularly academic and research use. When requesting data access, please be sure to carefully read the terms of use and ensure that your intended use is not restricted. Data are no longer publicly available via AWS, aside from an example dataset.
 
+After completing the Access Request Form, you will be provided a Status and Trends access key, which you will need when downloading data. To store the key so the `ebirdst` package can access it when downloading data, use the function `set_ebirdst_access_key("XXXXX")`, where `"XXXXX"` is the access key provided to you.
+
 ## Citation
 
 If you use the the eBird Status & Trends data please cite it with: 

@@ -14,6 +14,7 @@ devtools::check(run_dont_test = TRUE)
 # vignettes, readme, site
 Sys.setenv(BUILD_VIGNETTES = TRUE)
 rmarkdown::render("README.Rmd")
+unlink("README.html")
 pkgdown::build_site()
 Sys.unsetenv("BUILD_VIGNETTES")
 

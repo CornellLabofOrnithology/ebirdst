@@ -39,7 +39,6 @@ Imports:
     DBI,
     dplyr (>= 0.7.0),
     fasterize,
-    fs,
     gbm,
     ggplot2,
     grDevices,

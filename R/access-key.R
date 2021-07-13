@@ -1,14 +1,14 @@
-#' Store the eBird Status and Trends API key
+#' Store the eBird Status and Trends access key
 #'
-#' Accessing eBird Status and Trends data requires an API key, which can be
+#' Accessing eBird Status and Trends data requires an access key, which can be
 #' obtained by visiting https://ebird.org/st/request. This key must be
 #' stored as the environment variable `EBIRDST_KEY` in order for
 #' [ebirdst_download()] to use it. The easiest approach is to store the key in
 #' your `.Renviron` file so it can always be accessed in your R sessions. Use
 #' this function to set `EBIRDST_KEY` in your `.Renviron` file provided that it
 #' is located in the standard location in your home directory. It is also
-#' possible to manually edit the `.Renviron` file. **The API key is specific to
-#' you and should never be shared or made publicly accessible.**
+#' possible to manually edit the `.Renviron` file. **The access key is specific
+#' to you and should never be shared or made publicly accessible.**
 #'
 #' @param key character; API key obtained by filling out the form at
 #'   https://ebird.org/st/request.
@@ -21,9 +21,9 @@
 #' @examples
 #' \dontrun{
 #' # save the api key, replace XXXXXX with your actual key
-#' set_ebirdst_api_key("XXXXXX")
+#' set_ebirdst_access_key("XXXXXX")
 #' }
-set_ebirdst_api_key <- function(key, overwrite = FALSE) {
+set_ebirdst_access_key <- function(key, overwrite = FALSE) {
   stopifnot(is.character(key), length(key) == 1, nchar(key) > 0)
   stopifnot(is.logical(overwrite), length(overwrite) == 1)
 
@@ -56,11 +56,11 @@ set_ebirdst_api_key <- function(key, overwrite = FALSE) {
 }
 
 
-get_ebirdst_api_key <- function() {
+get_ebirdst_access_key <- function() {
   key <- Sys.getenv("EBIRDST_KEY")
   if (is.na(key) || key == "" || nchar(key) == 0) {
-    stop("eBird Status and Trends API key not found in .Renviron. ",
-         "Considering using set_ebirdst_api_key() to store the key.")
+    stop("eBird Status and Trends access key not found in .Renviron. ",
+         "Considering using set_ebirdst_access_key() to store the key.")
   }
   invisible(key)
 }

@@ -41,11 +41,11 @@ given species.
 \description{
 Download an eBird Status and Trends data package for a single species, or for
 an example species, to a specified path. Accessing Status and Trends data
-requires an API key, consult \code{\link[=set_ebirdst_api_key]{set_ebirdst_api_key()}} for instructions on how
-to obtain and store this key. The example data consist of the results for
-Yellow-bellied Sapsucker subset to Michigan and are much smaller
-than the full dataset, making these data quicker to download and process. In
-addition, the example data are accessible without an API key.
+requires an access key, consult \code{\link[=set_ebirdst_access_key]{set_ebirdst_access_key()}} for instructions
+on how to obtain and store this key. The example data consist of the results
+for Yellow-bellied Sapsucker subset to Michigan and are much smaller than the
+full dataset, making these data quicker to download and process. In addition,
+the example data are accessible without an access key.
 }
 \examples{
 # download the example data
