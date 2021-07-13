@@ -2,11 +2,11 @@
 #'
 #' Download an eBird Status and Trends data package for a single species, or for
 #' an example species, to a specified path. Accessing Status and Trends data
-#' requires an API key, consult [set_ebirdst_api_key()] for instructions on how
-#' to obtain and store this key. The example data consist of the results for
-#' Yellow-bellied Sapsucker subset to Michigan and are much smaller
-#' than the full dataset, making these data quicker to download and process. In
-#' addition, the example data are accessible without an API key.
+#' requires an access key, consult [set_ebirdst_access_key()] for instructions
+#' on how to obtain and store this key. The example data consist of the results
+#' for Yellow-bellied Sapsucker subset to Michigan and are much smaller than the
+#' full dataset, making these data quicker to download and process. In addition,
+#' the example data are accessible without an access key.
 #'
 #' @param species character; a single species given as a scientific name, common
 #'   name or six-letter species code (e.g. woothr). The full list of valid
@@ -79,7 +79,7 @@ ebirdst_download <- function(species,
     files <- files[as.numeric(files$size) > 0 & grepl(run, files$file), ,
                    drop = FALSE]
   } else {
-    key <- get_ebirdst_api_key()
+    key <- get_ebirdst_access_key()
     species <- get_species(species)
     api_url <- "https://test.st-download.ebird.org/v1/"
 

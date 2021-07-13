@@ -50,9 +50,9 @@ To describe how each species is associated with features of its local environmen
 
 As of July 2021, data access is now granted through a Access Request Form at: https://ebird.org/st/request. Access with this form generates a key to be used with this R package and is provided immediately (as long as commercial use is not requested). Our terms of use have been updated to be more permissive in many cases, particularly academic and research use. When requesting data access, please be sure to carefully read the terms of use and ensure that your intended use is not restricted. Data are no longer publicly available via AWS, aside from an example dataset.
 
-The provided access key can be made available to this R package with...
+After completing the Access Request Form, you will be provided a Status and Trends access key, which you will need when downloading data. To store the key so the `ebirdst` package can access it when downloading data, use the function `set_ebirdst_access_key("XXXXX")`, where `"XXXXX"` is the access key provided to you.
 
-Throughout the package vignettes, a simplified example dataset is used consisting of Yellow-bellied Sapsucker in Michigan. This dataset designed to be small for faster download and is accessible without an API key. 
+Throughout the package vignettes, a simplified example dataset is used consisting of Yellow-bellied Sapsucker in Michigan. This dataset is designed to be small for faster download and is accessible without a key. 
 
 ```{r quick_start}
 library(ebirdst)
