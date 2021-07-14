@@ -53,7 +53,7 @@ Imports:
     rgdal,
     rlang,
     RSQLite,
-    sf,
+    sf (>= 1.0-0),
     stats,
     stringr,
     tidyr (>= 1.0.0),
