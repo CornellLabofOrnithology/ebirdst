@@ -76,7 +76,7 @@ calculating predictive performance metrics." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -101,7 +101,7 @@ calculating predictive performance metrics." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/CornellLabofOrnithology/ebirdst">
-    <span class="fas fa-github fa-lg"></span>
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -155,35 +155,37 @@ rather then the default data frame.</p></td>
 observed counts and model predictiosn for the test data.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='co'># download example data</span>
-<span class='va'>path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span><span class='op'>(</span><span class='st'>"example_data"</span>, tifs_only <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Data already exists, use force = TRUE to re-download.</span></div><div class='input'><span class='co'># or get the path if you already have the data downloaded</span>
-<span class='va'>path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='get_species_path.html'>get_species_path</a></span><span class='op'>(</span><span class='st'>"example_data"</span><span class='op'>)</span>
-
-<span class='co'># test data</span>
-<span class='va'>test_predictions</span> <span class='op'>&lt;-</span> <span class='fu'>load_predictions</span><span class='op'>(</span><span class='va'>path</span><span class='op'>)</span>
-<span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://pillar.r-lib.org/reference/glimpse.html'>glimpse</a></span><span class='op'>(</span><span class='va'>test_predictions</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Rows: 69,325
-#&gt; Columns: 17
-#&gt; $ sampling_event_id <span style='color: #949494; font-style: italic;'>&lt;int&gt;</span> 10052301, 10081039, 10143301, 10209225, 10216906, 10…
-#&gt; $ lon               <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> -86.00780, -84.27086, -86.19749, -82.53907, -84.6824…
-#&gt; $ lat               <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 43.25270, 44.04061, 42.64337, 43.27222, 44.97813, 42…
-#&gt; $ year              <span style='color: #949494; font-style: italic;'>&lt;int&gt;</span> 2012, 2012, 2012, 2012, 2012, 2012, 2012, 2012, 2012…
-#&gt; $ date              <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 0.1584699, 0.1748634, 0.1939891, 0.2131148, 0.215847…
-#&gt; $ obs               <span style='color: #949494; font-style: italic;'>&lt;int&gt;</span> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
-#&gt; $ pi_median         <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 0.0012130352, 0.0000000000, 0.0056247482, 0.00103057…
-#&gt; $ pi_upper          <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 1.624602e-03, 9.706170e-06, 5.906293e-03, 1.775320e-…
-#&gt; $ pi_lower          <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 0.0010769033, 0.0000000000, 0.0052052081, 0.00017210…
-#&gt; $ mu_median         <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 0.7783889, 0.0000000, 0.9310000, 0.7955000, 0.628666…
-#&gt; $ mu_upper          <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 0.78925107, 0.05334441, 0.96202950, 0.81088107, 0.73…
-#&gt; $ mu_lower          <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 0.76657136, 0.00000000, 0.87568918, 0.78384603, 0.33…
-#&gt; $ pi_mu_median      <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 0.0009054828, 0.0000000000, 0.0051081508, 0.00071076…
-#&gt; $ pi_mu_upper       <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 1.206035e-03, 3.977800e-06, 6.086650e-03, 8.993073e-…
-#&gt; $ pi_mu_lower       <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 7.216887e-04, 0.000000e+00, 4.116163e-03, 4.944714e-…
-#&gt; $ pat               <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 0.0000000, 0.0000000, 0.0000000, 0.0000000, 0.000000…
-#&gt; $ pi_es             <span style='color: #949494; font-style: italic;'>&lt;int&gt;</span> 100, 84, 100, 100, 72, 101, 100, 101, 100, 100, 100,…</div><div class='input'><span class='co'># }</span>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># \donttest{</span></span>
+<span class='r-in'><span class='co'># download example data</span></span>
+<span class='r-in'><span class='va'>path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span><span class='op'>(</span><span class='st'>"example_data"</span>, tifs_only <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Data already exists, use force = TRUE to re-download.</span>
+<span class='r-in'><span class='co'># or get the path if you already have the data downloaded</span></span>
+<span class='r-in'><span class='va'>path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='get_species_path.html'>get_species_path</a></span><span class='op'>(</span><span class='st'>"example_data"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># test data</span></span>
+<span class='r-in'><span class='va'>test_predictions</span> <span class='op'>&lt;-</span> <span class='fu'>load_predictions</span><span class='op'>(</span><span class='va'>path</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://pillar.r-lib.org/reference/glimpse.html'>glimpse</a></span><span class='op'>(</span><span class='va'>test_predictions</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Rows: 69,325</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Columns: 17</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ sampling_event_id <span style='color: #949494; font-style: italic;'>&lt;int&gt;</span> 10052301, 10081039, 10143301, 10209225, 10216906, 10…</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ lon               <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> -86.00780, -84.27086, -86.19749, -82.53907, -84.6824…</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ lat               <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 43.25270, 44.04061, 42.64337, 43.27222, 44.97813, 42…</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ year              <span style='color: #949494; font-style: italic;'>&lt;int&gt;</span> 2012, 2012, 2012, 2012, 2012, 2012, 2012, 2012, 2012…</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ date              <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 0.1584699, 0.1748634, 0.1939891, 0.2131148, 0.215847…</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ obs               <span style='color: #949494; font-style: italic;'>&lt;int&gt;</span> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ pi_median         <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 0.0012130352, 0.0000000000, 0.0056247482, 0.00103057…</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ pi_upper          <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 1.624602e-03, 9.706170e-06, 5.906293e-03, 1.775320e-…</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ pi_lower          <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 0.0010769033, 0.0000000000, 0.0052052081, 0.00017210…</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ mu_median         <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 0.7783889, 0.0000000, 0.9310000, 0.7955000, 0.628666…</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ mu_upper          <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 0.78925107, 0.05334441, 0.96202950, 0.81088107, 0.73…</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ mu_lower          <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 0.76657136, 0.00000000, 0.87568918, 0.78384603, 0.33…</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ pi_mu_median      <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 0.0009054828, 0.0000000000, 0.0051081508, 0.00071076…</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ pi_mu_upper       <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 1.206035e-03, 3.977800e-06, 6.086650e-03, 8.993073e-…</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ pi_mu_lower       <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 7.216887e-04, 0.000000e+00, 4.116163e-03, 4.944714e-…</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ pat               <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> 0.0000000, 0.0000000, 0.0000000, 0.0000000, 0.000000…</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ pi_es             <span style='color: #949494; font-style: italic;'>&lt;int&gt;</span> 100, 84, 100, 100, 72, 101, 100, 101, 100, 100, 100,…</span>
+<span class='r-in'><span class='co'># }</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
