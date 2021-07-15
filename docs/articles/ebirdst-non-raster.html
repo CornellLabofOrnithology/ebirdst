@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -56,7 +56,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/CornellLabofOrnithology/ebirdst">
-    <span class="fas fa-github fa-lg"></span>
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -70,13 +70,13 @@
 
       
 
-      </header><script src="ebirdst-non-raster_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
+      </header><script src="ebirdst-non-raster_files/header-attrs-2.9/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Non-raster Data: Using Predictor Importance, Partial Dependence, and Predictive Performance Metrics</h1>
                         <h4 class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2021-07-13</h4>
+            <h4 class="date">2021-07-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-non-raster.Rmd"><code>vignettes/ebirdst-non-raster.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-non-raster.Rmd</code></div>
@@ -234,7 +234,7 @@
 <code class="sourceCode R"><span class="co"># define a spatiotemporal extent</span>
 <span class="va">lp_extent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ebirdst_extent.html">ebirdst_extent</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>xmin <span class="op">=</span> <span class="op">-</span><span class="fl">86</span>, xmax <span class="op">=</span> <span class="op">-</span><span class="fl">83</span>, ymin <span class="op">=</span> <span class="fl">42</span>, ymax <span class="op">=</span> <span class="fl">45</span><span class="op">)</span>,
                             t <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.425</span>, <span class="fl">0.475</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">lp_extent</span><span class="op">)</span>
+<span class="fu"><a href="https://www.math.uzh.ch/pages/spam//reference/print.html">print</a></span><span class="op">(</span><span class="va">lp_extent</span><span class="op">)</span>
 <span class="co">#&gt; eBird Status &amp; Trends extent: </span>
 <span class="co">#&gt;   Bounding box: xmin -86; ymin 42; xmax -83; ymax 45</span>
 <span class="co">#&gt;   CRS: +proj=longlat +datum=WGS84 +no_defs </span>
@@ -281,9 +281,9 @@
 <span class="co">#&gt; Rows: 25</span>
 <span class="co">#&gt; Columns: 4</span>
 <span class="co">#&gt; $ x         &lt;dbl&gt; -1.197944e+01, -1.098123e+01, -9.983009e+00, -8.984792e+00, …</span>
-<span class="co">#&gt; $ pd_median &lt;dbl&gt; 0.0074838377, 0.0072978290, 0.0068957299, 0.0067468416, 0.00…</span>
-<span class="co">#&gt; $ pd_lower  &lt;dbl&gt; 0.0065330260, 0.0065722010, 0.0066003052, 0.0064271984, 0.00…</span>
-<span class="co">#&gt; $ pd_upper  &lt;dbl&gt; 0.0082762412, 0.0077822635, 0.0072571151, 0.0071868719, 0.00…</span>
+<span class="co">#&gt; $ pd_median &lt;dbl&gt; 0.0051529046, 0.0055314303, 0.0059403585, 0.0059389603, 0.00…</span>
+<span class="co">#&gt; $ pd_lower  &lt;dbl&gt; 0.0037219476, 0.0039047604, 0.0041453724, 0.0043615340, 0.00…</span>
+<span class="co">#&gt; $ pd_upper  &lt;dbl&gt; 0.0067653522, 0.0069031673, 0.0072701844, 0.0072551624, 0.00…</span>
 
 <span class="co"># deciduous broadleaf forest</span>
 <span class="fu"><a href="../reference/plot_pds.html">plot_pds</a></span><span class="op">(</span><span class="va">pds</span>, <span class="st">"mcd12q1_lccs1_fs_c14_1500_pland"</span>, ext <span class="op">=</span> <span class="va">lp_extent</span>, n_bs <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></code></pre></div>

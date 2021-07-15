@@ -36,7 +36,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -61,7 +61,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/CornellLabofOrnithology/ebirdst">
-    <span class="fas fa-github fa-lg"></span>
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -98,7 +98,7 @@
 <h2 class="hasAnchor">
 <a href="#data-access" class="anchor"></a>Data access</h2>
 <p>As of July 2021, data access is now granted through a Access Request Form at: <a href="https://ebird.org/st/request" class="uri">https://ebird.org/st/request</a>. Access with this form generates a key to be used with this R package and is provided immediately (as long as commercial use is not requested). Our terms of use have been updated to be more permissive in many cases, particularly academic and research use. When requesting data access, please be sure to carefully read the terms of use and ensure that your intended use is not restricted. Data are no longer publicly available via AWS, aside from an example dataset.</p>
-<p>After completing the Access Request Form, you will be provided a Status and Trends access key, which you will need when downloading data. To store the key so the <code>ebirdst</code> package can access it when downloading data, use the function <code><a href="reference/set_ebirdst_access_key.html">set_ebirdst_access_key("XXXXX")</a></code>, where <code>"XXXXX"</code> is the access key provided to you.</p>
+<p>After completing the Access Request Form, you will be provided a Status and Trends access key, which you will need when downloading data. To store the key so the <code>ebirdst</code> package can access it when downloading data, use the function <code>set_ebirdst_access_key("XXXXX")</code>, where <code>"XXXXX"</code> is the access key provided to you.</p>
 </div>
 <div id="citation" class="section level2">
 <h2 class="hasAnchor">
@@ -152,7 +152,7 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
 
 <span class="co"># get a date vector specifying which week each raster layer corresponds to</span>
 <span class="va">weeks</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/parse_raster_dates.html">parse_raster_dates</a></span><span class="op">(</span><span class="va">abd</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">weeks</span><span class="op">)</span>
+<span class="fu"><a href="https://www.math.uzh.ch/pages/spam//reference/print.html">print</a></span><span class="op">(</span><span class="va">weeks</span><span class="op">)</span>
 <span class="co">#&gt;  [1] "2019-01-04" "2019-01-11" "2019-01-18" "2019-01-25" "2019-02-01" "2019-02-08" "2019-02-15" "2019-02-22" "2019-03-01"</span>
 <span class="co">#&gt; [10] "2019-03-08" "2019-03-15" "2019-03-22" "2019-03-29" "2019-04-05" "2019-04-12" "2019-04-19" "2019-04-26" "2019-05-03"</span>
 <span class="co">#&gt; [19] "2019-05-10" "2019-05-17" "2019-05-24" "2019-05-31" "2019-06-07" "2019-06-14" "2019-06-21" "2019-06-28" "2019-07-06"</span>
@@ -170,8 +170,8 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
 <span class="co"># get reference data from the rnaturalearth package</span>
 <span class="co"># the example data currently shows only the US state of Michigan</span>
 <span class="va">wh_states</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rnaturalearth/man/ne_states.html">ne_states</a></span><span class="op">(</span>country <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"United States of America"</span>, <span class="st">"Canada"</span><span class="op">)</span>,
-                       returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="va">crs</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+                       returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span> <span class="op"><a href="reference/%&gt;%.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="va">crs</span><span class="op">)</span> <span class="op"><a href="reference/%&gt;%.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html">st_geometry</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="co"># start plotting</span>

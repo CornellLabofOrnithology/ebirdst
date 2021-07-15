@@ -5,7 +5,7 @@ pkgdown::clean_site()
 
 # rebuild docs and install
 devtools::document()
-devtools::install()
+pak::pkg_install(".")
 
 # local tests and checks
 devtools::test()
