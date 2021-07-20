@@ -21,7 +21,7 @@ parameters used in the modeling process.
 }
 \examples{
 # download example data
-path <- ebirdst_download("example_data", tifs_only = FALSE)
+path <- ebirdst_download("example_data")
 # or get the path if you already have the data downloaded
 path <- get_species_path("example_data")
 
