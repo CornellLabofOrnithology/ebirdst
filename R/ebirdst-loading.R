@@ -79,9 +79,16 @@ ebirdst_download <- function(species,
     files <- files[as.numeric(files$size) > 0 & grepl(run, files$file), ,
                    drop = FALSE]
   } else {
-    key <- get_ebirdst_access_key()
     species <- get_species(species)
-    api_url <- "https://test.st-download.ebird.org/v1/"
+    which_run <- which(ebirdst::ebirdst_runs$species_code == species)
+    run <- ebirdst::ebirdst_runs$run_name[which_run]
+    if (is.na(run) || length(run) != 1) {
+      stop("species does not uniquely identify a Status and Trends run.")
+    }
+
+    # api url and key
+    key <- get_ebirdst_access_key()
+    api_url <- "http://3.87.12.94:8080/v1/"
 
     # get file list for this species
     list_obj_url <- stringr::str_glue("{api_url}/list-obj/{species}?key={key}")
@@ -126,7 +133,7 @@ ebirdst_download <- function(species,
       return(invisible(normalizePath(file.path(path, run))))
     }
   } else if (any(files$exists)) {
-    if (!force) {
+    if (!isTRUE(force)) {
       message(paste("Some files already exist, only downloading new files.",
                     "\nUse force = TRUE to re-download all files."))
       files <- files[!files$exists, ]
@@ -172,9 +179,11 @@ ebirdst_download <- function(species,
 #'
 #' # get the path to the full data package for yellow-bellied sapsucker
 #' # common name, scientific name, or species code can be used
+#' \dontrun{
 #' path <- get_species_path("Yellow-bellied Sapsucker")
 #' path <- get_species_path("Sphyrapicus varius")
 #' path <- get_species_path("yebsap")
+#' }
 get_species_path <- function(species,
                              path = rappdirs::user_data_dir("ebirdst")) {
   stopifnot(is.character(species), length(species) == 1)
@@ -686,7 +695,7 @@ load_predictions <- function(path, return_sf = FALSE) {
 #'
 #' @examples
 #' # download example data
-#' path <- ebirdst_download("example_data", tifs_only = FALSE)
+#' path <- ebirdst_download("example_data")
 #' # or get the path if you already have the data downloaded
 #' path <- get_species_path("example_data")
 #'

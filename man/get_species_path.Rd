@@ -37,7 +37,9 @@ abd <- load_raster(path, "abundance")
 
 # get the path to the full data package for yellow-bellied sapsucker
 # common name, scientific name, or species code can be used
+\dontrun{
 path <- get_species_path("Yellow-bellied Sapsucker")
 path <- get_species_path("Sphyrapicus varius")
 path <- get_species_path("yebsap")
+}
 }

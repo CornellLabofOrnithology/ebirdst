@@ -49,9 +49,9 @@ example dataset.
 
 After completing the Access Request Form, you will be provided a Status
 and Trends access key, which you will need when downloading data. To
-store the key so the `ebirdst` package can access it when downloading
-data, use the function `set_ebirdst_access_key("XXXXX")`, where
-`"XXXXX"` is the access key provided to you.
+store the key so the package can access it when downloading data, use
+the function `set_ebirdst_access_key("XXXXX")`, where `"XXXXX"` is the
+access key provided to you.
 
 ## Citation
 
