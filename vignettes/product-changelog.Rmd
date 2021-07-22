@@ -1,9 +1,9 @@
 ---
-title: "Changelog"
+title: "Data Product Changelog"
 author: "Tom Auer"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Changelog}
+  %\VignetteIndexEntry{Data Product Changelog}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
