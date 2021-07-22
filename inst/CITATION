@@ -14,7 +14,7 @@ citEntry(
   url          = "https://cornelllabofornithology.github.io/ebirdst/",
 
   textVersion  =
-  paste("Tom Auer, Daniel Fink, and Matthew Strimas-Mackey (2021).",
+  paste("Matthew Strimas-Mackey, Shawn Ligocki, Tom Auer, Daniel Fink (2021).",
         "ebirdst: Tools for loading, plotting, mapping and analysis of eBird Status and Trends data products.",
         "R package version 1.0.0.",
         "https://cornelllabofornithology.github.io/ebirdst/")
