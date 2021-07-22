@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Changelog • ebirdst</title>
+<title>eBird Status and Trends predictors — ebirdst_predictors • ebirdst</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,13 @@
 
 
 
-<meta property="og:title" content="Changelog" />
+<meta property="og:title" content="eBird Status and Trends predictors — ebirdst_predictors" />
+<meta property="og:description" content="A data frame of the predictors used in the eBird Status and Trends models.
+These include effort variables (e.g. distance traveled, number of observers,
+etc.) in addition to land and water cover variables. These landcover
+variables are derived from the MODIS MCD12Q1 500 m landcover product, and for
+each land cover class two FRAGSTATS metrics are calculated within a 1.5 km
+buffer around each checklist: % landcover (PLAND) and edge density (ED)." />
 
 
 
@@ -66,7 +72,7 @@
   <body data-spy="scroll" data-target="#toc">
     
 
-    <div class="container template-news">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -136,59 +142,49 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1 data-toc-skip>Changelog <small></small></h1>
-      <small>Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
+    <h1>eBird Status and Trends predictors</h1>
+    <small class="dont-index">Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/R/data.R'><code>R/data.R</code></a></small>
+    <div class="hidden name"><code>ebirdst_predictors.Rd</code></div>
     </div>
 
-    <div id="ebirdst-030" class="section level1">
-<h1 class="page-header" data-toc-text="0.3.0">
-<a href="#ebirdst-030" class="anchor" aria-hidden="true"></a>ebirdst 0.3.0<small> Unreleased </small></h1>
-<ul><li>add support for new data structures used for 2020 eBird Status and Trends</li>
-<li>functionality to handle partial dependence data added</li>
-<li>overhaul of package API to be more intuitive and streamlined</li>
-<li>all documentation and vignettes updated</li>
-</ul></div>
-    <div id="ebirdst-022" class="section level1">
-<h1 class="page-header" data-toc-text="0.2.2">
-<a href="#ebirdst-022" class="anchor" aria-hidden="true"></a>ebirdst 0.2.2<small> 2021-01-16 </small></h1>
-<ul><li>add support for variable ensemble support in <code>compute_ppms()</code>
-</li>
-</ul></div>
-    <div id="ebirdst-021" class="section level1">
-<h1 class="page-header" data-toc-text="0.2.1">
-<a href="#ebirdst-021" class="anchor" aria-hidden="true"></a>ebirdst 0.2.1<small> 2020-03-23 </small></h1>
-<ul><li>bug fix: corrected date types in seasonal definitions</li>
-<li>bug fix: fixed possibility that ebirdst_extent could produce invalid date (day 366 of 2015)</li>
-<li>added import of pipe operator</li>
-<li>
-<code>velox</code> was archived, removed dependency from Suggests</li>
-<li>
-<code>fasterize</code> was archived, removed dependency from Imports</li>
-</ul></div>
-    <div id="ebirdst-020" class="section level1">
-<h1 class="page-header" data-toc-text="0.2.0">
-<a href="#ebirdst-020" class="anchor" aria-hidden="true"></a>ebirdst 0.2.0<small> 2020-02-26 </small></h1>
-<ul><li>change maintainer to Matthew Strimas-Mackey</li>
-<li>update to access 2019 status and trends data</li>
-<li>partial dependence data no longer available, all references to PDs removed</li>
-<li>bug fix: <code><a href="../reference/load_raster.html">load_raster()</a></code> gave incorrect names to seasonal rasters</li>
-<li>bug fix: didn’t properly implement quantile binning</li>
-<li>
-<code><a href="../reference/date_to_st_week.html">date_to_st_week()</a></code> gets the status and trends week for a give vector of dates</li>
-</ul></div>
-    <div id="ebirdst-010" class="section level1">
-<h1 class="page-header" data-toc-text="0.1.0">
-<a href="#ebirdst-010" class="anchor" aria-hidden="true"></a>ebirdst 0.1.0<small> 2019-04-04 </small></h1>
-<ul><li>first CRAN release</li>
-</ul></div>
-  </div>
+    <div class="ref-description">
+    <p>A data frame of the predictors used in the eBird Status and Trends models.
+These include effort variables (e.g. distance traveled, number of observers,
+etc.) in addition to land and water cover variables. These landcover
+variables are derived from the MODIS MCD12Q1 500 m landcover product, and for
+each land cover class two FRAGSTATS metrics are calculated within a 1.5 km
+buffer around each checklist: % landcover (PLAND) and edge density (ED).</p>
+    </div>
 
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='va'>ebirdst_predictors</span></code></pre></div>
+
+
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
+
+    <p>A data frame with 74 rows and 5 columns:</p><dl>
+<dt>predictor</dt><dd><p>Predictor variable name.</p></dd>
+<dt>predictor_tidy</dt><dd><p>Predictor variable name, tidied to only contain
+lowercase letters and underscores.</p></dd>
+<dt>predictor_label</dt><dd><p>Descriptive labels for predictors for plotting and
+translating the cryptic variables names (e.g. <code>umd_fs_c1</code> is
+Evergreen Needleleaf Forest.</p></dd>
+<dt>lc_class</dt><dd><p>For the land and water cover FRAGSTATS variables, this
+gives the associated landcover class. It can be used for grouping
+and summarizing the four FRAGSTATS metrics to the level of the
+landcover class.</p></dd>
+<dt>lc_class_label</dt><dd><p>Similar to <code>predictor_label</code>; however, this variable
+gives the FRAGSTATS metrics a single name for the landcover
+class.</p></dd>
+
+</dl>
+
+
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
     </nav>
   </div>
-
 </div>
 
 

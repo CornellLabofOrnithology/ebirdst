@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Changelog • ebirdst</title>
+<title>Calculates relative abundance bins (breaks) based for mapping — calc_bins • ebirdst</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,15 @@
 
 
 
-<meta property="og:title" content="Changelog" />
+<meta property="og:title" content="Calculates relative abundance bins (breaks) based for mapping — calc_bins" />
+<meta property="og:description" content="Mapping species abundance across the full-annual cycle presents a challenge,
+in that patterns of concentration and dispersion in abundance change
+throughout the year, making it difficult to define color bins that suit all
+seasons and accurately reflect the detail of abundance predictions. To
+address this, when mapping the relative abundance data, we recommend using
+quantile bins based on the underlying count distribution, adjusted
+according to the relative abundance distribution. To access pre-calculated
+bins for the full annual cycle use load_fac_map_parameters()." />
 
 
 
@@ -66,7 +74,7 @@
   <body data-spy="scroll" data-target="#toc">
     
 
-    <div class="container template-news">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -136,59 +144,69 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1 data-toc-skip>Changelog <small></small></h1>
-      <small>Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
+    <h1>Calculates relative abundance bins (breaks) based for mapping</h1>
+    <small class="dont-index">Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/R/ebirdst-mapping.R'><code>R/ebirdst-mapping.R</code></a></small>
+    <div class="hidden name"><code>calc_bins.Rd</code></div>
     </div>
 
-    <div id="ebirdst-030" class="section level1">
-<h1 class="page-header" data-toc-text="0.3.0">
-<a href="#ebirdst-030" class="anchor" aria-hidden="true"></a>ebirdst 0.3.0<small> Unreleased </small></h1>
-<ul><li>add support for new data structures used for 2020 eBird Status and Trends</li>
-<li>functionality to handle partial dependence data added</li>
-<li>overhaul of package API to be more intuitive and streamlined</li>
-<li>all documentation and vignettes updated</li>
-</ul></div>
-    <div id="ebirdst-022" class="section level1">
-<h1 class="page-header" data-toc-text="0.2.2">
-<a href="#ebirdst-022" class="anchor" aria-hidden="true"></a>ebirdst 0.2.2<small> 2021-01-16 </small></h1>
-<ul><li>add support for variable ensemble support in <code>compute_ppms()</code>
-</li>
-</ul></div>
-    <div id="ebirdst-021" class="section level1">
-<h1 class="page-header" data-toc-text="0.2.1">
-<a href="#ebirdst-021" class="anchor" aria-hidden="true"></a>ebirdst 0.2.1<small> 2020-03-23 </small></h1>
-<ul><li>bug fix: corrected date types in seasonal definitions</li>
-<li>bug fix: fixed possibility that ebirdst_extent could produce invalid date (day 366 of 2015)</li>
-<li>added import of pipe operator</li>
-<li>
-<code>velox</code> was archived, removed dependency from Suggests</li>
-<li>
-<code>fasterize</code> was archived, removed dependency from Imports</li>
-</ul></div>
-    <div id="ebirdst-020" class="section level1">
-<h1 class="page-header" data-toc-text="0.2.0">
-<a href="#ebirdst-020" class="anchor" aria-hidden="true"></a>ebirdst 0.2.0<small> 2020-02-26 </small></h1>
-<ul><li>change maintainer to Matthew Strimas-Mackey</li>
-<li>update to access 2019 status and trends data</li>
-<li>partial dependence data no longer available, all references to PDs removed</li>
-<li>bug fix: <code><a href="../reference/load_raster.html">load_raster()</a></code> gave incorrect names to seasonal rasters</li>
-<li>bug fix: didn’t properly implement quantile binning</li>
-<li>
-<code><a href="../reference/date_to_st_week.html">date_to_st_week()</a></code> gets the status and trends week for a give vector of dates</li>
-</ul></div>
-    <div id="ebirdst-010" class="section level1">
-<h1 class="page-header" data-toc-text="0.1.0">
-<a href="#ebirdst-010" class="anchor" aria-hidden="true"></a>ebirdst 0.1.0<small> 2019-04-04 </small></h1>
-<ul><li>first CRAN release</li>
-</ul></div>
-  </div>
+    <div class="ref-description">
+    <p>Mapping species abundance across the full-annual cycle presents a challenge,
+in that patterns of concentration and dispersion in abundance change
+throughout the year, making it difficult to define color bins that suit all
+seasons and accurately reflect the detail of abundance predictions. To
+address this, when mapping the relative abundance data, we recommend using
+quantile bins based on the underlying count distribution, adjusted
+according to the relative abundance distribution. To access pre-calculated
+bins for the full annual cycle use <code><a href='load_fac_map_parameters.html'>load_fac_map_parameters()</a></code>.</p>
+    </div>
 
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>calc_bins</span><span class='op'>(</span><span class='va'>abundance</span>, <span class='va'>count</span><span class='op'>)</span></code></pre></div>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>abundance</th>
+      <td><p><code>Raster</code> object; eBird Status and Trends relative abundance
+data cube, or a subset of the data cube.</p></td>
+    </tr>
+    <tr>
+      <th>count</th>
+      <td><p><code>Raster</code> object; eBird Status and Trends count data cube, or a
+subset of the data cube.</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A numeric vector defining the breaks of the relative abundance bins.
+In addition, the <code>labels</code> attribute of this vector provides the 5th, 50th,
+and 95th quantile of abundance, which can be used to label the bottom,
+middle, and top of a legend.</p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='co'># \donttest{</span></span>
+<span class='r-in'><span class='co'># download example data</span></span>
+<span class='r-in'><span class='va'>path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span><span class='op'>(</span><span class='st'>"example_data"</span><span class='op'>)</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Data already exists, use force = TRUE to re-download.</span>
+<span class='r-in'><span class='co'># or get the path if you already have the data downloaded</span></span>
+<span class='r-in'><span class='va'>path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='get_species_path.html'>get_species_path</a></span><span class='op'>(</span><span class='st'>"example_data"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># abundance data</span></span>
+<span class='r-in'><span class='va'>abd</span> <span class='op'>&lt;-</span> <span class='fu'><a href='load_raster.html'>load_raster</a></span><span class='op'>(</span><span class='va'>path</span>, <span class='st'>"abundance"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># count data</span></span>
+<span class='r-in'><span class='va'>cnt</span> <span class='op'>&lt;-</span> <span class='fu'><a href='load_raster.html'>load_raster</a></span><span class='op'>(</span><span class='va'>path</span>, <span class='st'>"count"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># calculate bins for a single week for this example</span></span>
+<span class='r-in'><span class='va'>bins</span> <span class='op'>&lt;-</span> <span class='fu'>calc_bins</span><span class='op'>(</span><span class='va'>abd</span>, <span class='va'>cnt</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+</code></pre></div>
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
     </nav>
   </div>
-
 </div>
 
 

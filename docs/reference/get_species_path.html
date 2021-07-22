@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Changelog • ebirdst</title>
+<title>Get the data package path for a given species — get_species_path • ebirdst</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,9 @@
 
 
 
-<meta property="og:title" content="Changelog" />
+<meta property="og:title" content="Get the data package path for a given species — get_species_path" />
+<meta property="og:description" content="This helper function can be used to get the path to a data package for a
+given species to be used by the various loading functions." />
 
 
 
@@ -66,7 +68,7 @@
   <body data-spy="scroll" data-target="#toc">
     
 
-    <div class="container template-news">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -136,59 +138,67 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1 data-toc-skip>Changelog <small></small></h1>
-      <small>Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
+    <h1>Get the data package path for a given species</h1>
+    <small class="dont-index">Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/R/ebirdst-loading.R'><code>R/ebirdst-loading.R</code></a></small>
+    <div class="hidden name"><code>get_species_path.Rd</code></div>
     </div>
 
-    <div id="ebirdst-030" class="section level1">
-<h1 class="page-header" data-toc-text="0.3.0">
-<a href="#ebirdst-030" class="anchor" aria-hidden="true"></a>ebirdst 0.3.0<small> Unreleased </small></h1>
-<ul><li>add support for new data structures used for 2020 eBird Status and Trends</li>
-<li>functionality to handle partial dependence data added</li>
-<li>overhaul of package API to be more intuitive and streamlined</li>
-<li>all documentation and vignettes updated</li>
-</ul></div>
-    <div id="ebirdst-022" class="section level1">
-<h1 class="page-header" data-toc-text="0.2.2">
-<a href="#ebirdst-022" class="anchor" aria-hidden="true"></a>ebirdst 0.2.2<small> 2021-01-16 </small></h1>
-<ul><li>add support for variable ensemble support in <code>compute_ppms()</code>
-</li>
-</ul></div>
-    <div id="ebirdst-021" class="section level1">
-<h1 class="page-header" data-toc-text="0.2.1">
-<a href="#ebirdst-021" class="anchor" aria-hidden="true"></a>ebirdst 0.2.1<small> 2020-03-23 </small></h1>
-<ul><li>bug fix: corrected date types in seasonal definitions</li>
-<li>bug fix: fixed possibility that ebirdst_extent could produce invalid date (day 366 of 2015)</li>
-<li>added import of pipe operator</li>
-<li>
-<code>velox</code> was archived, removed dependency from Suggests</li>
-<li>
-<code>fasterize</code> was archived, removed dependency from Imports</li>
-</ul></div>
-    <div id="ebirdst-020" class="section level1">
-<h1 class="page-header" data-toc-text="0.2.0">
-<a href="#ebirdst-020" class="anchor" aria-hidden="true"></a>ebirdst 0.2.0<small> 2020-02-26 </small></h1>
-<ul><li>change maintainer to Matthew Strimas-Mackey</li>
-<li>update to access 2019 status and trends data</li>
-<li>partial dependence data no longer available, all references to PDs removed</li>
-<li>bug fix: <code><a href="../reference/load_raster.html">load_raster()</a></code> gave incorrect names to seasonal rasters</li>
-<li>bug fix: didn’t properly implement quantile binning</li>
-<li>
-<code><a href="../reference/date_to_st_week.html">date_to_st_week()</a></code> gets the status and trends week for a give vector of dates</li>
-</ul></div>
-    <div id="ebirdst-010" class="section level1">
-<h1 class="page-header" data-toc-text="0.1.0">
-<a href="#ebirdst-010" class="anchor" aria-hidden="true"></a>ebirdst 0.1.0<small> 2019-04-04 </small></h1>
-<ul><li>first CRAN release</li>
-</ul></div>
-  </div>
+    <div class="ref-description">
+    <p>This helper function can be used to get the path to a data package for a
+given species to be used by the various loading functions.</p>
+    </div>
 
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>get_species_path</span><span class='op'>(</span><span class='va'>species</span>, path <span class='op'>=</span> <span class='fu'>rappdirs</span><span class='fu'>::</span><span class='fu'><a href='https://rappdirs.r-lib.org/reference/user_data_dir.html'>user_data_dir</a></span><span class='op'>(</span><span class='st'>"ebirdst"</span><span class='op'>)</span><span class='op'>)</span></code></pre></div>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>species</th>
+      <td><p>character; a single species given as a scientific name, common
+name or six-letter species code (e.g. woothr). The full list of valid
+species is can be viewed in the <a href='ebirdst_runs.html'>ebirdst_runs</a> data frame included in this
+package. To download the example dataset, use "example_data".</p></td>
+    </tr>
+    <tr>
+      <th>path</th>
+      <td><p>character; directory to download the data to. All downloaded
+files will be placed in a sub-directory of this directory named according
+to the unique run ID associated with this species. Defaults to a persistent
+data directory, which can be found by calling
+rappdirs::user_data_dir("ebirdst")).</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>The path to the data package directory.</p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='co'># download the example data</span></span>
+<span class='r-in'><span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span><span class='op'>(</span><span class='st'>"example_data"</span><span class='op'>)</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Data already exists, use force = TRUE to re-download.</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># get the path</span></span>
+<span class='r-in'><span class='va'>path</span> <span class='op'>&lt;-</span> <span class='fu'>get_species_path</span><span class='op'>(</span><span class='st'>"example_data"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># use it to load data</span></span>
+<span class='r-in'><span class='va'>abd</span> <span class='op'>&lt;-</span> <span class='fu'><a href='load_raster.html'>load_raster</a></span><span class='op'>(</span><span class='va'>path</span>, <span class='st'>"abundance"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># get the path to the full data package for yellow-bellied sapsucker</span></span>
+<span class='r-in'><span class='co'># common name, scientific name, or species code can be used</span></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'><span class='va'>path</span> <span class='op'>&lt;-</span> <span class='fu'>get_species_path</span><span class='op'>(</span><span class='st'>"Yellow-bellied Sapsucker"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>path</span> <span class='op'>&lt;-</span> <span class='fu'>get_species_path</span><span class='op'>(</span><span class='st'>"Sphyrapicus varius"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>path</span> <span class='op'>&lt;-</span> <span class='fu'>get_species_path</span><span class='op'>(</span><span class='st'>"yebsap"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+</code></pre></div>
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
     </nav>
   </div>
-
 </div>
 
 
