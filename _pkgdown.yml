@@ -1,6 +1,6 @@
 navbar:
   structure:
-    left: [home, intro, articles, reference, changelog]
+    left: [home, intro, articles, reference, statuschanges, news]
     right: [github]
   components:
     home: ~
@@ -19,9 +19,12 @@ navbar:
     reference:
       text: Function Reference
       href: reference/index.html
-    changelog:
+    statuschanges:
       text: Changelog
       href: articles/changelog.html
+    news:
+      text: Version History
+      href: news/index.html
     github:
       icon: fab fa-github fa-lg
       href: https://github.com/CornellLabofOrnithology/ebirdst/

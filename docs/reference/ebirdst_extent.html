@@ -46,8 +46,6 @@ spatially and temporally. This function constructs these objects." />
 
 
 
-
-
 <!-- mathjax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
@@ -59,15 +57,9 @@ spatially and temporally. This function constructs these objects." />
 
 
 
-  
-
-  
-
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    
-
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -114,6 +106,9 @@ spatially and temporally. This function constructs these objects." />
 <li>
   <a href="../articles/changelog.html">Changelog</a>
 </li>
+<li>
+  <a href="../news/index.html">Version History</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -145,7 +140,7 @@ spatially and temporally. This function constructs these objects." />
 spatially and temporally. This function constructs these objects.</p>
     </div>
 
-    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>ebirdst_extent</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>t</span>, <span class='va'>...</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>ebirdst_extent</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>t</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for bbox</span>
 <span class='fu'>ebirdst_extent</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>t</span>, <span class='va'>...</span><span class='op'>)</span>
@@ -157,7 +152,7 @@ spatially and temporally. This function constructs these objects.</p>
 <span class='fu'>ebirdst_extent</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>t</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for sf</span>
-<span class='fu'>ebirdst_extent</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>t</span>, <span class='va'>...</span><span class='op'>)</span></code></pre></div>
+<span class='fu'>ebirdst_extent</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>t</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -229,7 +224,7 @@ or January.</p>
 </ul>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='co'># bounding box of the north eastern united stats as a numeric vector</span></span>
+    <pre class="examples"><span class='r-in'><span class='co'># bounding box of the north eastern united stats as a numeric vector</span></span>
 <span class='r-in'><span class='va'>bb_vec</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>xmin <span class='op'>=</span> <span class='op'>-</span><span class='fl'>80</span>, xmax <span class='op'>=</span> <span class='op'>-</span><span class='fl'>70</span>, ymin <span class='op'>=</span> <span class='fl'>40</span>, ymax <span class='op'>=</span> <span class='fl'>47</span><span class='op'>)</span></span>
 <span class='r-in'><span class='fu'>ebirdst_extent</span><span class='op'>(</span><span class='va'>bb_vec</span><span class='op'>)</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> eBird Status &amp; Trends extent: </span>
@@ -274,7 +269,7 @@ or January.</p>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>   Bounding box: xmin -80; ymin 40; xmax -70; ymax 47</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>   CRS: +proj=longlat +datum=WGS84 +no_defs </span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>   Temporal extent: 12-01  -  01-31 </span>
-</code></pre></div>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -286,11 +281,11 @@ or January.</p>
 
       <footer>
       <div class="copyright">
-  <p><p>Developed by <a href="http://strimas.com" class="external-link">Matthew Strimas-Mackey</a>, Shawn Ligocki, <a href="http://twitter.com/tom_auer" class="external-link">Tom Auer</a>, Daniel Fink.</p></p>
+  <p>Developed by <a href='http://strimas.com'>Matthew Strimas-Mackey</a>, Shawn Ligocki, <a href='http://twitter.com/tom_auer'>Tom Auer</a>, Daniel Fink.</p>
 </div>
 
 <div class="pkgdown">
-  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
@@ -298,8 +293,6 @@ or January.</p>
 
   
 
-
-  
 
   </body>
 </html>

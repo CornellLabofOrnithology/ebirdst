@@ -47,8 +47,6 @@ loaded with the week dates for each band." />
 
 
 
-
-
 <!-- mathjax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
@@ -60,15 +58,9 @@ loaded with the week dates for each band." />
 
 
 
-  
-
-  
-
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    
-
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -115,6 +107,9 @@ loaded with the week dates for each band." />
 <li>
   <a href="../articles/changelog.html">Changelog</a>
 </li>
+<li>
+  <a href="../news/index.html">Version History</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -147,7 +142,7 @@ convenience, this function labels the layers of a data cube once it has been
 loaded with the week dates for each band.</p>
     </div>
 
-    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>label_raster_stack</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></code></pre></div>
+    <pre class="usage"><span class='fu'>label_raster_stack</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -168,7 +163,7 @@ to contain "-", so it is not possible to store the date in an ISO compliant
 format. Use <code><a href='parse_raster_dates.html'>parse_raster_dates()</a></code> to convert the layer names to dates.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='co'># download and load example abundance data</span></span>
+    <pre class="examples"><span class='r-in'><span class='co'># download and load example abundance data</span></span>
 <span class='r-in'><span class='va'>sp_path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span><span class='op'>(</span><span class='st'>"example_data"</span><span class='op'>)</span></span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Data already exists, use force = TRUE to re-download.</span>
 <span class='r-in'><span class='va'>abd</span> <span class='op'>&lt;-</span> <span class='fu'><a href='load_raster.html'>load_raster</a></span><span class='op'>(</span><span class='va'>sp_path</span>, <span class='st'>"abundance"</span><span class='op'>)</span></span>
@@ -187,7 +182,7 @@ format. Use <code><a href='parse_raster_dates.html'>parse_raster_dates()</a></co
 <span class='r-out co'><span class='r-pr'>#&gt;</span> [41] "w2019.10.12" "w2019.10.19" "w2019.10.26" "w2019.11.02" "w2019.11.09"</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> [46] "w2019.11.16" "w2019.11.23" "w2019.11.30" "w2019.12.07" "w2019.12.14"</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> [51] "w2019.12.21" "w2019.12.28"</span>
-</code></pre></div>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -199,11 +194,11 @@ format. Use <code><a href='parse_raster_dates.html'>parse_raster_dates()</a></co
 
       <footer>
       <div class="copyright">
-  <p><p>Developed by <a href="http://strimas.com" class="external-link">Matthew Strimas-Mackey</a>, Shawn Ligocki, <a href="http://twitter.com/tom_auer" class="external-link">Tom Auer</a>, Daniel Fink.</p></p>
+  <p>Developed by <a href='http://strimas.com'>Matthew Strimas-Mackey</a>, Shawn Ligocki, <a href='http://twitter.com/tom_auer'>Tom Auer</a>, Daniel Fink.</p>
 </div>
 
 <div class="pkgdown">
-  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
@@ -211,8 +206,6 @@ format. Use <code><a href='parse_raster_dates.html'>parse_raster_dates()</a></co
 
   
 
-
-  
 
   </body>
 </html>

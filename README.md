@@ -72,7 +72,7 @@ the full spectrum from introductory to advanced usage, please see the
 package [website](https://cornelllabofornithology.github.io/ebirdst).
 There are four available vignettes are:
 
--   [Introduction](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-introduction.html):
+-   [Introduction](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst.html):
     details data access and the structure of the results.
 -   [Introductory
     mapping](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html):
