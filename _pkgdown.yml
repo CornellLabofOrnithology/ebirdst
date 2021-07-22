@@ -3,7 +3,6 @@ navbar:
     left: [home, intro, articles, reference, statuschanges, news]
     right: [github]
   components:
-    home: ~
     intro:
       text: Get Started
       href: articles/ebirdst.html
@@ -20,8 +19,8 @@ navbar:
       text: Function Reference
       href: reference/index.html
     statuschanges:
-      text: Changelog
-      href: articles/changelog.html
+      text: Data Product Changelog
+      href: articles/product-changelog.html
     news:
       text: Version History
       href: news/index.html
