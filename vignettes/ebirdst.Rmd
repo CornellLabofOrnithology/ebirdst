@@ -40,7 +40,7 @@ knitr::opts_chunk$set(eval = nzchar(Sys.getenv("BUILD_VIGNETTES")))
 
 # Background
 
-The study and conservation of the natural world relies on detailed information about species’ distributions, abundances, environmental associations, and population trends over time. For many taxa, this information is challenging to obtain at relevant geographic scales. The goal of the eBird Status and Trends project is to use data from [eBird](https://eBird.org), the global citizen science bird monitoring administered by Cornell Lab of Ornithology, to generate a reliable, standardized source of biodiversity information for the world’s bird populations. To translate the eBird observations into robust data products, we use statistical models to fill spatiotemporal gaps, using local land cover descriptions derived from NASA MODIS and other remote sensing data, while controlling for biases inherent in species observations collected by volunteers.
+The study and conservation of the natural world relies on detailed information about species’ distributions, abundances, environmental associations, and population trends over time. For many taxa, this information is challenging to obtain at relevant geographic scales. The goal of the eBird Status and Trends project is to use data from [eBird](https://ebird.org/home), the global citizen science bird monitoring administered by Cornell Lab of Ornithology, to generate a reliable, standardized source of biodiversity information for the world’s bird populations. To translate the eBird observations into robust data products, we use statistical models to fill spatiotemporal gaps, using local land cover descriptions derived from NASA MODIS and other remote sensing data, while controlling for biases inherent in species observations collected by volunteers.
 
 This data set provides estimates of the year-round distribution, abundances, and environmental associations for a the majority of North American bird species for the year 2019 For each species, distribution and abundance estimates are available for all 52 weeks of the year across a regular grid of locations that cover terrestrial North and South America at a resolution of 2.96 km x 2.96 km. Variation in detectability associated with the search effort is controlled by standardizing the estimates as the expected occupancy rate and count of the species at the optimal time of day, while expending the effort necessary to maximize detection of the species. Predictions have been optimized for search effort and user skill, specific for the given region, season, and species, in order to maximize detection rates.
 
@@ -50,9 +50,9 @@ To describe how each species is associated with features of its local environmen
 
 As of July 2021, data access is now granted through a Access Request Form at: https://ebird.org/st/request. Access with this form generates a key to be used with this R package and is provided immediately (as long as commercial use is not requested). Our terms of use have been updated to be more permissive in many cases, particularly academic and research use. When requesting data access, please be sure to carefully read the terms of use and ensure that your intended use is not restricted. Data are no longer publicly available via AWS, aside from an example dataset.
 
-The provided access key can be made available to this R package with...
+After completing the Access Request Form, you will be provided a Status and Trends access key, which you will need when downloading data. To store the key so the package can access it when downloading data, use the function `set_ebirdst_access_key("XXXXX")`, where `"XXXXX"` is the access key provided to you.
 
-Throughout the package vignettes, a simplified example dataset is used consisting of Yellow-bellied Sapsucker in Michigan. This dataset designed to be small for faster download and is accessible without an API key. 
+Throughout the package vignettes, a simplified example dataset is used consisting of Yellow-bellied Sapsucker in Michigan. This dataset is designed to be small for faster download and is accessible without a key. 
 
 ```{r quick_start}
 library(ebirdst)

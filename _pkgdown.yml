@@ -1,24 +1,37 @@
 navbar:
-  title: ~
-  type: default
-  left:
-  - text: Introduction - Data Access and Structure
-    href: articles/ebirdst-introduction.html
-  - text: Intro Mapping
-    href: articles/ebirdst-intro-mapping.html
-  - text: Advanced Mapping
-    href: articles/ebirdst-advanced-mapping.html
-  - text: Non-Raster Data
-    href: articles/ebirdst-non-raster.html
-  - text: Function Reference
-    href: reference/index.html
-  right:
-  - icon: fa-github fa-lg
-    href: https://github.com/CornellLabofOrnithology/ebirdst
+  structure:
+    left: [home, intro, articles, reference, changelog]
+    right: [github]
+  components:
+    home: ~
+    intro:
+      text: Get Started
+      href: articles/ebirdst.html
+    articles:
+      text: Vignettes
+      menu:
+      - text: Introduction to Mapping
+        href: articles/ebirdst-intro-mapping.html
+      - text: Advanced Mapping
+        href: articles/ebirdst-advanced-mapping.html
+      - text: Non-raster Data
+        href: articles/ebirdst-non-raster.html
+    reference:
+      text: Function Reference
+      href: reference/index.html
+    changelog:
+      text: Changelog
+      href: articles/changelog.html
+    github:
+      icon: fab fa-github fa-lg
+      href: https://github.com/CornellLabofOrnithology/ebirdst/
+      aria-label: github
 
 authors:
+  Matthew Strimas-Mackey:
+    href: http://strimas.com
+  Shawn Ligocki:
   Tom Auer:
     href: http://twitter.com/tom_auer
   Daniel Fink:
-  Matthew Strimas-Mackey:
-    href: http://strimas.com
+

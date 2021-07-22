@@ -49,6 +49,8 @@ optimized for this extent." />
 
 
 
+
+
 <!-- mathjax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
@@ -60,9 +62,15 @@ optimized for this extent." />
 
 
 
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -76,32 +84,44 @@ optimized for this extent." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../articles/ebirdst-introduction.html">Introduction - Data Access and Structure</a>
+  <a href="../articles/ebirdst.html">Get Started</a>
 </li>
-<li>
-  <a href="../articles/ebirdst-intro-mapping.html">Intro Mapping</a>
-</li>
-<li>
-  <a href="../articles/ebirdst-advanced-mapping.html">Advanced Mapping</a>
-</li>
-<li>
-  <a href="../articles/ebirdst-non-raster.html">Non-Raster Data</a>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Vignettes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/ebirdst-intro-mapping.html">Introduction to Mapping</a>
+    </li>
+    <li>
+      <a href="../articles/ebirdst-advanced-mapping.html">Advanced Mapping</a>
+    </li>
+    <li>
+      <a href="../articles/ebirdst-non-raster.html">Non-raster Data</a>
+    </li>
+  </ul>
 </li>
 <li>
   <a href="../reference/index.html">Function Reference</a>
 </li>
+<li>
+  <a href="../articles/changelog.html">Changelog</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/CornellLabofOrnithology/ebirdst">
-    <span class="fas fa-github fa-lg"></span>
+  <a href="https://github.com/CornellLabofOrnithology/ebirdst/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -131,7 +151,7 @@ extent of non-zero data across the full annual cycle and the projection is
 optimized for this extent.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>load_fac_map_parameters</span><span class='op'>(</span><span class='va'>path</span><span class='op'>)</span></pre>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>load_fac_map_parameters</span><span class='op'>(</span><span class='va'>path</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -159,44 +179,46 @@ raster in the custom projection.</p></li>
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='co'># download example data</span>
-<span class='va'>path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span><span class='op'>(</span><span class='st'>"example_data"</span>, tifs_only <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Data already exists, use force = TRUE to re-download.</span></div><div class='input'><span class='co'># or get the path if you already have the data downloaded</span>
-<span class='va'>path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='get_species_path.html'>get_species_path</a></span><span class='op'>(</span><span class='st'>"example_data"</span><span class='op'>)</span>
-
-<span class='co'># get map parameters</span>
-<span class='fu'>load_fac_map_parameters</span><span class='op'>(</span><span class='va'>path</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $custom_projection
-#&gt; [1] "+proj=laea +lat_0=40.1815866905176 +lon_0=-90.9587386496754 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
-#&gt; 
-#&gt; $fa_extent
-#&gt; class      : Extent 
-#&gt; xmin       : -2759160 
-#&gt; xmax       : 2769342 
-#&gt; ymin       : -3388622 
-#&gt; ymax       : 3258931 
-#&gt; 
-#&gt; $res
-#&gt; [1] 2958 2739
-#&gt; 
-#&gt; $fa_extent_sinu
-#&gt; class      : Extent 
-#&gt; xmin       : -11028917 
-#&gt; xmax       : -3959660 
-#&gt; ymin       : 991727 
-#&gt; ymax       : 7047709 
-#&gt; 
-#&gt; $abundance_bins
-#&gt;  [1] 9.603170e-06 1.015085e-01 6.599966e-01 7.293533e-01 7.851071e-01
-#&gt;  [6] 8.355833e-01 8.846025e-01 9.334762e-01 9.821025e-01 1.029958e+00
-#&gt; [11] 1.077345e+00 1.125083e+00 1.174886e+00 1.228218e+00 1.287000e+00
-#&gt; [16] 1.353333e+00 1.430667e+00 1.524504e+00 1.643603e+00 1.807917e+00
-#&gt; [21] 2.096790e+00 1.014804e+01
-#&gt; attr(,"labels")
-#&gt; [1] 0.1015085 1.1012143 2.0967896
-#&gt; </div><div class='input'><span class='co'># }</span>
-</div></pre>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='co'># \donttest{</span></span>
+<span class='r-in'><span class='co'># download example data</span></span>
+<span class='r-in'><span class='va'>path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span><span class='op'>(</span><span class='st'>"example_data"</span>, tifs_only <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Data already exists, use force = TRUE to re-download.</span>
+<span class='r-in'><span class='co'># or get the path if you already have the data downloaded</span></span>
+<span class='r-in'><span class='va'>path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='get_species_path.html'>get_species_path</a></span><span class='op'>(</span><span class='st'>"example_data"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># get map parameters</span></span>
+<span class='r-in'><span class='fu'>load_fac_map_parameters</span><span class='op'>(</span><span class='va'>path</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $custom_projection</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "+proj=laea +lat_0=40.1815866905176 +lon_0=-90.9587386496754 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $fa_extent</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> class      : Extent </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> xmin       : -2759160 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> xmax       : 2769342 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ymin       : -3388622 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ymax       : 3258931 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $res</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 2958 2739</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $fa_extent_sinu</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> class      : Extent </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> xmin       : -11028917 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> xmax       : -3959660 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ymin       : 991727 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ymax       : 7047709 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $abundance_bins</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] 9.603170e-06 1.015085e-01 6.599966e-01 7.293533e-01 7.851071e-01</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [6] 8.355833e-01 8.846025e-01 9.334762e-01 9.821025e-01 1.029958e+00</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [11] 1.077345e+00 1.125083e+00 1.174886e+00 1.228218e+00 1.287000e+00</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [16] 1.353333e+00 1.430667e+00 1.524504e+00 1.643603e+00 1.807917e+00</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [21] 2.096790e+00 1.014804e+01</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> attr(,"labels")</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 0.1015085 1.1012143 2.0967896</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='co'># }</span></span>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -208,11 +230,11 @@ raster in the custom projection.</p></li>
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='http://strimas.com'>Matthew Strimas-Mackey</a>, Shawn Ligocki, <a href='http://twitter.com/tom_auer'>Tom Auer</a>, Daniel Fink.</p>
+  <p><p>Developed by <a href="http://strimas.com" class="external-link">Matthew Strimas-Mackey</a>, Shawn Ligocki, <a href="http://twitter.com/tom_auer" class="external-link">Tom Auer</a>, Daniel Fink.</p></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
 </div>
 
       </footer>
@@ -220,6 +242,8 @@ raster in the custom projection.</p></li>
 
   
 
+
+  
 
   </body>
 </html>

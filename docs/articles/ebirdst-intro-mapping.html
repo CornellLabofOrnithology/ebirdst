@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,32 +33,44 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="../articles/ebirdst-introduction.html">Introduction - Data Access and Structure</a>
+  <a href="../articles/ebirdst.html">Get Started</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Vignettes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
 <li>
-  <a href="../articles/ebirdst-intro-mapping.html">Intro Mapping</a>
-</li>
-<li>
-  <a href="../articles/ebirdst-advanced-mapping.html">Advanced Mapping</a>
-</li>
-<li>
-  <a href="../articles/ebirdst-non-raster.html">Non-Raster Data</a>
+      <a href="../articles/ebirdst-intro-mapping.html">Introduction to Mapping</a>
+    </li>
+    <li>
+      <a href="../articles/ebirdst-advanced-mapping.html">Advanced Mapping</a>
+    </li>
+    <li>
+      <a href="../articles/ebirdst-non-raster.html">Non-raster Data</a>
+    </li>
+  </ul>
 </li>
 <li>
   <a href="../reference/index.html">Function Reference</a>
 </li>
+<li>
+  <a href="../articles/changelog.html">Changelog</a>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/CornellLabofOrnithology/ebirdst">
-    <span class="fas fa-github fa-lg"></span>
+  <a href="https://github.com/CornellLabofOrnithology/ebirdst/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -70,15 +84,15 @@
 
       
 
-      </header><script src="ebirdst-intro-mapping_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
+      </header><script src="ebirdst-intro-mapping_files/header-attrs-2.9/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Introduction to loading, mapping, and plotting</h1>
-                        <h4 class="author">Tom Auer, Daniel Fink</h4>
+                        <h4 data-toc-skip class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2021-07-09</h4>
+            <h4 data-toc-skip class="date">2021-07-22</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-intro-mapping.Rmd"><code>vignettes/ebirdst-intro-mapping.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-intro-mapping.Rmd" class="external-link"><code>vignettes/ebirdst-intro-mapping.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-intro-mapping.Rmd</code></div>
 
     </div>
@@ -92,7 +106,7 @@
 </style>
 <div id="outline" class="section level1">
 <h1 class="hasAnchor">
-<a href="#outline" class="anchor"></a>Outline</h1>
+<a href="#outline" class="anchor" aria-hidden="true"></a>Outline</h1>
 <ol style="list-style-type: decimal">
 <li><a href="#loading-rasters">Loading Rasters</a></li>
 <li><a href="#mapping-occurrence-and-abundance">Mapping Occurrence and Abundance</a></li>
@@ -101,17 +115,17 @@
 </div>
 <div id="loading-rasters" class="section level1">
 <h1 class="hasAnchor">
-<a href="#loading-rasters" class="anchor"></a>Loading Rasters</h1>
+<a href="#loading-rasters" class="anchor" aria-hidden="true"></a>Loading Rasters</h1>
 <p>Once you have downloaded a set of eBird Status and Trends products, one of the first tasks is to load one of the abundance, count, or occurrence estimate and plot it. Each estimate is stored in a multi-band GeoTiff file that is most appropriately loaded as a <code>RasterStack</code> object in R. These “cubes” come with areas of predicted and assumed zeroes, such that any cells that are NA represent areas outside of the area of estimation. All cubes have 52 weeks, even if some weeks are all NA (such as those species that winter entirely outside of North America). The following code example shows how to load an estimate raster and assign names.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/CornellLabofOrnithology/ebirdst">ebirdst</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/raster">raster</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/">sf</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ropenscilabs/rnaturalearth">rnaturalearth</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://sjmgarnier.github.io/viridisLite/">viridisLite</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/CornellLabofOrnithology/ebirdst" class="external-link">ebirdst</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/raster" class="external-link">raster</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ropenscilabs/rnaturalearth" class="external-link">rnaturalearth</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sjmgarnier.github.io/viridisLite/" class="external-link">viridisLite</a></span><span class="op">)</span>
 <span class="co"># handle namespace conflicts</span>
-<span class="va">extract</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/raster/man/extract.html">extract</a></span>
+<span class="va">extract</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/raster/man/extract.html" class="external-link">extract</a></span>
 
 <span class="co"># Currently, example data is available on a public s3 bucket. The following </span>
 <span class="co"># ebirdst_download() function copies the species results to a selected path and </span>
@@ -124,7 +138,7 @@
 
 <span class="co"># use parse_raster_dates() to get actual date objects for each layer</span>
 <span class="va">date_vector</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_raster_dates.html">parse_raster_dates</a></span><span class="op">(</span><span class="va">abd</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">date_vector</span><span class="op">)</span>
+<span class="fu"><a href="https://www.math.uzh.ch/pages/spam//reference/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">date_vector</span><span class="op">)</span>
 <span class="co">#&gt;  [1] "2019-01-04" "2019-01-11" "2019-01-18" "2019-01-25" "2019-02-01"</span>
 <span class="co">#&gt;  [6] "2019-02-08" "2019-02-15" "2019-02-22" "2019-03-01" "2019-03-08"</span>
 <span class="co">#&gt; [11] "2019-03-15" "2019-03-22" "2019-03-29" "2019-04-05" "2019-04-12"</span>
@@ -146,10 +160,10 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">abd_lr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">sp_path</span>, <span class="st">"abundance"</span>, resolution <span class="op">=</span> <span class="st">"lr"</span><span class="op">)</span>
 <span class="co"># native resolution</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/resolution.html">res</a></span><span class="op">(</span><span class="va">abd</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/resolution.html" class="external-link">res</a></span><span class="op">(</span><span class="va">abd</span><span class="op">)</span>
 <span class="co">#&gt; [1] 2962.807 2962.809</span>
 <span class="co"># low resolution</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/resolution.html">res</a></span><span class="op">(</span><span class="va">abd_lr</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/resolution.html" class="external-link">res</a></span><span class="op">(</span><span class="va">abd_lr</span><span class="op">)</span>
 <span class="co">#&gt; [1] 26665.26 26665.28</span></code></pre></div>
 <p>In the interest of faster processing time, we’ll work with the medium resolution rasters in this vignette, however, for actual analyses you may want to consider using the high resolution data.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -157,35 +171,35 @@
 </div>
 <div id="mapping-relative-abundance" class="section level1">
 <h1 class="hasAnchor">
-<a href="#mapping-relative-abundance" class="anchor"></a>Mapping Relative Abundance</h1>
+<a href="#mapping-relative-abundance" class="anchor" aria-hidden="true"></a>Mapping Relative Abundance</h1>
 <p>One of the most common tasks with eBird Status and Trends products is to make maps of relative abundance. Basic maps can easily be produced with limited code, but to make high-quality, presentation-ready maps requires extra work. This section describes some functions in the <code>ebirdst</code> package intended to assist with mapping.</p>
 <div id="projections" class="section level2">
 <h2 class="hasAnchor">
-<a href="#projections" class="anchor"></a>Projections</h2>
+<a href="#projections" class="anchor" aria-hidden="true"></a>Projections</h2>
 <p>The sinusoidal projection that NASA provides MODIS data in, while functional because of its equal-area property, is not good for mapping because of the significant distortion of land masses across the globe. Instead, we’ll use the Eckert IV for mapping because of its pleasing conformal properties across the globe, ease of projection configuration within R and its proj4string construction, and the ease of setting central meridians that best display the Western Hemisphere. It is worth noting that while projecting to a more visually appealing projection is ideal for mapping, it is not necessary for quantitative analysis of eBird Status and Trends products, for which purposes the results can be left in the original Sinusoidal projection.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># define an eckert iv projection centered on the western hemisphere</span>
 <span class="va">eck</span> <span class="op">&lt;-</span> <span class="st">"+proj=eck4 +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"</span>
 
 <span class="co"># project single layer from stack to mollweide</span>
-<span class="va">week38_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projectRaster.html">projectRaster</a></span><span class="op">(</span><span class="va">abd</span><span class="op">[[</span><span class="fl">38</span><span class="op">]</span><span class="op">]</span>, crs <span class="op">=</span> <span class="va">eck</span>, method <span class="op">=</span> <span class="st">"ngb"</span><span class="op">)</span>
-<span class="va">week38_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/trim.html">trim</a></span><span class="op">(</span><span class="va">week38_proj</span><span class="op">)</span>
+<span class="va">week38_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projectRaster.html" class="external-link">projectRaster</a></span><span class="op">(</span><span class="va">abd</span><span class="op">[[</span><span class="fl">38</span><span class="op">]</span><span class="op">]</span>, crs <span class="op">=</span> <span class="va">eck</span>, method <span class="op">=</span> <span class="st">"ngb"</span><span class="op">)</span>
+<span class="va">week38_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/trim.html" class="external-link">trim</a></span><span class="op">(</span><span class="va">week38_proj</span><span class="op">)</span>
 
 <span class="co"># optionally, you can project an entire stack, but it takes much longer</span>
 <span class="co"># abd_proj &lt;- projectRaster(abund, crs = eck, method = "ngb")</span>
 
 <span class="co"># map single layer with full annual extent</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">week38_proj</span>, 
+<span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">week38_proj</span>, 
      col <span class="op">=</span> <span class="fu"><a href="../reference/abundance_palette.html">abundance_palette</a></span><span class="op">(</span><span class="fl">10</span>, season <span class="op">=</span> <span class="st">"weekly"</span><span class="op">)</span>, 
      axes <span class="op">=</span> <span class="cn">FALSE</span>, box <span class="op">=</span> <span class="cn">FALSE</span>, 
-     maxpixels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html">ncell</a></span><span class="op">(</span><span class="va">week38_proj</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+     maxpixels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html" class="external-link">ncell</a></span><span class="op">(</span><span class="va">week38_proj</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="ebirdst-intro-mapping_files/figure-html/project_stack-1.png" width="100%" style="display: block; margin: auto;"></p>
 <p>If working with a full set of data for a species, mapping the layer at the full spatial extent of the analysis area makes for a small map. The raster cube has zeroes for our prediction extent and NAs for the entire Western Hemisphere, unifying the weeks in a cube to the same extent. However, this also means that mapping defaults to the full spatial extent of NAs, the Western Hemisphere. To assist with this, project the <code>RasterStack</code> or <code>RasterLayer</code> to Eckert IV, calculate the full annual spatial extent for the species with the <code><a href="../reference/calc_full_extent.html">calc_full_extent()</a></code> function, and then map, showing an extent that works for the entire full-annual cycle of the species.</p>
 </div>
 <div id="mapping-occurrence" class="section level2">
 <h2 class="hasAnchor">
-<a href="#mapping-occurrence" class="anchor"></a>Mapping Occurrence</h2>
+<a href="#mapping-occurrence" class="anchor" aria-hidden="true"></a>Mapping Occurrence</h2>
 <p>Most examples in this vignette focus primarily on relative abundance estimates, as they’re the most novel and informative. However, we also provide estimates for the probability of occurrence. These are much simpler to map than abundance in terms of color scales and binning, as values range between 0 and 1 throughout the year.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">occ</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">sp_path</span>, <span class="st">"occurrence"</span>, resolution <span class="op">=</span> <span class="st">"mr"</span><span class="op">)</span>
@@ -194,48 +208,48 @@
 <span class="va">occ_week26</span> <span class="op">&lt;-</span> <span class="va">occ</span><span class="op">[[</span><span class="fl">26</span><span class="op">]</span><span class="op">]</span>
 
 <span class="co"># create breaks every 0.1 from 0 to 1</span>
-<span class="va">occ_bins</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, by <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span>
-<span class="va">occ_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projectRaster.html">projectRaster</a></span><span class="op">(</span><span class="va">occ_week26</span>, crs <span class="op">=</span> <span class="va">eck</span>, method <span class="op">=</span> <span class="st">"ngb"</span><span class="op">)</span>
-<span class="va">occ_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/trim.html">trim</a></span><span class="op">(</span><span class="va">occ_proj</span><span class="op">)</span>
+<span class="va">occ_bins</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, by <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span>
+<span class="va">occ_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projectRaster.html" class="external-link">projectRaster</a></span><span class="op">(</span><span class="va">occ_week26</span>, crs <span class="op">=</span> <span class="va">eck</span>, method <span class="op">=</span> <span class="st">"ngb"</span><span class="op">)</span>
+<span class="va">occ_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/trim.html" class="external-link">trim</a></span><span class="op">(</span><span class="va">occ_proj</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span>, cex <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">occ_proj</span>, 
+<span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span>, cex <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">occ_proj</span>, 
      breaks <span class="op">=</span> <span class="va">occ_bins</span>, 
-     col <span class="op">=</span> <span class="fu"><a href="../reference/abundance_palette.html">abundance_palette</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">occ_bins</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>, season <span class="op">=</span> <span class="st">"weekly"</span><span class="op">)</span>,
+     col <span class="op">=</span> <span class="fu"><a href="../reference/abundance_palette.html">abundance_palette</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">occ_bins</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>, season <span class="op">=</span> <span class="st">"weekly"</span><span class="op">)</span>,
      axes <span class="op">=</span> <span class="cn">FALSE</span>, box <span class="op">=</span> <span class="cn">FALSE</span>, 
-     maxpixels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html">ncell</a></span><span class="op">(</span><span class="va">occ_proj</span><span class="op">)</span>,
+     maxpixels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html" class="external-link">ncell</a></span><span class="op">(</span><span class="va">occ_proj</span><span class="op">)</span>,
      legend.width <span class="op">=</span> <span class="fl">2</span>, legend.shrink <span class="op">=</span> <span class="fl">0.97</span><span class="op">)</span></code></pre></div>
 <p><img src="ebirdst-intro-mapping_files/figure-html/map_occurrence-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div id="calculating-abundance-bins" class="section level2">
 <h2 class="hasAnchor">
-<a href="#calculating-abundance-bins" class="anchor"></a>Calculating Abundance Bins</h2>
+<a href="#calculating-abundance-bins" class="anchor" aria-hidden="true"></a>Calculating Abundance Bins</h2>
 <p>Mapping relative abundance estimates across the full-annual cycle presents a challenge, in that patterns of concentration and dispersal in abundance change throughout the year, making it difficult to define color bins that suit all seasons and accurately reflect the detail of abundance predictions. To address this, when mapping the relative abundance data, we recommend using quantile bins based on the underlying count distribution, adjusted according to the relative abundance distribution. The function <code><a href="../reference/calc_bins.html">calc_bins()</a></code> will generate bins using this method.</p>
 <p>To compare, we first scale the colors linearly, based on the maximum from the entire year. Since the max is quite high, times of the year with low concentration appear flat.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">year_max</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extremeValues.html">maxValue</a></span><span class="op">(</span><span class="va">abd</span><span class="op">)</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">year_max</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extremeValues.html" class="external-link">maxValue</a></span><span class="op">(</span><span class="va">abd</span><span class="op">)</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
-<span class="va">week14_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projectRaster.html">projectRaster</a></span><span class="op">(</span><span class="va">abd</span><span class="op">[[</span><span class="fl">14</span><span class="op">]</span><span class="op">]</span>, crs <span class="op">=</span> <span class="va">eck</span>, method <span class="op">=</span> <span class="st">"ngb"</span><span class="op">)</span>
-<span class="va">week14_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/trim.html">trim</a></span><span class="op">(</span><span class="va">week14_proj</span><span class="op">)</span>
+<span class="va">week14_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projectRaster.html" class="external-link">projectRaster</a></span><span class="op">(</span><span class="va">abd</span><span class="op">[[</span><span class="fl">14</span><span class="op">]</span><span class="op">]</span>, crs <span class="op">=</span> <span class="va">eck</span>, method <span class="op">=</span> <span class="st">"ngb"</span><span class="op">)</span>
+<span class="va">week14_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/trim.html" class="external-link">trim</a></span><span class="op">(</span><span class="va">week14_proj</span><span class="op">)</span>
 
 <span class="co"># set graphical params</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># use raster bounding box to set the spatial extent for the plot</span>
-<span class="va">bb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sfc.html">st_as_sfc</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html">st_bbox</a></span><span class="op">(</span><span class="va">week14_proj</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">bb</span>, col <span class="op">=</span> <span class="st">"white"</span>, border <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span>
+<span class="va">bb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sfc.html" class="external-link">st_as_sfc</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="va">week14_proj</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bb</span>, col <span class="op">=</span> <span class="st">"white"</span>, border <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span>
 <span class="co"># plot the abundance</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">week38_proj</span>, zlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">year_max</span><span class="op">)</span>, 
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">week38_proj</span>, zlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">year_max</span><span class="op">)</span>, 
      col <span class="op">=</span> <span class="fu"><a href="../reference/abundance_palette.html">abundance_palette</a></span><span class="op">(</span><span class="fl">20</span>, season <span class="op">=</span> <span class="st">"weekly"</span><span class="op">)</span>, 
-     maxpixels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html">ncell</a></span><span class="op">(</span><span class="va">week38_proj</span><span class="op">)</span>,
+     maxpixels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html" class="external-link">ncell</a></span><span class="op">(</span><span class="va">week38_proj</span><span class="op">)</span>,
      axes <span class="op">=</span> <span class="cn">FALSE</span>, box <span class="op">=</span> <span class="cn">FALSE</span>, legend <span class="op">=</span> <span class="cn">FALSE</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
 <span class="co"># do the same for week 14</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">bb</span>, col <span class="op">=</span> <span class="st">"white"</span>, border <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">week14_proj</span>, zlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">year_max</span><span class="op">)</span>,
+<span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bb</span>, col <span class="op">=</span> <span class="st">"white"</span>, border <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">week14_proj</span>, zlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">year_max</span><span class="op">)</span>,
      col <span class="op">=</span> <span class="fu"><a href="../reference/abundance_palette.html">abundance_palette</a></span><span class="op">(</span><span class="fl">20</span>, season <span class="op">=</span> <span class="st">"weekly"</span><span class="op">)</span>, 
-     maxpixels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html">ncell</a></span><span class="op">(</span><span class="va">week14_proj</span><span class="op">)</span>,
+     maxpixels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html" class="external-link">ncell</a></span><span class="op">(</span><span class="va">week14_proj</span><span class="op">)</span>,
      axes <span class="op">=</span> <span class="cn">FALSE</span>, box <span class="op">=</span> <span class="cn">FALSE</span>, legend.shrink <span class="op">=</span> <span class="fl">0.97</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="ebirdst-intro-mapping_files/figure-html/map_linear-1.png" width="100%" style="display: block; margin: auto;"></p>
 <p>We can compare this with maps made using the <code><a href="../reference/calc_bins.html">calc_bins()</a></code> method.</p>
@@ -245,29 +259,29 @@
 <span class="va">year_bins</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calc_bins.html">calc_bins</a></span><span class="op">(</span>abundance <span class="op">=</span> <span class="va">abd</span>, count <span class="op">=</span> <span class="va">count</span><span class="op">)</span>
 
 <span class="co"># plot</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">bb</span>, col <span class="op">=</span> <span class="st">"white"</span>, border <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">week38_proj</span>, 
+<span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bb</span>, col <span class="op">=</span> <span class="st">"white"</span>, border <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">week38_proj</span>, 
      breaks <span class="op">=</span> <span class="va">year_bins</span>, 
-     col <span class="op">=</span> <span class="fu"><a href="../reference/abundance_palette.html">abundance_palette</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">year_bins</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>, season <span class="op">=</span> <span class="st">"weekly"</span><span class="op">)</span>, 
-     maxpixels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html">ncell</a></span><span class="op">(</span><span class="va">week38_proj</span><span class="op">)</span>, 
+     col <span class="op">=</span> <span class="fu"><a href="../reference/abundance_palette.html">abundance_palette</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">year_bins</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>, season <span class="op">=</span> <span class="st">"weekly"</span><span class="op">)</span>, 
+     maxpixels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html" class="external-link">ncell</a></span><span class="op">(</span><span class="va">week38_proj</span><span class="op">)</span>, 
      axes <span class="op">=</span> <span class="cn">FALSE</span>, box <span class="op">=</span> <span class="cn">FALSE</span>, legend <span class="op">=</span> <span class="cn">FALSE</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">bb</span>, col <span class="op">=</span> <span class="st">"white"</span>, border <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">week14_proj</span>, 
+<span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bb</span>, col <span class="op">=</span> <span class="st">"white"</span>, border <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">week14_proj</span>, 
      breaks <span class="op">=</span> <span class="va">year_bins</span>, 
-     col <span class="op">=</span> <span class="fu"><a href="../reference/abundance_palette.html">abundance_palette</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">year_bins</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>, season <span class="op">=</span> <span class="st">"weekly"</span><span class="op">)</span>, 
-     maxpixels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html">ncell</a></span><span class="op">(</span><span class="va">week14_proj</span><span class="op">)</span>, 
+     col <span class="op">=</span> <span class="fu"><a href="../reference/abundance_palette.html">abundance_palette</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">year_bins</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>, season <span class="op">=</span> <span class="st">"weekly"</span><span class="op">)</span>, 
+     maxpixels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html" class="external-link">ncell</a></span><span class="op">(</span><span class="va">week14_proj</span><span class="op">)</span>, 
      axes <span class="op">=</span> <span class="cn">FALSE</span>, box <span class="op">=</span> <span class="cn">FALSE</span>, legend <span class="op">=</span> <span class="cn">FALSE</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
 <span class="co"># plot legend</span>
-<span class="va">lbls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html">attr</a></span><span class="op">(</span><span class="va">year_bins</span>, <span class="st">"labels"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">week14_proj</span>, zlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, legend.only <span class="op">=</span> <span class="cn">TRUE</span>, 
-     col <span class="op">=</span> <span class="fu"><a href="../reference/abundance_palette.html">abundance_palette</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">year_bins</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>, season <span class="op">=</span> <span class="st">"weekly"</span><span class="op">)</span>, 
-     breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">year_bins</span><span class="op">)</span><span class="op">)</span>, 
+<span class="va">lbls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">year_bins</span>, <span class="st">"labels"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">week14_proj</span>, zlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, legend.only <span class="op">=</span> <span class="cn">TRUE</span>, 
+     col <span class="op">=</span> <span class="fu"><a href="../reference/abundance_palette.html">abundance_palette</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">year_bins</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>, season <span class="op">=</span> <span class="st">"weekly"</span><span class="op">)</span>, 
+     breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">year_bins</span><span class="op">)</span><span class="op">)</span>, 
      legend.shrink <span class="op">=</span> <span class="fl">0.97</span>, legend.width <span class="op">=</span> <span class="fl">2</span>,  
-     axis.args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">lbls</span><span class="op">)</span><span class="op">)</span>, 
-                      labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">signif</a></span><span class="op">(</span><span class="va">lbls</span>, <span class="fl">3</span><span class="op">)</span>,
+     axis.args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">lbls</span><span class="op">)</span><span class="op">)</span>, 
+                      labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">signif</a></span><span class="op">(</span><span class="va">lbls</span>, <span class="fl">3</span><span class="op">)</span>,
                       col.axis <span class="op">=</span> <span class="st">"black"</span>, fg <span class="op">=</span> <span class="cn">NA</span>,
                       cex.axis <span class="op">=</span> <span class="fl">0.9</span>, lwd.ticks <span class="op">=</span> <span class="fl">0</span>,
                       line <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -275,65 +289,65 @@
 </div>
 <div id="mapping-abundance" class="section level2">
 <h2 class="hasAnchor">
-<a href="#mapping-abundance" class="anchor"></a>Mapping Abundance</h2>
-<p>As seen in the map above, the <code>calc_bins</code> method excludes zeroes. However, with color bins that accurately represent the data distribution, we can add in details about zeroes, tweak the legend, and add some reference data to make a complete map. Like the quick start guide, this will show you how to download example data and plot abundance values similar to how they are plotted for the <a href="https://ebird.org/science/status-and-trends/woothr/abundance-map-weekly">eBird Status and Trends Abundance animations</a>.</p>
+<a href="#mapping-abundance" class="anchor" aria-hidden="true"></a>Mapping Abundance</h2>
+<p>As seen in the map above, the <code>calc_bins</code> method excludes zeroes. However, with color bins that accurately represent the data distribution, we can add in details about zeroes, tweak the legend, and add some reference data to make a complete map. Like the quick start guide, this will show you how to download example data and plot abundance values similar to how they are plotted for the <a href="https://ebird.org/science/status-and-trends/woothr/abundance-map-weekly" class="external-link">eBird Status and Trends Abundance animations</a>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># to add context, let's pull in some reference data to add</span>
-<span class="va">wh_states</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rnaturalearth/man/ne_states.html">ne_states</a></span><span class="op">(</span>country <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"United States of America"</span>, <span class="st">"Canada"</span><span class="op">)</span>,
-                    returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="va">eck</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html">st_geometry</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">wh_states</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rnaturalearth/man/ne_states.html" class="external-link">ne_states</a></span><span class="op">(</span>country <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"United States of America"</span>, <span class="st">"Canada"</span><span class="op">)</span>,
+                    returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="va">eck</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="co"># we'll plot a week in the middle of summer</span>
-<span class="va">week26_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projectRaster.html">projectRaster</a></span><span class="op">(</span><span class="va">abd</span><span class="op">[[</span><span class="fl">26</span><span class="op">]</span><span class="op">]</span>, crs <span class="op">=</span> <span class="va">eck</span>, method <span class="op">=</span> <span class="st">"ngb"</span><span class="op">)</span>
-<span class="va">week26_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/trim.html">trim</a></span><span class="op">(</span><span class="va">week26_proj</span><span class="op">)</span>
+<span class="va">week26_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projectRaster.html" class="external-link">projectRaster</a></span><span class="op">(</span><span class="va">abd</span><span class="op">[[</span><span class="fl">26</span><span class="op">]</span><span class="op">]</span>, crs <span class="op">=</span> <span class="va">eck</span>, method <span class="op">=</span> <span class="st">"ngb"</span><span class="op">)</span>
+<span class="va">week26_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/trim.html" class="external-link">trim</a></span><span class="op">(</span><span class="va">week26_proj</span><span class="op">)</span>
 
 <span class="co"># set graphics params</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># use the extent object to set the spatial extent for the plot</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sfc.html">st_as_sfc</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html">st_bbox</a></span><span class="op">(</span><span class="va">week26_proj</span><span class="op">)</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"white"</span>, border <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sfc.html" class="external-link">st_as_sfc</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="va">week26_proj</span><span class="op">)</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"white"</span>, border <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span>
 
 <span class="co"># add background spatial context</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">wh_states</span>, col <span class="op">=</span> <span class="st">"#cfcfcf"</span>, border <span class="op">=</span> <span class="cn">NA</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">wh_states</span>, col <span class="op">=</span> <span class="st">"#cfcfcf"</span>, border <span class="op">=</span> <span class="cn">NA</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
 <span class="co"># plot zeroes as gray</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">week26_proj</span>, col <span class="op">=</span> <span class="st">"#e6e6e6"</span>, 
-     maxpixels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html">ncell</a></span><span class="op">(</span><span class="va">week26_proj</span><span class="op">)</span>,
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">week26_proj</span>, col <span class="op">=</span> <span class="st">"#e6e6e6"</span>, 
+     maxpixels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html" class="external-link">ncell</a></span><span class="op">(</span><span class="va">week26_proj</span><span class="op">)</span>,
      axes <span class="op">=</span> <span class="cn">FALSE</span>, legend <span class="op">=</span> <span class="cn">FALSE</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
 <span class="co"># define color bins</span>
-<span class="va">qcol</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/abundance_palette.html">abundance_palette</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">year_bins</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>, <span class="st">"weekly"</span><span class="op">)</span>
+<span class="va">qcol</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/abundance_palette.html">abundance_palette</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">year_bins</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>, <span class="st">"weekly"</span><span class="op">)</span>
 
 <span class="co"># plot abundances</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">week26_proj</span>, breaks <span class="op">=</span> <span class="va">year_bins</span>, col <span class="op">=</span> <span class="va">qcol</span>, 
-     maxpixels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html">ncell</a></span><span class="op">(</span><span class="va">week26_proj</span><span class="op">)</span>,
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">week26_proj</span>, breaks <span class="op">=</span> <span class="va">year_bins</span>, col <span class="op">=</span> <span class="va">qcol</span>, 
+     maxpixels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html" class="external-link">ncell</a></span><span class="op">(</span><span class="va">week26_proj</span><span class="op">)</span>,
      axes <span class="op">=</span> <span class="cn">FALSE</span>, legend <span class="op">=</span> <span class="cn">FALSE</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
 <span class="co"># add zero to the bin labels</span>
-<span class="va">bin_labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">signif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/attr.html">attr</a></span><span class="op">(</span><span class="va">year_bins</span>, <span class="st">"labels"</span><span class="op">)</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>
+<span class="va">bin_labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">signif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">year_bins</span>, <span class="st">"labels"</span><span class="op">)</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>
 
 <span class="co"># create colors that include gray for 0</span>
-<span class="va">lcol</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"#e6e6e6"</span>, <span class="va">qcol</span><span class="op">)</span>
+<span class="va">lcol</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#e6e6e6"</span>, <span class="va">qcol</span><span class="op">)</span>
 
 <span class="co"># plot legend</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">week14_proj</span>, zlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.05</span>, <span class="fl">1</span><span class="op">)</span>, legend.only <span class="op">=</span> <span class="cn">TRUE</span>, 
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">week14_proj</span>, zlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.05</span>, <span class="fl">1</span><span class="op">)</span>, legend.only <span class="op">=</span> <span class="cn">TRUE</span>, 
      col <span class="op">=</span> <span class="va">lcol</span>, 
-     breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.05</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">lcol</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, 
+     breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.05</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">lcol</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, 
      legend.shrink <span class="op">=</span> <span class="fl">0.97</span>, legend.width <span class="op">=</span> <span class="fl">2</span>,  
-     axis.args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.05</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">bin_labels</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span>, 
+     axis.args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.05</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bin_labels</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span>, 
                       labels <span class="op">=</span> <span class="va">bin_labels</span>,
                       col.axis <span class="op">=</span> <span class="st">"black"</span>, fg <span class="op">=</span> <span class="cn">NA</span>,
                       cex.axis <span class="op">=</span> <span class="fl">0.9</span>, lwd.ticks <span class="op">=</span> <span class="fl">0</span>,
                       line <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># add state boundaries on top</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">wh_states</span>, border <span class="op">=</span> <span class="st">"white"</span>, lwd <span class="op">=</span> <span class="fl">1.5</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">wh_states</span>, border <span class="op">=</span> <span class="st">"white"</span>, lwd <span class="op">=</span> <span class="fl">1.5</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="ebirdst-intro-mapping_files/figure-html/map_w_es-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div id="mapping-abundance-confidence-intervals" class="section level2">
 <h2 class="hasAnchor">
-<a href="#mapping-abundance-confidence-intervals" class="anchor"></a>Mapping Abundance Confidence Intervals</h2>
+<a href="#mapping-abundance-confidence-intervals" class="anchor" aria-hidden="true"></a>Mapping Abundance Confidence Intervals</h2>
 <p>In addition to occurrence and abundance estimates, we also provide confidence intervals at an upper value of 90% and lower value of 10%. These can be used to calculate and map a confidence band width.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># load lower and upper stacks</span>
@@ -343,78 +357,78 @@
 <span class="co"># calculate band width</span>
 <span class="va">conf_band</span> <span class="op">&lt;-</span> <span class="va">upper</span><span class="op">[[</span><span class="fl">26</span><span class="op">]</span><span class="op">]</span> <span class="op">-</span> <span class="va">lower</span><span class="op">[[</span><span class="fl">26</span><span class="op">]</span><span class="op">]</span>
 
-<span class="va">conf_week26</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projectRaster.html">projectRaster</a></span><span class="op">(</span><span class="va">conf_band</span>, crs <span class="op">=</span> <span class="va">eck</span>, method <span class="op">=</span> <span class="st">"ngb"</span><span class="op">)</span>
+<span class="va">conf_week26</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projectRaster.html" class="external-link">projectRaster</a></span><span class="op">(</span><span class="va">conf_band</span>, crs <span class="op">=</span> <span class="va">eck</span>, method <span class="op">=</span> <span class="st">"ngb"</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/trim.html">trim</a></span><span class="op">(</span><span class="va">conf_week26</span><span class="op">)</span>, col <span class="op">=</span> <span class="fu"><a href="https://sjmgarnier.github.io/viridisLite/reference/viridis.html">magma</a></span><span class="op">(</span><span class="fl">20</span><span class="op">)</span>, 
-     maxpixel <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html">ncell</a></span><span class="op">(</span><span class="va">conf_week26</span><span class="op">)</span>,
+<span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/trim.html" class="external-link">trim</a></span><span class="op">(</span><span class="va">conf_week26</span><span class="op">)</span>, col <span class="op">=</span> <span class="fu"><a href="https://sjmgarnier.github.io/viridisLite/reference/viridis.html" class="external-link">magma</a></span><span class="op">(</span><span class="fl">20</span><span class="op">)</span>, 
+     maxpixel <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html" class="external-link">ncell</a></span><span class="op">(</span><span class="va">conf_week26</span><span class="op">)</span>,
      axes <span class="op">=</span> <span class="cn">FALSE</span>, box <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <p><img src="ebirdst-intro-mapping_files/figure-html/map_confidence_band-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div id="extracting-trajectories-with-uncertainty" class="section level1">
 <h1 class="hasAnchor">
-<a href="#extracting-trajectories-with-uncertainty" class="anchor"></a>Extracting Trajectories with Uncertainty</h1>
+<a href="#extracting-trajectories-with-uncertainty" class="anchor" aria-hidden="true"></a>Extracting Trajectories with Uncertainty</h1>
 <p>With <code>RasterStacks</code> for relative abundance estimates, as well as upper and lower confidence intervals, we can extract an abundance trajectory with uncertainty intervals and plot them across the year for a single location.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># set a point</span>
-<span class="va">pt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st.html">st_point</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">88.1</span>, <span class="fl">46.7</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sfc.html">st_sfc</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="fl">4326</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projection.html">projection</a></span><span class="op">(</span><span class="va">abd</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html">st_coordinates</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">pt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st.html" class="external-link">st_point</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">88.1</span>, <span class="fl">46.7</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sfc.html" class="external-link">st_sfc</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="fl">4326</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projection.html" class="external-link">projection</a></span><span class="op">(</span><span class="va">abd</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="co"># extract</span>
-<span class="va">abd_traj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/extract.html">extract</a></span><span class="op">(</span><span class="va">abd</span>, <span class="va">pt</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span>
-<span class="va">upper_traj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/extract.html">extract</a></span><span class="op">(</span><span class="va">upper</span>, <span class="va">pt</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span>
-<span class="va">lower_traj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/extract.html">extract</a></span><span class="op">(</span><span class="va">lower</span>, <span class="va">pt</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span>
+<span class="va">abd_traj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">abd</span>, <span class="va">pt</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span>
+<span class="va">upper_traj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">upper</span>, <span class="va">pt</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span>
+<span class="va">lower_traj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">lower</span>, <span class="va">pt</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span>
 
 <span class="co"># plot trajectories</span>
-<span class="va">plot_frame</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">abd_traj</span><span class="op">)</span>,
-                         y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span><span class="va">abd_traj</span><span class="op">)</span>,
-                         upper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span><span class="va">upper_traj</span><span class="op">)</span>,
-                         lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span><span class="va">lower_traj</span><span class="op">)</span><span class="op">)</span>
+<span class="va">plot_frame</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">abd_traj</span><span class="op">)</span>,
+                         y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">abd_traj</span><span class="op">)</span>,
+                         upper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">upper_traj</span><span class="op">)</span>,
+                         lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">lower_traj</span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">plot_frame</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_frame</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_ribbon</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_frame</span>, 
-              <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>ymin <span class="op">=</span> <span class="va">lower</span>, ymax <span class="op">=</span> <span class="va">upper</span><span class="op">)</span>, 
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">plot_frame</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_frame</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html" class="external-link">geom_ribbon</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_frame</span>, 
+              <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>ymin <span class="op">=</span> <span class="va">lower</span>, ymax <span class="op">=</span> <span class="va">upper</span><span class="op">)</span>, 
               alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"Expected Count"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"Week"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_light</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Expected Count"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Week"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_light</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p><img src="ebirdst-intro-mapping_files/figure-html/trajectories-1.png" width="100%" style="display: block; margin: auto;"></p>
 <p>It is also possible to extract trajectories for regions, but it takes a little more data work.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># set an extent based on polygon</span>
-<span class="va">mi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rnaturalearth/man/ne_states.html">ne_states</a></span><span class="op">(</span>country <span class="op">=</span> <span class="st">"United States of America"</span>, returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projection.html">projection</a></span><span class="op">(</span><span class="va">abd</span><span class="op">)</span><span class="op">)</span>
+<span class="va">mi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rnaturalearth/man/ne_states.html" class="external-link">ne_states</a></span><span class="op">(</span>country <span class="op">=</span> <span class="st">"United States of America"</span>, returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projection.html" class="external-link">projection</a></span><span class="op">(</span><span class="va">abd</span><span class="op">)</span><span class="op">)</span>
 <span class="va">mi</span> <span class="op">&lt;-</span> <span class="va">mi</span><span class="op">[</span><span class="va">mi</span><span class="op">$</span><span class="va">name</span> <span class="op">==</span> <span class="st">"Michigan"</span><span class="op">]</span>
 
 <span class="co"># extract</span>
 <span class="co"># because we're using a region, we get lots of values that we need to average</span>
-<span class="va">abd_traj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/extract.html">extract</a></span><span class="op">(</span><span class="va">abd</span>, <span class="va">mi</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="va">abd_traj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span><span class="op">(</span><span class="va">abd_traj</span>, <span class="fl">2</span>, <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">abd_traj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">abd</span>, <span class="va">mi</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">abd_traj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">abd_traj</span>, <span class="fl">2</span>, <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
-<span class="va">upper_traj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/extract.html">extract</a></span><span class="op">(</span><span class="va">upper</span>, <span class="va">mi</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="va">upper_traj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span><span class="op">(</span><span class="va">upper_traj</span>, <span class="fl">2</span>, <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">upper_traj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">upper</span>, <span class="va">mi</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">upper_traj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">upper_traj</span>, <span class="fl">2</span>, <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
-<span class="va">lower_traj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/extract.html">extract</a></span><span class="op">(</span><span class="va">lower</span>, <span class="va">mi</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="va">lower_traj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span><span class="op">(</span><span class="va">lower_traj</span>, <span class="fl">2</span>, <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">lower_traj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">lower</span>, <span class="va">mi</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">lower_traj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">lower_traj</span>, <span class="fl">2</span>, <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
 <span class="co"># plot trajectories</span>
-<span class="va">plot_frame</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">abd_traj</span><span class="op">)</span>,
-                         y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span><span class="va">abd_traj</span><span class="op">)</span>,
-                         upper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span><span class="va">upper_traj</span><span class="op">)</span>,
-                         lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span><span class="va">lower_traj</span><span class="op">)</span><span class="op">)</span>
+<span class="va">plot_frame</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">abd_traj</span><span class="op">)</span>,
+                         y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">abd_traj</span><span class="op">)</span>,
+                         upper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">upper_traj</span><span class="op">)</span>,
+                         lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">lower_traj</span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">plot_frame</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_frame</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_ribbon</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_frame</span>, 
-              <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>ymin <span class="op">=</span> <span class="va">lower</span>, ymax <span class="op">=</span><span class="va">upper</span><span class="op">)</span>, 
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">plot_frame</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_frame</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html" class="external-link">geom_ribbon</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_frame</span>, 
+              <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>ymin <span class="op">=</span> <span class="va">lower</span>, ymax <span class="op">=</span><span class="va">upper</span><span class="op">)</span>, 
               alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"Expected Count"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"Week"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_light</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Expected Count"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Week"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_light</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p><img src="ebirdst-intro-mapping_files/figure-html/trajectories_region-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
   </div>
@@ -430,11 +444,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="http://strimas.com">Matthew Strimas-Mackey</a>, Shawn Ligocki, <a href="http://twitter.com/tom_auer">Tom Auer</a>, Daniel Fink.</p>
+  <p></p>
+<p>Developed by <a href="http://strimas.com" class="external-link external-link">Matthew Strimas-Mackey</a>, Shawn Ligocki, <a href="http://twitter.com/tom_auer" class="external-link external-link">Tom Auer</a>, Daniel Fink.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9001.</p>
 </div>
 
       </footer>
@@ -442,6 +458,8 @@
 
   
 
+
+  
 
   </body>
 </html>
