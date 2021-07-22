@@ -44,8 +44,6 @@
 
 
 
-
-
 <!-- mathjax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
@@ -57,15 +55,9 @@
 
 
 
-  
-
-  
-
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    
-
     <div class="container template-news">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -112,6 +104,9 @@
 <li>
   <a href="../articles/changelog.html">Changelog</a>
 </li>
+<li>
+  <a href="../news/index.html">Version History</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -139,45 +134,60 @@
 
     <div id="ebirdst-030" class="section level1">
 <h1 class="page-header" data-toc-text="0.3.0">
-<a href="#ebirdst-030" class="anchor" aria-hidden="true"></a>ebirdst 0.3.0<small> Unreleased </small></h1>
-<ul><li>add support for new data structures used for 2020 eBird Status and Trends</li>
+<a href="#ebirdst-030" class="anchor"></a>ebirdst 0.3.0<small> Unreleased </small>
+</h1>
+<ul>
+<li>add support for new data structures used for 2020 eBird Status and Trends</li>
 <li>functionality to handle partial dependence data added</li>
 <li>overhaul of package API to be more intuitive and streamlined</li>
 <li>all documentation and vignettes updated</li>
-</ul></div>
+</ul>
+</div>
     <div id="ebirdst-022" class="section level1">
 <h1 class="page-header" data-toc-text="0.2.2">
-<a href="#ebirdst-022" class="anchor" aria-hidden="true"></a>ebirdst 0.2.2<small> 2021-01-16 </small></h1>
-<ul><li>add support for variable ensemble support in <code>compute_ppms()</code>
+<a href="#ebirdst-022" class="anchor"></a>ebirdst 0.2.2<small> 2021-01-16 </small>
+</h1>
+<ul>
+<li>add support for variable ensemble support in <code>compute_ppms()</code>
 </li>
-</ul></div>
+</ul>
+</div>
     <div id="ebirdst-021" class="section level1">
 <h1 class="page-header" data-toc-text="0.2.1">
-<a href="#ebirdst-021" class="anchor" aria-hidden="true"></a>ebirdst 0.2.1<small> 2020-03-23 </small></h1>
-<ul><li>bug fix: corrected date types in seasonal definitions</li>
+<a href="#ebirdst-021" class="anchor"></a>ebirdst 0.2.1<small> 2020-03-23 </small>
+</h1>
+<ul>
+<li>bug fix: corrected date types in seasonal definitions</li>
 <li>bug fix: fixed possibility that ebirdst_extent could produce invalid date (day 366 of 2015)</li>
 <li>added import of pipe operator</li>
 <li>
 <code>velox</code> was archived, removed dependency from Suggests</li>
 <li>
 <code>fasterize</code> was archived, removed dependency from Imports</li>
-</ul></div>
+</ul>
+</div>
     <div id="ebirdst-020" class="section level1">
 <h1 class="page-header" data-toc-text="0.2.0">
-<a href="#ebirdst-020" class="anchor" aria-hidden="true"></a>ebirdst 0.2.0<small> 2020-02-26 </small></h1>
-<ul><li>change maintainer to Matthew Strimas-Mackey</li>
+<a href="#ebirdst-020" class="anchor"></a>ebirdst 0.2.0<small> 2020-02-26 </small>
+</h1>
+<ul>
+<li>change maintainer to Matthew Strimas-Mackey</li>
 <li>update to access 2019 status and trends data</li>
 <li>partial dependence data no longer available, all references to PDs removed</li>
 <li>bug fix: <code><a href="../reference/load_raster.html">load_raster()</a></code> gave incorrect names to seasonal rasters</li>
 <li>bug fix: didn’t properly implement quantile binning</li>
 <li>
 <code><a href="../reference/date_to_st_week.html">date_to_st_week()</a></code> gets the status and trends week for a give vector of dates</li>
-</ul></div>
+</ul>
+</div>
     <div id="ebirdst-010" class="section level1">
 <h1 class="page-header" data-toc-text="0.1.0">
-<a href="#ebirdst-010" class="anchor" aria-hidden="true"></a>ebirdst 0.1.0<small> 2019-04-04 </small></h1>
-<ul><li>first CRAN release</li>
-</ul></div>
+<a href="#ebirdst-010" class="anchor"></a>ebirdst 0.1.0<small> 2019-04-04 </small>
+</h1>
+<ul>
+<li>first CRAN release</li>
+</ul>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -191,11 +201,11 @@
 
       <footer>
       <div class="copyright">
-  <p><p>Developed by <a href="http://strimas.com" class="external-link">Matthew Strimas-Mackey</a>, Shawn Ligocki, <a href="http://twitter.com/tom_auer" class="external-link">Tom Auer</a>, Daniel Fink.</p></p>
+  <p>Developed by <a href='http://strimas.com'>Matthew Strimas-Mackey</a>, Shawn Ligocki, <a href='http://twitter.com/tom_auer'>Tom Auer</a>, Daniel Fink.</p>
 </div>
 
 <div class="pkgdown">
-  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
@@ -203,8 +213,6 @@
 
   
 
-
-  
 
   </body>
 </html>
