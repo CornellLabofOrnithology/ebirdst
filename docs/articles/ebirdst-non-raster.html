@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,32 +33,44 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="../articles/ebirdst-introduction.html">Introduction - Data Access and Structure</a>
+  <a href="../articles/ebirdst.html">Get Started</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Vignettes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
 <li>
-  <a href="../articles/ebirdst-intro-mapping.html">Intro Mapping</a>
-</li>
-<li>
-  <a href="../articles/ebirdst-advanced-mapping.html">Advanced Mapping</a>
-</li>
-<li>
-  <a href="../articles/ebirdst-non-raster.html">Non-Raster Data</a>
+      <a href="../articles/ebirdst-intro-mapping.html">Introduction to Mapping</a>
+    </li>
+    <li>
+      <a href="../articles/ebirdst-advanced-mapping.html">Advanced Mapping</a>
+    </li>
+    <li>
+      <a href="../articles/ebirdst-non-raster.html">Non-raster Data</a>
+    </li>
+  </ul>
 </li>
 <li>
   <a href="../reference/index.html">Function Reference</a>
 </li>
+<li>
+  <a href="../articles/changelog.html">Changelog</a>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/CornellLabofOrnithology/ebirdst">
-    <span class="fas fa-github fa-lg"></span>
+  <a href="https://github.com/CornellLabofOrnithology/ebirdst/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -70,15 +84,15 @@
 
       
 
-      </header><script src="ebirdst-non-raster_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
+      </header><script src="ebirdst-non-raster_files/header-attrs-2.9/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Non-raster Data: Using Predictor Importance, Partial Dependence, and Predictive Performance Metrics</h1>
-                        <h4 class="author">Tom Auer, Daniel Fink</h4>
+                        <h4 data-toc-skip class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 class="date">2021-07-09</h4>
+            <h4 data-toc-skip class="date">2021-07-22</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-non-raster.Rmd"><code>vignettes/ebirdst-non-raster.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-non-raster.Rmd" class="external-link"><code>vignettes/ebirdst-non-raster.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-non-raster.Rmd</code></div>
 
     </div>
@@ -87,7 +101,7 @@
     
 <div id="outline" class="section level1">
 <h1 class="hasAnchor">
-<a href="#outline" class="anchor"></a>Outline</h1>
+<a href="#outline" class="anchor" aria-hidden="true"></a>Outline</h1>
 <ol style="list-style-type: decimal">
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#loading-centroids">Loading Centroids</a></li>
@@ -100,11 +114,11 @@
 </div>
 <div id="introduction" class="section level1">
 <h1 class="hasAnchor">
-<a href="#introduction" class="anchor"></a>Introduction</h1>
+<a href="#introduction" class="anchor" aria-hidden="true"></a>Introduction</h1>
 <p>Beyond estimates of occurrence and relative abundance, the eBird Status and Trends products contain estimates of predictor importance (PI), partial dependence (PD), and predictive performance metrics (PPMs). The PPMs can be used to evaluate statistical performance of the models, either over the entire spatiotemporal extent of the model results, or for a specific region and season. Predictor importances (PIs) and partial dependences (PDs can be used to understand relationships between the occurrence or count response and predictors, most notably the land cover variables used in the model. The functions described in this section help load and analyse these data. More details about predictive performance metrics and how they were calculated and interpreted can be found in Fink et al. (2019).</p>
 <div id="data-structure" class="section level2">
 <h2 class="hasAnchor">
-<a href="#data-structure" class="anchor"></a>Data Structure</h2>
+<a href="#data-structure" class="anchor" aria-hidden="true"></a>Data Structure</h2>
 <p><strong>IMPORTANT. AFTER DOWNLOADING THE RESULTS, DO NOT CHANGE THE FILE STRUCTURE.</strong> All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package.</p>
 <p>The non-raster data are stored in two SQLite databases:</p>
 <ul>
@@ -118,11 +132,11 @@
 </div>
 <div id="pi-and-pd" class="section level1">
 <h1 class="hasAnchor">
-<a href="#pi-and-pd" class="anchor"></a>PI and PD</h1>
+<a href="#pi-and-pd" class="anchor" aria-hidden="true"></a>PI and PD</h1>
 <p>We’ll start by loading the PI and PD data from the example data package for Yellow-bellied Sapsucker in Michigan.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/CornellLabofOrnithology/ebirdst">ebirdst</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/CornellLabofOrnithology/ebirdst" class="external-link">ebirdst</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>
 
 <span class="co"># Because the non-raster data is large, there is a parameter on the</span>
 <span class="co"># ebirdst_download function that defaults to downloading only the raster data.</span>
@@ -131,7 +145,7 @@
 
 <span class="co"># predictor importance</span>
 <span class="va">pis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_pis.html">load_pis</a></span><span class="op">(</span><span class="va">sp_path</span><span class="op">)</span>
-<span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html">glimpse</a></span><span class="op">(</span><span class="va">pis</span><span class="op">)</span>
+<span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">pis</span><span class="op">)</span>
 <span class="co">#&gt; Rows: 3,310</span>
 <span class="co">#&gt; Columns: 78</span>
 <span class="co">#&gt; $ stixel_id                        &lt;chr&gt; "1-169.6-NSEWWEWW", "1-108.6-NSSEEWNW…</span>
@@ -215,7 +229,7 @@
 
 <span class="co"># partial dependence</span>
 <span class="va">pds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_pds.html">load_pds</a></span><span class="op">(</span><span class="va">sp_path</span><span class="op">)</span>
-<span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html">glimpse</a></span><span class="op">(</span><span class="va">pds</span><span class="op">)</span>
+<span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">pds</span><span class="op">)</span>
 <span class="co">#&gt; Rows: 1,818,380</span>
 <span class="co">#&gt; Columns: 7</span>
 <span class="co">#&gt; $ stixel_id       &lt;chr&gt; "1-169.6-NSEWWEWW", "1-169.6-NSEWWEWW", "1-169.6-NSEWW…</span>
@@ -228,13 +242,13 @@
 <p>Notice that the data in both these data frames is provided for each stixel, identified by a <code>stixel_id</code>.</p>
 <div id="selecting-region-and-season" class="section level2">
 <h2 class="hasAnchor">
-<a href="#selecting-region-and-season" class="anchor"></a>Selecting Region and Season</h2>
+<a href="#selecting-region-and-season" class="anchor" aria-hidden="true"></a>Selecting Region and Season</h2>
 <p>When working with Predictive Performance Metrics (PPMs), PIs, or PDs, it is very common to select a subset of space and time for analysis. In <code>ebirdst</code> this is done by creating a spatiotemporal extent object with <code><a href="../reference/ebirdst_extent.html">ebirdst_extent()</a></code>. These objects define the region and season for analysis and are passed to many functions in <code>ebirdst</code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># define a spatiotemporal extent</span>
-<span class="va">lp_extent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ebirdst_extent.html">ebirdst_extent</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>xmin <span class="op">=</span> <span class="op">-</span><span class="fl">86</span>, xmax <span class="op">=</span> <span class="op">-</span><span class="fl">83</span>, ymin <span class="op">=</span> <span class="fl">42</span>, ymax <span class="op">=</span> <span class="fl">45</span><span class="op">)</span>,
-                            t <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.425</span>, <span class="fl">0.475</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">lp_extent</span><span class="op">)</span>
+<span class="va">lp_extent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ebirdst_extent.html">ebirdst_extent</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>xmin <span class="op">=</span> <span class="op">-</span><span class="fl">86</span>, xmax <span class="op">=</span> <span class="op">-</span><span class="fl">83</span>, ymin <span class="op">=</span> <span class="fl">42</span>, ymax <span class="op">=</span> <span class="fl">45</span><span class="op">)</span>,
+                            t <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.425</span>, <span class="fl">0.475</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://www.math.uzh.ch/pages/spam//reference/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">lp_extent</span><span class="op">)</span>
 <span class="co">#&gt; eBird Status &amp; Trends extent: </span>
 <span class="co">#&gt;   Bounding box: xmin -86; ymin 42; xmax -83; ymax 45</span>
 <span class="co">#&gt;   CRS: +proj=longlat +datum=WGS84 +no_defs </span>
@@ -242,20 +256,20 @@
 
 <span class="co"># subset to this extent</span>
 <span class="va">pis_ss</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ebirdst_subset.html">ebirdst_subset</a></span><span class="op">(</span><span class="va">pis</span>, ext <span class="op">=</span> <span class="va">lp_extent</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html">nrow</a></span><span class="op">(</span><span class="va">pis</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">pis</span><span class="op">)</span>
 <span class="co">#&gt; [1] 3310</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html">nrow</a></span><span class="op">(</span><span class="va">pis_ss</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">pis_ss</span><span class="op">)</span>
 <span class="co">#&gt; [1] 125</span></code></pre></div>
-<p>To understand which stixels are contributing to estimates within a given spatiotemporal extent, <code><a href="../reference/stixel_footprint.html">stixel_footprint()</a></code> generate a <code>RasterLayer</code> depicting where a majority of the information is coming from within a given extent. The map ranges from 0 to 1, with pixels have a value of 1 meaning that 100% of the selected stixels are contributing information at that pixel. Calling <code><a href="https://rdrr.io/pkg/raster/man/plot.html">plot()</a></code> on the output of this function will map the stixel footprint as well as centroids of all the stixels.</p>
+<p>To understand which stixels are contributing to estimates within a given spatiotemporal extent, <code><a href="../reference/stixel_footprint.html">stixel_footprint()</a></code> generate a <code>RasterLayer</code> depicting where a majority of the information is coming from within a given extent. The map ranges from 0 to 1, with pixels have a value of 1 meaning that 100% of the selected stixels are contributing information at that pixel. Calling <code><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot()</a></code> on the output of this function will map the stixel footprint as well as centroids of all the stixels.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span>
 <span class="va">footprint</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/stixel_footprint.html">stixel_footprint</a></span><span class="op">(</span><span class="va">sp_path</span>, ext <span class="op">=</span> <span class="va">lp_extent</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">footprint</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">footprint</span><span class="op">)</span></code></pre></div>
 <p><img src="ebirdst-non-raster_files/figure-html/plot_extents-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div id="plot-predictor-importance" class="section level2">
 <h2 class="hasAnchor">
-<a href="#plot-predictor-importance" class="anchor"></a>Plot Predictor Importance</h2>
+<a href="#plot-predictor-importance" class="anchor" aria-hidden="true"></a>Plot Predictor Importance</h2>
 <p>The <code><a href="../reference/plot_pis.html">plot_pis()</a></code> function generates a bar plot showing a rank of the most important predictors within a spatiotemporal subset. There is an option to show all predictors or to aggregate FRAGSTATS by the land cover types.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># with all classes</span>
@@ -269,7 +283,7 @@
 </div>
 <div id="plotting-partial-dependence" class="section level2">
 <h2 class="hasAnchor">
-<a href="#plotting-partial-dependence" class="anchor"></a>Plotting Partial Dependence</h2>
+<a href="#plotting-partial-dependence" class="anchor" aria-hidden="true"></a>Plotting Partial Dependence</h2>
 <p>Smoothed partial dependence curves for a given predictor can be plotted using <code><a href="../reference/plot_pds.html">plot_pds()</a></code>. Confidence intervals are estimated through a processing of subsampling and bootstrapping. This function returns the smoothed data and CIs and plots these data. For example, let’s look at PD curves for checklist start time, expressed as the difference from solar noon, and the percentage of broadleaf forest cover. The full list of predictors see the data frame <code>ebirdst_predictors</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># in the interest of speed, run with 5 bootstrap iterations</span>
@@ -277,13 +291,13 @@
 <span class="va">pd_smooth</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_pds.html">plot_pds</a></span><span class="op">(</span><span class="va">pds</span>, <span class="st">"solar_noon_diff"</span>, ext <span class="op">=</span> <span class="va">lp_extent</span>, n_bs <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></code></pre></div>
 <p><img src="ebirdst-non-raster_files/figure-html/plot_pds-1.png" width="100%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html">glimpse</a></span><span class="op">(</span><span class="va">pd_smooth</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">pd_smooth</span><span class="op">)</span>
 <span class="co">#&gt; Rows: 25</span>
 <span class="co">#&gt; Columns: 4</span>
 <span class="co">#&gt; $ x         &lt;dbl&gt; -1.197944e+01, -1.098123e+01, -9.983009e+00, -8.984792e+00, …</span>
-<span class="co">#&gt; $ pd_median &lt;dbl&gt; 0.0056256084, 0.0060984397, 0.0062741325, 0.0060826671, 0.00…</span>
-<span class="co">#&gt; $ pd_lower  &lt;dbl&gt; 3.356564e-03, 3.738787e-03, 4.090465e-03, 4.442142e-03, 4.79…</span>
-<span class="co">#&gt; $ pd_upper  &lt;dbl&gt; 0.0074086377, 0.0071327514, 0.0073407303, 0.0083307680, 0.00…</span>
+<span class="co">#&gt; $ pd_median &lt;dbl&gt; 0.0059409572, 0.0061101289, 0.0071471399, 0.0065362595, 0.00…</span>
+<span class="co">#&gt; $ pd_lower  &lt;dbl&gt; 0.0040936174, 0.0044459730, 0.0047331548, 0.0049407515, 0.00…</span>
+<span class="co">#&gt; $ pd_upper  &lt;dbl&gt; 0.0085116783, 0.0085140598, 0.0084319943, 0.0082389412, 0.00…</span>
 
 <span class="co"># deciduous broadleaf forest</span>
 <span class="fu"><a href="../reference/plot_pds.html">plot_pds</a></span><span class="op">(</span><span class="va">pds</span>, <span class="st">"mcd12q1_lccs1_fs_c14_1500_pland"</span>, ext <span class="op">=</span> <span class="va">lp_extent</span>, n_bs <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></code></pre></div>
@@ -292,7 +306,7 @@
 </div>
 <div id="predictive-performance-metrics" class="section level1">
 <h1 class="hasAnchor">
-<a href="#predictive-performance-metrics" class="anchor"></a>Predictive Performance Metrics</h1>
+<a href="#predictive-performance-metrics" class="anchor" aria-hidden="true"></a>Predictive Performance Metrics</h1>
 <p>Beyond confidence intervals provided for the abundance estimates, the centroid data can also be used to calculate predictive performance metrics, to get an idea as to whether there is substantial statistical performance to evaluate information provided by PIs and PDs (as well as abundance and occurrence information). Three types of PPMs are calculated:</p>
 <ul>
 <li>
@@ -303,27 +317,27 @@
 <strong>Abundance PPMs</strong> assess the predicted abundance</li>
 </ul>
 <p>Both the occurrence and count PPMs are within-range metrics, meaning the comparison between observations and predictions is only made within the range where the species occurs.</p>
-<p>The function <code><a href="../reference/ebirdst_ppms.html">ebirdst_ppms()</a></code> calculates a suite of PPMs for a given spatiotemporal extent. The results can then be plotted with <code><a href="https://rdrr.io/pkg/raster/man/plot.html">plot()</a></code>.</p>
+<p>The function <code><a href="../reference/ebirdst_ppms.html">ebirdst_ppms()</a></code> calculates a suite of PPMs for a given spatiotemporal extent. The results can then be plotted with <code><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot()</a></code>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ppms</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ebirdst_ppms.html">ebirdst_ppms</a></span><span class="op">(</span><span class="va">sp_path</span>, ext <span class="op">=</span> <span class="va">lp_extent</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">ppms</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ppms</span><span class="op">)</span></code></pre></div>
 <p><img src="ebirdst-non-raster_files/figure-html/ppms-1.png" width="100%" style="display: block; margin: auto;"></p>
-<p><code><a href="../reference/ebirdst_ppms_ts.html">ebirdst_ppms_ts()</a></code> can be used to get a time series of PPMs, calculating the full suite either at a weekly or monthly resolution. <code><a href="https://rdrr.io/pkg/raster/man/plot.html">plot()</a></code> can be used to visualise these PPM time series for a given PPM.</p>
+<p><code><a href="../reference/ebirdst_ppms_ts.html">ebirdst_ppms_ts()</a></code> can be used to get a time series of PPMs, calculating the full suite either at a weekly or monthly resolution. <code><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot()</a></code> can be used to visualise these PPM time series for a given PPM.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ppms_monthly</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ebirdst_ppms_ts.html">ebirdst_ppms_ts</a></span><span class="op">(</span><span class="va">sp_path</span>, ext <span class="op">=</span> <span class="va">lp_extent</span>, summarize_by <span class="op">=</span> <span class="st">"months"</span><span class="op">)</span>
 <span class="co"># plot binary kappa</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">ppms_monthly</span>, type <span class="op">=</span> <span class="st">"binary"</span>, metric <span class="op">=</span> <span class="st">"kappa"</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ppms_monthly</span>, type <span class="op">=</span> <span class="st">"binary"</span>, metric <span class="op">=</span> <span class="st">"kappa"</span><span class="op">)</span></code></pre></div>
 <p><img src="ebirdst-non-raster_files/figure-html/binary_by_time-1.png" width="100%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># plot occurrence probability auc</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">ppms_monthly</span>, type <span class="op">=</span> <span class="st">"occurrence"</span>, metric <span class="op">=</span> <span class="st">"auc"</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ppms_monthly</span>, type <span class="op">=</span> <span class="st">"occurrence"</span>, metric <span class="op">=</span> <span class="st">"auc"</span><span class="op">)</span></code></pre></div>
 <p><img src="ebirdst-non-raster_files/figure-html/binary_by_time-2.png" width="100%" style="display: block; margin: auto;"></p>
 <div id="references" class="section level2">
 <h2 class="hasAnchor">
-<a href="#references" class="anchor"></a>References</h2>
+<a href="#references" class="anchor" aria-hidden="true"></a>References</h2>
 <p>Fink, D., T. Damoulas, &amp; J. Dave, J. 2013. Adaptive Spatio-Temporal Exploratory Models: Hemisphere-wide species distributions from massively crowdsourced eBird data. In Twenty-Seventh AAAI Conference on Artificial Intelligence.</p>
 <p>Fink, D., W.M. Hochachka, B. Zuckerberg, D.W. Winkler, B. Shaby, M.A. Munson, G. Hooker, M. Riedewald, D. Sheldon, &amp; S. Kelling. 2010. Spatiotemporal exploratory models for broad‐scale survey data. Ecological Applications, 20(8), 2131-2147.</p>
-<p>Fink, D., T. Auer, A. Johnston, V. Ruiz‐Gutierrez, W.M. Hochachka, &amp; S. Kelling. 2019. Modeling avian full annual cycle distribution and population trends with citizen science data. Ecological Applications, 00(00):e02056. <a href="https://doi.org/10.1002/eap.2056" class="uri">https://doi.org/10.1002/eap.2056</a></p>
+<p>Fink, D., T. Auer, A. Johnston, V. Ruiz‐Gutierrez, W.M. Hochachka, &amp; S. Kelling. 2019. Modeling avian full annual cycle distribution and population trends with citizen science data. Ecological Applications, 00(00):e02056. <a href="https://doi.org/10.1002/eap.2056" class="external-link uri">https://doi.org/10.1002/eap.2056</a></p>
 </div>
 </div>
   </div>
@@ -339,11 +353,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="http://strimas.com">Matthew Strimas-Mackey</a>, Shawn Ligocki, <a href="http://twitter.com/tom_auer">Tom Auer</a>, Daniel Fink.</p>
+  <p></p>
+<p>Developed by <a href="http://strimas.com" class="external-link external-link">Matthew Strimas-Mackey</a>, Shawn Ligocki, <a href="http://twitter.com/tom_auer" class="external-link external-link">Tom Auer</a>, Daniel Fink.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9001.</p>
 </div>
 
       </footer>
@@ -351,6 +367,8 @@
 
   
 
+
+  
 
   </body>
 </html>

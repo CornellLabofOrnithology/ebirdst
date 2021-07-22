@@ -89,7 +89,6 @@ nrow(pis)
 nrow(pis_ss)
 ```
 
-
 To understand which stixels are contributing to estimates within a given spatiotemporal extent, `stixel_footprint()` generate a `RasterLayer` depicting where a majority of the information is coming from within a given extent. The map ranges from 0 to 1, with pixels have a value of 1 meaning that 100% of the selected stixels are contributing information at that pixel. Calling `plot()` on the output of this function will map the stixel footprint as well as centroids of all the stixels.
 
 ```{r plot_extents}

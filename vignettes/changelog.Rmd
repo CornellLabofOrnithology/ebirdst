@@ -1,0 +1,58 @@
+---
+title: "Changelog"
+author: "Tom Auer"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Changelog}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# eBird Status Data Products 2019 Changelog
+
+**Data Version:** 2019
+
+**Citation:** 
+<blockquote>
+Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. Hochachka, C. Wood, I. Davies, M. Iliff, L. Seitz. 2020. eBird Status and Trends, Data Version: 2019; Released: 2020. Cornell Lab of Ornithology, Ithaca, New York. https://doi.org/10.2173/ebirdst.2019
+</blockquote>
+
+## Data Inputs
+
+### eBird Checklists
+
+- CHANGED: Checklists are included for January 1, 2005 through April 15, 2020, updated from January 1, 2014 through December 31, 2018.
+- ADDED: Include checklists from the [International Shorebird Survey (ISS)](https://www.manomet.org/project/international-shorebird-survey/) as complete for shorebird species.
+- CHANGED: Checklists where “slashes” (representing two similar species) are non-zero now have child species set to “X” (present-only, no count info).
+- FIXED: Subspecies did not always roll up to species-level correctly.
+
+### Environmental Covariates
+
+- CHANGED: [ASTER Global Water Bodies Database](https://lpdaac.usgs.gov/products/astwbdv001/) at 30m for ocean, river, and lakes replaces [MOD44W](https://lpdaac.usgs.gov/products/mod44wv006/) which was 500m resolution, had only land or water classification, and only ran through 2015.
+- ADDED: [GLOBIO Global Roads Inventory Project (GRIP)](https://www.globio.info/download-grip-dataset)  as road density (m/km2) for five classes of roads.
+
+## Workflow and Code Changes
+
+### Spatiotemporal Partitioning
+
+- CHANGED: The adaptive partitioning algorithm (AdaSTEM) now uses projected coordinates (sinusoidal) and meters instead of unprojected coordinates and degrees.
+- CHANGED: AdaSTEM partitions are now 1500 kilometers on a side at their largest and 187 kilometers on a side at their smallest.
+- CHANGED: AdaSTEM rules now split partitions if they contain more than 16,000 checklists or are larger than 1500 kilometers on a side.
+- CHANGED: AdaSTEM now reverts individual partitions back to the next largest size if any of the partition children contain less than 500 checklists and are not mostly open water. Partitions are never allowed to revert back to partitions that are 1500 kilometers or more on a side.
+
+### Model Ensemble
+
+- ADDED: Individual models now report 0 for predictions if the training data set contains less than 10 positive observations of a species and the mean spatial coverage within the model is greater than or equal to 5%.
+- CHANGED: Range boundaries are now set weekly to have the highest level of ensemble support, between 50% and 95% of models, while including at least 99.5% of positive observations, changed from being fixed at 75% of models in previous versions.
+- CHANGED: Zeroes in data products that are outside of the prediction area for species (also known as assumed zeroes) are now based on the mean spatial coverage of checklists within those areas. For locations where species-specific models did not report zero or non-zero predictions, locations need to have, on average, across the up-to 100 models in the ensemble, 0.1% of 3km grid cells filled with at least 1 checklist for a given week to be reported as zero. Previously, these locations required 95% of models at a given location to have had at least 50 complete checklists for the given week.
+
+### Seasonal Products
+
+- ADDED: When averaging weekly estimates to represent resident species, reviewers  select a subset of weeks, as opposed to having previously averaged the entire year.
+
+### Data Products
+
+- ADDED: There are now 184 species modeled at a fully global extent. The overall species total is now 807.
+
+### Expert Review
+- ADDED: Expert reviewers now assign quality scores for the full-year, animations, and all seasons.

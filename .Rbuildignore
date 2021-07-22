@@ -16,3 +16,5 @@
 ^LICENSE\.md$
 ^makefile.r$
 ^\.github$
+^pkgdown$
+vignettes/changelog.Rmd

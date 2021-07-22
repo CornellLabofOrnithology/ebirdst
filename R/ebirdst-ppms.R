@@ -176,12 +176,12 @@ ebirdst_ppms <- function(path, ext, es_cutoff) {
 
   for (i_mc in seq_len(n_mc)) {
     # case control sampling
-    sampled <- sample_case_control(preds,
-                                   res = c(3000, 3000),
-                                   t_res = 7 / 365,
-                                   n = 1,
-                                   jitter = TRUE,
-                                   replace = FALSE)
+    sampled <- sample_grid(preds,
+                           res = c(3000, 3000),
+                           t_res = 7 / 365,
+                           n = 1,
+                           jitter = TRUE,
+                           replace = FALSE)
 
     # index back to full vector
     data_i <- preds[sampled, ]

@@ -474,7 +474,7 @@ title("Yellow-bellied Sapsucker Seasonal Range Map",
 
 # Regional Statistics
 
-In addition to maps and visualizations, the eBird Status and Trends website provides a set of statistics summarizing the spatial data over regions. In the US and Canada, statistics are provided for each state and province, and throughout North America they are provided for [Bird Conservation Regions (BCRs)](http://nabci-us.org/resources/bird-conservation-regions-map/). The five regional statistics are:
+In addition to maps and visualizations, the eBird Status and Trends website provides a set of statistics summarizing the spatial data over regions. In the US and Canada, statistics are provided for each state and province, and throughout North America they are provided for [Bird Conservation Regions (BCRs)](https://nabci-us.org/resources/bird-conservation-regions-map/). The five regional statistics are:
 
 1. **Mean relative abundance:** the average estimated relative abundance within the given region for a given season.
 2. **Percentage of seasonal North American population:** the sum of the estimated relative abundance within the selected region divided by the sum of the estimated relative abundance across North America.

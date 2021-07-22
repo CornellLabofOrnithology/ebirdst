@@ -46,6 +46,8 @@ readable land cover names." />
 
 
 
+
+
 <!-- mathjax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
@@ -57,9 +59,15 @@ readable land cover names." />
 
 
 
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -73,32 +81,44 @@ readable land cover names." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../articles/ebirdst-introduction.html">Introduction - Data Access and Structure</a>
+  <a href="../articles/ebirdst.html">Get Started</a>
 </li>
-<li>
-  <a href="../articles/ebirdst-intro-mapping.html">Intro Mapping</a>
-</li>
-<li>
-  <a href="../articles/ebirdst-advanced-mapping.html">Advanced Mapping</a>
-</li>
-<li>
-  <a href="../articles/ebirdst-non-raster.html">Non-Raster Data</a>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Vignettes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/ebirdst-intro-mapping.html">Introduction to Mapping</a>
+    </li>
+    <li>
+      <a href="../articles/ebirdst-advanced-mapping.html">Advanced Mapping</a>
+    </li>
+    <li>
+      <a href="../articles/ebirdst-non-raster.html">Non-raster Data</a>
+    </li>
+  </ul>
 </li>
 <li>
   <a href="../reference/index.html">Function Reference</a>
 </li>
+<li>
+  <a href="../articles/changelog.html">Changelog</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/CornellLabofOrnithology/ebirdst">
-    <span class="fas fa-github fa-lg"></span>
+  <a href="https://github.com/CornellLabofOrnithology/ebirdst/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -125,7 +145,7 @@ readable land cover names." />
 readable land cover names.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>convert_classes</span><span class='op'>(</span><span class='va'>x</span>, by_cover_class <span class='op'>=</span> <span class='cn'>FALSE</span>, pretty <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>convert_classes</span><span class='op'>(</span><span class='va'>x</span>, by_cover_class <span class='op'>=</span> <span class='cn'>FALSE</span>, pretty <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -150,11 +170,12 @@ with a name for the cover class as whole.</p></td>
     <p>A vector of converted names.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='va'>predictors</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"MCD12Q1_LCCS1_FS_C1_1500_ED"</span>, <span class='st'>"MOD44W_OIC_FS_C3_1500_ED"</span>,
-                <span class='st'>"ELEV_SD"</span><span class='op'>)</span>
-<span class='fu'>ebirdst</span><span class='fu'>:::</span><span class='fu'>convert_classes</span><span class='op'>(</span><span class='va'>predictors</span>, pretty <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "Barren ED"                "mod44w_oic_fs_c3_1500_ed"
-#&gt; [3] "Elevation SD"            </div></pre>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='va'>predictors</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"MCD12Q1_LCCS1_FS_C1_1500_ED"</span>, <span class='st'>"MOD44W_OIC_FS_C3_1500_ED"</span>,</span>
+<span class='r-in'>                <span class='st'>"ELEV_SD"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>ebirdst</span><span class='fu'>:::</span><span class='fu'>convert_classes</span><span class='op'>(</span><span class='va'>predictors</span>, pretty <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "Barren ED"                "mod44w_oic_fs_c3_1500_ed"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [3] "Elevation SD"            </span>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -166,11 +187,11 @@ with a name for the cover class as whole.</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='http://strimas.com'>Matthew Strimas-Mackey</a>, Shawn Ligocki, <a href='http://twitter.com/tom_auer'>Tom Auer</a>, Daniel Fink.</p>
+  <p><p>Developed by <a href="http://strimas.com" class="external-link">Matthew Strimas-Mackey</a>, Shawn Ligocki, <a href="http://twitter.com/tom_auer" class="external-link">Tom Auer</a>, Daniel Fink.</p></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
 </div>
 
       </footer>
@@ -178,6 +199,8 @@ with a name for the cover class as whole.</p></td>
 
   
 
+
+  
 
   </body>
 </html>
