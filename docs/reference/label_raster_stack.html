@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Changelog • ebirdst</title>
+<title>Label data cubes with the week date for each band — label_raster_stack • ebirdst</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,10 @@
 
 
 
-<meta property="og:title" content="Changelog" />
+<meta property="og:title" content="Label data cubes with the week date for each band — label_raster_stack" />
+<meta property="og:description" content="The data cubes are saved as GeoTIFFs, which don't allow for band labels. For
+convenience, this function labels the layers of a data cube once it has been
+loaded with the week dates for each band." />
 
 
 
@@ -66,7 +69,7 @@
   <body data-spy="scroll" data-target="#toc">
     
 
-    <div class="container template-news">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -136,59 +139,64 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1 data-toc-skip>Changelog <small></small></h1>
-      <small>Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
+    <h1>Label data cubes with the week date for each band</h1>
+    <small class="dont-index">Source: <a href='https://github.com/CornellLabofOrnithology/ebirdst/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
+    <div class="hidden name"><code>label_raster_stack.Rd</code></div>
     </div>
 
-    <div id="ebirdst-030" class="section level1">
-<h1 class="page-header" data-toc-text="0.3.0">
-<a href="#ebirdst-030" class="anchor" aria-hidden="true"></a>ebirdst 0.3.0<small> Unreleased </small></h1>
-<ul><li>add support for new data structures used for 2020 eBird Status and Trends</li>
-<li>functionality to handle partial dependence data added</li>
-<li>overhaul of package API to be more intuitive and streamlined</li>
-<li>all documentation and vignettes updated</li>
-</ul></div>
-    <div id="ebirdst-022" class="section level1">
-<h1 class="page-header" data-toc-text="0.2.2">
-<a href="#ebirdst-022" class="anchor" aria-hidden="true"></a>ebirdst 0.2.2<small> 2021-01-16 </small></h1>
-<ul><li>add support for variable ensemble support in <code>compute_ppms()</code>
-</li>
-</ul></div>
-    <div id="ebirdst-021" class="section level1">
-<h1 class="page-header" data-toc-text="0.2.1">
-<a href="#ebirdst-021" class="anchor" aria-hidden="true"></a>ebirdst 0.2.1<small> 2020-03-23 </small></h1>
-<ul><li>bug fix: corrected date types in seasonal definitions</li>
-<li>bug fix: fixed possibility that ebirdst_extent could produce invalid date (day 366 of 2015)</li>
-<li>added import of pipe operator</li>
-<li>
-<code>velox</code> was archived, removed dependency from Suggests</li>
-<li>
-<code>fasterize</code> was archived, removed dependency from Imports</li>
-</ul></div>
-    <div id="ebirdst-020" class="section level1">
-<h1 class="page-header" data-toc-text="0.2.0">
-<a href="#ebirdst-020" class="anchor" aria-hidden="true"></a>ebirdst 0.2.0<small> 2020-02-26 </small></h1>
-<ul><li>change maintainer to Matthew Strimas-Mackey</li>
-<li>update to access 2019 status and trends data</li>
-<li>partial dependence data no longer available, all references to PDs removed</li>
-<li>bug fix: <code><a href="../reference/load_raster.html">load_raster()</a></code> gave incorrect names to seasonal rasters</li>
-<li>bug fix: didn’t properly implement quantile binning</li>
-<li>
-<code><a href="../reference/date_to_st_week.html">date_to_st_week()</a></code> gets the status and trends week for a give vector of dates</li>
-</ul></div>
-    <div id="ebirdst-010" class="section level1">
-<h1 class="page-header" data-toc-text="0.1.0">
-<a href="#ebirdst-010" class="anchor" aria-hidden="true"></a>ebirdst 0.1.0<small> 2019-04-04 </small></h1>
-<ul><li>first CRAN release</li>
-</ul></div>
-  </div>
+    <div class="ref-description">
+    <p>The data cubes are saved as GeoTIFFs, which don't allow for band labels. For
+convenience, this function labels the layers of a data cube once it has been
+loaded with the week dates for each band.</p>
+    </div>
 
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>label_raster_stack</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></code></pre></div>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>x</th>
+      <td><p><code>RasterStack</code> or <code>RasterBrick</code>; original eBird Status and Trends
+data cube with 52 bands, one for each week.</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A <code>RasterStack</code> or <code>RasterBrick</code> with names assigned for the dates in
+the format of "wYYYY.MM.DD" per raster package constraints. The <code>Raster*</code>
+objects do not allow the names to start with a number, nor are they allowed
+to contain "-", so it is not possible to store the date in an ISO compliant
+format. Use <code><a href='parse_raster_dates.html'>parse_raster_dates()</a></code> to convert the layer names to dates.</p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='co'># download and load example abundance data</span></span>
+<span class='r-in'><span class='va'>sp_path</span> <span class='op'>&lt;-</span> <span class='fu'><a href='ebirdst_download.html'>ebirdst_download</a></span><span class='op'>(</span><span class='st'>"example_data"</span><span class='op'>)</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Data already exists, use force = TRUE to re-download.</span>
+<span class='r-in'><span class='va'>abd</span> <span class='op'>&lt;-</span> <span class='fu'><a href='load_raster.html'>load_raster</a></span><span class='op'>(</span><span class='va'>sp_path</span>, <span class='st'>"abundance"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># label</span></span>
+<span class='r-in'><span class='va'>abd</span> <span class='op'>&lt;-</span> <span class='fu'>label_raster_stack</span><span class='op'>(</span><span class='va'>abd</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/pkg/raster/man/names.html'>names</a></span><span class='op'>(</span><span class='va'>abd</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "w2019.01.04" "w2019.01.11" "w2019.01.18" "w2019.01.25" "w2019.02.01"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [6] "w2019.02.08" "w2019.02.15" "w2019.02.22" "w2019.03.01" "w2019.03.08"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [11] "w2019.03.15" "w2019.03.22" "w2019.03.29" "w2019.04.05" "w2019.04.12"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [16] "w2019.04.19" "w2019.04.26" "w2019.05.03" "w2019.05.10" "w2019.05.17"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [21] "w2019.05.24" "w2019.05.31" "w2019.06.07" "w2019.06.14" "w2019.06.21"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [26] "w2019.06.28" "w2019.07.06" "w2019.07.13" "w2019.07.20" "w2019.07.27"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [31] "w2019.08.03" "w2019.08.10" "w2019.08.17" "w2019.08.24" "w2019.08.31"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [36] "w2019.09.07" "w2019.09.14" "w2019.09.21" "w2019.09.28" "w2019.10.05"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [41] "w2019.10.12" "w2019.10.19" "w2019.10.26" "w2019.11.02" "w2019.11.09"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [46] "w2019.11.16" "w2019.11.23" "w2019.11.30" "w2019.12.07" "w2019.12.14"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [51] "w2019.12.21" "w2019.12.28"</span>
+</code></pre></div>
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
     </nav>
   </div>
-
 </div>
 
 

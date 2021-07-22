@@ -128,16 +128,16 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
 <div id="vignettes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#vignettes" class="anchor" aria-hidden="true"></a>Vignettes</h2>
-<p>For full package documentation, including a series of vignettes covering the full spectrum from introductory to advanced usage, please see the package <a href="https://cornelllabofornithology.github.io/ebirdst" class="external-link">website</a>. There are four available vignettes are:</p>
+<p>For full package documentation, including a series of vignettes covering the full spectrum from introductory to advanced usage, please see the package <a href="https://cornelllabofornithology.github.io/ebirdst">website</a>. There are four available vignettes are:</p>
 <ul>
 <li>
-<a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst.html" class="external-link">Introduction</a>: details data access and the structure of the results.</li>
+<a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst.html">Introduction</a>: details data access and the structure of the results.</li>
 <li>
-<a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html" class="external-link">Introductory mapping</a>: covers the basic of making abundance maps using the eBird Status and Trends data.</li>
+<a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html">Introductory mapping</a>: covers the basic of making abundance maps using the eBird Status and Trends data.</li>
 <li>
-<a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-advanced-mapping.html" class="external-link">Advanced mapping</a>: shows how to reproduce the seasonal abundance maps, range polygons, and statistics on the <a href="https://ebird.org/science/status-and-trends" class="external-link">eBird Status and Trends website</a>.</li>
+<a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-advanced-mapping.html">Advanced mapping</a>: shows how to reproduce the seasonal abundance maps, range polygons, and statistics on the <a href="https://ebird.org/science/status-and-trends" class="external-link">eBird Status and Trends website</a>.</li>
 <li>
-<a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-pipd.html" class="external-link">Non-raster data</a>: covers working with the non-raster data in the <code>ebirst</code> data packages, including exploring <strong>predictor importance</strong>, plotting <strong>partial dependence</strong> curves for model predictors, and assessing model quality with <strong>predictive performance metrics</strong>.</li>
+<a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-pipd.html">Non-raster data</a>: covers working with the non-raster data in the <code>ebirst</code> data packages, including exploring <strong>predictor importance</strong>, plotting <strong>partial dependence</strong> curves for model predictors, and assessing model quality with <strong>predictive performance metrics</strong>.</li>
 </ul>
 </div>
 <div id="quick-start" class="section level2">
@@ -153,13 +153,13 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ropenscilabs/rnaturalearth" class="external-link">rnaturalearth</a></span><span class="op">)</span>
 
 <span class="co"># download example data, yellow-bellied sapsucker in michigan</span>
-<span class="va">dl_path</span> <span class="op">&lt;-</span> <span class="fu">ebirdst_download</span><span class="op">(</span>species <span class="op">=</span> <span class="st">"example_data"</span><span class="op">)</span>
+<span class="va">dl_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span>species <span class="op">=</span> <span class="st">"example_data"</span><span class="op">)</span>
 
 <span class="co"># load relative abundance raster stack with 52 layers, one for each week</span>
-<span class="va">abd</span> <span class="op">&lt;-</span> <span class="fu">load_raster</span><span class="op">(</span><span class="st">"abundance"</span>, path <span class="op">=</span> <span class="va">dl_path</span><span class="op">)</span>
+<span class="va">abd</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="st">"abundance"</span>, path <span class="op">=</span> <span class="va">dl_path</span><span class="op">)</span>
 
 <span class="co"># load species specific mapping parameters</span>
-<span class="va">pars</span> <span class="op">&lt;-</span> <span class="fu">load_fac_map_parameters</span><span class="op">(</span><span class="va">dl_path</span><span class="op">)</span>
+<span class="va">pars</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_fac_map_parameters.html">load_fac_map_parameters</a></span><span class="op">(</span><span class="va">dl_path</span><span class="op">)</span>
 <span class="co"># custom coordinate reference system</span>
 <span class="va">crs</span> <span class="op">&lt;-</span> <span class="va">pars</span><span class="op">$</span><span class="va">custom_projection</span>
 <span class="co"># legend breaks</span>
@@ -168,7 +168,7 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
 <span class="va">labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">breaks</span>, <span class="st">"labels"</span><span class="op">)</span>
 
 <span class="co"># get a date vector specifying which week each raster layer corresponds to</span>
-<span class="va">weeks</span> <span class="op">&lt;-</span> <span class="fu">parse_raster_dates</span><span class="op">(</span><span class="va">abd</span><span class="op">)</span>
+<span class="va">weeks</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/parse_raster_dates.html">parse_raster_dates</a></span><span class="op">(</span><span class="va">abd</span><span class="op">)</span>
 <span class="fu"><a href="https://www.math.uzh.ch/pages/spam//reference/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">weeks</span><span class="op">)</span>
 <span class="co">#&gt;  [1] "2019-01-04" "2019-01-11" "2019-01-18" "2019-01-25" "2019-02-01" "2019-02-08" "2019-02-15" "2019-02-22" "2019-03-01"</span>
 <span class="co">#&gt; [10] "2019-03-08" "2019-03-15" "2019-03-22" "2019-03-29" "2019-04-05" "2019-04-12" "2019-04-19" "2019-04-26" "2019-05-03"</span>
@@ -187,8 +187,8 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
 <span class="co"># get reference data from the rnaturalearth package</span>
 <span class="co"># the example data currently shows only the US state of Michigan</span>
 <span class="va">wh_states</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rnaturalearth/man/ne_states.html" class="external-link">ne_states</a></span><span class="op">(</span>country <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"United States of America"</span>, <span class="st">"Canada"</span><span class="op">)</span>,
-                       returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="va">crs</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
+                       returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="va">crs</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="co"># start plotting</span>
@@ -205,7 +205,7 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
      axes <span class="op">=</span> <span class="cn">FALSE</span>, legend <span class="op">=</span> <span class="cn">FALSE</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
 <span class="co"># define color palette</span>
-<span class="va">pal</span> <span class="op">&lt;-</span> <span class="fu">abundance_palette</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">breaks</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>, <span class="st">"weekly"</span><span class="op">)</span>
+<span class="va">pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/abundance_palette.html">abundance_palette</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">breaks</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>, <span class="st">"weekly"</span><span class="op">)</span>
 <span class="co"># plot abundance</span>
 <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_prj</span>, col <span class="op">=</span> <span class="va">pal</span>, breaks <span class="op">=</span> <span class="va">breaks</span>, maxpixels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html" class="external-link">ncell</a></span><span class="op">(</span><span class="va">abd_prj</span><span class="op">)</span>,
      axes <span class="op">=</span> <span class="cn">FALSE</span>, legend <span class="op">=</span> <span class="cn">FALSE</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>

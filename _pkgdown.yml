@@ -1,3 +1,5 @@
+url: https://cornelllabofornithology.github.io/ebirdst/
+
 navbar:
   structure:
     left: [home, intro, articles, reference, statuschanges, news]
