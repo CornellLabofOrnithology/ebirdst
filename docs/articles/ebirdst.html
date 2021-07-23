@@ -64,7 +64,7 @@
   <a href="../reference/index.html">Function Reference</a>
 </li>
 <li>
-  <a href="../articles/product-changelog.html">Data Product Changelog</a>
+  <a href="../articles/product-changelog.html">Changelog</a>
 </li>
 <li>
   <a href="../news/index.html">Version History</a>
@@ -93,7 +93,7 @@
       <h1 data-toc-skip>Background, Data Access, and Data Structure</h1>
                         <h4 data-toc-skip class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 data-toc-skip class="date">2021-07-22</h4>
+            <h4 data-toc-skip class="date">2021-07-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst.Rmd" class="external-link"><code>vignettes/ebirdst.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst.Rmd</code></div>
@@ -289,7 +289,14 @@
 <span class="co"># Convert raster object into a matrix</span>
 <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/rasterToPoints.html" class="external-link">rasterToPoints</a></span><span class="op">(</span><span class="va">abd_ll</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"longitude"</span>, <span class="st">"latitude"</span>, <span class="st">"abundance_umean"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span>
+<span class="co">#&gt;      longitude latitude abundance_umean</span>
+<span class="co">#&gt; [1,] -88.56451 48.15386       0.0000000</span>
+<span class="co">#&gt; [2,] -88.52431 48.15386       0.0000000</span>
+<span class="co">#&gt; [3,] -88.64491 48.12726       0.0000000</span>
+<span class="co">#&gt; [4,] -88.60471 48.12726       0.0000000</span>
+<span class="co">#&gt; [5,] -88.56451 48.12726       0.2123874</span>
+<span class="co">#&gt; [6,] -88.72531 48.10066       0.0000000</span></code></pre></div>
 <p>These results can then be written to CSV.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">p</span>, file <span class="op">=</span> <span class="st">"yebsap_week26.csv"</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
