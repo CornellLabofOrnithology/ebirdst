@@ -64,7 +64,7 @@
   <a href="../reference/index.html">Function Reference</a>
 </li>
 <li>
-  <a href="../articles/product-changelog.html">Data Product Changelog</a>
+  <a href="../articles/product-changelog.html">Changelog</a>
 </li>
 <li>
   <a href="../news/index.html">Version History</a>
@@ -93,7 +93,7 @@
       <h1 data-toc-skip>Generating Seasonal Abundance and Range Maps and Stats</h1>
                         <h4 data-toc-skip class="author">Matt Strimas-Mackey, Tom Auer, Daniel Fink</h4>
             
-            <h4 data-toc-skip class="date">2021-07-22</h4>
+            <h4 data-toc-skip class="date">2021-07-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-advanced-mapping.Rmd" class="external-link"><code>vignettes/ebirdst-advanced-mapping.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-advanced-mapping.Rmd</code></div>
@@ -210,7 +210,14 @@
 <span class="co"># did the season pass review</span>
 <span class="va">quality_rating</span> <span class="op">&lt;-</span> <span class="va">run_review</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">yebsap_dates</span><span class="op">$</span><span class="va">season</span>, <span class="st">"_quality"</span><span class="op">)</span><span class="op">]</span>
 <span class="va">yebsap_dates</span><span class="op">$</span><span class="va">pass</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">quality_rating</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">1</span>
-<span class="va">yebsap_dates</span></code></pre></div>
+<span class="va">yebsap_dates</span>
+<span class="co">#&gt; # A tibble: 4 x 4</span>
+<span class="co">#&gt;   season                 start_dt   end_dt     pass </span>
+<span class="co">#&gt;   &lt;chr&gt;                  &lt;date&gt;     &lt;date&gt;     &lt;lgl&gt;</span>
+<span class="co">#&gt; 1 breeding               2019-05-24 2019-09-07 TRUE </span>
+<span class="co">#&gt; 2 nonbreeding            2019-11-23 2019-03-08 TRUE </span>
+<span class="co">#&gt; 3 postbreeding_migration 2019-09-14 2019-11-16 TRUE </span>
+<span class="co">#&gt; 4 prebreeding_migration  2019-03-15 2019-05-17 TRUE</span></code></pre></div>
 <p>Now, we’ll use these season definitions to assign each of the weekly abundance layers to a season.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># dates for each abundance layer</span>
@@ -231,7 +238,12 @@
   <span class="op">}</span>
   <span class="va">weeks_season</span><span class="op">[</span><span class="va">in_season</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">s</span><span class="op">$</span><span class="va">season</span>
 <span class="op">}</span>
-<span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">weeks_season</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">weeks_season</span><span class="op">)</span>
+<span class="co">#&gt; weeks_season</span>
+<span class="co">#&gt;               breeding            nonbreeding postbreeding_migration </span>
+<span class="co">#&gt;                     16                     16                     10 </span>
+<span class="co">#&gt;  prebreeding_migration </span>
+<span class="co">#&gt;                     10</span></code></pre></div>
 <p>Finally, let’s average all the weeks within each season to produce seasonal relative abundance rasters.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># drop weeks not assigned to season</span>
@@ -247,7 +259,15 @@
 <span class="va">abd_season</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">seasons</span>, <span class="va">mean_season</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/pkg/raster/man/stack.html" class="external-link">stack</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">seasons</span><span class="op">)</span>
-<span class="va">abd_season</span></code></pre></div>
+<span class="va">abd_season</span>
+<span class="co">#&gt; class      : RasterStack </span>
+<span class="co">#&gt; dimensions : 244, 260, 63440, 4  (nrow, ncol, ncell, nlayers)</span>
+<span class="co">#&gt; resolution : 2962.807, 2962.809  (x, y)</span>
+<span class="co">#&gt; extent     : -7203933, -6433604, 4635982, 5358907  (xmin, xmax, ymin, ymax)</span>
+<span class="co">#&gt; crs        : +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +R=6371007.181 +units=m +no_defs </span>
+<span class="co">#&gt; names      : nonbreeding, prebreeding_migration,   breeding, postbreeding_migration </span>
+<span class="co">#&gt; min values :           0,                     0,          0,                      0 </span>
+<span class="co">#&gt; max values :  0.09554554,            1.93999040, 1.93377865,             0.62279958</span></code></pre></div>
 </div>
 <div id="abundance-maps" class="section level1">
 <h1 class="hasAnchor">
@@ -274,7 +294,10 @@
   <span class="va">split_migration</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span>
 <span class="op">}</span>
 <span class="va">n_just</span> <span class="op">/</span> <span class="va">n_all</span>
-<span class="va">split_migration</span></code></pre></div>
+<span class="co">#&gt;  prebreeding_migration postbreeding_migration </span>
+<span class="co">#&gt;             0.09867184             0.01005795</span>
+<span class="va">split_migration</span>
+<span class="co">#&gt; [1] FALSE</span></code></pre></div>
 <p>In this case, there is essentially complete overlap between pre- and post-breeding migration, so we won’t split them into separate colors on the map. Next, we’ll calculate the average annual abundance, which we’ll display as a separate color if at least 1% of the range is occupied in all four seasons.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">threshold_yearround</span> <span class="op">&lt;-</span> <span class="fl">0.01</span>
@@ -293,7 +316,8 @@
 <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span>
   <span class="va">show_yearround</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span>
 <span class="op">}</span>
-<span class="va">show_yearround</span></code></pre></div>
+<span class="va">show_yearround</span>
+<span class="co">#&gt; [1] FALSE</span></code></pre></div>
 <p>Mapping relative abundance across the full-annual cycle requires a specialized set of color bins in order to ensure the full range of abundance values is effectively displayed. For simplicity, we’ll use quantile bins based on the seasonal abundance, however, you could also use the function <code><a href="../reference/calc_bins.html">calc_bins()</a></code> to calculate the optimal break points of bins for Status and Trends abundance data.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">vals</span> <span class="op">&lt;-</span> <span class="va">abd_season</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
@@ -403,6 +427,7 @@
 <span class="op">}</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/title.html" class="external-link">title</a></span><span class="op">(</span><span class="st">"Yellow-bellied Sapsucker Relative Abundance"</span>, 
       line <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>, cex.main <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
+<p><img src="ebirdst-advanced-mapping_files/figure-html/abd-map-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div id="range-maps" class="section level1">
 <h1 class="hasAnchor">
@@ -441,7 +466,22 @@
 <span class="co"># combine the sf objects for all seasons</span>
 <span class="va">range</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://www.math.uzh.ch/pages/spam//reference/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">range</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">pred_area</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/row.names.html" class="external-link">row.names</a></span><span class="op">(</span><span class="va">range</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">NULL</span>
-<span class="fu"><a href="https://www.math.uzh.ch/pages/spam//reference/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">range</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://www.math.uzh.ch/pages/spam//reference/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">range</span><span class="op">)</span>
+<span class="co">#&gt; Simple feature collection with 8 features and 2 fields</span>
+<span class="co">#&gt; Geometry type: MULTIPOLYGON</span>
+<span class="co">#&gt; Dimension:     XY</span>
+<span class="co">#&gt; Bounding box:  xmin: -42798.85 ymin: 5192682 xmax: 642641.1 ymax: 5888862</span>
+<span class="co">#&gt; CRS:           +proj=eck4 +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs</span>
+<span class="co">#&gt; Precision:     1e+06 </span>
+<span class="co">#&gt;                   season           layer                       geometry</span>
+<span class="co">#&gt; 1            nonbreeding           range MULTIPOLYGON (((461201.1 52...</span>
+<span class="co">#&gt; 2  prebreeding_migration           range MULTIPOLYGON (((632561.1 53...</span>
+<span class="co">#&gt; 3               breeding           range MULTIPOLYGON (((461201.1 52...</span>
+<span class="co">#&gt; 4 postbreeding_migration           range MULTIPOLYGON (((592241.1 52...</span>
+<span class="co">#&gt; 5            nonbreeding prediction_area MULTIPOLYGON (((632561.1 53...</span>
+<span class="co">#&gt; 6  prebreeding_migration prediction_area MULTIPOLYGON (((632561.1 53...</span>
+<span class="co">#&gt; 7               breeding prediction_area MULTIPOLYGON (((632561.1 53...</span>
+<span class="co">#&gt; 8 postbreeding_migration prediction_area MULTIPOLYGON (((632561.1 53...</span></code></pre></div>
 <p>Converting from raster to polygons frequently yields tiny fragments of polygons and jagged polygon edges, which result in maps that aren’t very aesthetically pleasing. To address this, we’ll apply some algorithms from the <code>smoothr</code> package to clean up the polygons.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># clean and smooth</span>
@@ -520,6 +560,7 @@
 <span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"bottomleft"</span>, legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">rng_legend</span><span class="op">)</span>, fill <span class="op">=</span> <span class="va">rng_legend</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/title.html" class="external-link">title</a></span><span class="op">(</span><span class="st">"Yellow-bellied Sapsucker Seasonal Range Map"</span>, 
       line <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>, cex.main <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
+<p><img src="ebirdst-advanced-mapping_files/figure-html/range-map-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div id="regional-statistics" class="section level1">
 <h1 class="hasAnchor">
@@ -566,7 +607,14 @@
 <span class="co"># transpose to one season per row</span>
 <span class="va">abd_mean_region</span> <span class="op">&lt;-</span> <span class="va">abd_mean_region</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html" class="external-link">gather</a></span><span class="op">(</span><span class="va">season</span>, <span class="va">mean_abundance</span>, <span class="op">-</span><span class="va">county_code</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">abd_mean_region</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">abd_mean_region</span><span class="op">)</span>
+<span class="co">#&gt;   county_code   season mean_abundance</span>
+<span class="co">#&gt; 1    US.MI.AC breeding             NA</span>
+<span class="co">#&gt; 2    US.MI.AG breeding   0.6738384577</span>
+<span class="co">#&gt; 3    US.MI.AL breeding   0.0002190809</span>
+<span class="co">#&gt; 4    US.MI.AP breeding             NA</span>
+<span class="co">#&gt; 5    US.MI.AN breeding   0.5538232129</span>
+<span class="co">#&gt; 6    US.MI.AR breeding   0.2715548898</span></code></pre></div>
 <p>Let’s make a quick map comparing the breeding and non-breeding mean relative abundance within counties in Michigan.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># join back to county boundaries</span>
@@ -586,6 +634,7 @@
        fill <span class="op">=</span> <span class="st">"Relative abundance"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></code></pre></div>
+<p><img src="ebirdst-advanced-mapping_files/figure-html/mean-rel-abd-map-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div id="days-of-occupation" class="section level2">
 <h2 class="hasAnchor">
@@ -618,7 +667,16 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>days_occ <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fl">7</span> <span class="op">*</span> <span class="va">weeks_occ</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/pkg/raster/man/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">county_code</span>, <span class="va">season</span>, <span class="va">days_occ</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">days_occupation</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">days_occupation</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 6 x 3</span>
+<span class="co">#&gt;   county_code season                 days_occ</span>
+<span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;                     &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 US.MI.AC    breeding                    112</span>
+<span class="co">#&gt; 2 US.MI.AC    nonbreeding                   0</span>
+<span class="co">#&gt; 3 US.MI.AC    postbreeding_migration       35</span>
+<span class="co">#&gt; 4 US.MI.AC    prebreeding_migration        49</span>
+<span class="co">#&gt; 5 US.MI.AG    breeding                    112</span>
+<span class="co">#&gt; 6 US.MI.AG    nonbreeding                   0</span></code></pre></div>
 <p>Finally, let’s produce a map comparing days occupation in the breeding and non-breeding season.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># join back to county boundaries</span>
@@ -638,6 +696,7 @@
        fill <span class="op">=</span> <span class="st">"Days of occupation"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></code></pre></div>
+<p><img src="ebirdst-advanced-mapping_files/figure-html/day-occ-map-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 </div>
   </div>

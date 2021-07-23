@@ -21,7 +21,7 @@ navbar:
       text: Function Reference
       href: reference/index.html
     statuschanges:
-      text: Data Product Changelog
+      text: Changelog
       href: articles/product-changelog.html
     news:
       text: Version History

@@ -64,7 +64,7 @@
   <a href="../reference/index.html">Function Reference</a>
 </li>
 <li>
-  <a href="../articles/product-changelog.html">Data Product Changelog</a>
+  <a href="../articles/product-changelog.html">Changelog</a>
 </li>
 <li>
   <a href="../news/index.html">Version History</a>
@@ -93,7 +93,7 @@
       <h1 data-toc-skip>Introduction to loading, mapping, and plotting</h1>
                         <h4 data-toc-skip class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 data-toc-skip class="date">2021-07-22</h4>
+            <h4 data-toc-skip class="date">2021-07-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-intro-mapping.Rmd" class="external-link"><code>vignettes/ebirdst-intro-mapping.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-intro-mapping.Rmd</code></div>
@@ -141,7 +141,18 @@
 
 <span class="co"># use parse_raster_dates() to get actual date objects for each layer</span>
 <span class="va">date_vector</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_raster_dates.html">parse_raster_dates</a></span><span class="op">(</span><span class="va">abd</span><span class="op">)</span>
-<span class="fu"><a href="https://www.math.uzh.ch/pages/spam//reference/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">date_vector</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://www.math.uzh.ch/pages/spam//reference/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">date_vector</span><span class="op">)</span>
+<span class="co">#&gt;  [1] "2019-01-04" "2019-01-11" "2019-01-18" "2019-01-25" "2019-02-01"</span>
+<span class="co">#&gt;  [6] "2019-02-08" "2019-02-15" "2019-02-22" "2019-03-01" "2019-03-08"</span>
+<span class="co">#&gt; [11] "2019-03-15" "2019-03-22" "2019-03-29" "2019-04-05" "2019-04-12"</span>
+<span class="co">#&gt; [16] "2019-04-19" "2019-04-26" "2019-05-03" "2019-05-10" "2019-05-17"</span>
+<span class="co">#&gt; [21] "2019-05-24" "2019-05-31" "2019-06-07" "2019-06-14" "2019-06-21"</span>
+<span class="co">#&gt; [26] "2019-06-28" "2019-07-06" "2019-07-13" "2019-07-20" "2019-07-27"</span>
+<span class="co">#&gt; [31] "2019-08-03" "2019-08-10" "2019-08-17" "2019-08-24" "2019-08-31"</span>
+<span class="co">#&gt; [36] "2019-09-07" "2019-09-14" "2019-09-21" "2019-09-28" "2019-10-05"</span>
+<span class="co">#&gt; [41] "2019-10-12" "2019-10-19" "2019-10-26" "2019-11-02" "2019-11-09"</span>
+<span class="co">#&gt; [46] "2019-11-16" "2019-11-23" "2019-11-30" "2019-12-07" "2019-12-14"</span>
+<span class="co">#&gt; [51] "2019-12-21" "2019-12-28"</span></code></pre></div>
 <p>All Status and Trends raster predictions made on a standard 2.96 x 2.96 km grid, however, for convenience lower resolution GeoTIFFs are also provided. The three available resolutions are:</p>
 <ul>
 <li>High resolution (<code>hr</code>): the native 2.96 km resolution data</li>
@@ -153,8 +164,10 @@
 <code class="sourceCode R"><span class="va">abd_lr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">sp_path</span>, <span class="st">"abundance"</span>, resolution <span class="op">=</span> <span class="st">"lr"</span><span class="op">)</span>
 <span class="co"># native resolution</span>
 <span class="fu"><a href="https://rdrr.io/pkg/raster/man/resolution.html" class="external-link">res</a></span><span class="op">(</span><span class="va">abd</span><span class="op">)</span>
+<span class="co">#&gt; [1] 2962.807 2962.809</span>
 <span class="co"># low resolution</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/resolution.html" class="external-link">res</a></span><span class="op">(</span><span class="va">abd_lr</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/resolution.html" class="external-link">res</a></span><span class="op">(</span><span class="va">abd_lr</span><span class="op">)</span>
+<span class="co">#&gt; [1] 26665.26 26665.28</span></code></pre></div>
 <p>In the interest of faster processing time, we’ll work with the medium resolution rasters in this vignette, however, for actual analyses you may want to consider using the high resolution data.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">abd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">sp_path</span>, <span class="st">"abundance"</span>, resolution <span class="op">=</span> <span class="st">"mr"</span><span class="op">)</span></code></pre></div>
@@ -184,6 +197,7 @@
      col <span class="op">=</span> <span class="fu"><a href="../reference/abundance_palette.html">abundance_palette</a></span><span class="op">(</span><span class="fl">10</span>, season <span class="op">=</span> <span class="st">"weekly"</span><span class="op">)</span>, 
      axes <span class="op">=</span> <span class="cn">FALSE</span>, box <span class="op">=</span> <span class="cn">FALSE</span>, 
      maxpixels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html" class="external-link">ncell</a></span><span class="op">(</span><span class="va">week38_proj</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p><img src="ebirdst-intro-mapping_files/figure-html/project_stack-1.png" width="100%" style="display: block; margin: auto;"></p>
 <p>If working with a full set of data for a species, mapping the layer at the full spatial extent of the analysis area makes for a small map. The raster cube has zeroes for our prediction extent and NAs for the entire Western Hemisphere, unifying the weeks in a cube to the same extent. However, this also means that mapping defaults to the full spatial extent of NAs, the Western Hemisphere. To assist with this, project the <code>RasterStack</code> or <code>RasterLayer</code> to Eckert IV, calculate the full annual spatial extent for the species with the <code><a href="../reference/calc_full_extent.html">calc_full_extent()</a></code> function, and then map, showing an extent that works for the entire full-annual cycle of the species.</p>
 </div>
 <div id="mapping-occurrence" class="section level2">
@@ -208,6 +222,7 @@
      axes <span class="op">=</span> <span class="cn">FALSE</span>, box <span class="op">=</span> <span class="cn">FALSE</span>, 
      maxpixels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html" class="external-link">ncell</a></span><span class="op">(</span><span class="va">occ_proj</span><span class="op">)</span>,
      legend.width <span class="op">=</span> <span class="fl">2</span>, legend.shrink <span class="op">=</span> <span class="fl">0.97</span><span class="op">)</span></code></pre></div>
+<p><img src="ebirdst-intro-mapping_files/figure-html/map_occurrence-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div id="calculating-abundance-bins" class="section level2">
 <h2 class="hasAnchor">
@@ -239,6 +254,7 @@
      col <span class="op">=</span> <span class="fu"><a href="../reference/abundance_palette.html">abundance_palette</a></span><span class="op">(</span><span class="fl">20</span>, season <span class="op">=</span> <span class="st">"weekly"</span><span class="op">)</span>, 
      maxpixels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html" class="external-link">ncell</a></span><span class="op">(</span><span class="va">week14_proj</span><span class="op">)</span>,
      axes <span class="op">=</span> <span class="cn">FALSE</span>, box <span class="op">=</span> <span class="cn">FALSE</span>, legend.shrink <span class="op">=</span> <span class="fl">0.97</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="ebirdst-intro-mapping_files/figure-html/map_linear-1.png" width="100%" style="display: block; margin: auto;"></p>
 <p>We can compare this with maps made using the <code><a href="../reference/calc_bins.html">calc_bins()</a></code> method.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># calculate ideal color bins for relative abundance</span>
@@ -272,6 +288,7 @@
                       col.axis <span class="op">=</span> <span class="st">"black"</span>, fg <span class="op">=</span> <span class="cn">NA</span>,
                       cex.axis <span class="op">=</span> <span class="fl">0.9</span>, lwd.ticks <span class="op">=</span> <span class="fl">0</span>,
                       line <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p><img src="ebirdst-intro-mapping_files/figure-html/map_bins-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div id="mapping-abundance" class="section level2">
 <h2 class="hasAnchor">
@@ -329,6 +346,7 @@
 
 <span class="co"># add state boundaries on top</span>
 <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">wh_states</span>, border <span class="op">=</span> <span class="st">"white"</span>, lwd <span class="op">=</span> <span class="fl">1.5</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="ebirdst-intro-mapping_files/figure-html/map_w_es-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div id="mapping-abundance-confidence-intervals" class="section level2">
 <h2 class="hasAnchor">
@@ -348,6 +366,7 @@
 <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/trim.html" class="external-link">trim</a></span><span class="op">(</span><span class="va">conf_week26</span><span class="op">)</span>, col <span class="op">=</span> <span class="fu"><a href="https://sjmgarnier.github.io/viridisLite/reference/viridis.html" class="external-link">magma</a></span><span class="op">(</span><span class="fl">20</span><span class="op">)</span>, 
      maxpixel <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html" class="external-link">ncell</a></span><span class="op">(</span><span class="va">conf_week26</span><span class="op">)</span>,
      axes <span class="op">=</span> <span class="cn">FALSE</span>, box <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<p><img src="ebirdst-intro-mapping_files/figure-html/map_confidence_band-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div id="extracting-trajectories-with-uncertainty" class="section level1">
@@ -380,6 +399,7 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Expected Count"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Week"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_light</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<p><img src="ebirdst-intro-mapping_files/figure-html/trajectories-1.png" width="100%" style="display: block; margin: auto;"></p>
 <p>It is also possible to extract trajectories for regions, but it takes a little more data work.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># set an extent based on polygon</span>
@@ -412,6 +432,7 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Expected Count"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Week"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_light</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<p><img src="ebirdst-intro-mapping_files/figure-html/trajectories_region-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
   </div>
 
