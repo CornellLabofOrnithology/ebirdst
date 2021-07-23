@@ -88,7 +88,7 @@ ebirdst_download <- function(species,
 
     # api url and key
     key <- get_ebirdst_access_key()
-    api_url <- "http://3.87.12.94:8080/v1/"
+    api_url <- "https://st-download.ebird.org/v1/"
 
     # get file list for this species
     list_obj_url <- stringr::str_glue("{api_url}/list-obj/{species}?key={key}")
