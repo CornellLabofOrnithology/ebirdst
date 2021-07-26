@@ -303,9 +303,9 @@ load_raster <- function(path,
     return(suppressWarnings(raster::raster(tif_path)))
   } else if (product == "abundance_seasonal") {
     # seasonal abundance
-    tif_path <- list.files(file.path(path, "abundance_seasonal"),
-                           pattern = paste0("_", resolution, "_",
-                                            ".*_abundance-seasonal_.*tif$"),
+    pat <- stringr::str_glue("abundance.*{resolution}.*\\.tif$")
+    tif_path <- list.files(file.path(path, "seasonal"),
+                           pattern = pat,
                            full.names = TRUE)
     if (any(!file.exists(tif_path))) {
       stop("Error locating seasonal abundance GeoTIFFs")
@@ -316,28 +316,39 @@ load_raster <- function(path,
                       "nonbreeding", "prebreeding_migration",
                       "resident")
     seasons <- stringr::str_extract(tif_path,
-                                    "(?<=abundance-seasonal_)[a-z_]+")
+                                    "(?<=_abundance_)[-a-z]+")
+    seasons <- stringr::str_replace_all(seasons, "-", "_")
     r <- suppressWarnings(raster::stack(tif_path))
     names(r) <- seasons
     return(r[[intersect(season_order, seasons)]])
   } else {
-    # 52 week stack
-    tif_path <- list.files(file.path(path, "weekly_cubes"),
-                           pattern = paste0("_", resolution, "_",
-                                            ".*", product, "\\.tif$"),
+    # weekly stack
+    pat <- stringr::str_glue("{product}_{resolution}.*\\.tif$")
+    tif_path <- list.files(file.path(path, "cubes"),
+                           pattern = pat,
                            full.names = TRUE)
     if (length(tif_path) != 1 || !file.exists(tif_path)) {
       stop(paste("Error locating GeoTIFF file for:", product))
     }
     r <- suppressWarnings(raster::stack(tif_path))
-    return(label_raster_stack(r))
+
+    # label
+    if (raster::nlayers(r) == 52) {
+      r <- label_raster_stack(r)
+    } else {
+      l <- load_config(path)
+      weeks <- paste0(l$SRD_PRED_YEAR, "-", l$DATE_NAMES)
+      weeks <- as.Date(weeks, "%Y-%m-%d")
+      r <- label_raster_stack(r, weeks = weeks)
+    }
+    return(r)
   }
 }
 
 
 #' Load eBird Status and Trends predictor importance data
 #'
-#' Loads the predictor importance (PI) data from the pi-pd.db sqlite database.
+#' Loads the predictor importance (PI) data from the stixel_summary.db sqlite database.
 #' PI estimates are provided for each stixel over which a model was run and are
 #' identified by a unique stixel ID in addition to the coordinates of the stixel
 #' centroid. PI estimates are for the occurrence model only.
@@ -346,6 +357,8 @@ load_raster <- function(path,
 #' @param ext [ebirdst_extent] object; the spatiotemporal extent to filter the
 #'   data to. The spatial component of the extent object must be provided in
 #'   unprojected, latitude-longitude coordinates.
+#' @param model character; whether to make estimates for the occurrence or count
+#'   model.
 #' @param return_sf logical; whether to return an [sf] object of spatial points
 #'   rather then the default data frame.
 #'
@@ -376,16 +389,19 @@ load_raster <- function(path,
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #' plot_pis(pis, ext = e, n_top_pred = 15, by_cover_class = TRUE)
 #' }
-load_pis <- function(path, ext, return_sf = FALSE) {
+load_pis <- function(path, ext, model = c("occurrence", "count"),
+                     return_sf = FALSE) {
   stopifnot(dir.exists(path))
   stopifnot(is.logical(return_sf), length(return_sf) == 1)
   if (!missing(ext)) {
     stopifnot(inherits(ext, "ebirdst_extent"))
   }
+  model <- match.arg(model)
+  table <- paste0(model, "_pis")
 
-  db_file <- file.path(path, "pi-pd.db")
+  db_file <- file.path(path, "stixel_summary.db")
   if(!file.exists(db_file)) {
-    stop("The file 'pi-pd.db' does not exist in: ", path)
+    stop("The file 'stixel_summary.db' does not exist in: ", path)
   }
 
   # connect to db
@@ -393,12 +409,12 @@ load_pis <- function(path, ext, return_sf = FALSE) {
 
   # query
   if (missing(ext)) {
-    sql <- paste("SELECT p.*, s.lat, s.lon, s.date",
-                 "FROM occ_pis AS p INNER JOIN stixel_summary AS s",
-                 "ON p.stixel_id = s.stixel_id;")
+    sql <- stringr::str_glue("SELECT p.*, s.lat, s.lon, s.date ",
+                             "FROM {table} AS p INNER JOIN stixel_summary AS s ",
+                             "ON p.stixel_id = s.stixel_id;")
   } else {
     sql <- stringr::str_glue("SELECT p.*, s.lat, s.lon, s.date ",
-                             "FROM occ_pis AS p ",
+                             "FROM {table} AS p ",
                              "INNER JOIN stixel_summary AS s ",
                              "ON p.stixel_id = s.stixel_id ",
                              "{sql_extent_subset(ext)};")
@@ -409,17 +425,12 @@ load_pis <- function(path, ext, return_sf = FALSE) {
   pis <- dplyr::tibble(pis)
   DBI::dbDisconnect(db)
 
-  # clean up
-  p <- ebirdst::ebirdst_predictors
-  preds <- intersect(names(pis), p$predictor)
-  pis <- pis[, c("stixel_id", "lat", "lon", "date", preds)]
-  pis <- dplyr::tibble(pis)
-  matches <- match(names(pis), p$predictor)
-  for (i in seq_along(matches)) {
-    if (!is.na(matches[i])) {
-      names(pis)[i] <- p$predictor_tidy[matches[i]]
-    }
-  }
+  # clean up names
+  preds <- ebirdst::ebirdst_predictors[, c("predictor", "predictor_tidy")]
+  names(preds) <- c("covariate", "predictor")
+  pis <- dplyr::inner_join(pis, preds, by = "covariate")
+  pis <- pis[, c("stixel_id", "lat", "lon", "date", "predictor", "pi")]
+  pis <- dplyr::rename(pis, importance = "pi")
 
   # check for missing stixels centroid
   has_centroid <- stats::complete.cases(pis[, c("lat", "lon", "date")])
@@ -438,6 +449,7 @@ load_pis <- function(path, ext, return_sf = FALSE) {
     pis <- sf::st_as_sf(pis, coords = c("lon", "lat"), crs = 4326)
   }
 
+  attr(pis, "model") <- model
   return(pis)
 }
 
@@ -482,16 +494,19 @@ load_pis <- function(path, ext, return_sf = FALSE) {
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #' plot_pds(pds, "solar_noon_diff", ext = e, n_bs = 5)
 #' }
-load_pds <- function(path, ext, return_sf = FALSE) {
+load_pds <- function(path, ext, model = c("occurrence", "count"),
+                     return_sf = FALSE) {
   stopifnot(dir.exists(path))
   stopifnot(is.logical(return_sf), length(return_sf) == 1)
   if (!missing(ext)) {
     stopifnot(inherits(ext, "ebirdst_extent"))
   }
+  model <- match.arg(model)
+  table <- paste0(model, "_pds")
 
-  db_file <- file.path(path, "pi-pd.db")
+  db_file <- file.path(path, "stixel_summary.db")
   if(!file.exists(db_file)) {
-    stop("The file 'pi-pd.db' does not exist in: ", path)
+    stop("The file 'stixel_summary.db' does not exist in: ", path)
   }
 
   # connect to db
@@ -499,12 +514,12 @@ load_pds <- function(path, ext, return_sf = FALSE) {
 
   # query
   if (missing(ext)) {
-    sql <- paste("SELECT p.*, s.lat, s.lon, s.date",
-                 "FROM occ_pds AS p INNER JOIN stixel_summary AS s",
-                 "ON p.stixel_id = s.stixel_id;")
+    sql <- stringr::str_glue("SELECT p.*, s.lat, s.lon, s.date ",
+                             "FROM {table} AS p INNER JOIN stixel_summary AS s ",
+                             "ON p.stixel_id = s.stixel_id;")
   } else {
     sql <- stringr::str_glue("SELECT p.*, s.lat, s.lon, s.date ",
-                             "FROM occ_pds AS p ",
+                             "FROM {table} AS p ",
                              "INNER JOIN stixel_summary AS s ",
                              "ON p.stixel_id = s.stixel_id ",
                              "{sql_extent_subset(ext)};")
@@ -539,6 +554,7 @@ load_pds <- function(path, ext, return_sf = FALSE) {
     pds <- sf::st_as_sf(pds, coords = c("lon", "lat"), crs = 4326)
   }
 
+  attr(pds, "model") <- model
   return(pds)
 }
 
@@ -550,7 +566,8 @@ load_pds <- function(path, ext, return_sf = FALSE) {
 #' performed many times and the prediction at any given point is the median of
 #' the predictions from all the stixels that that point falls in. This function
 #' loads summary statistics for each stixel, for example, the size of the
-#' stixels and the number of observations within each stixel.
+#' stixels, the number of observations within each stixel, and a suite of
+#' predictive performance metrics (PPMs) for the model fit within that stixel.
 #'
 #' @inheritParams load_pis
 #'
@@ -579,9 +596,9 @@ load_stixels <- function(path, ext, return_sf = FALSE) {
     stopifnot(inherits(ext, "ebirdst_extent"))
   }
 
-  db_file <- file.path(path, "pi-pd.db")
+  db_file <- file.path(path, "stixel_summary.db")
   if(!file.exists(db_file)) {
-    stop("The file 'pi-pd.db' does not exist in: ", path)
+    stop("The file 'stixel_summary.db' does not exist in: ", path)
   }
 
   # connect to db
@@ -599,11 +616,6 @@ load_stixels <- function(path, ext, return_sf = FALSE) {
   stx <- DBI::dbGetQuery(db, sql)
   stx <- dplyr::tibble(stx)
   DBI::dbDisconnect(db)
-
-  # clean up
-  for (col in c("summary_hash", "stixel", "data_type", "srd_n")) {
-    stx[[col]] <- NULL
-  }
 
   # check for missing stixels centroid
   has_centroid <- stats::complete.cases(stx[, c("lat", "lon", "date")])
@@ -703,12 +715,12 @@ load_predictions <- function(path, return_sf = FALSE) {
 #' cfg <- load_config(path)
 load_config <- function(path) {
   stopifnot(dir.exists(path))
-  cfg_file <- file.path(path, "config.rds")
+  cfg_file <- file.path(path, "config.json")
   if(!file.exists(cfg_file)) {
     stop("The file 'config.rds' does not exist in: ", path)
   }
   # load configuration file
-  readRDS(cfg_file)
+  jsonlite::read_json(cfg_file, simplifyVector = TRUE)
 }
 
 
@@ -748,13 +760,13 @@ load_fac_map_parameters <- function(path) {
   stopifnot(dir.exists(path))
 
   # load configuration file
-  l <- load_config(path)
+  p <- load_config(path)
 
-  list(custom_projection = l$FA_PROJECTION$crs,
-       fa_extent = l$FA_PROJECTION$extent,
-       res = l$FA_PROJECTION$res,
-       fa_extent_sinu = l$SINU_EXTENT,
-       abundance_bins = l$bins$hr$quantile)
+  list(custom_projection = p$projection$crs,
+       fa_extent = raster::extent(p$projection$extent),
+       res = p$projection$res,
+       fa_extent_sinu = raster::extent(p$extent_sinu),
+       abundance_bins = p$bins$hr$breaks)
 }
 
 sql_extent_subset <- function(ext) {

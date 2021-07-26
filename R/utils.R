@@ -134,7 +134,7 @@ get_species <- function(x) {
 # internal functions ----
 
 ebirdst_version <- function() {
-  c(data_version = 2019, release_year = 2020)
+  c(data_version = 2020, release_year = 2021)
 }
 
 # convert from an iso date to a 0-1 srd date

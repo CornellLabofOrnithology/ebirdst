@@ -8,12 +8,13 @@
 #' @inheritParams load_raster
 #' @param ext [ebirdst_extent] object (optional); the spatiotemporal extent over
 #'   which to calculate the PPMs.
-#' @param es_cutoff integer between 0-100; the ensemble support cutoff to use in
+#' @param es_cutoff fraction between 0-1; the ensemble support cutoff to use in
 #'   distinguishing zero and non-zero predictions. Optimal ensemble support
 #'   cutoff values are calculated for each week during the modeling process and
 #'   stored in the data package for each species. **In general, you should not
 #'   specify a value for `es_cutoff` and instead allow the function to use the
 #'   species-specific model-base values.**
+#' @param pat_cutoff numeric between 0-1; percent above threshold.
 #'
 #' @details During the eBird Status and Trends modeling process, a subset of
 #'   observations (the "test data") are held out from model fitting to be used
@@ -66,20 +67,27 @@
 #' ppms <- ebirdst_ppms(path = path, ext = e)
 #' plot(ppms)
 #' }
-ebirdst_ppms <- function(path, ext, es_cutoff) {
+ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 10) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
+  stopifnot(is.numeric(pat_cutoff), length(pat_cutoff) == 1,
+            pat_cutoff > 0, pat_cutoff < 1)
   if (!missing(ext)) {
     stopifnot(inherits(ext, "ebirdst_extent"))
   }
+
+  # load configuration file
+  l <- load_config(path)
+  l_es_cutoff <- setNames(l[["es_cutoff"]][["cutoff"]],
+                          l[["es_cutoff"]][["week"]])
+
   if (missing(es_cutoff)) {
-    # load configuration file
-    l <- load_config(path)
     # get dynamic es cutoff
-    es_cutoff <- dplyr::coalesce(l[["ES_CUTOFF"]], 75)
+    es_cutoff <- dplyr::coalesce(l_es_cutoff, 0.75)
   } else {
     stopifnot(is.numeric(es_cutoff), length(es_cutoff) == 1,
-              es_cutoff > 0, es_cutoff < 100)
+              es_cutoff > 0, es_cutoff < 1)
     es_cutoff <- rep(es_cutoff, times = 52)
+    names(es_cutoff) <- format(ebirdst::ebirdst_weeks$date, "%m-%d")
   }
 
   # load the test data and assign names
@@ -95,10 +103,14 @@ ebirdst_ppms <- function(path, ext, es_cutoff) {
   }
 
   # add weekly es cutoffs
-  ws <- ebirdst::ebirdst_weeks$week_start
-  ws[1] <- -Inf
-  we <- ebirdst::ebirdst_weeks$week_end
-  we[length(we)] <- Inf
+  weeks <- ebirdst::ebirdst_weeks
+  weeks <- weeks[format(weeks$date, "%m-%d") %in% names(es_cutoff), ]
+  ws <- weeks$week_start
+  we <- weeks$week_end
+  if (length(es_cutoff) == 52) {
+    ws[1] <- -Inf
+    we[length(we)] <- Inf
+  }
   preds_week <- list()
   for (i in seq_along(es_cutoff)) {
     preds_week[[i]] <- preds[preds$date > ws[i] & preds$date <= we[i], ]
@@ -128,11 +140,12 @@ ebirdst_ppms <- function(path, ext, es_cutoff) {
   # within range: expected count ppms
   count_stat_names <- c("mc_iteration", "sample_size", "mean",
                         "poisson_dev_abd", "poisson_dev_occ",
-                        "spearman_abd", "spearman_occ")
+                        "spearman_abd", "spearman_occ",
+                        "spearman_count", "pearson_count")
 
   # compute monte carlo sample of ppms for spatiotemporal subset
   # split data into within range and out of range
-  is_zero <- preds$pi_es < preds$es_cutoff | is.na(preds$pi_es)
+  is_zero <- (preds$pi_es / l$FOLD_N) < preds$es_cutoff | is.na(preds$pi_es)
   zeroes <- preds[is_zero, ]
   preds <- preds[!is_zero, ]
 
@@ -142,7 +155,7 @@ ebirdst_ppms <- function(path, ext, es_cutoff) {
   }
 
   # false discovery rate (fdr)
-  p_values <- apply(preds, 1, binom_test_p)
+  p_values <- apply(preds, 1, binom_test_p, pat_cutoff = pat_cutoff)
   p_adj <- stats::p.adjust(p_values, "fdr")
   # add binary prediction
   preds$binary <- as.numeric(p_adj < 0.01)
@@ -184,16 +197,16 @@ ebirdst_ppms <- function(path, ext, es_cutoff) {
                            replace = FALSE)
 
     # index back to full vector
-    data_i <- preds[sampled, ]
+    test_sample <- preds[sampled, ]
 
     # binary occurrence ppms
     bs$mc_iteration[i_mc] <- i_mc
-    bs$sample_size[i_mc] <- nrow(data_i)
-    bs$mean[i_mc] <- mean(as.numeric(data_i$obs > 0))
-    if (nrow(data_i) >= occ_min_ss) {
+    bs$sample_size[i_mc] <- nrow(test_sample)
+    bs$mean[i_mc] <- mean(as.numeric(test_sample$obs > 0))
+    if (nrow(test_sample) >= occ_min_ss) {
       pa_df <- data.frame(blank = "x",
-                          obs = as.numeric(data_i$obs > 0),
-                          pred = data_i$binary)
+                          obs = as.numeric(test_sample$obs > 0),
+                          pred = test_sample$binary)
       pa_cmx <- PresenceAbsence::cmx(pa_df, na.rm = T)
       bs$sensitivity[i_mc] <- PresenceAbsence::sensitivity(pa_cmx,
                                                            st.dev = FALSE)
@@ -208,17 +221,17 @@ ebirdst_ppms <- function(path, ext, es_cutoff) {
     }
 
     # within range, occurrence rate ppms
-    data_i <- data_i[data_i$binary > 0, ]
-    data_i <- data_i[stats::complete.cases(data_i$pi_median), ]
+    test_inrng <- test_sample[test_sample$binary > 0, ]
+    test_inrng <- test_inrng[stats::complete.cases(test_inrng$pi_median), ]
 
     os$mc_iteration[i_mc] <- i_mc
-    os$sample_size[i_mc] <- nrow(data_i)
-    os$mean[i_mc] <- mean(as.numeric(data_i$obs > 0))
+    os$sample_size[i_mc] <- nrow(test_inrng)
+    os$mean[i_mc] <- mean(as.numeric(test_inrng$obs > 0))
 
-    if (nrow(data_i) >= occ_min_ss && os$mean[i_mc] >= occ_min_mean) {
+    if (nrow(test_inrng) >= occ_min_ss && os$mean[i_mc] >= occ_min_mean) {
       pa_df <- data.frame(blank = "x",
-                          obs = as.numeric(data_i$obs > 0),
-                          pred = data_i$pi_median)
+                          obs = as.numeric(test_inrng$obs > 0),
+                          pred = test_inrng$pi_median)
       pa_mets <- PresenceAbsence::presence.absence.accuracy(pa_df,
                                                             threshold = 0.5,
                                                             na.rm = TRUE,
@@ -241,27 +254,37 @@ ebirdst_ppms <- function(path, ext, es_cutoff) {
 
     # within range, expected count ppms
     cs$mc_iteration[i_mc] <- i_mc
-    cs$sample_size[i_mc] <- nrow(data_i)
-    cs$mean[i_mc] <- mean(as.numeric(data_i$obs))
+    cs$sample_size[i_mc] <- nrow(test_inrng)
+    cs$mean[i_mc] <- mean(as.numeric(test_inrng$obs))
 
-    if (nrow(data_i) >= count_min_ss && cs$mean[i_mc] >= count_min_mean) {
+    if (nrow(test_inrng) >= count_min_ss && cs$mean[i_mc] >= count_min_mean) {
       # poisson deviance
-      cs$poisson_dev_abd[i_mc] <- poisson_dev(obs = data_i$obs,
-                                              pred = data_i$pi_mu_median)[3]
+      cs$poisson_dev_abd[i_mc] <- poisson_dev(obs = test_inrng$obs,
+                                              pred = test_inrng$pi_mu_median)[3]
 
-      pdev <- as.numeric(poisson_dev(obs = data_i$obs,
-                                     pred = data_i$pi_median))
-      cs$poisson_dev_occ[i_mc] <- poisson_dev(obs = data_i$obs,
-                                              pred = data_i$pi_median)[3]
+      cs$poisson_dev_occ[i_mc] <- poisson_dev(obs = test_inrng$obs,
+                                              pred = test_inrng$pi_median)[3]
 
       # spearman's rank correlations
-      cs$spearman_abd[i_mc] <- stats::cor(data_i$pi_mu_median,
-                                          data_i$obs,
+      cs$spearman_abd[i_mc] <- stats::cor(test_inrng$pi_mu_median,
+                                          test_inrng$obs,
                                           method = "spearman")
-      cs$spearman_occ[i_mc] <- stats::cor(data_i$pi_median,
-                                          data_i$obs,
+      cs$spearman_occ[i_mc] <- stats::cor(test_inrng$pi_median,
+                                          test_inrng$obs,
                                           method = "spearman")
     }
+
+    # count ppms, based on observed occurrences
+    test_cnt <- test_sample[test_sample$obs > 0, ]
+    if (nrow(test_cnt) >= count_min_ss &&
+        mean(test_cnt$obs, na.rm = TRUE) >= count_min_mean) {
+      cs$spearman_count[i_mc] <- stats::cor(test_cnt$mu_median, test_cnt$obs,
+                                            method = "spearman")
+      cs$pearson_count[i_mc] <- stats::cor(test_cnt$mu_median, test_cnt$obs,
+                                           method = "pearson")
+    }
+
+
   }
   structure(list(binary_ppms = dplyr::tibble(type = "binary", bs),
                  occ_ppms = dplyr::tibble(type = "occurrence", os),
@@ -295,7 +318,8 @@ plot.ebirdst_ppms <- function(x, ...) {
   for (t in names(x)) {
     vars <- c("type", "auc", "pcc", "kappa", "bernoulli_dev",
               "sensitivity", "specificity",
-              "poisson_dev_abd", "spearman_abd")
+              "poisson_dev_abd", "spearman_abd",
+              "spearman_count", "pearson_count")
     vars <- intersect(vars, names(x[[t]]))
     if (t == "binary_ppms") {
       vars <- setdiff(vars, "bernoulli_dev")
@@ -311,6 +335,8 @@ plot.ebirdst_ppms <- function(x, ...) {
   # apply nicer labels
   ppms$label <- ppm_labels(ppms$metric)
   ppms$label <- stringr::str_replace(ppms$label, " Deviance", "\nDeviance")
+  ppms$label <- stringr::str_replace(ppms$label, "Count ", "Count\n")
+  ppms$label <- stringr::str_replace(ppms$label, "Abundance ", "Abundance\n")
 
   # construct plot for binary ppms
   ppm_b <- ppms[ppms$type == "binary", ]
@@ -661,7 +687,9 @@ ppm_labels <- function(x) {
     x == "poisson_dev_abd" ~ "Poisson Deviance",
     x == "poisson_dev_abd" ~ "Poisson Deviance",
     x == "poisson_dev_occ" ~ "Poisson Deviance",
-    x == "spearman_abd" ~ "Spearman",
     x == "spearman_occ" ~ "Spearman",
+    x == "spearman_abd" ~ "Abundance Spearman",
+    x == "spearman_count" ~ "Count Spearman",
+    x == "pearson_count" ~ "Count Pearson",
     TRUE ~ x)
 }
