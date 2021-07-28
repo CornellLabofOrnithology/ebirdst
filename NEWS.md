@@ -1,3 +1,5 @@
+# ebirdst 1.0.0
+
 # ebirdst 0.3.0
 
 - add support for new data structures used for 2020 eBird Status and Trends

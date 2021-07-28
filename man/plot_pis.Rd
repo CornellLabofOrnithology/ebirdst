@@ -8,7 +8,7 @@ plot_pis(
   pis,
   ext,
   by_cover_class = TRUE,
-  n_top_pred = 20,
+  n_top_pred = 15,
   pretty_names = TRUE,
   plot = TRUE
 )
@@ -33,9 +33,9 @@ readable land cover class names.}
 predictors.}
 }
 \value{
-Plots a boxplot of predictor importance and invisibly returns a named
-vector of top predictors, and their median predictor importance, based on
-the \code{n_top_pred} parameter.
+Plots a boxplot of predictor importance and invisibly returns the PI
+data subset to just the top predictors, grouped and renamed according to
+\code{by_cover_class} and \code{pretty_names}.
 }
 \description{
 For a given eBird Status and Trends species, produce a box plot showing the

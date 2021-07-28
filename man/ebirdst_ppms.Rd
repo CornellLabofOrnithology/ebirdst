@@ -5,7 +5,7 @@
 \alias{plot.ebirdst_ppms}
 \title{eBird Status and Trends predictive performance metrics (PPMs)}
 \usage{
-ebirdst_ppms(path, ext, es_cutoff)
+ebirdst_ppms(path, ext, es_cutoff, pat_cutoff = 1/10)
 
 \method{plot}{ebirdst_ppms}(x, ...)
 }
@@ -17,12 +17,14 @@ or \code{get_species_path()}.}
 \item{ext}{\link{ebirdst_extent} object (optional); the spatiotemporal extent over
 which to calculate the PPMs.}
 
-\item{es_cutoff}{integer between 0-100; the ensemble support cutoff to use in
+\item{es_cutoff}{fraction between 0-1; the ensemble support cutoff to use in
 distinguishing zero and non-zero predictions. Optimal ensemble support
 cutoff values are calculated for each week during the modeling process and
 stored in the data package for each species. \strong{In general, you should not
 specify a value for \code{es_cutoff} and instead allow the function to use the
 species-specific model-base values.}}
+
+\item{pat_cutoff}{numeric between 0-1; percent above threshold.}
 
 \item{x}{\link{ebirdst_ppms} object; PPMs as calculated by \code{\link[=ebirdst_ppms]{ebirdst_ppms()}}.}
 

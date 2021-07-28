@@ -30,7 +30,8 @@ within which individual base models are fit. The process of stixelization is
 performed many times and the prediction at any given point is the median of
 the predictions from all the stixels that that point falls in. This function
 loads summary statistics for each stixel, for example, the size of the
-stixels and the number of observations within each stixel.
+stixels, the number of observations within each stixel, and a suite of
+predictive performance metrics (PPMs) for the model fit within that stixel.
 }
 \examples{
 \donttest{
