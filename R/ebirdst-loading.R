@@ -348,10 +348,10 @@ load_raster <- function(path,
 
 #' Load eBird Status and Trends predictor importance data
 #'
-#' Loads the predictor importance (PI) data from the stixel_summary.db sqlite database.
-#' PI estimates are provided for each stixel over which a model was run and are
-#' identified by a unique stixel ID in addition to the coordinates of the stixel
-#' centroid. PI estimates are for the occurrence model only.
+#' Loads the predictor importance (PI) data from the stixel_summary.db sqlite
+#' database. PI estimates are provided for each stixel over which a model was
+#' run and are identified by a unique stixel ID in addition to the coordinates
+#' of the stixel centroid. PI estimates are for the occurrence model only.
 #'
 #' @inheritParams load_raster
 #' @param ext [ebirdst_extent] object; the spatiotemporal extent to filter the
