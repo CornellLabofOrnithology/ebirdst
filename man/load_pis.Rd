@@ -32,10 +32,10 @@ in space and time is specified by the \code{lat}, \code{lon}, and \code{date} co
 which expresses the day of year as a value from 0-1.
 }
 \description{
-Loads the predictor importance (PI) data from the stixel_summary.db sqlite database.
-PI estimates are provided for each stixel over which a model was run and are
-identified by a unique stixel ID in addition to the coordinates of the stixel
-centroid. PI estimates are for the occurrence model only.
+Loads the predictor importance (PI) data from the stixel_summary.db sqlite
+database. PI estimates are provided for each stixel over which a model was
+run and are identified by a unique stixel ID in addition to the coordinates
+of the stixel centroid. PI estimates are for the occurrence model only.
 }
 \examples{
 \donttest{
