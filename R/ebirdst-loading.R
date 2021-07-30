@@ -785,7 +785,7 @@ sql_extent_subset <- function(ext) {
 
 
   # temporal filtering
-  t <- ext$t
+  t <- ext$t * 366
   if (!identical(t, c(0, 1))) {
     if (t[1] <= t[2]) {
       t_sql <- stringr::str_glue("AND s.date > {t[1]} AND s.date <= {t[2]}")

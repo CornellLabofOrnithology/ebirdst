@@ -41,13 +41,13 @@ ebirdst_subset.data.frame <- function(x, ext) {
     if (all(x$date >= 1) && all(x$date <= 366)) {
       message("date column is not between 0 and 1, assuming date encoded as ",
               "day of year (1-366).")
-      date_normalized <- x$date / 366
+      t_ext <- ext$t * 366
     } else {
       stop("Format of date column is unknown, should be day of year encoded ",
            "either as 0-1 or 1-366.")
     }
   } else {
-    date_normalized <- x$date
+    t_ext <- ext$t
   }
 
   if (nrow(x) == 0) {
@@ -55,11 +55,11 @@ ebirdst_subset.data.frame <- function(x, ext) {
   }
 
   # temporal filtering
-  if (!identical(ext$t, c(0, 1))) {
-    if (ext$t[1] <= ext$t[2]) {
-      x <- x[date_normalized > ext$t[1] & date_normalized <= ext$t[2], ]
+  if (!identical(t_ext, c(0, 1))) {
+    if (t_ext[1] <= t_ext[2]) {
+      x <- x[x$date > t_ext[1] & x$date <= t_ext[2], ]
     } else {
-      x <- x[date_normalized > ext$t[1] | date_normalized <= ext$t[2], ]
+      x <- x[x$date > t_ext[1] | x$date <= t_ext[2], ]
     }
   }
 
