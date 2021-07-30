@@ -34,8 +34,21 @@ ebirdst_subset <- function(x, ext) {
 #' @describeIn ebirdst_subset PI or PD data
 ebirdst_subset.data.frame <- function(x, ext) {
   stopifnot(all(c("date", "lon", "lat") %in% names(x)))
-  stopifnot(is.numeric(x$date), all(x$date >= 0), all(x$date <= 1))
+  stopifnot(is.numeric(x$date), all(x$date >= 0))
   stopifnot(inherits(ext, "ebirdst_extent"))
+
+  if (!all(x$date <= 1)) {
+    if (all(x$date >= 1) && all(x$date <= 366)) {
+      message("date column is not between 0 and 1, assuming date encoded as ",
+              "day of year (1-366).")
+      date_normalized <- x$date / 366
+    } else {
+      stop("Format of date column is unknown, should be day of year encoded ",
+           "either as 0-1 or 1-366.")
+    }
+  } else {
+    date_normalized <- x$date
+  }
 
   if (nrow(x) == 0) {
     return(x)
@@ -44,9 +57,9 @@ ebirdst_subset.data.frame <- function(x, ext) {
   # temporal filtering
   if (!identical(ext$t, c(0, 1))) {
     if (ext$t[1] <= ext$t[2]) {
-      x <- x[x$date > ext$t[1] & x$date <= ext$t[2], ]
+      x <- x[date_normalized > ext$t[1] & date_normalized <= ext$t[2], ]
     } else {
-      x <- x[x$date > ext$t[1] | x$date <= ext$t[2], ]
+      x <- x[date_normalized > ext$t[1] | date_normalized <= ext$t[2], ]
     }
   }
 

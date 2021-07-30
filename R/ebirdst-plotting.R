@@ -224,6 +224,9 @@ plot_pds <- function(pds, predictor, ext,
 
   # were these occurrence or count pds
   m <- attr(pds, "model")
+  if (is.null(m)) {
+    m <- ""
+  }
 
   # match predictor
   p <- ebirdst::ebirdst_predictors
