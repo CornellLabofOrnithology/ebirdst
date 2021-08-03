@@ -14,15 +14,19 @@ for all results}
 \item{common_name}{English common name from eBird Taxonomy v2018}
 \item{resident}{Classifies this species a resident or a migrant}
 \item{breeding_quality}{Breeding season quality}
+\item{breeding_range_modeled}{Is the full range modeled?}
 \item{breeding_start}{Breeding season start date}
 \item{breeding_end}{Breeding season start date}
 \item{nonbreeding_quality}{Non-breeding season quality}
+\item{nonbreeding_range_modeled}{Is the full range modeled?}
 \item{nonbreeding_start}{Non-breeding season start date}
 \item{nonbreeding_end}{Non-breeding season start date}
 \item{postbreeding_migration_quality}{Post-breeding season quality}
+\item{postbreeding_range_modeled}{Is the full range modeled?}
 \item{postbreeding_migration_start}{Post-breeding season start date}
 \item{postbreeding_migration_end}{Post-breeding season start date}
 \item{prebreeding_migration_quality}{Pre-breeding season quality}
+\item{prebreeding_range_modeled}{Is the full range modeled?}
 \item{prebreeding_migration_start}{Pre-breeding season start date}
 \item{prebreeding_migration_end}{Pre-breeding season start date}
 \item{resident_quality}{Resident quality}
