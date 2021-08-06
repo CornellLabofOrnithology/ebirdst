@@ -307,6 +307,9 @@ load_raster <- function(path,
     tif_path <- list.files(file.path(path, "seasonal"),
                            pattern = pat,
                            full.names = TRUE)
+    # drop core seasons
+    is_core <- stringr::str_detect(tif_path, "_core_")
+    tif_path <- tif_path[!is_core]
     if (any(!file.exists(tif_path))) {
       stop("Error locating seasonal abundance GeoTIFFs")
     } else if (length(tif_path) == 0) {
