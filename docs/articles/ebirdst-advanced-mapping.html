@@ -93,7 +93,7 @@
       <h1 data-toc-skip>Generating Seasonal Abundance and Range Maps and Stats</h1>
                         <h4 data-toc-skip class="author">Matt Strimas-Mackey, Tom Auer, Daniel Fink</h4>
             
-            <h4 data-toc-skip class="date">2021-07-23</h4>
+            <h4 data-toc-skip class="date">2021-08-07</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-advanced-mapping.Rmd" class="external-link"><code>vignettes/ebirdst-advanced-mapping.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-advanced-mapping.Rmd</code></div>
@@ -211,7 +211,7 @@
 <span class="va">quality_rating</span> <span class="op">&lt;-</span> <span class="va">run_review</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">yebsap_dates</span><span class="op">$</span><span class="va">season</span>, <span class="st">"_quality"</span><span class="op">)</span><span class="op">]</span>
 <span class="va">yebsap_dates</span><span class="op">$</span><span class="va">pass</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">quality_rating</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">1</span>
 <span class="va">yebsap_dates</span>
-<span class="co">#&gt; # A tibble: 4 x 4</span>
+<span class="co">#&gt; # A tibble: 4 × 4</span>
 <span class="co">#&gt;   season                 start_dt   end_dt     pass </span>
 <span class="co">#&gt;   &lt;chr&gt;                  &lt;date&gt;     &lt;date&gt;     &lt;lgl&gt;</span>
 <span class="co">#&gt; 1 breeding               2019-05-24 2019-09-07 TRUE </span>
@@ -668,7 +668,7 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>days_occ <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fl">7</span> <span class="op">*</span> <span class="va">weeks_occ</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/pkg/raster/man/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">county_code</span>, <span class="va">season</span>, <span class="va">days_occ</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/raster/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">days_occupation</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 3</span>
+<span class="co">#&gt; # A tibble: 6 × 3</span>
 <span class="co">#&gt;   county_code season                 days_occ</span>
 <span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;                     &lt;dbl&gt;</span>
 <span class="co">#&gt; 1 US.MI.AC    breeding                    112</span>
