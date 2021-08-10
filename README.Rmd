@@ -27,13 +27,7 @@ knitr::opts_chunk$set(
 
 ## Installation
 
-Install `ebirdst` from CRAN with:
-
-```{r cran-install, eval = FALSE}
-install.packages("ebirdst")
-```
-
-Alternatively, you can install the development version from GitHub with:
+Install `ebirdst` from GitHub with:
 
 ```{r gh-installation, eval = FALSE}
 # install.packages("remotes")
