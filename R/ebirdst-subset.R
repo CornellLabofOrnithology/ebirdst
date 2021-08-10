@@ -14,6 +14,7 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' # download example data
 #' path <- ebirdst_download("example_data")
 #' # or get the path if you already have the data downloaded
@@ -26,6 +27,7 @@
 #' # load and subset raster data
 #' abd <- load_raster(path, product = "abundance")
 #' abd_ss <- ebirdst_subset(abd, ext = e)
+#' }
 ebirdst_subset <- function(x, ext) {
   UseMethod("ebirdst_subset")
 }

@@ -16,6 +16,7 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' # download and load example abundance data
 #' sp_path <- ebirdst_download("example_data")
 #' abd <- load_raster(sp_path, "abundance")
@@ -23,6 +24,7 @@
 #' # label
 #' abd <- label_raster_stack(abd)
 #' names(abd)
+#' }
 label_raster_stack <- function(x) {
   stopifnot(inherits(x, "Raster"))
 
@@ -65,12 +67,14 @@ label_raster_stack <- function(x) {
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' # download and load example abundance data
 #' sp_path <- ebirdst_download("example_data")
 #' abd <- load_raster(sp_path, "abundance")
 #'
 #' # parse dates
 #' parse_raster_dates(abd)
+#' }
 parse_raster_dates <- function(x) {
   stopifnot(inherits(x, "Raster"))
   if (!all(grepl("w[0-9]{4}\\.[0-9]{2}\\.[0-9]{2}", names(x)))) {

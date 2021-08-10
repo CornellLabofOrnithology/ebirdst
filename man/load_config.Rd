@@ -20,6 +20,7 @@ configuration file is mostly for internal use and contains a variety of
 parameters used in the modeling process.
 }
 \examples{
+\donttest{
 # download example data
 path <- ebirdst_download("example_data")
 # or get the path if you already have the data downloaded
@@ -27,4 +28,5 @@ path <- get_species_path("example_data")
 
 # load configuration file
 cfg <- load_config(path)
+}
 }

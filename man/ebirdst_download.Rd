@@ -48,10 +48,10 @@ full dataset, making these data quicker to download and process. In addition,
 the example data are accessible without an access key.
 }
 \examples{
+\dontrun{
 # download the example data
 ebirdst_download("example_data")
 
-\dontrun{
 # download the data package for wood thrush, geotiffs only
 ebirdst_download("woothr")
 # download the data package for wood thrush, all data
