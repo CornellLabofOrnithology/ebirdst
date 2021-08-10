@@ -31,10 +31,10 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # download the example data
 #' ebirdst_download("example_data")
 #'
-#' \dontrun{
 #' # download the data package for wood thrush, geotiffs only
 #' ebirdst_download("woothr")
 #' # download the data package for wood thrush, all data
@@ -168,6 +168,7 @@ ebirdst_download <- function(species,
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # download the example data
 #' ebirdst_download("example_data")
 #'
@@ -179,7 +180,6 @@ ebirdst_download <- function(species,
 #'
 #' # get the path to the full data package for yellow-bellied sapsucker
 #' # common name, scientific name, or species code can be used
-#' \dontrun{
 #' path <- get_species_path("Yellow-bellied Sapsucker")
 #' path <- get_species_path("Sphyrapicus varius")
 #' path <- get_species_path("yebsap")
@@ -265,6 +265,7 @@ get_species_path <- function(species,
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # download example data
 #' path <- ebirdst_download("example_data")
 #' # or get the path if you already have the data downloaded
@@ -272,6 +273,7 @@ get_species_path <- function(species,
 #'
 #' # load data
 #' load_raster(path, "abundance")
+#' }
 load_raster <- function(path,
                         product = c("abundance",
                                     "abundance_seasonal",
@@ -694,6 +696,7 @@ load_predictions <- function(path, return_sf = FALSE) {
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' # download example data
 #' path <- ebirdst_download("example_data")
 #' # or get the path if you already have the data downloaded
@@ -701,6 +704,7 @@ load_predictions <- function(path, return_sf = FALSE) {
 #'
 #' # load configuration file
 #' cfg <- load_config(path)
+#' }
 load_config <- function(path) {
   stopifnot(dir.exists(path))
   cfg_file <- file.path(path, "config.rds")
