@@ -1,5 +1,7 @@
 # ebirdst 1.0.0
 
+- updates for 2021 eBird Status Data Products
+
 ## Test environments
 
 - local OS X install, R 4.1

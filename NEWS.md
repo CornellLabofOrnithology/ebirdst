@@ -1,5 +1,11 @@
 # ebirdst 1.0.0
 
+- updates for 2021 eBird Status Data Products
+
+# ebirdst 0.3.1
+
+- prevent tests and examples from leaving files behind to pass CRAN checks
+
 # ebirdst 0.3.0
 
 - add support for new data structures used for 2020 eBird Status and Trends

@@ -26,6 +26,7 @@ This helper function can be used to get the path to a data package for a
 given species to be used by the various loading functions.
 }
 \examples{
+\dontrun{
 # download the example data
 ebirdst_download("example_data")
 
@@ -37,7 +38,6 @@ abd <- load_raster(path, "abundance")
 
 # get the path to the full data package for yellow-bellied sapsucker
 # common name, scientific name, or species code can be used
-\dontrun{
 path <- get_species_path("Yellow-bellied Sapsucker")
 path <- get_species_path("Sphyrapicus varius")
 path <- get_species_path("yebsap")
