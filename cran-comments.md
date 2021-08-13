@@ -1,13 +1,6 @@
-# Re-submission
+# ebirdst 0.3.1
 
-- fixing long running examples
-
-# ebirdst 0.3.0
-
-- add support for new data structures used for 2020 eBird Status and Trends
-- functionality to handle partial dependence data added
-- overhaul of package API to be more intuitive and streamlined
-- all documentation and vignettes updated
+- prevent tests and examples from leaving files behind to pass CRAN checks
 
 ## Test environments
 

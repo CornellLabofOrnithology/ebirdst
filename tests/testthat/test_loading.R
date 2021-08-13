@@ -1,9 +1,10 @@
 context("Loading functions")
 
+skip_on_cran()
+
 path <- ebirdst_download("example_data", tifs_only = TRUE)
 
 test_that("get_species_path", {
-  skip_on_cran()
   p <- get_species_path("example_data")
   expect_true(dir.exists(p))
   expect_error(get_species_path("not-a-real-species"))
