@@ -1,5 +1,7 @@
 context("Loading and subsetting raster data")
 
+skip_on_cran()
+
 path <- ebirdst_download("example_data", tifs_only = TRUE)
 
 test_that("load_raster", {
