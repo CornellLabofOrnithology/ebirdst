@@ -40,7 +40,7 @@ ebirdst_subset.data.frame <- function(x, ext) {
   stopifnot(inherits(ext, "ebirdst_extent"))
 
   if (!all(x$date <= 1)) {
-    if (all(x$date >= 1) && all(x$date <= 366)) {
+    if (all(x$date >= 0) && all(x$date <= 366)) {
       message("date column is not between 0 and 1, assuming date encoded as ",
               "day of year (1-366).")
       t_ext <- ext$t * 366

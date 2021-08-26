@@ -55,7 +55,7 @@ stixelize.data.frame <- function(x) {
                     crs = 4326)
 
   # combine with data
-  sf::st_sf(x, geometry = stx)
+  sf::st_make_valid(sf::st_sf(x, geometry = stx))
 }
 
 #' @export

@@ -1,11 +1,13 @@
 library(tidyverse)
+library(jsonlite)
 
-l <- file.path("data-raw", "config.rds") %>%
-  readRDS()
-ebirdst_weeks <- tibble(week_number = seq_along(l$SRD_DATE_VEC),
-                        date = as.Date(paste(l$SRD_PRED_YEAR,
-                                             l$DATE_NAMES, sep = "-")),
-                        week_midpoint = l$SRD_DATE_VEC)
+p <- file.path("data-raw", "config.json") %>%
+  read_json(simplifyVector = TRUE)
+
+ebirdst_weeks <- tibble(week_number = seq_along(p$SRD_DATE_VEC),
+                        date = as.Date(paste(p$SRD_PRED_YEAR,
+                                             p$DATE_NAMES, sep = "-")),
+                        week_midpoint = p$SRD_DATE_VEC)
 start_end <- map(1:52, ~ c((. - 1) / 52, . / 52)) %>%
   Reduce(rbind, .) %>%
   as_tibble() %>%

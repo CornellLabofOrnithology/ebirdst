@@ -115,8 +115,8 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
 
   # calculate % of stixel within focal extent
   stixels <- suppressWarnings(suppressMessages(
-    sf::st_intersection(stixels, ext_poly)
-    ))
+    sf::st_make_valid(sf::st_intersection(stixels, ext_poly))
+  ))
   stixels$area_in_extent <- sf::st_area(stixels)
   stixels$coverage <- as.numeric(stixels$area_in_extent / stixels$area)
   stixel_coverage <- sf::st_drop_geometry(stixels)
@@ -130,8 +130,8 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
 
   # load pis and pds, occurrence only
   if (!missing(path)) {
-    pis <- load_pis(path = path, ext = ext)
-    pds <- load_pds(path = path, ext = ext)
+    pis <- load_pis(path = path, ext = ext, model = "occurrence")
+    pds <- load_pds(path = path, ext = ext, model = "occurrence")
   } else {
     pis <- ebirdst_subset(pis, ext = ext)
     pds <- ebirdst_subset(pds, ext = ext)
@@ -174,9 +174,7 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
   pd_slope <- pds[, c("stixel_id", "date", "predictor",
                       "predictor_value", "response")]
   rm(pds)
-  pd_slope <- tidyr::nest(pd_slope, data = -dplyr::all_of(c("stixel_id",
-                                                            "date",
-                                                            "predictor")))
+  pd_slope <- tidyr::nest(pd_slope, data = c("predictor_value", "response"))
   sl <- vapply(pd_slope$data, FUN = lm_slope, FUN.VALUE = numeric(1))
   # convert to binary
   pd_slope$slope <- as.numeric(sl > 0)
@@ -188,12 +186,15 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
   pd_smooth <- dplyr::select(pd_slope, .data$predictor,
                              x = .data$date, y = .data$slope,
                              weight = .data$coverage)
+  # convert from day of year to year fraction
+  pd_smooth[["x"]] <- pd_smooth[["x"]] / 366
   rm(pd_slope)
   pd_smooth <- tidyr::drop_na(pd_smooth)
-  pd_smooth <- tidyr::nest(pd_smooth, data = -dplyr::all_of("predictor"))
+  pd_smooth <- tidyr::nest(pd_smooth, data = c("x", "y", "weight"))
+  pred_weeks <- ebirdst::ebirdst_weeks$week_midpoint
   pd_smooth$smooth <- lapply(pd_smooth[["data"]],
                              FUN = loess_smooth,
-                             predict_to = ebirdst::ebirdst_weeks$week_midpoint,
+                             predict_to = pred_weeks,
                              na_value = NA_real_,
                              check_width = 7 / 366)
   pd_smooth$data <- NULL
@@ -210,12 +211,14 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
   pi_smooth <- dplyr::select(pis, .data$predictor,
                              x = .data$date, y = .data$importance,
                              weight = .data$coverage)
+  # convert from day of year to year fraction
+  pi_smooth[["x"]] <- pi_smooth[["x"]] / 366
   # log transform
   pi_smooth$y <- log(pi_smooth$y + 0.001)
   pi_smooth <- tidyr::nest(pi_smooth, data = -dplyr::all_of("predictor"))
   pi_smooth$smooth <- lapply(pi_smooth[["data"]],
                              FUN = loess_smooth,
-                             predict_to = ebirdst::ebirdst_weeks$week_midpoint,
+                             predict_to = pred_weeks,
                              na_value = 0,
                              check_width = 7 / 366)
   pi_smooth$data <- NULL

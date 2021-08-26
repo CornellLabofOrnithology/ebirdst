@@ -1,8 +1,13 @@
 library(tidyverse)
+library(jsonlite)
 
-pl <- file.path("data-raw", "config.rds") %>%
-  readRDS() %>%
+pl <- file.path("data-raw", "config.json") %>%
+  read_json(simplifyVector = TRUE) %>%
   pluck("PREDICTOR_LIST")
+
+# weather labels
+wv <- read_csv("data-raw/weather-variables.csv") %>%
+  select(predictor = variable, label)
 
 # predictors
 ebirdst_predictors <- tibble(predictor = pl) %>%
@@ -71,11 +76,15 @@ ebirdst_predictors <- tibble(predictor = pl) %>%
     predictor_label = str_replace(predictor_label, "Hrs", "Hours"),
     predictor_label = str_replace(predictor_label, "Elev", "Elevation"),
     predictor_label = str_replace(predictor_label, "Sd", "SD"),
+    predictor_label = ifelse(predictor == "CCI", "CCI", predictor_label),
     lc_class = if_else(str_detect(lc_class, "gp_rtp"),
                        "gp_rtp", lc_class),
     lc_class_label =  if_else(str_detect(lc_class, "gp_rtp"),
                               "Roads", lc_class_label),
     lc_class_label = dplyr::coalesce(lc_class_label, predictor_label)) %>%
+  left_join(wv, by = "predictor") %>%
+  mutate(predictor_label = coalesce(label, predictor_label),
+         lc_class_label = coalesce(label, lc_class_label)) %>%
   select(predictor, predictor_tidy, predictor_label, lc_class, lc_class_label)
 
 usethis::use_data(ebirdst_predictors, overwrite = TRUE)

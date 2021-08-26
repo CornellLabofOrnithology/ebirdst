@@ -7,8 +7,6 @@
 \format{
 A data frame with 15 variables:
 \describe{
-\item{run_name}{Unique analysis identifier and the top level folder name
-for all results}
 \item{species_code}{Six letter eBird code in eBird Taxonomy v2018}
 \item{scientific_name}{Scientific name from eBird Taxonomy v2018}
 \item{common_name}{English common name from eBird Taxonomy v2018}
