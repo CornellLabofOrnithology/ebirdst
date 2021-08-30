@@ -4,8 +4,11 @@
 #' convenience, this function labels the layers of a data cube once it has been
 #' loaded with the week dates for each band.
 #'
-#' @param x `RasterStack` or `RasterBrick`; original eBird Status and Trends
-#'   data cube with 52 bands, one for each week.
+#' @param x `RasterStack` or `RasterBrick`; eBird Status and Trends data cube,
+#'   typically with 52 bands, one for each week.
+#' @param weeks vector of dates corresponding to the weeks of each layer in `x`.
+#'   This argument should be used only rarely, when you're labelling a cube with
+#'   fewer that the usual 52 weeks of predictions.
 #'
 #' @return A `RasterStack` or `RasterBrick` with names assigned for the dates in
 #'   the format of "wYYYY.MM.DD" per raster package constraints. The `Raster*`
@@ -16,7 +19,6 @@
 #' @export
 #'
 #' @examples
-#' \donttest{
 #' # download and load example abundance data
 #' sp_path <- ebirdst_download("example_data")
 #' abd <- load_raster(sp_path, "abundance")
@@ -24,29 +26,24 @@
 #' # label
 #' abd <- label_raster_stack(abd)
 #' names(abd)
-#' }
-label_raster_stack <- function(x) {
+label_raster_stack <- function(x, weeks = NULL) {
   stopifnot(inherits(x, "Raster"))
 
-  # check length
-  if((raster::nlayers(x) != 52)) {
-    stop(paste("The input Raster* object must be a full cube of 52",
-               "layers as originally provided."))
+  if (is.null(weeks)) {
+    if((raster::nlayers(x) != 52)) {
+      stop("The input Raster* object must be a full cube of 52 weeks unless ",
+           "a weeks argument is provided to label_raster_stack().")
+    }
+    weeks <- ebirdst::ebirdst_weeks$date
+  }
+  stopifnot(inherits(weeks, "Date"))
+
+  # check lengths
+  if (raster::nlayers(x) != length(weeks)) {
+    stop("The number of raster layers must match the number of weeks.")
   }
 
-  srd_date_vec <- seq(from = 0, to = 1, length.out = 52 + 1)
-  srd_date_vec <- (srd_date_vec[1:52] + srd_date_vec[2:(52 + 1)]) / 2
-  srd_date_vec <- round(srd_date_vec, digits = 4)
-
-  year_seq <- 2015
-  p_time <- strptime(x = paste(round(srd_date_vec * 366), year_seq), "%j %Y")
-  date_names <- paste(paste0("w", ebirdst_version()["data_version"]),
-                      formatC(p_time$mon + 1, width = 2, format = "d",
-                              flag = "0"),
-                      formatC(p_time$mday, width = 2, format = "d",
-                              flag = "0"),
-                      sep = ".")
-
+  date_names <- format(weeks, "w%Y.%m.%d")
   names(x) <- date_names
 
   return(x)
