@@ -11,13 +11,17 @@
 #'   calculate the habitat associations. Note that **temporal component of `ext`
 #'   is ignored is this function**, habitat associations are always calculated
 #'   for the full year.
-#' @param pis,pds,stixels as an alternative to providing the `path` argument
-#'   specifying the location of the data package, the data required to calculate
-#'   habitat associations can be provided explicitly. PI, PD, and stixel data
-#'   frames can provided, which come from the `load_pis()`, `load_pds()`, and
-#'   `load_stixels()` functions, respectively. Ignored if `path` is provided.
-#'   **In most cases, users will want to avoid using these arguments and simply
-#'   provide `path` instead.**
+#' @param data as an alternative to providing the `path` argument specifying the
+#'   location of the data package, the data required to calculate habitat
+#'   associations can be provided explicitly as a named list of three data
+#'   frames: `pis` containing PI data from [load_pis()], `pds` containing PD
+#'   data from [load_pds()], and `stixels` containing stixel weights in a
+#'   `weight` column. All data should be provided at the stixel level,
+#'   identified by the `stixel_id` column, and only those stixels appearing in
+#'   the `stixels` data frame will be used. Typically stixel weights are the
+#'   proportion of the focal region that the given stixel overlaps. Ignored if
+#'   `path` is provided. **In most cases, users will want to avoid using these
+#'   arguments and simply provide `path` instead.**
 #'
 #' @details The Status and Trends models use both effort (e.g. number of
 #'   observers, length of checklist) and habitat (e.g. elevation, percent forest
@@ -70,72 +74,84 @@
 #' # produce a cake plot
 #' plot(habitat)
 #' }
-ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
+ebirdst_habitat <- function(path, ext, data = NULL) {
   if (missing(path)) {
-    stopifnot(is.data.frame(pis))
-    stopifnot(is.data.frame(pds))
-    stopifnot(is.data.frame(stixels))
+    stopifnot(is.list(data), all(c("pis", "pds", "stixels") %in% names(data)))
+    pis <- data[["pis"]]
+    pds <- data[["pds"]]
+    stixel_coverage <- data[["stixels"]]
+
+    col_names <- c("stixel_id", "date", "predictor", "importance")
+    stopifnot(is.data.frame(pis), all(col_names %in% names(pis)))
+
+    col_names <- c("stixel_id", "date", "predictor",
+                   "predictor_value", "response")
+    stopifnot(is.data.frame(pds), all(col_names %in% names(pds)))
+
+    col_names <- c("stixel_id", "weight")
+    stopifnot(is.data.frame(stixel_coverage),
+              all(col_names %in% names(stixel_coverage)))
   } else {
     stopifnot(is.character(path), length(path) == 1, dir.exists(path))
-  }
 
-  if (missing(ext)) {
-    stop("A spatiotemporal extent must be provided.")
-  } else {
-    stopifnot(inherits(ext, "ebirdst_extent"))
-    if (!sf::st_is_longlat(ext$extent)) {
-      stop("Extent must provided in WGS84 lon-lat coordinates.")
+    if (missing(ext)) {
+      stop("A spatiotemporal extent must be provided.")
+    } else {
+      stopifnot(inherits(ext, "ebirdst_extent"))
+      if (!sf::st_is_longlat(ext$extent)) {
+        stop("Extent must provided in WGS84 lon-lat coordinates.")
+      }
     }
-  }
-  # remove temporal component of extent
-  ext$t <- c(0, 1)
-  # spatial extent polygon
-  ext_poly <- ext$extent
-  if (ext$type == "bbox") {
-    ext_poly <- sf::st_as_sfc(ext_poly)
-  }
-  ext_poly <- sf::st_transform(ext_poly, crs = 4326)
+    # remove temporal component of extent
+    ext$t <- c(0, 1)
+    # spatial extent polygon
+    ext_poly <- ext$extent
+    if (ext$type == "bbox") {
+      ext_poly <- sf::st_as_sfc(ext_poly)
+    }
+    ext_poly <- sf::st_transform(ext_poly, crs = 4326)
 
-  # generate stixel polygons
-  if (!missing(path)) {
-    stixels <- load_stixels(path = path, ext = ext)
-  } else {
-    stixels <- ebirdst_subset(stixels, ext = ext)
-  }
+    # generate stixel polygons
+    if (!missing(path)) {
+      stixels <- load_stixels(path = path, ext = ext)
+    } else {
+      stixels <- ebirdst_subset(stixels, ext = ext)
+    }
 
-  if (nrow(stixels) == 0) {
-    warning("No stixels within the provided extent.")
-    return(NULL)
-  }
+    if (nrow(stixels) == 0) {
+      warning("No stixels within the provided extent.")
+      return(NULL)
+    }
 
-  # convert stixels to polygons
-  stixels <- stixelize(stixels)
-  stixels$area <- sf::st_area(stixels)
-  stixels <- dplyr::select(stixels, .data$stixel_id, .data$area)
+    # convert stixels to polygons
+    stixels <- stixelize(stixels)
+    stixels$area <- sf::st_area(stixels)
+    stixels <- dplyr::select(stixels, .data$stixel_id, .data$area)
 
-  # calculate % of stixel within focal extent
-  stixels <- suppressWarnings(suppressMessages(
-    sf::st_make_valid(sf::st_intersection(stixels, ext_poly))
-  ))
-  stixels$area_in_extent <- sf::st_area(stixels)
-  stixels$coverage <- as.numeric(stixels$area_in_extent / stixels$area)
-  stixel_coverage <- sf::st_drop_geometry(stixels)
-  stixel_coverage <- dplyr::select(stixel_coverage,
-                                   .data$stixel_id,
-                                   .data$coverage)
-  rm(stixels)
+    # calculate % of stixel within focal extent
+    stixels <- suppressWarnings(suppressMessages(
+      sf::st_make_valid(sf::st_intersection(stixels, ext_poly))
+    ))
+    stixels$area_in_extent <- sf::st_area(stixels)
+    stixels$weight <- as.numeric(stixels$area_in_extent / stixels$area)
+    stixel_coverage <- sf::st_drop_geometry(stixels)
+    stixel_coverage <- dplyr::select(stixel_coverage,
+                                     .data$stixel_id,
+                                     .data$weight)
+    rm(stixels)
 
-  # drop any stixels that cover less than 10% of the focal extent
-  stixel_coverage <- stixel_coverage[stixel_coverage$coverage >= 0.10, ]
+    # drop any stixels that cover less than 10% of the focal extent
+    stixel_coverage <- stixel_coverage[stixel_coverage$weight >= 0.10, ]
 
-  # load pis and pds, occurrence only
-  if (!missing(path)) {
+    # load pis and pds, occurrence only
     pis <- load_pis(path = path, ext = ext, model = "occurrence")
     pds <- load_pds(path = path, ext = ext, model = "occurrence")
-  } else {
-    pis <- ebirdst_subset(pis, ext = ext)
-    pds <- ebirdst_subset(pds, ext = ext)
   }
+
+  # drop stixels not in region
+  pis <- dplyr::semi_join(pis, stixel_coverage, by = "stixel_id")
+  pds <- dplyr::semi_join(pds, stixel_coverage, by = "stixel_id")
+
   # remove intertidal if it's missing for any stixels
   it <- pis[pis$predictor == "intertidal_fs_c1_1500_pland", ]$importance
   if (any(is.na(it))) {
@@ -149,10 +165,6 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
   }
   pis <- tidyr::drop_na(pis)
   pds <- tidyr::drop_na(pds)
-
-  # drop stixels covering less than 10% of focal area, bring in % coverage
-  pis <- dplyr::inner_join(pis, stixel_coverage, by = "stixel_id")
-  pds <- dplyr::inner_join(pds, stixel_coverage, by = "stixel_id")
 
   if (nrow(pis) == 0 || nrow(pds) == 0) {
     warning("No stixels within the provided extent.")
@@ -185,7 +197,7 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
   # temporal smoothing of pds
   pd_smooth <- dplyr::select(pd_slope, .data$predictor,
                              x = .data$date, y = .data$slope,
-                             weight = .data$coverage)
+                             .data$weight)
   # convert from day of year to year fraction
   pd_smooth[["x"]] <- pd_smooth[["x"]] / 366
   rm(pd_slope)
@@ -209,8 +221,7 @@ ebirdst_habitat <- function(path, ext, pis = NULL, pds = NULL, stixels = NULL) {
 
   # temporal smoothing of pis
   pi_smooth <- dplyr::select(pis, .data$predictor,
-                             x = .data$date, y = .data$importance,
-                             weight = .data$coverage)
+                             x = .data$date, y = .data$importance)
   # convert from day of year to year fraction
   pi_smooth[["x"]] <- pi_smooth[["x"]] / 366
   # log transform
@@ -324,6 +335,66 @@ plot.ebirdst_habitat <- function(x, n_predictors = 15,
 
 
 # internal functions ----
+
+pi_pd_stixel <- function(path, ext) {
+  if (missing(ext)) {
+    stop("A spatiotemporal extent must be provided.")
+  } else {
+    stopifnot(inherits(ext, "ebirdst_extent"))
+    if (!sf::st_is_longlat(ext$extent)) {
+      stop("Extent must provided in WGS84 lon-lat coordinates.")
+    }
+  }
+  # remove temporal component of extent
+  ext$t <- c(0, 1)
+  # spatial extent polygon
+  ext_poly <- ext$extent
+  if (ext$type == "bbox") {
+    ext_poly <- sf::st_as_sfc(ext_poly)
+  }
+  ext_poly <- sf::st_transform(ext_poly, crs = 4326)
+
+  # generate stixel polygons
+  stixels <- load_stixels(path = path, ext = ext)
+
+  if (nrow(stixels) == 0) {
+    warning("No stixels within the provided extent.")
+    return(NULL)
+  }
+
+  # convert stixels to polygons
+  stixels <- stixelize(stixels)
+  stixels$area <- sf::st_area(stixels)
+  stixels <- dplyr::select(stixels, .data$stixel_id, .data$area)
+
+  # calculate % of stixel within focal extent
+  stixels <- suppressWarnings(suppressMessages(
+    sf::st_make_valid(sf::st_intersection(stixels, ext_poly))
+  ))
+  stixels$area_in_extent <- sf::st_area(stixels)
+  stixels$coverage <- as.numeric(stixels$area_in_extent / stixels$area)
+  stixel_coverage <- sf::st_drop_geometry(stixels)
+  stixel_coverage <- dplyr::select(stixel_coverage,
+                                   .data$stixel_id,
+                                   .data$coverage)
+  rm(stixels)
+
+  # drop any stixels that cover less than 10% of the focal extent
+  stixel_coverage <- stixel_coverage[stixel_coverage$coverage >= 0.10, ]
+
+  # load pis and pds, occurrence only
+  if (!missing(path)) {
+    pis <- load_pis(path = path, ext = ext, model = "occurrence")
+    pds <- load_pds(path = path, ext = ext, model = "occurrence")
+  } else {
+    pis <- ebirdst_subset(pis, ext = ext)
+    pds <- ebirdst_subset(pds, ext = ext)
+  }
+
+  # drop stixels covering less than 10% of focal area, bring in % coverage
+  pis <- dplyr::inner_join(pis, stixel_coverage, by = "stixel_id")
+  pds <- dplyr::inner_join(pds, stixel_coverage, by = "stixel_id")
+}
 
 lm_slope <- function(data) {
   stopifnot(is.data.frame(data), ncol(data) == 2)

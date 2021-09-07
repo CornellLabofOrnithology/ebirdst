@@ -5,7 +5,7 @@
 \alias{plot.ebirdst_habitat}
 \title{eBird Status and Trends predictive habitat associations}
 \usage{
-ebirdst_habitat(path, ext, pis = NULL, pds = NULL, stixels = NULL)
+ebirdst_habitat(path, ext, data = NULL)
 
 \method{plot}{ebirdst_habitat}(x, n_predictors = 15, date_range = c(0, 1), ...)
 }
@@ -19,13 +19,17 @@ calculate the habitat associations. Note that \strong{temporal component of \cod
 is ignored is this function}, habitat associations are always calculated
 for the full year.}
 
-\item{pis, pds, stixels}{as an alternative to providing the \code{path} argument
-specifying the location of the data package, the data required to calculate
-habitat associations can be provided explicitly. PI, PD, and stixel data
-frames can provided, which come from the \code{load_pis()}, \code{load_pds()}, and
-\code{load_stixels()} functions, respectively. Ignored if \code{path} is provided.
-\strong{In most cases, users will want to avoid using these arguments and simply
-provide \code{path} instead.}}
+\item{data}{as an alternative to providing the \code{path} argument specifying the
+location of the data package, the data required to calculate habitat
+associations can be provided explicitly as a named list of three data
+frames: \code{pis} containing PI data from \code{\link[=load_pis]{load_pis()}}, \code{pds} containing PD
+data from \code{\link[=load_pds]{load_pds()}}, and \code{stixels} containing stixel weights in a
+\code{weight} column. All data should be provided at the stixel level,
+identified by the \code{stixel_id} column, and only those stixels appearing in
+the \code{stixels} data frame will be used. Typically stixel weights are the
+proportion of the focal region that the given stixel overlaps. Ignored if
+\code{path} is provided. \strong{In most cases, users will want to avoid using these
+arguments and simply provide \code{path} instead.}}
 
 \item{x}{\link{ebirdst_habitat} object; habitat relationships as calculated by
 \code{\link[=ebirdst_habitat]{ebirdst_habitat()}}.}
