@@ -140,9 +140,6 @@ ebirdst_habitat <- function(path, ext, data = NULL) {
                                      .data$weight)
     rm(stixels)
 
-    # drop any stixels that cover less than 10% of the focal extent
-    stixel_coverage <- stixel_coverage[stixel_coverage$weight >= 0.10, ]
-
     # load pis and pds, occurrence only
     pis <- load_pis(path = path, ext = ext, model = "occurrence")
     pds <- load_pds(path = path, ext = ext, model = "occurrence")
