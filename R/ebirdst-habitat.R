@@ -91,6 +91,7 @@ ebirdst_habitat <- function(path, ext, data = NULL) {
     col_names <- c("stixel_id", "weight")
     stopifnot(is.data.frame(stixel_coverage),
               all(col_names %in% names(stixel_coverage)))
+    ext <- NULL
   } else {
     stopifnot(is.character(path), length(path) == 1, dir.exists(path))
 
