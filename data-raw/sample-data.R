@@ -9,20 +9,20 @@ select <- dplyr::select
 
 # source data
 root_path <- rappdirs::user_data_dir("ebirdst")
-species <- "yebsap-ERD2019-STATUS-20200930-8d36d265"
+species <- "yebsap_erd2020"
 sp_path <- path(root_path, species)
 
 # destination
-ex_species <- paste0(species, "-example")
+ex_species <- paste0(species, "_example")
 ex_dir <- path(root_path, ex_species)
-ex_cubes_dir <- path(ex_dir, "weekly_cubes")
-ex_seasonal_dir <- path(ex_dir, "abundance_seasonal")
+ex_cubes_dir <- path(ex_dir, "cubes")
+ex_seasonal_dir <- path(ex_dir, "seasonal")
 dir_create(ex_dir)
 dir_create(ex_cubes_dir)
 dir_create(ex_seasonal_dir)
 
 # copy config file and databases
-dir_ls(sp_path, regexp = "(rds|db)$", recurse = FALSE, type = "file") %>%
+dir_ls(sp_path, regexp = "(json|db)$", recurse = FALSE, type = "file") %>%
   file_copy(ex_dir)
 
 # raster template
@@ -41,7 +41,7 @@ state_mi <- state_mi_ll %>%
 # crop and mask rasters
 tifs <- dir_ls(sp_path, regexp = "tif$", recurse = TRUE, type = "file")
 for (f in tifs) {
-  f_out <- str_replace_all(f, species, paste0(species, "-example"))
+  f_out <- str_replace_all(f, species, ex_species)
   r_ex <- f %>%
     stack() %>%
     crop(state_mi) %>%
@@ -49,11 +49,11 @@ for (f in tifs) {
     writeRaster(filename = f_out, overwrite = TRUE,
                 options = c("COMPRESS=DEFLATE","TILED=YES"))
 }
-file_copy(path(sp_path, "weekly_cubes", "band_dates.csv"),
-          path(ex_cubes_dir, "band_dates.csv"))
+dir_ls(path(sp_path, "cubes"), regexp = "csv$", recurse = FALSE, type = "file") %>%
+  file_copy(ex_cubes_dir)
 
 # database connections
-pipd_db <- path(ex_dir, "pi-pd.db")
+pipd_db <- path(ex_dir, "stixel_summary.db")
 pred_db <- path(ex_dir, "predictions.db")
 pipd_con <- dbConnect(SQLite(), pipd_db)
 pred_con <- dbConnect(SQLite(), pred_db)
@@ -94,7 +94,9 @@ stixels <- tbl(pipd_con, "stixel_summary") %>%
   st_drop_geometry()
 copy_to(pipd_con, stixels)
 # drop rows from other tables without out of bounds stixel centroids
-for (t in c("occ_pds", "occ_pis", "stixel_summary")) {
+for (t in c("occurrence_pds", "occurrence_pis",
+            "count_pds", "count_pis",
+            "stixel_summary")) {
   sql <- str_glue("DELETE FROM {t} WHERE stixel_id NOT IN ",
                   "(SELECT stixel_id FROM stixels);")
   dbSendStatement(pipd_con, sql)
