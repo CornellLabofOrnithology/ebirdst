@@ -1,4 +1,4 @@
-habitat_code,habitat_description,habitat_color,legend_order
+habitat_code,habitat_name,color,legend_order
 mcd12q1_lccs1_fs_c11,Evergreen Needleleaf Forests,#48D8AE,1
 mcd12q1_lccs1_fs_c12,Evergreen Broadleaf Forests,#19AB81,2
 mcd12q1_lccs1_fs_c13,Deciduous Needleleaf Forests,#88DA4A,3

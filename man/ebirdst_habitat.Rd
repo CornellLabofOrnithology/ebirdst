@@ -7,7 +7,7 @@
 \usage{
 ebirdst_habitat(path, ext, data = NULL)
 
-\method{plot}{ebirdst_habitat}(x, n_predictors = 15, date_range = c(0, 1), ...)
+\method{plot}{ebirdst_habitat}(x, n_habitat_types = 15, date_range = c(0, 1), ...)
 }
 \arguments{
 \item{path}{character; directory that the Status and Trends data for a given
@@ -34,9 +34,9 @@ arguments and simply provide \code{path} instead.}}
 \item{x}{\link{ebirdst_habitat} object; habitat relationships as calculated by
 \code{\link[=ebirdst_habitat]{ebirdst_habitat()}}.}
 
-\item{n_predictors}{number of predictors to include in the cake plot. The
-most important set of predictors will be chosen based on the maximum weekly
-importance value across the whole year.}
+\item{n_habitat_types}{number of habitat types to include in the cake plot.
+The most important set of predictors will be chosen based on the maximum
+weekly importance value across the whole year.}
 
 \item{date_range}{the range of dates for plotting; a 2-element vector of the
 start and end dates of the date range, provided either as dates (Date
@@ -57,6 +57,7 @@ the year. The columns are:
 See \link{ebirdst_weeks} to convert these values to ISO dates.
 \item \code{importance}: the relative importance of the predictor, these values are
 scaled so they sum to 1 within each week.
+\item \code{prob_pos_slope}: the predicted probability that the slope of the PD
 \item \code{direction}: the direction of the relationship, either 1 for a positive
 relationship, -1 for a negative relationship, or NA when the direction of
 the relationship is not significant.

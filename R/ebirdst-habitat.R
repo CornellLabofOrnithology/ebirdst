@@ -51,6 +51,8 @@
 #'   See [ebirdst_weeks] to convert these values to ISO dates.
 #'   - `importance`: the relative importance of the predictor, these values are
 #'   scaled so they sum to 1 within each week.
+#'   - `prob_pos_slope`: the predicted probability that the slope of the PD
+#    relationship for the given predictor is positive.
 #'   - `direction`: the direction of the relationship, either 1 for a positive
 #'   relationship, -1 for a negative relationship, or NA when the direction of
 #'   the relationship is not significant.
@@ -92,6 +94,7 @@ ebirdst_habitat <- function(path, ext, data = NULL) {
     stopifnot(is.data.frame(stixel_coverage),
               all(col_names %in% names(stixel_coverage)))
     ext <- NULL
+    rm(data)
   } else {
     stopifnot(is.character(path), length(path) == 1, dir.exists(path))
 
@@ -252,9 +255,9 @@ ebirdst_habitat <- function(path, ext, data = NULL) {
 
 #' @param x [ebirdst_habitat] object; habitat relationships as calculated by
 #'   [ebirdst_habitat()].
-#' @param n_predictors number of predictors to include in the cake plot. The
-#'   most important set of predictors will be chosen based on the maximum weekly
-#'   importance value across the whole year.
+#' @param n_habitat_types number of habitat types to include in the cake plot.
+#'   The most important set of predictors will be chosen based on the maximum
+#'   weekly importance value across the whole year.
 #' @param date_range the range of dates for plotting; a 2-element vector of the
 #'   start and end dates of the date range, provided either as dates (Date
 #'   objects or strings in ISO format "YYYY-MM-DD") or numbers between 0 and 1
@@ -265,11 +268,11 @@ ebirdst_habitat <- function(path, ext, data = NULL) {
 #'
 #' @export
 #' @rdname ebirdst_habitat
-plot.ebirdst_habitat <- function(x, n_predictors = 15,
+plot.ebirdst_habitat <- function(x, n_habitat_types = 15,
                                  date_range = c(0, 1),
                                  ...) {
-  stopifnot(is.numeric(n_predictors), length(n_predictors) == 1,
-            n_predictors > 0)
+  stopifnot(is.numeric(n_habitat_types), length(n_habitat_types) == 1,
+            n_habitat_types > 0)
 
   # convert temporal extent
   date_range <- process_t_extent(date_range)
@@ -282,13 +285,14 @@ plot.ebirdst_habitat <- function(x, n_predictors = 15,
   date_range <- from_srd_date(date_range)
 
   # subset to top predictors
-  x <- subset_top_predictors(x, n_predictors = n_predictors)
+  x <- subset_top_predictors(x, n_habitat_types = n_habitat_types)
 
   # max weekly stack height
   y_max <- dplyr::group_by(x, .data$date,
-                           direction = sign(.data$pi_direction))
+                           direction = sign(.data$habitat_association))
   y_max <- dplyr::summarise(y_max,
-                            height = sum(.data$pi_direction, na.rm = TRUE),
+                            height = sum(.data$habitat_association,
+                                         na.rm = TRUE),
                             .groups = "drop")
   y_max <- max(abs(y_max$height), na.rm = TRUE)
 
@@ -297,18 +301,19 @@ plot.ebirdst_habitat <- function(x, n_predictors = 15,
   x$iso_date <- w$date[match(x$date, w$week_midpoint)]
 
   # order by importance
-  x$predictor <- stats::reorder(x$predictor, x$pi_direction,
-                                FUN = function(x) {mean(abs(x))})
+  x$habitat_code <- stats::reorder(x$habitat_code,
+                                   x$habitat_association,
+                                   FUN = function(x) {mean(abs(x))})
   # get colors
-  hc <- habitat_colors[habitat_colors$habitat_code %in% x$predictor, ]
-  #hc$habitat_code <- factor(hc$habitat_code, levels = rev(levels(x$predictor)))
+  hc <- habitat_colors[habitat_colors$habitat_code %in% x$habitat_code, ]
   hc <- dplyr::arrange(hc, .data$legend_order)
 
   # cake plot
   g <- ggplot2::ggplot(x) +
-    ggplot2::aes_string(x = "iso_date", y = "pi_direction",
-                        fill = "predictor",
-                        group = "predictor", order = "predictor") +
+    ggplot2::aes_string(x = "iso_date", y = "habitat_association",
+                        fill = "habitat_code",
+                        group = "habitat_code",
+                        order = "habitat_code") +
     ggplot2::geom_area(colour = "white", size = 0.1) +
     ggplot2::geom_vline(xintercept = date_range[1], size = 0.25) +
     ggplot2::geom_vline(xintercept = date_range[2], size = 0.25) +
@@ -317,12 +322,12 @@ plot.ebirdst_habitat <- function(x, n_predictors = 15,
                           date_breaks = "1 month",
                           date_labels = "%b") +
     ggplot2::ylim(-y_max, y_max) +
-    ggplot2::scale_fill_manual(values = hc$habitat_color,
+    ggplot2::scale_fill_manual(values = hc$color,
                                breaks = hc$habitat_code,
-                               label = hc$habitat_description) +
+                               label = hc$habitat_name) +
     ggplot2::labs(x = NULL,
                   y = "Importance (+/-)",
-                  fill = "Predictor",
+                  fill = "Habitat",
                   title = "Habitat associations (occurrence model)") +
     ggplot2::theme_light() +
     ggplot2::theme(legend.key.size = ggplot2::unit(1, "line"))
@@ -333,66 +338,6 @@ plot.ebirdst_habitat <- function(x, n_predictors = 15,
 
 
 # internal functions ----
-
-pi_pd_stixel <- function(path, ext) {
-  if (missing(ext)) {
-    stop("A spatiotemporal extent must be provided.")
-  } else {
-    stopifnot(inherits(ext, "ebirdst_extent"))
-    if (!sf::st_is_longlat(ext$extent)) {
-      stop("Extent must provided in WGS84 lon-lat coordinates.")
-    }
-  }
-  # remove temporal component of extent
-  ext$t <- c(0, 1)
-  # spatial extent polygon
-  ext_poly <- ext$extent
-  if (ext$type == "bbox") {
-    ext_poly <- sf::st_as_sfc(ext_poly)
-  }
-  ext_poly <- sf::st_transform(ext_poly, crs = 4326)
-
-  # generate stixel polygons
-  stixels <- load_stixels(path = path, ext = ext)
-
-  if (nrow(stixels) == 0) {
-    warning("No stixels within the provided extent.")
-    return(NULL)
-  }
-
-  # convert stixels to polygons
-  stixels <- stixelize(stixels)
-  stixels$area <- sf::st_area(stixels)
-  stixels <- dplyr::select(stixels, .data$stixel_id, .data$area)
-
-  # calculate % of stixel within focal extent
-  stixels <- suppressWarnings(suppressMessages(
-    sf::st_make_valid(sf::st_intersection(stixels, ext_poly))
-  ))
-  stixels$area_in_extent <- sf::st_area(stixels)
-  stixels$coverage <- as.numeric(stixels$area_in_extent / stixels$area)
-  stixel_coverage <- sf::st_drop_geometry(stixels)
-  stixel_coverage <- dplyr::select(stixel_coverage,
-                                   .data$stixel_id,
-                                   .data$coverage)
-  rm(stixels)
-
-  # drop any stixels that cover less than 10% of the focal extent
-  stixel_coverage <- stixel_coverage[stixel_coverage$coverage >= 0.10, ]
-
-  # load pis and pds, occurrence only
-  if (!missing(path)) {
-    pis <- load_pis(path = path, ext = ext, model = "occurrence")
-    pds <- load_pds(path = path, ext = ext, model = "occurrence")
-  } else {
-    pis <- ebirdst_subset(pis, ext = ext)
-    pds <- ebirdst_subset(pds, ext = ext)
-  }
-
-  # drop stixels covering less than 10% of focal area, bring in % coverage
-  pis <- dplyr::inner_join(pis, stixel_coverage, by = "stixel_id")
-  pds <- dplyr::inner_join(pds, stixel_coverage, by = "stixel_id")
-}
 
 lm_slope <- function(data) {
   stopifnot(is.data.frame(data), ncol(data) == 2)
@@ -466,7 +411,7 @@ train_check <- function(x, x_train, x_range, check_width) {
   return(pass)
 }
 
-subset_top_predictors <- function(x, n_predictors = 15) {
+subset_top_predictors <- function(x, n_habitat_types = 15) {
   # bring in pretty names
   lc <- dplyr::select(ebirdst::ebirdst_predictors,
                       predictor = .data$predictor_tidy,
@@ -476,36 +421,38 @@ subset_top_predictors <- function(x, n_predictors = 15) {
   x <- dplyr::inner_join(lc, x, by = "predictor")
 
   # multiply importance and direction, fill with zeros
-  x$pi_direction <- dplyr::coalesce(x$importance * x$direction, 0)
+  x$habitat_association <- dplyr::coalesce(x$importance * x$direction, 0)
 
   # group roads
   x <- dplyr::group_by(x,
-                       predictor = .data$lc_class,
-                       label = .data$lc_class_label,
+                       habitat_code = .data$lc_class,
+                       habitat_name = .data$lc_class_label,
                        .data$date)
   x <- dplyr::summarise(x,
                         importance = sum(.data$importance, na.rm = TRUE),
-                        pi_direction = sum(.data$pi_direction, na.rm = TRUE),
+                        habitat_association = sum(.data$habitat_association,
+                                                  na.rm = TRUE),
                         .groups = "drop")
 
   # no significant associations
-  if (all(is.na(x$pi_direction))) {
+  if (all(is.na(x$habitat_association))) {
     warning("No significant habitat associations")
     return(x[NULL, ])
   }
 
   # pick top predictors based on max importance across weeks
-  top_pis <- dplyr::group_by(x[abs(x$pi_direction) > 0, ], .data$predictor)
+  top_pis <- dplyr::group_by(x[abs(x$habitat_association) > 0, ],
+                             .data$habitat_code)
   top_pis <- dplyr::summarise(top_pis,
                               importance = max(.data$importance),
                               .groups = "drop")
   top_pis <- dplyr::top_n(top_pis,
-                          n = min(n_predictors, nrow(top_pis)),
+                          n = min(n_habitat_types, nrow(top_pis)),
                           wt = .data$importance)
   # ensure there's always 15 at most
   top_pis <- dplyr::arrange(top_pis, -.data$importance)
   top_pis <- utils::head(top_pis, 15)
 
   # subset to top predictors
-  x[x$predictor %in% top_pis$predictor, ]
+  x[x$habitat_code %in% top_pis$habitat_code, ]
 }
