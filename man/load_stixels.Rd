@@ -33,7 +33,7 @@ loads summary statistics for each stixel, for example, the size of the
 stixels and the number of observations within each stixel.
 }
 \examples{
-\donttest{
+\dontrun{
 # download example data
 path <- ebirdst_download("example_data", tifs_only = FALSE)
 # or get the path if you already have the data downloaded

@@ -88,7 +88,7 @@ given land cover class and the position above or below the x-axis indicates
 the direction of the relationship.
 }
 \examples{
-\donttest{
+\dontrun{
 # download example data
 path <- ebirdst_download("example_data", tifs_only = FALSE)
 # or get the path if you already have the data downloaded

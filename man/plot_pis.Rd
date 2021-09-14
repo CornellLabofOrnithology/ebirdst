@@ -44,7 +44,7 @@ model. Predictors are plotted in order from highest to lowest importance.
 Many function parameters allow for customized plots.
 }
 \examples{
-\donttest{
+\dontrun{
 # download example data
 path <- ebirdst_download("example_data", tifs_only = FALSE)
 # or get the path if you already have the data downloaded

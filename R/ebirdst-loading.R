@@ -363,7 +363,7 @@ load_raster <- function(path,
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # download example data
 #' path <- ebirdst_download("example_data", tifs_only = FALSE)
 #' # or get the path if you already have the data downloaded
@@ -469,7 +469,7 @@ load_pis <- function(path, ext, return_sf = FALSE) {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # download example data
 #' path <- ebirdst_download("example_data", tifs_only = FALSE)
 #' # or get the path if you already have the data downloaded
@@ -564,7 +564,7 @@ load_pds <- function(path, ext, return_sf = FALSE) {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # download example data
 #' path <- ebirdst_download("example_data", tifs_only = FALSE)
 #' # or get the path if you already have the data downloaded
@@ -643,7 +643,7 @@ load_stixels <- function(path, ext, return_sf = FALSE) {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # download example data
 #' path <- ebirdst_download("example_data", tifs_only = FALSE)
 #' # or get the path if you already have the data downloaded
@@ -696,7 +696,7 @@ load_predictions <- function(path, return_sf = FALSE) {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # download example data
 #' path <- ebirdst_download("example_data")
 #' # or get the path if you already have the data downloaded
@@ -739,7 +739,7 @@ load_config <- function(path) {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # download example data
 #' path <- ebirdst_download("example_data", tifs_only = FALSE)
 #' # or get the path if you already have the data downloaded

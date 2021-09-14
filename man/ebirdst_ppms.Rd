@@ -69,7 +69,7 @@ using \code{\link[=ebirdst_subset]{ebirdst_subset()}}. This process is performed
 iterations resulting in 25 estimates of each PPM.
 }
 \examples{
-\donttest{
+\dontrun{
 # download example data
 path <- ebirdst_download("example_data", tifs_only = FALSE)
 # or get the path if you already have the data downloaded

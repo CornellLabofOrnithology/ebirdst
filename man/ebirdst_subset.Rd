@@ -41,7 +41,7 @@ The spatiotemporal extent should be defined using \code{\link[=ebirdst_extent]{e
 }}
 
 \examples{
-\donttest{
+\dontrun{
 # download example data
 path <- ebirdst_download("example_data")
 # or get the path if you already have the data downloaded

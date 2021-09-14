@@ -19,7 +19,7 @@
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # download example data
 #' path <- ebirdst_download("example_data", tifs_only = FALSE)
 #' # or get the path if you already have the data downloaded
@@ -107,7 +107,7 @@ stixelize.sf <- function(x) {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # download example data
 #' path <- ebirdst_download("example_data")
 #' # or get the path if you already have the data downloaded

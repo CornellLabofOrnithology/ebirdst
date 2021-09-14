@@ -35,7 +35,7 @@ identified by a unique stixel ID in addition to the coordinates of the stixel
 centroid. PI estimates are for the occurrence model only.
 }
 \examples{
-\donttest{
+\dontrun{
 # download example data
 path <- ebirdst_download("example_data", tifs_only = FALSE)
 # or get the path if you already have the data downloaded
