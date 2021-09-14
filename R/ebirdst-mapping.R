@@ -27,7 +27,7 @@
 #' raster::extent(r)
 #' calc_full_extent(r)
 #'
-#' \donttest{
+#' \dontrun{
 #' # download example data
 #' path <- ebirdst_download("example_data")
 #' # or get the path if you already have the data downloaded
@@ -103,7 +103,7 @@ calc_full_extent <- function(x, aggregate = TRUE) {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # download example data
 #' path <- ebirdst_download("example_data")
 #' # or get the path if you already have the data downloaded

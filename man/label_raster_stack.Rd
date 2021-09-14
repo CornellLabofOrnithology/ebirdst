@@ -23,7 +23,7 @@ convenience, this function labels the layers of a data cube once it has been
 loaded with the week dates for each band.
 }
 \examples{
-\donttest{
+\dontrun{
 # download and load example abundance data
 sp_path <- ebirdst_download("example_data")
 abd <- load_raster(sp_path, "abundance")

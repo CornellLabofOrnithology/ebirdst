@@ -16,7 +16,7 @@
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # download and load example abundance data
 #' sp_path <- ebirdst_download("example_data")
 #' abd <- load_raster(sp_path, "abundance")
@@ -67,7 +67,7 @@ label_raster_stack <- function(x) {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # download and load example abundance data
 #' sp_path <- ebirdst_download("example_data")
 #' abd <- load_raster(sp_path, "abundance")

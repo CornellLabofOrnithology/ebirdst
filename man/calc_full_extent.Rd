@@ -35,7 +35,7 @@ r[5025:5075] <- 1
 raster::extent(r)
 calc_full_extent(r)
 
-\donttest{
+\dontrun{
 # download example data
 path <- ebirdst_download("example_data")
 # or get the path if you already have the data downloaded

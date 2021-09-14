@@ -30,7 +30,7 @@ according to the relative abundance distribution. To access pre-calculated
 bins for the full annual cycle use \code{\link[=load_fac_map_parameters]{load_fac_map_parameters()}}.
 }
 \examples{
-\donttest{
+\dontrun{
 # download example data
 path <- ebirdst_download("example_data")
 # or get the path if you already have the data downloaded

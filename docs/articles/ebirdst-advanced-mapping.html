@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.2</span>
       </span>
     </div>
 
@@ -87,13 +87,13 @@
 
       
 
-      </header><script src="ebirdst-advanced-mapping_files/header-attrs-2.9/header-attrs.js"></script><div class="row">
+      </header><script src="ebirdst-advanced-mapping_files/header-attrs-2.10/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Generating Seasonal Abundance and Range Maps and Stats</h1>
                         <h4 data-toc-skip class="author">Matt Strimas-Mackey, Tom Auer, Daniel Fink</h4>
             
-            <h4 data-toc-skip class="date">2021-08-12</h4>
+            <h4 data-toc-skip class="date">2021-09-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-advanced-mapping.Rmd" class="external-link"><code>vignettes/ebirdst-advanced-mapping.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-advanced-mapping.Rmd</code></div>
@@ -130,7 +130,9 @@
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>
 <span class="co"># resolve namespace conflicts</span>
-<span class="va">select</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="va"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span></code></pre></div>
+<span class="va">select</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="va"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span>
+<span class="fu"><a href="https://r-spatial.github.io/sf/reference/s2.html" class="external-link">sf_use_s2</a></span><span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span>
+<span class="co">#&gt; Spherical geometry (s2) switched off</span></code></pre></div>
 </div>
 <div id="data-download" class="section level1">
 <h1 class="hasAnchor">
@@ -142,52 +144,36 @@
 <span class="co"># this automatically labels layers with their dates</span>
 <span class="va">abd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">sp_path</span>, <span class="st">"abundance"</span><span class="op">)</span></code></pre></div>
 <p>The abundance data now consist of a <code>RasterStack</code> object with 52 layers, each corresponding to the relative abundance for a single week.</p>
-<p>We’ll also need some additional spatial data (state and country borders, lakes, etc.) to provide context for the maps we’ll make. <a href="https://www.naturalearthdata.com/" class="external-link">Natural Earth</a> is the best source for free map data and there’s an associated R package (<code>rnaturalearth</code>) for accessing the data. For all the maps in this vignette, we’ll use the Eckert IV projection, a good option for continental scale maps.</p>
+<p>We’ll also need some additional spatial data (state and country borders, lakes, etc.) to provide context for the maps we’ll make. <a href="https://www.naturalearthdata.com/" class="external-link">Natural Earth</a> is the best source for free map data and there’s an associated R package (<code>rnaturalearth</code>) for accessing the data. However, we’ll work with a prepared subset of the data stored in the <code>ebirdst</code> GitHub repository. For all the maps in this vignette, we’ll use the Eckert IV projection, a good option for continental scale maps.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">proj</span> <span class="op">&lt;-</span> <span class="st">"+proj=eck4 +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"</span>
-<span class="va">ne_scale</span> <span class="op">&lt;-</span> <span class="fl">50</span>
+
+<span class="co"># download natural earth data</span>
+<span class="va">temp_gpkg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".gpkg"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"https://github.com/CornellLabofOrnithology/ebirdst/raw/"</span>,
+          <span class="st">"master/data-raw/ebirdst_gis-data.gpkg"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="va">temp_gpkg</span><span class="op">)</span>
 
 <span class="co"># land polygon</span>
-<span class="va">ne_land</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rnaturalearth/man/ne_countries.html" class="external-link">ne_countries</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="va">ne_scale</span>, returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">continent</span> <span class="op"><a href="https://rdrr.io/pkg/raster/man/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"North America"</span>, <span class="st">"South America"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_precision.html" class="external-link">st_set_precision</a></span><span class="op">(</span><span class="fl">1e6</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/valid.html" class="external-link">st_make_valid</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_union</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+<span class="va">ne_land</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">read_sf</a></span><span class="op">(</span><span class="va">temp_gpkg</span>, layer <span class="op">=</span> <span class="st">"ne_land"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="va">proj</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co"># function to subset other features to those  within this land area</span>
-<span class="va">wh_subset</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">in_wh</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">st_intersects</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">ne_land</span>, sparse <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span>
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="va">in_wh</span><span class="op">]</span>, crs <span class="op">=</span> <span class="va">proj</span><span class="op">)</span>
-<span class="op">}</span>
 <span class="co"># country lines</span>
-<span class="va">ne_country_lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rnaturalearth/man/ne_download.html" class="external-link">ne_download</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="va">ne_scale</span>, category <span class="op">=</span> <span class="st">"cultural"</span>,
-                                type <span class="op">=</span> <span class="st">"admin_0_boundary_lines_land"</span>,
-                                returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/valid.html" class="external-link">st_make_valid</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu">wh_subset</span><span class="op">(</span><span class="op">)</span>
+<span class="va">ne_country_lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">read_sf</a></span><span class="op">(</span><span class="va">temp_gpkg</span>, layer <span class="op">=</span> <span class="st">"ne_country_lines"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="va">proj</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co"># state lines</span>
-<span class="va">ne_state_lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rnaturalearth/man/ne_download.html" class="external-link">ne_download</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="va">ne_scale</span>, category <span class="op">=</span> <span class="st">"cultural"</span>,
-                              type <span class="op">=</span> <span class="st">"admin_1_states_provinces_lines"</span>,
-                              returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/valid.html" class="external-link">st_make_valid</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu">wh_subset</span><span class="op">(</span><span class="op">)</span>
+<span class="va">ne_state_lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">read_sf</a></span><span class="op">(</span><span class="va">temp_gpkg</span>, layer <span class="op">=</span> <span class="st">"ne_state_lines"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="va">proj</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co"># rivers</span>
-<span class="va">ne_rivers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rnaturalearth/man/ne_download.html" class="external-link">ne_download</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="va">ne_scale</span>, category <span class="op">=</span> <span class="st">"physical"</span>,
-                         type <span class="op">=</span> <span class="st">"rivers_lake_centerlines"</span>,
-                         returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/valid.html" class="external-link">st_make_valid</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu">wh_subset</span><span class="op">(</span><span class="op">)</span>
+<span class="va">ne_rivers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">read_sf</a></span><span class="op">(</span><span class="va">temp_gpkg</span>, layer <span class="op">=</span> <span class="st">"ne_rivers"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="va">proj</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co"># lakes</span>
-<span class="va">ne_lakes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rnaturalearth/man/ne_download.html" class="external-link">ne_download</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="va">ne_scale</span>, category <span class="op">=</span> <span class="st">"physical"</span>,
-                        type <span class="op">=</span> <span class="st">"lakes"</span>,
-                        returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/valid.html" class="external-link">st_make_valid</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu">wh_subset</span><span class="op">(</span><span class="op">)</span>
-<span class="va">ne_land</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">ne_land</span>, crs <span class="op">=</span> <span class="va">proj</span><span class="op">)</span></code></pre></div>
+<span class="va">ne_lakes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">read_sf</a></span><span class="op">(</span><span class="va">temp_gpkg</span>, layer <span class="op">=</span> <span class="st">"ne_lakes"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="va">proj</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="seasonal-abundance" class="section level1">
 <h1 class="hasAnchor">

@@ -1,6 +1,6 @@
-# ebirdst 0.3.1
+# ebirdst 0.3.2
 
-- prevent tests and examples from leaving files behind to pass CRAN checks
+- again try to prevent tests and examples from leaving files behind to pass CRAN checks
 
 ## Test environments
 
@@ -13,4 +13,8 @@
 
 ## R CMD check results
 
-0 errors | 0 warnings | 0 notes
+0 errors | 0 warnings | 2 notes
+
+notes:
+- eBird was incorrectly identified as a misspelled word
+- this release should fix the CRAN policy violation that caused the package to be archived

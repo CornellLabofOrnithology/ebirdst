@@ -19,7 +19,7 @@ week dates in the format of "wYYYY.MM.DD", because of constraints in the
 compliant Date vector.
 }
 \examples{
-\donttest{
+\dontrun{
 # download and load example abundance data
 sp_path <- ebirdst_download("example_data")
 abd <- load_raster(sp_path, "abundance")
