@@ -24,7 +24,7 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -50,7 +50,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
     Vignettes
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
@@ -79,7 +79,7 @@
 <li>
   <a href="https://github.com/CornellLabofOrnithology/ebirdst/">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul>
@@ -90,7 +90,7 @@
 </div>
 <!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="contents col-md-9">
@@ -106,7 +106,7 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># install.packages("remotes")</span>
 <span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"CornellLabofOrnithology/ebirdst"</span><span class="op">)</span></code></pre></div>
-<p>The current version of <code>ebirdst</code> is designed for working with the eBird Status and Trends data products that make estimates for 2019, with visualizations being released on the web in December 2020, and data access being made available in August 2021. <strong>Users are strongly discouraged from comparing Status and Trends results between years due to methodological differences between versions.</strong> To request access to previous versions, please contact <a href="mailto:ebird@cornell.edu" class="email">ebird@cornell.edu</a>.</p>
+<p>The current version of <code>ebirdst</code> is designed for working with the eBird Status and Trends data products that make estimates for 2019, with visualizations being released on the web in December 2020, and data access being made available in August 2021. <strong>Users are strongly discouraged from comparing Status and Trends results between years due to methodological differences between versions.</strong>  If you have accessed and used previous versions and/or may need access to previous versions for reasons related to reproducibility, please contact <a href="mailto:ebird@cornell.edu" class="email">ebird@cornell.edu</a> and your request will be considered.</p>
 </div>
 <div id="data-access" class="section level2">
 <h2 class="hasAnchor">
@@ -185,8 +185,8 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
 <span class="co"># get reference data from the rnaturalearth package</span>
 <span class="co"># the example data currently shows only the US state of Michigan</span>
 <span class="va">wh_states</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rnaturalearth/man/ne_states.html" class="external-link">ne_states</a></span><span class="op">(</span>country <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"United States of America"</span>, <span class="st">"Canada"</span><span class="op">)</span>,
-                       returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="va">crs</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> 
+                       returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="va">crs</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="co"># start plotting</span>
@@ -216,7 +216,7 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
 <span class="fu"><a href="https://rdrr.io/pkg/fields/man/image.plot.html" class="external-link">image.plot</a></span><span class="op">(</span>zlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, breaks <span class="op">=</span> <span class="va">label_breaks</span>, col <span class="op">=</span> <span class="va">pal</span>,
            smallplot <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.90</span>, <span class="fl">0.93</span>, <span class="fl">0.15</span>, <span class="fl">0.85</span><span class="op">)</span>,
            legend.only <span class="op">=</span> <span class="cn">TRUE</span>,
-           axis.args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.5</span>, <span class="fl">1</span><span class="op">)</span>, 
+           axis.args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.5</span>, <span class="fl">1</span><span class="op">)</span>,
                             labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">labels</span>, <span class="fl">2</span><span class="op">)</span>,
                             cex.axis <span class="op">=</span> <span class="fl">0.9</span>, lwd.ticks <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="reference/figures/README-quick_start-1.png" width="100%"></p>
@@ -299,10 +299,10 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
       </footer>
 </div>
 
-  
 
 
-  
+
+
 
   </body>
 </html>

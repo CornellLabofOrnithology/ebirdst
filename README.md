@@ -26,8 +26,7 @@ Status and Trends data products that make estimates for 2019, with
 visualizations being released on the web in December 2020, and data
 access being made available in August 2021. **Users are strongly
 discouraged from comparing Status and Trends results between years due
-to methodological differences between versions.** To request access to
-previous versions, please contact <ebird@cornell.edu>.
+to methodological differences between versions.** If you have accessed and used previous versions and/or may need access to previous versions for reasons related to reproducibility, please contact <ebird@cornell.edu> and your request will be considered.
 
 ## Data access
 
