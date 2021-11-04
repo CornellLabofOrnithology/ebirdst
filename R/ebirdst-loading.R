@@ -80,9 +80,9 @@ ebirdst_download <- function(species,
                    drop = FALSE]
   } else {
     species <- get_species(species)
-    which_run <- which(ebirdst::ebirdst_runs$species_code == species)
-    run <- ebirdst::ebirdst_runs$run_name[which_run]
-    if (is.na(run) || length(run) != 1) {
+    run <- dplyr::filter(ebirdst::ebirdst_runs,
+                         .data$species_code == species)
+    if (nrow(run) != 1) {
       stop("species does not uniquely identify a Status and Trends run.")
     }
 
