@@ -54,10 +54,6 @@ plot_pis <- function(pis, ext,
   stopifnot(is.logical(pretty_names), length(pretty_names) == 1)
   stopifnot(is.logical(plot), length(plot) == 1)
 
-  if (all(c(0, 1) == round(ext$t, 2))) {
-    stop("Must subset temporally, results not meaningful for full year.")
-  }
-
   # subset
   pis <- ebirdst_subset(pis, ext = ext)
   pis <- pis[, ebirdst::ebirdst_predictors$predictor_tidy]
@@ -214,9 +210,7 @@ plot_pds <- function(pds, predictor, ext,
             ci_alpha > 0, ci_alpha < 0.5)
   stopifnot(is_integer(gbm_n_trees), length(gbm_n_trees) == 1, gbm_n_trees > 0)
   stopifnot(is.logical(plot), length(plot) == 1)
-  if (all(c(0, 1) == round(ext$t, 2))) {
-    stop("Must subset temporally, results not meaningful for full year.")
-  }
+
   if (!is.null(ylim)) {
     stopifnot(is.numeric(ylim), length(ylim) == 2, ylim[1] < ylim[2])
   }
