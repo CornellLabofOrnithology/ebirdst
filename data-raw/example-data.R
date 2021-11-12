@@ -118,4 +118,5 @@ for (f in to_compress) {
 
 # file list
 dir_ls(repo_dir, type = "file", recurse = TRUE) %>%
+  str_remove("example-data/") %>%
   write_lines("example-data/file-list.txt")
