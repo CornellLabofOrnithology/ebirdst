@@ -3,6 +3,7 @@ library(fs)
 library(sf)
 library(rnaturalearth)
 library(tidyverse)
+library(glue)
 library(DBI)
 library(RSQLite)
 select <- dplyr::select
@@ -102,3 +103,19 @@ for (t in c("occ_pds", "occ_pis", "stixel_summary")) {
 dbSendStatement(pipd_con, "DROP TABLE stixels;")
 dbSendStatement(pipd_con, "vacuum;")
 dbDisconnect(pipd_con)
+
+# copy to repo dir ---
+
+repo_dir <- path("example-data", basename(ex_dir))
+dir_copy(ex_dir, "example-data/")
+
+# compress db files to meet GH size constrains
+to_compress <- dir_ls(repo_dir, glob = "*.db")
+for (f in to_compress) {
+  zip(paste0(f, ".zip"), f)
+  file_delete(f)
+}
+
+# file list
+dir_ls(repo_dir, type = "file", recurse = TRUE) %>%
+  write_lines("example-data/file-list.txt")
