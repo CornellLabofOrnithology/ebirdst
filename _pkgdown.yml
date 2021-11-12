@@ -22,7 +22,7 @@ navbar:
       href: reference/index.html
     statuschanges:
       text: Changelog
-      href: articles/product-changelog.html
+      href: articles/product-changelog.html#2019-changelog
     news:
       text: Version History
       href: news/index.html
