@@ -125,10 +125,6 @@ test_that("plot_pis", {
   expect_error(plot_pis(pis = pis))
   expect_error(plot_pis(pis = 1:10, ext = e))
   expect_error(plot_pis(pis = data.frame(), ext = e))
-
-  # missing temporal info
-  nt <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 45))
-  expect_error(plot_pis(pis = pis, ext = nt))
 })
 
 test_that("plot_pds", {
@@ -146,8 +142,4 @@ test_that("plot_pds", {
   expect_error(plot_pds(pds, "invalid_pred", ext = e))
   expect_error(plot_pds(pds = 1:10, ext = e))
   expect_error(plot_pds(pds = data.frame(), ext = e))
-
-  # missing temporal info
-  nt <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 45))
-  expect_error(plot_pds(pds, "solar_noon_diff", ext = nt, n_bs = 5))
 })
