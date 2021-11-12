@@ -58,26 +58,11 @@ ebirdst_download <- function(species,
 
   # example data or a real run
   if (species == "example_data") {
-    api_url <- "https://ebirdst-data.s3.amazonaws.com/"
-    run <- "yebsap-ERD2019-STATUS-20200930-8d36d265-example"
-    bucket_url_sp <- paste0(api_url, "?prefix=", run)
-
-    # get bucket contents
-    s3_contents <- xml2::xml_ns_strip(xml2::read_xml(bucket_url_sp))
-    s3_contents <- xml2::xml_find_all(s3_contents, ".//Contents")
-    if (length(s3_contents) == 0) {
-      stop(sprintf("Files not found on AWS S3 for species = %s", species))
-    }
-
-    # store filename and size
-    files <- data.frame(
-      file = xml2::xml_text(xml2::xml_find_all(s3_contents, ".//Key")),
-      size = xml2::xml_text(xml2::xml_find_all(s3_contents, ".//Size")))
-    files$size <- as.numeric(files$size)
-
-    # filter to desired run/species
-    files <- files[as.numeric(files$size) > 0 & grepl(run, files$file), ,
-                   drop = FALSE]
+    run_path <- dl_example_data(path = path,
+                                tifs_only = tifs_only,
+                                force = force,
+                                show_progress = show_progress)
+    return(invisible(run_path))
   } else {
     species <- get_species(species)
     which_run <- which(ebirdst::ebirdst_runs$species_code == species)
@@ -143,7 +128,7 @@ ebirdst_download <- function(species,
   # download
   old_timeout <- getOption("timeout")
   options(timeout = max(3000, old_timeout))
-  for(i in seq_len(nrow(files))) {
+  for (i in seq_len(nrow(files))) {
     dl_response <- utils::download.file(files$src_path[i],
                                         files$dest_path[i],
                                         quiet = !show_progress,
@@ -788,4 +773,60 @@ sql_extent_subset <- function(ext) {
     }
   }
   return(sql)
+}
+
+
+dl_example_data <- function(path, tifs_only, force, show_progress) {
+  base_dir <- paste0("https://raw.githubusercontent.com/CornellLabofOrnithology/",
+                     "ebirdst/master/example-data/")
+  # get file list from github
+  fl <- system.file("extdata", "example-data_file-list.txt",
+                    package = "ebirdst")
+  files <- readLines(fl)
+  run <- stringr::str_split(files[1], "/")[[1]][1]
+  run_path <- normalizePath(file.path(path, run), mustWork = FALSE)
+  dir.create(run_path, recursive = TRUE, showWarnings = FALSE)
+
+  # drop database files
+  if (isTRUE(tifs_only)) {
+    files <- files[!stringr::str_detect(files, "\\.zip$")]
+  }
+
+  # check for files already existing
+  dst_files <- file.path(path, files)
+  dst_files <- stringr::str_remove(dst_files, "\\.zip$")
+  fe <- file.exists(dst_files)
+  if (any(fe)) {
+    if (isTRUE(force)) {
+      file.remove(dst_files[fe])
+    } else {
+      files <- files[!fe]
+      if (length(files) == 0) {
+        message("Example data already downloaded")
+        return(invisible(run_path))
+      }
+    }
+  }
+
+  # download
+  src_files <- file.path(base_dir, files)
+  dst_files <- file.path(path, files)
+  for (d in unique(dirname(dst_files))) {
+    dir.create(d, recursive = TRUE, showWarnings = FALSE)
+  }
+  for (i in seq_along(src_files)) {
+    dl_response <- utils::download.file(src_files[i], dst_files[i],
+                                        quiet = !show_progress,
+                                        mode = "wb")
+    if (dl_response != 0) {
+      stop("Error downloading file: ", files[i])
+    }
+    # unzip
+    if (stringr::str_detect(dst_files[i], "\\.zip")) {
+      uz <- utils::unzip(dst_files[i], exdir = dirname(dst_files[i]))
+      fm <- file.remove(dst_files[i])
+    }
+  }
+
+  return(invisible(run_path))
 }

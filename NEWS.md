@@ -1,3 +1,7 @@
+# ebirdst 0.3.3
+
+- move example data to GitHub
+
 # ebirdst 0.3.2
 
 - again try to prevent tests and examples from leaving files behind to pass CRAN checks

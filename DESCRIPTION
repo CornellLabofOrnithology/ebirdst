@@ -1,7 +1,7 @@
 Type: Package
 Package: ebirdst
 Title: Access and Analyze eBird Status and Trends Data
-Version: 0.3.2
+Version: 0.3.3
 Authors@R: 
     c(person(given = "Matthew",
              family = "Strimas-Mackey",
@@ -73,4 +73,4 @@ VignetteBuilder:
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2

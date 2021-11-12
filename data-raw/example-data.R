@@ -111,12 +111,17 @@ dir_copy(ex_dir, "example-data/")
 
 # compress db files to meet GH size constrains
 to_compress <- dir_ls(repo_dir, glob = "*.db")
+wd <- getwd()
 for (f in to_compress) {
-  zip(paste0(f, ".zip"), f)
-  file_delete(f)
+  setwd(dirname(to_compress))
+  zip(paste0(basename(f), ".zip"), basename(f))
+  file_delete(basename(f))
+  setwd(wd)
 }
 
 # file list
-dir_ls(repo_dir, type = "file", recurse = TRUE) %>%
-  str_remove("example-data/") %>%
-  write_lines("example-data/file-list.txt")
+file_list <- dir_ls(repo_dir, type = "file", recurse = TRUE) %>%
+  str_remove("example-data/")
+write_lines(file_list, "example-data/file-list.txt")
+dir.create("inst/extdata")
+write_lines(file_list, "inst/extdata/example-data_file-list.txt")
