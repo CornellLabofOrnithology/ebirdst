@@ -13,10 +13,11 @@ species is can be viewed in the \link{ebirdst_runs} data frame included in this
 package. To download the example dataset, use "example_data".}
 
 \item{path}{character; directory to download the data to. All downloaded
-files will be placed in a sub-directory of this directory named according
-to the unique run ID associated with this species. Defaults to a persistent
-data directory, which can be found by calling
-rappdirs::user_data_dir("ebirdst")).}
+files will be placed in a sub-directory of this directory named for the
+data version, e.g. "v2020" for the 2020 Status Data Products. Each species'
+data package will then appear in a directory named with the eBird species
+code. Defaults to a persistent data directory, which can be found by
+calling rappdirs::user_data_dir("ebirdst")).}
 }
 \value{
 The path to the data package directory.

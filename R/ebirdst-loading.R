@@ -13,10 +13,11 @@
 #'   species is can be viewed in the [ebirdst_runs] data frame included in this
 #'   package. To download the example dataset, use "example_data".
 #' @param path character; directory to download the data to. All downloaded
-#'   files will be placed in a sub-directory of this directory named according
-#'   to the unique run ID associated with this species. Defaults to a persistent
-#'   data directory, which can be found by calling
-#'   rappdirs::user_data_dir("ebirdst")).
+#'   files will be placed in a sub-directory of this directory named for the
+#'   data version, e.g. "v2020" for the 2020 Status Data Products. Each species'
+#'   data package will then appear in a directory named with the eBird species
+#'   code. Defaults to a persistent data directory, which can be found by
+#'   calling rappdirs::user_data_dir("ebirdst")).
 #' @param tifs_only logical; whether to only download the GeoTIFFs for
 #'   abundance and occurrence (the default), or download the entire data
 #'   package, including data for predictor importance, partial dependence, and
@@ -33,7 +34,7 @@
 #' @examples
 #' \dontrun{
 #' # download the example data
-#' ebirdst_download("example_data")
+#' ebirdst_download("example_data", tifs_only = F)
 #'
 #' # download the data package for wood thrush, geotiffs only
 #' ebirdst_download("woothr")
@@ -52,32 +53,19 @@ ebirdst_download <- function(species,
   stopifnot(is.logical(show_progress), length(show_progress) == 1)
   species <- tolower(species)
 
+  # append version to path
+  path <- file.path(path, paste0("v", ebirdst_version()["data_version"]))
   if (!dir.exists(path)) {
     dir.create(path, recursive = TRUE)
   }
 
   # example data or a real run
   if (species == "example_data") {
-    api_url <- "https://ebirdst-data.s3.amazonaws.com/"
-    run <- "yebsap-ERD2019-STATUS-20200930-8d36d265-example"
-    bucket_url_sp <- paste0(api_url, "?prefix=", run)
-
-    # get bucket contents
-    s3_contents <- xml2::xml_ns_strip(xml2::read_xml(bucket_url_sp))
-    s3_contents <- xml2::xml_find_all(s3_contents, ".//Contents")
-    if (length(s3_contents) == 0) {
-      stop(sprintf("Files not found on AWS S3 for species = %s", species))
-    }
-
-    # store filename and size
-    files <- data.frame(
-      file = xml2::xml_text(xml2::xml_find_all(s3_contents, ".//Key")),
-      size = xml2::xml_text(xml2::xml_find_all(s3_contents, ".//Size")))
-    files$size <- as.numeric(files$size)
-
-    # filter to desired run/species
-    files <- files[as.numeric(files$size) > 0 & grepl(run, files$file), ,
-                   drop = FALSE]
+    run_path <- dl_example_data(path = path,
+                                tifs_only = tifs_only,
+                                force = force,
+                                show_progress = show_progress)
+    return(invisible(run_path))
   } else {
     species <- get_species(species)
     run <- dplyr::filter(ebirdst::ebirdst_runs,
@@ -143,7 +131,7 @@ ebirdst_download <- function(species,
   # download
   old_timeout <- getOption("timeout")
   options(timeout = max(3000, old_timeout))
-  for(i in seq_len(nrow(files))) {
+  for (i in seq_len(nrow(files))) {
     dl_response <- utils::download.file(files$src_path[i],
                                         files$dest_path[i],
                                         quiet = !show_progress,
@@ -189,8 +177,11 @@ get_species_path <- function(species,
   stopifnot(is.character(species), length(species) == 1)
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
 
+  # append version to path
+  path <- file.path(path, paste0("v", ebirdst_version()["data_version"]))
+
   if (species == "example_data") {
-    run <- "yebsap-ERD2019-STATUS-20200930-8d36d265-example"
+    run <- "yebsap_example"
   } else {
     species <- get_species(species)
     row_id <- which(ebirdst::ebirdst_runs$species_code == species)
@@ -803,4 +794,100 @@ sql_extent_subset <- function(ext) {
     }
   }
   return(sql)
+}
+
+
+dl_example_data <- function(path, tifs_only, force, show_progress) {
+  base_dir <- paste0("https://raw.githubusercontent.com/CornellLabofOrnithology/",
+                     "ebirdst/dev_erd2020/example-data/")
+  # get file list from github
+  fl <- system.file("extdata", "example-data_file-list.txt",
+                    package = "ebirdst")
+  files <- readLines(fl)
+  run <- stringr::str_split(files[1], "/")[[1]][1]
+  run_path <- normalizePath(file.path(path, run), mustWork = FALSE)
+  dir.create(run_path, recursive = TRUE, showWarnings = FALSE)
+
+  # drop database files
+  if (isTRUE(tifs_only)) {
+    files <- files[!stringr::str_detect(files, "\\.zip$")]
+  }
+
+  # check for files already existing
+  dst_files <- file.path(path, files)
+  dst_files <- stringr::str_remove(dst_files, "\\.zip$")
+  fe <- file.exists(dst_files)
+  if (any(fe)) {
+    if (isTRUE(force)) {
+      file.remove(dst_files[fe])
+    } else {
+      files <- files[!fe]
+      if (length(files) == 0) {
+        message("Example data already downloaded")
+        return(invisible(run_path))
+      }
+    }
+  }
+
+  # download
+  src_files <- file.path(base_dir, files)
+  dst_files <- file.path(path, files)
+  for (d in unique(dirname(dst_files))) {
+    dir.create(d, recursive = TRUE, showWarnings = FALSE)
+  }
+  for (i in seq_along(src_files)) {
+    dl_response <- utils::download.file(src_files[i], dst_files[i],
+                                        quiet = !show_progress,
+                                        mode = "wb")
+    if (dl_response != 0) {
+      stop("Error downloading file: ", files[i])
+    }
+    # unzip
+    if (stringr::str_detect(dst_files[i], "\\.zip")) {
+      uz <- utils::unzip(dst_files[i], exdir = dirname(dst_files[i]))
+      fm <- file.remove(dst_files[i])
+    }
+  }
+
+  return(invisible(run_path))
+}
+
+
+ebirdst_download_s3 <- function(species,
+                                path = rappdirs::user_data_dir("ebirdst"),
+                                tifs_only = TRUE,
+                                profile = "default") {
+  stopifnot(is.character(species), length(species) >= 1)
+  stopifnot(is.character(path), length(path) == 1)
+  stopifnot(is.logical(tifs_only), length(tifs_only) == 1)
+  stopifnot(is.character(profile), length(profile) == 1)
+  species <- tolower(species)
+
+  if (!dir.exists(path)) {
+    dir.create(path, recursive = TRUE)
+  }
+  path <- normalizePath(path)
+
+  # runs to download
+  bucket_url <- "s3://da-ebirdst-results/"
+  species_code <- ebirdst::get_species(species)
+  if (any(is.na(species_code))) {
+    stop("The following species are invalid: ",
+         paste(species[is.na(species_code)], collapse = ", "))
+  }
+  row_id <- which(ebirdst::ebirdst_runs$species_code %in% species_code)
+  run_names <- ebirdst::ebirdst_runs$run_name[row_id]
+
+  # aws s3 download commands
+  s3_dl_cmd <- stringr::str_glue("aws s3 sync {bucket_url}{run_names} ",
+                                 "'{file.path(path, run_names)}' ",
+                                 "--profile {profile}")
+  if (isTRUE(tifs_only)) {
+    s3_dl_cmd <- paste(s3_dl_cmd, "--exclude '*.db'")
+  }
+  for(cmd in s3_dl_cmd) {
+    system(cmd)
+  }
+
+  return(invisible(normalizePath(file.path(path, run_names))))
 }

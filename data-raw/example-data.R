@@ -3,17 +3,18 @@ library(fs)
 library(sf)
 library(rnaturalearth)
 library(tidyverse)
+library(glue)
 library(DBI)
 library(RSQLite)
 select <- dplyr::select
 
 # source data
-root_path <- rappdirs::user_data_dir("ebirdst")
-species <- "yebsap_erd2020"
+root_path <- path(rappdirs::user_data_dir("ebirdst"), "v2020")
+species <- "yebsap"
 sp_path <- path(root_path, species)
 
 # destination
-ex_species <- paste0(species, "_example")
+ex_species <- "yebsap_example"
 ex_dir <- path(root_path, ex_species)
 ex_cubes_dir <- path(ex_dir, "cubes")
 ex_seasonal_dir <- path(ex_dir, "seasonal")
@@ -104,3 +105,29 @@ for (t in c("occurrence_pds", "occurrence_pis",
 dbSendStatement(pipd_con, "DROP TABLE stixels;")
 dbSendStatement(pipd_con, "vacuum;")
 dbDisconnect(pipd_con)
+
+
+# copy to repo dir ---
+
+repo_dir <- path("example-data", basename(ex_dir))
+dir_copy(ex_dir, repo_dir)
+
+# compress db files to meet GH size constrains
+to_compress <- dir_ls(repo_dir, glob = "*.db")
+for (f in to_compress) {
+  zip(paste0(f, ".zip"), f)
+  file_delete(f)
+}
+
+# file sizes must be below 100 mb
+sizes <- dir_ls(repo_dir, type = "file", recurse = TRUE) %>%
+  file_size() %>%
+  as.numeric() %>%
+  units::set_units("bytes")
+stopifnot(sizes < units::set_units(90, "megabytes"))
+
+# file list
+file_list <- dir_ls(repo_dir, type = "file", recurse = TRUE) %>%
+  str_remove("example-data/")
+write_lines(file_list, "example-data/file-list.txt")
+write_lines(file_list, "inst/extdata/example-data_file-list.txt")

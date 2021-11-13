@@ -1,6 +1,14 @@
-# ebirdst 1.0.0
+# ebirdst 0.4.0
 
-- updates for 2021 eBird Status Data Products
+- updates for eBird Status Data Products v2020
+
+# ebirdst 0.3.3
+
+- move example data to GitHub
+
+# ebirdst 0.3.2
+
+- again try to prevent tests and examples from leaving files behind to pass CRAN checks
 
 # ebirdst 0.3.1
 

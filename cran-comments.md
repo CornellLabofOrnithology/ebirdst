@@ -1,6 +1,6 @@
-# ebirdst 1.0.0
+# ebirdst 0.4.0
 
-- updates for 2021 eBird Status Data Products
+- updates for eBird Status Data Products v2020
 
 ## Test environments
 

@@ -34,7 +34,7 @@ Install `ebirdst` from GitHub with:
 remotes::install_github("CornellLabofOrnithology/ebirdst")
 ```
 
-The current version of `ebirdst` is designed for working with the eBird Status and Trends data products that make estimates for 2019, with visualizations being released on the web in December 2020, and data access being made available in August 2021. **Users are strongly discouraged from comparing Status and Trends results between years due to methodological differences between versions.** If you have accessed and used previous versions and/or may need access to previous versions for reasons related to reproducibility, please contact ebird@cornell.edu and your request will be considered.
+The current version of `ebirdst` is designed for working with the eBird Status and Trends data products that make estimates for 2020, with visualizations being released on the web in November 2021, and data access being made available in June 2022 **Users are strongly discouraged from comparing Status and Trends results between years due to methodological differences between versions.** If you have accessed and used previous versions and/or may need access to previous versions for reasons related to reproducibility, please contact ebird@cornell.edu and your request will be considered.
 
 ## Data access
 
@@ -47,7 +47,7 @@ After completing the Access Request Form, you will be provided a Status and Tren
 If you use the the eBird Status & Trends data please cite it with: 
 
 <blockquote>
-Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. Hochachka, C. Wood, I. Davies, M. Iliff, L. Seitz. 2020. eBird Status and Trends, Data Version: 2019; Released: 2020, Cornell Lab of Ornithology, Ithaca, New York. <a href="https://doi.org/10.2173/ebirdst.2019" class="uri">https://doi.org/10.2173/ebirdst.2019</a>
+Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. Hochachka, L. Jaromczyk, C. Wood, I. Davies, M. Iliff, L. Seitz. 2021. eBird Status and Trends, Data Version: 2020; Released: 2021. Cornell Lab of Ornithology, Ithaca, New York. <a href="https://doi.org/10.2173/ebirdst.2020" class="uri">https://doi.org/10.2173/ebirdst.2020</a>
 </blockquote>
 
 ## Vignettes
