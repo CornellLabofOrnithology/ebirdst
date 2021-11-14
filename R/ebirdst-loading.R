@@ -34,7 +34,7 @@
 #' @examples
 #' \dontrun{
 #' # download the example data
-#' ebirdst_download("example_data", tifs_only = F)
+#' ebirdst_download("example_data")
 #'
 #' # download the data package for wood thrush, geotiffs only
 #' ebirdst_download("woothr")
