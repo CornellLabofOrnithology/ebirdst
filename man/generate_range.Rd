@@ -7,7 +7,7 @@
 generate_range(x, smooth = TRUE)
 }
 \arguments{
-\item{x}{\link{RasterStack}; the input raster to convert to polygons.}
+\item{x}{\code{RasterStack}; the input raster to convert to polygons.}
 
 \item{smooth}{logical; whether to smooth the polygons and drop small
 fragments consisting of single raster cells. Smoothing is done via the

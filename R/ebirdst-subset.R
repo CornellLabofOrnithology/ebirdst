@@ -40,9 +40,7 @@ ebirdst_subset.data.frame <- function(x, ext) {
   stopifnot(inherits(ext, "ebirdst_extent"))
 
   if (!all(x$date <= 1)) {
-    if (all(x$date >= 0) && all(x$date <= 366)) {
-      message("date column is not between 0 and 1, assuming date encoded as ",
-              "day of year (1-366).")
+    if (all(x$date >= 0) && all(x$date <= 366.5)) {
       t_ext <- ext$t * 366
     } else {
       stop("Format of date column is unknown, should be day of year encoded ",
@@ -91,8 +89,18 @@ ebirdst_subset.data.frame <- function(x, ext) {
 #' @describeIn ebirdst_subset  PI or PD data as an `sf` object
 ebirdst_subset.sf <- function(x, ext) {
   stopifnot("date" %in% names(x))
-  stopifnot(all(x$date >= 0), all(x$date <= 1))
   stopifnot(inherits(ext, "ebirdst_extent"))
+
+  if (!all(x$date <= 1)) {
+    if (all(x$date >= 0) && all(x$date <= 366.5)) {
+      t_ext <- ext$t * 366
+    } else {
+      stop("Format of date column is unknown, should be day of year encoded ",
+           "either as 0-1 or 1-366.")
+    }
+  } else {
+    t_ext <- ext$t
+  }
 
   # temporal filtering
   if (!identical(ext$t, c(0, 1))) {

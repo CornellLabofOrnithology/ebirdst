@@ -6,7 +6,7 @@
 #' region where the raster has some non-missing value, including zero) will be
 #' generated.
 #'
-#' @param x [RasterStack]; the input raster to convert to polygons.
+#' @param x `RasterStack`; the input raster to convert to polygons.
 #' @param smooth logical; whether to smooth the polygons and drop small
 #'   fragments consisting of single raster cells. Smoothing is done via the
 #'   `smoothr` package. If `smooth = TRUE`, but the raw and smoothed polygons
@@ -44,6 +44,14 @@
 generate_range <- function(x, smooth = TRUE) {
   stopifnot(inherits(x, "Raster"))
   stopifnot(is.logical(smooth), length(smooth) == 1, !is.na(smooth))
+
+  # suggests check
+  if (!requireNamespace("smoothr", quietly = TRUE)) {
+    stop("Package smoothr required for generate_range()")
+  }
+  if (!requireNamespace("units", quietly = TRUE)) {
+    stop("Package units required for generate_range()")
+  }
 
   # convert to polygons
   rng <- NULL

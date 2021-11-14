@@ -7,21 +7,24 @@ path <- ebirdst_download("example_data", tifs_only = FALSE)
 test_that("load_pis", {
   pis <- load_pis(path)
   expect_is(pis, "data.frame")
-  expect_equal(ncol(pis), 78)
   expect_gt(nrow(pis), 0)
 
-  # predictors
-  expect_true(all(ebirdst_predictors$predictor_tidy %in% names(pis)))
+  # columns
+  expect_named(pis, c("stixel_id", "lat", "lon", "date",
+                      "predictor", "importance"))
 
-  # additional columns
-  expect_true(all(c("lat", "lon", "date") %in% names(pis)))
+  # predictors
+  expect_true(all(sort(unique(pis$predictor)) ==
+                    sort(ebirdst_predictors$predictor_tidy)))
 
   # return sf object
   pis <- load_pis(path, return_sf = TRUE)
   expect_is(pis, "sf")
-  expect_equal(ncol(pis), 77)
   expect_gt(nrow(pis), 0)
-  expect_true(all(ebirdst_predictors$predictor_tidy %in% names(pis)))
+  expect_named(pis, c("stixel_id", "date",
+                      "predictor", "importance", "geometry"))
+  expect_true(all(sort(unique(pis$predictor)) ==
+                    sort(ebirdst_predictors$predictor_tidy)))
 
   # invalid path
   expect_error(load_pis("/invalid/path"))
@@ -30,7 +33,6 @@ test_that("load_pis", {
 test_that("load_pds", {
   pds <- load_pds(path)
   expect_is(pds, "data.frame")
-  expect_equal(ncol(pds), 7)
   expect_gt(nrow(pds), 0)
 
   # columns
@@ -40,7 +42,6 @@ test_that("load_pds", {
   # return sf object
   pds <- load_pds(path, return_sf = TRUE)
   expect_is(pds, "sf")
-  expect_equal(ncol(pds), 6)
   expect_gt(nrow(pds), 0)
   expect_named(pds, c("stixel_id", "date",
                       "predictor", "predictor_value", "response",
@@ -56,8 +57,8 @@ test_that("subset pis/pds", {
   pds <- load_pds(path)
   e <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 45),
                       t = c(0.5, 0.6))
-  pi_ss <-ebirdst_subset(pis, e)
-  pd_ss <-ebirdst_subset(pds, e)
+  pi_ss <- ebirdst_subset(pis, e)
+  pd_ss <- ebirdst_subset(pds, e)
 
   # expectations
   expect_is(pi_ss, "data.frame")
@@ -72,8 +73,8 @@ test_that("subset pis/pds", {
   # data frame subset
   pis <- load_pis(path, return_sf = TRUE)
   pds <- load_pds(path, return_sf = TRUE)
-  pi_ss <-ebirdst_subset(pis, e)
-  pd_ss <-ebirdst_subset(pds, e)
+  pi_ss <- ebirdst_subset(pis, e)
+  pd_ss <- ebirdst_subset(pds, e)
 
   # expectations
   expect_is(pi_ss, "sf")
@@ -93,29 +94,29 @@ test_that("plot_pis", {
 
   # expectations
   top_pi <- plot_pis(pis = pis, ext = e, plot = FALSE)
-  expect_is(top_pi, "numeric")
-  expect_true(all(names(top_pi) %in% ebirdst_predictors$lc_class_label))
+  expect_is(top_pi, "data.frame")
+  expect_true(all(top_pi$predictor %in% ebirdst_predictors$lc_class_label))
 
   # check names and grouping work correctly
   top_pi <- plot_pis(pis = pis, ext = e,
                      pretty_names = FALSE, by_cover_class = TRUE,
                      plot = FALSE)
-  expect_true("mcd12q1_lccs1_fs_c14" %in% names(top_pi))
+  expect_true("mcd12q1_lccs1_fs_c14" %in% top_pi$predictor)
   top_pi <- plot_pis(pis = pis, ext = e,
                      pretty_names = TRUE, by_cover_class = FALSE,
                      plot = FALSE)
-  expect_true("Deciduous Broadleaf Forests PLAND" %in% names(top_pi))
+  expect_true("Deciduous Broadleaf Forests PLAND" %in% top_pi$predictor)
   top_pi <- plot_pis(pis = pis, ext = e,
                      pretty_names = FALSE, by_cover_class = FALSE,
                      plot = FALSE)
-  expect_true("mcd12q1_lccs1_fs_c14_1500_pland" %in% names(top_pi))
+  expect_true("mcd12q1_lccs1_fs_c14_1500_pland" %in% top_pi$predictor)
 
   # checking length
   top_pi <- plot_pis(pis = pis, ext = e, n_top_pred = 10, plot = FALSE)
-  expect_length(top_pi, 10)
+  expect_length(unique(top_pi$predictor), 10)
   top_pi <- plot_pis(pis = pis, ext = e, n_top_pred = 10,
                      by_cover_class = FALSE, plot = FALSE)
-  expect_length(top_pi, 10)
+  expect_length(unique(top_pi$predictor), 10)
 
   # not enough num_top_preds
   expect_error(plot_pis(pis = pis, ext = e, n_top_pred = 1,
@@ -137,7 +138,8 @@ test_that("plot_pds", {
                       t = c(0.5, 0.6))
 
   # expectations
-  pd_smooth <- plot_pds(pds, "solar_noon_diff", ext = e, n_bs = 5, plot = FALSE)
+  pd_smooth <- plot_pds(pds, "solar_noon_diff_mid", ext = e, n_bs = 5,
+                        plot = FALSE)
   expect_is(pd_smooth, "data.frame")
   expect_equal(nrow(pd_smooth), 25)
   expect_named(pd_smooth, c("x", "pd_median", "pd_lower", "pd_upper"))

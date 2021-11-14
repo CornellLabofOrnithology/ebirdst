@@ -62,12 +62,14 @@ Imports:
     viridisLite,
     xml2
 Suggests: 
+    smoothr,
     covr,
     fields,
     knitr,
     rmarkdown,
     rnaturalearth,
-    testthat
+    testthat,
+    units
 VignetteBuilder: 
     knitr
 Encoding: UTF-8

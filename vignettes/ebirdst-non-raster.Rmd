@@ -116,7 +116,7 @@ Smoothed partial dependence curves for a given predictor can be plotted using `p
 ```{r plot_pds}
 # in the interest of speed, run with 5 bootstrap iterations
 # in practice, best to run with the default number of iterations (100)
-pd_smooth <- plot_pds(pds, "solar_noon_diff", ext = lp_extent, n_bs = 5)
+pd_smooth <- plot_pds(pds, "solar_noon_diff_mid", ext = lp_extent, n_bs = 5)
 dplyr::glimpse(pd_smooth)
 
 # deciduous broadleaf forest

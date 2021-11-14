@@ -95,7 +95,7 @@ e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 
 # for testing, run with 5 bootstrap iterations for speed
 # in practice, best to run with the default number of iterations (100)
-pd_smooth <- plot_pds(pds, "solar_noon_diff", ext = e, n_bs = 5)
+pd_smooth <- plot_pds(pds, "solar_noon_diff_mid", ext = e, n_bs = 5)
 dplyr::glimpse(pd_smooth)
 }
 }

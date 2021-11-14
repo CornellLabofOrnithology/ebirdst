@@ -488,7 +488,7 @@ load_pis <- function(path, ext, model = c("occurrence", "count"),
 #' # define a spatiotemporal extent to plot data from
 #' bb_vec <- c(xmin = -86.6, xmax = -82.2, ymin = 41.5, ymax = 43.5)
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
-#' plot_pds(pds, "solar_noon_diff", ext = e, n_bs = 5)
+#' plot_pds(pds, "solar_noon_diff_mid", ext = e, n_bs = 5)
 #' }
 load_pds <- function(path, ext, model = c("occurrence", "count"),
                      return_sf = FALSE) {
@@ -763,7 +763,7 @@ load_fac_map_parameters <- function(path) {
   list(custom_projection = p$projection$crs,
        fa_extent = raster::extent(p$projection$extent),
        res = p$projection$res,
-       fa_extent_sinu = raster::extent(p$extent_sinu),
+       fa_extent_sinu = raster::extent(unlist(p$bbox_sinu)),
        abundance_bins = p$bins$hr$breaks)
 }
 
@@ -863,31 +863,32 @@ ebirdst_download_s3 <- function(species,
   stopifnot(is.character(profile), length(profile) == 1)
   species <- tolower(species)
 
+  # append version to path
+  path <- file.path(path, paste0("v", ebirdst_version()["data_version"]))
   if (!dir.exists(path)) {
     dir.create(path, recursive = TRUE)
   }
   path <- normalizePath(path)
 
   # runs to download
-  bucket_url <- "s3://da-ebirdst-results/"
+  bucket_url <- "s3://da-ebirdst-results/ERD2020/"
   species_code <- ebirdst::get_species(species)
   if (any(is.na(species_code))) {
     stop("The following species are invalid: ",
          paste(species[is.na(species_code)], collapse = ", "))
   }
-  row_id <- which(ebirdst::ebirdst_runs$species_code %in% species_code)
-  run_names <- ebirdst::ebirdst_runs$run_name[row_id]
 
   # aws s3 download commands
-  s3_dl_cmd <- stringr::str_glue("aws s3 sync {bucket_url}{run_names} ",
-                                 "'{file.path(path, run_names)}' ",
+  s3_dl_cmd <- stringr::str_glue("aws s3 sync {bucket_url}{species_code} ",
+                                 "'{file.path(path, species_code)}' ",
                                  "--profile {profile}")
   if (isTRUE(tifs_only)) {
     s3_dl_cmd <- paste(s3_dl_cmd, "--exclude '*.db'")
   }
-  for(cmd in s3_dl_cmd) {
+  print(s3_dl_cmd)
+  for (cmd in s3_dl_cmd) {
     system(cmd)
   }
 
-  return(invisible(normalizePath(file.path(path, run_names))))
+  return(invisible(normalizePath(file.path(path, species_code))))
 }

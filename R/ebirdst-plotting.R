@@ -74,14 +74,15 @@ plot_pis <- function(pis, ext,
   pis$predictor_class <- NULL
   if (isTRUE(by_cover_class)) {
     pis <- dplyr::group_by(pis, .data$stixel_id, .data$predictor)
-    pis <- dplyr::summarise(pis, importance = mean(importance, na.rm = TRUE),
+    pis <- dplyr::summarise(pis,
+                            importance = mean(.data$importance, na.rm = TRUE),
                             .groups = "drop")
   }
 
   # compute median predictor importance across stixels
   pi_median <- dplyr::group_by(pis, .data$predictor)
   pi_median <- dplyr::summarise(pi_median,
-                                importance = stats::median(importance,
+                                importance = stats::median(.data$importance,
                                                            na.rm = TRUE),
                                 .groups = "drop")
   pi_median <- dplyr::arrange(pi_median, dplyr::desc(.data$importance))
@@ -190,7 +191,7 @@ plot_pis <- function(pis, ext,
 #'
 #' # for testing, run with 5 bootstrap iterations for speed
 #' # in practice, best to run with the default number of iterations (100)
-#' pd_smooth <- plot_pds(pds, "solar_noon_diff", ext = e, n_bs = 5)
+#' pd_smooth <- plot_pds(pds, "solar_noon_diff_mid", ext = e, n_bs = 5)
 #' dplyr::glimpse(pd_smooth)
 #' }
 plot_pds <- function(pds, predictor, ext,

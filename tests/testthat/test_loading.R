@@ -30,7 +30,7 @@ test_that("load_fac_map_parameters", {
   # extent
   expect_is(l$fa_extent, "Extent")
   # resolution
-  expect_is(l$res, "numeric")
+  expect_is(l$res, c("numeric", "integer"))
   # sinusoidal extent
   expect_is(l$fa_extent_sinu, "Extent")
   # bins

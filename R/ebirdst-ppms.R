@@ -77,8 +77,8 @@ ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 10) {
 
   # load configuration file
   l <- load_config(path)
-  l_es_cutoff <- setNames(l[["es_cutoff"]][["cutoff"]],
-                          l[["es_cutoff"]][["week"]])
+  l_es_cutoff <- stats::setNames(l[["es_cutoff"]][["cutoff"]],
+                                 l[["es_cutoff"]][["week"]])
 
   if (missing(es_cutoff)) {
     # get dynamic es cutoff

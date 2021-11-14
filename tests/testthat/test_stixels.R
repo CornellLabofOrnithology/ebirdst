@@ -11,14 +11,14 @@ stx_sf <- load_stixels(path, return_sf = TRUE)
 test_that("load_stixels", {
   # expectations
   expect_is(stx, "data.frame")
-  expect_equal(ncol(stx), 29)
+  expect_equal(ncol(stx), 96)
   expect_gt(nrow(stx), 0)
   expect_true(all(c("stixel_id", "lon", "lat", "date") %in% names(stx)))
 
   # spatial format
   expect_is(stx_sf, "sf")
   expect_is(sf::st_geometry(stx_sf), "sfc_POINT")
-  expect_equal(ncol(stx_sf), 28)
+  expect_equal(ncol(stx_sf), 95)
   expect_gt(nrow(stx_sf), 0)
   expect_true(all(c("stixel_id", "date") %in% names(stx_sf)))
 

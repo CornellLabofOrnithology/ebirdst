@@ -3,8 +3,8 @@ context("PPM functions")
 skip_on_cran()
 
 path <- ebirdst_download("example_data", tifs_only = FALSE)
-e <- ebirdst_extent(c(xmin = -86, xmax = -85, ymin = 42, ymax = 43),
-                    t = c(0.5, 0.6))
+e <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 44),
+                    t = c(0.4, 0.6))
 ppm <- ebirdst_ppms(path, ext = e)
 wk <- ebirdst_ppms_ts(path, ext = e, summarize_by = "weeks")
 mt <- ebirdst_ppms_ts(path, ext = e, summarize_by = "months")
