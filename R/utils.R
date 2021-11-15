@@ -150,6 +150,8 @@ to_srd_date <- function(x) {
     } else {
       stop("Input is not a valid date.")
     }
+  } else if (is.numeric(x) || is.integer(x)) {
+    x <- as.Date(paste("2016-", x), format = "%Y-%j")
   } else if (!inherits(x, "Date")) {
     stop("Input is not a valid date.")
   }

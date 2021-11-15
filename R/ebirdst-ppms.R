@@ -67,7 +67,7 @@
 #' ppms <- ebirdst_ppms(path = path, ext = e)
 #' plot(ppms)
 #' }
-ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 10) {
+ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 7) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
   stopifnot(is.numeric(pat_cutoff), length(pat_cutoff) == 1,
             pat_cutoff > 0, pat_cutoff < 1)
@@ -112,12 +112,13 @@ ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 10) {
     we[length(we)] <- Inf
   }
   preds_week <- list()
+  date_frac <- preds$day_of_year / 366
   for (i in seq_along(es_cutoff)) {
-    preds_week[[i]] <- preds[preds$date > ws[i] & preds$date <= we[i], ]
+    preds_week[[i]] <- preds[date_frac > ws[i] & date_frac <= we[i], ]
     preds_week[[i]][["es_cutoff"]] <- es_cutoff[i]
   }
   preds <- dplyr::bind_rows(preds_week)
-  rm(preds_week)
+  rm(preds_week, date_frac)
 
   # static variables
   n_mc <- 25
@@ -283,8 +284,6 @@ ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 10) {
       cs$pearson_count[i_mc] <- stats::cor(test_cnt$mu_median, test_cnt$obs,
                                            method = "pearson")
     }
-
-
   }
   structure(list(binary_ppms = dplyr::tibble(type = "binary", bs),
                  occ_ppms = dplyr::tibble(type = "occurrence", os),

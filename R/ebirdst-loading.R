@@ -405,11 +405,11 @@ load_pis <- function(path, ext, model = c("occurrence", "count"),
 
   # query
   if (missing(ext)) {
-    sql <- stringr::str_glue("SELECT p.*, s.lat, s.lon, s.date ",
+    sql <- stringr::str_glue("SELECT p.*, s.latitude, s.longitude, s.day_of_year ",
                              "FROM {table} AS p INNER JOIN stixel_summary AS s ",
                              "ON p.stixel_id = s.stixel_id;")
   } else {
-    sql <- stringr::str_glue("SELECT p.*, s.lat, s.lon, s.date ",
+    sql <- stringr::str_glue("SELECT p.*, s.latitude, s.longitude, s.day_of_year ",
                              "FROM {table} AS p ",
                              "INNER JOIN stixel_summary AS s ",
                              "ON p.stixel_id = s.stixel_id ",
@@ -422,14 +422,13 @@ load_pis <- function(path, ext, model = c("occurrence", "count"),
   DBI::dbDisconnect(db)
 
   # clean up names
-  preds <- ebirdst::ebirdst_predictors[, c("predictor", "predictor_tidy")]
-  names(preds) <- c("covariate", "predictor")
-  pis <- dplyr::inner_join(pis, preds, by = "covariate")
-  pis <- pis[, c("stixel_id", "lat", "lon", "date", "predictor", "pi")]
+  pis <- pis[, c("stixel_id", "latitude", "longitude", "day_of_year",
+                 "covariate", "pi")]
   pis <- dplyr::rename(pis, importance = "pi")
 
   # check for missing stixels centroid
-  has_centroid <- stats::complete.cases(pis[, c("lat", "lon", "date")])
+  has_centroid <- stats::complete.cases(pis[, c("latitude", "longitude",
+                                                "day_of_year")])
   if (any(!has_centroid)) {
     warning("Removing ", sum(!has_centroid),
             " stixels with missing centroids data.")
@@ -442,7 +441,7 @@ load_pis <- function(path, ext, model = c("occurrence", "count"),
   }
 
   if (isTRUE(return_sf)) {
-    pis <- sf::st_as_sf(pis, coords = c("lon", "lat"), crs = 4326)
+    pis <- sf::st_as_sf(pis, coords = c("longitude", "latitude"), crs = 4326)
   }
 
   attr(pis, "model") <- model
@@ -510,11 +509,11 @@ load_pds <- function(path, ext, model = c("occurrence", "count"),
 
   # query
   if (missing(ext)) {
-    sql <- stringr::str_glue("SELECT p.*, s.lat, s.lon, s.date ",
+    sql <- stringr::str_glue("SELECT p.*, s.latitude, s.longitude, s.day_of_year ",
                              "FROM {table} AS p INNER JOIN stixel_summary AS s ",
                              "ON p.stixel_id = s.stixel_id;")
   } else {
-    sql <- stringr::str_glue("SELECT p.*, s.lat, s.lon, s.date ",
+    sql <- stringr::str_glue("SELECT p.*, s.latitude, s.longitude, s.day_of_year ",
                              "FROM {table} AS p ",
                              "INNER JOIN stixel_summary AS s ",
                              "ON p.stixel_id = s.stixel_id ",
@@ -527,14 +526,12 @@ load_pds <- function(path, ext, model = c("occurrence", "count"),
   DBI::dbDisconnect(db)
 
   # clean up names
-  preds <- ebirdst::ebirdst_predictors[, c("predictor", "predictor_tidy")]
-  names(preds) <- c("covariate", "predictor")
-  pds <- dplyr::inner_join(pds, preds, by = "covariate")
-  pds <- pds[, c("stixel_id", "lat", "lon", "date",
-                 "predictor", "predictor_value", "response")]
+  pds <- pds[, c("stixel_id", "latitude", "longitude", "day_of_year",
+                 "covariate", "predictor_value", "response")]
 
   # check for missing stixels centroid
-  has_centroid <- stats::complete.cases(pds[, c("lat", "lon", "date")])
+  has_centroid <- stats::complete.cases(pds[, c("latitude", "longitude",
+                                                "day_of_year")])
   if (any(!has_centroid)) {
     warning("Removing ", sum(!has_centroid),
             " stixels with missing centroids data.")
@@ -547,7 +544,7 @@ load_pds <- function(path, ext, model = c("occurrence", "count"),
   }
 
   if (isTRUE(return_sf)) {
-    pds <- sf::st_as_sf(pds, coords = c("lon", "lat"), crs = 4326)
+    pds <- sf::st_as_sf(pds, coords = c("longitude", "latitude"), crs = 4326)
   }
 
   attr(pds, "model") <- model
@@ -614,7 +611,8 @@ load_stixels <- function(path, ext, return_sf = FALSE) {
   DBI::dbDisconnect(db)
 
   # check for missing stixels centroid
-  has_centroid <- stats::complete.cases(stx[, c("lat", "lon", "date")])
+  has_centroid <- stats::complete.cases(stx[, c("latitude", "longitude",
+                                                "day_of_year")])
   if (any(!has_centroid)) {
     warning("Removing ", sum(!has_centroid),
             " stixels with missing centroids data.")
@@ -627,7 +625,7 @@ load_stixels <- function(path, ext, return_sf = FALSE) {
   }
 
   if (isTRUE(return_sf)) {
-    stx <- sf::st_as_sf(stx, coords = c("lon", "lat"), crs = 4326)
+    stx <- sf::st_as_sf(stx, coords = c("longitude", "latitude"), crs = 4326)
   }
   return(stx)
 }
@@ -676,15 +674,9 @@ load_predictions <- function(path, return_sf = FALSE) {
   preds <- dplyr::tibble(preds)
   DBI::dbDisconnect(db)
 
-  # strip year from date
-  preds$date <- preds$date %% 1
-
-  # clean up
-  names(preds)[names(preds) == "latitude"] <- "lat"
-  names(preds)[names(preds) == "longitude"] <- "lon"
-
   if (isTRUE(return_sf)) {
-    preds <- sf::st_as_sf(preds, coords = c("lon", "lat"), crs = 4326)
+    preds <- sf::st_as_sf(preds, coords = c("longitude", "latitude"),
+                          crs = 4326)
   }
   return(preds)
 }
@@ -783,13 +775,15 @@ sql_extent_subset <- function(ext) {
 
 
   # temporal filtering
-  t <- ext$t * 366
-  if (!identical(t, c(0, 1))) {
+  if (!identical(ext$t, c(0, 1))) {
+    t <- ext$t * 366
     if (t[1] <= t[2]) {
-      t_sql <- stringr::str_glue("AND s.date > {t[1]} AND s.date <= {t[2]}")
+      t_sql <- stringr::str_glue("AND s.day_of_year > {t[1]} ",
+                                 "AND s.day_of_year <= {t[2]}")
       sql <- paste(sql, t_sql)
     } else {
-      t_sql <- stringr::str_glue("AND (s.date > {t[1]} OR s.date <= {t[2]})")
+      t_sql <- stringr::str_glue("AND (s.day_of_year > {t[1]} ",
+                                 "OR s.day_of_year <= {t[2]})")
       sql <- paste(sql, t_sql)
     }
   }

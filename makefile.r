@@ -23,4 +23,3 @@ devtools::check_win_devel()
 devtools::check_win_release()
 rhub::check_for_cran(platforms = "solaris-x86-patched", show_status = FALSE)
 rhub::check_for_cran(platforms = "debian-gcc-release", show_status = FALSE)
-

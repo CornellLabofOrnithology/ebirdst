@@ -5,7 +5,7 @@
 \alias{plot.ebirdst_ppms}
 \title{eBird Status and Trends predictive performance metrics (PPMs)}
 \usage{
-ebirdst_ppms(path, ext, es_cutoff, pat_cutoff = 1/10)
+ebirdst_ppms(path, ext, es_cutoff, pat_cutoff = 1/7)
 
 \method{plot}{ebirdst_ppms}(x, ...)
 }

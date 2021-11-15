@@ -11,7 +11,7 @@
 #'   of the temporal extent, provided either as dates (Date objects or strings
 #'   in ISO format "YYYY-MM-DD") or numbers between 0 and 1 representing the
 #'   fraction of the year. Note that dates can wrap around the year, e.g.
-#'   `c("2018-12-01", "2018-01-31") is acceptable. See Details for further
+#'   `c("2021-12-01", "2021-01-31") is acceptable. See Details for further
 #'   explanation of the format of t. **Leave the argument blank to include the
 #'   full year of data.**
 #' @param crs coordinate reference system, provided as a `crs` object or
@@ -38,7 +38,7 @@
 #'   omitted (i.e. "MM-DD"). Alternatively, dates can be defined in terms of
 #'   fractions of the year, e.g. `t = c(0.25, 0.5) ` would subset to data within
 #'   the second quarter of the year. In all cases, dates can wrap around the
-#'   year, e.g. c("2018-12-01", "2018-01-31") would subset to data in December
+#'   year, e.g. c("2021-12-01", "2021-01-31") would subset to data in December
 #'   or January.
 #'
 #' @return An `ebirdst_extent` object consisting of a list with three elements:
@@ -60,10 +60,10 @@
 #' ebirdst_extent(poly)
 #'
 #' # subset to january
-#' ebirdst_extent(bb, t = c("2018-01-01", "2018-01-31"))
+#' ebirdst_extent(bb, t = c("2021-01-01", "2021-01-31"))
 #'
 #' # dates can wrap around, e.g. to use dec-jan
-#' ebirdst_extent(bb, t = c("2018-12-01", "2018-01-31"))
+#' ebirdst_extent(bb, t = c("2021-12-01", "2021-01-31"))
 #'
 #' # dates can also be given without an associated year
 #' ebirdst_extent(bb, t = c("12-01", "01-31"))

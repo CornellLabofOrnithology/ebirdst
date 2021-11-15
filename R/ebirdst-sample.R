@@ -63,7 +63,7 @@ sample_grid <- function(x, res, t_res, n = 1, replace = FALSE,
 #' @export
 sample_grid.sf <- function(x, res, t_res, n = 1, replace = FALSE,
                            jitter = TRUE) {
-  stopifnot(nrow(x) > 0, "date" %in% names(x),
+  stopifnot(nrow(x) > 0, "day_of_year" %in% names(x),
             sf::st_geometry_type(x) == "POINT")
   stopifnot(is.numeric(res), length(res) %in% 1:2,
             all(!is.na(res)), all(res > 1))
@@ -78,11 +78,10 @@ sample_grid.sf <- function(x, res, t_res, n = 1, replace = FALSE,
   }
 
   # use sinusoidal equal area projection
-  sinu <- paste("+proj=sinu +lon_0=0 +x_0=0 +y_0=0",
-                "+a=6371007.181 +b=6371007.181 +units=m +no_defs")
+  sinu <- paste("+proj=sinu")
   x <- sf::st_transform(x, crs = sinu)
-  x <- cbind(sf::st_coordinates(x), x$date)
-  x <- stats::setNames(as.data.frame(x), c("x", "y", "date"))
+  x <- cbind(sf::st_coordinates(x), x$day_of_year)
+  x <- stats::setNames(as.data.frame(x), c("x", "y", "day_of_year"))
 
   # define grid
   # lower left corner
@@ -95,7 +94,7 @@ sample_grid.sf <- function(x, res, t_res, n = 1, replace = FALSE,
   # assign to grid cells
   x_cell <- 1 + (x$x - ll[1]) %/% res[1]
   y_cell <- 1 + (x$y - ll[2]) %/% res[2]
-  t_cell <- 1 + (x$date - ll[3]) %/% t_res
+  t_cell <- 1 + (x$day_of_year - ll[3]) %/% t_res
   cell <- x_cell +
     (y_cell - 1) * max(x_cell, na.rm = TRUE) +
     (t_cell - 1) * max(x_cell, na.rm = TRUE) * max(y_cell, na.rm = TRUE)
@@ -116,8 +115,9 @@ sample_grid.sf <- function(x, res, t_res, n = 1, replace = FALSE,
 #' @export
 sample_grid.data.frame <- function(x, res, t_res, n = 1, replace = FALSE,
                                    jitter = TRUE) {
-  stopifnot(nrow(x) > 0, all(c("lon", "lat", "date") %in% names(x)))
-  x <- sf::st_as_sf(x, coords = c("lon", "lat"), crs = 4326)
+  stopifnot(nrow(x) > 0,
+            all(c("longitude", "latitude", "day_of_year") %in% names(x)))
+  x <- sf::st_as_sf(x, coords = c("longitude", "latitude"), crs = 4326)
   sample_grid.sf(x, res = res, t_res = t_res, n = n,
                  replace = replace, jitter = jitter)
 }
@@ -134,7 +134,7 @@ sample_case_control <- function(x, res, t_res, n = 1, replace = FALSE,
 #' @export
 sample_case_control.sf <- function(x, res, t_res, n = 1, replace = FALSE,
                                    jitter = TRUE)  {
-  stopifnot(nrow(x) > 1, all(c("obs", "date") %in% names(x)),
+  stopifnot(nrow(x) > 1, all(c("obs", "day_of_year") %in% names(x)),
             sf::st_geometry_type(x) == "POINT")
   stopifnot(is.numeric(res), length(res) %in% 1:2,
             all(!is.na(res)), all(res > 1))
@@ -166,8 +166,9 @@ sample_case_control.sf <- function(x, res, t_res, n = 1, replace = FALSE,
 #' @export
 sample_case_control.data.frame <- function(x, res, t_res, n = 1,
                                            replace = FALSE, jitter = TRUE) {
-  stopifnot(nrow(x) > 0, all(c("obs", "lon", "lat", "date") %in% names(x)))
-  x <- sf::st_as_sf(x, coords = c("lon", "lat"), crs = 4326)
+  stopifnot(nrow(x) > 0,
+            all(c("obs", "longitude", "latitude", "day_of_year") %in% names(x)))
+  x <- sf::st_as_sf(x, coords = c("longitude", "latitude"), crs = 4326)
   sample_case_control.sf(x, res = res, t_res = t_res, n = n,
                          replace = replace, jitter = jitter)
 }

@@ -35,31 +35,22 @@ ebirdst_subset <- function(x, ext) {
 #' @export
 #' @describeIn ebirdst_subset PI or PD data
 ebirdst_subset.data.frame <- function(x, ext) {
-  stopifnot(all(c("date", "lon", "lat") %in% names(x)))
-  stopifnot(is.numeric(x$date), all(x$date >= 0))
+  stopifnot(all(c("day_of_year", "longitude", "latitude") %in% names(x)))
+  stopifnot(is.numeric(x$day_of_year) || is.integer(day_of_year),
+            all(x$day_of_year >= 0), all(x$day_of_year <= 366.5))
   stopifnot(inherits(ext, "ebirdst_extent"))
-
-  if (!all(x$date <= 1)) {
-    if (all(x$date >= 0) && all(x$date <= 366.5)) {
-      t_ext <- ext$t * 366
-    } else {
-      stop("Format of date column is unknown, should be day of year encoded ",
-           "either as 0-1 or 1-366.")
-    }
-  } else {
-    t_ext <- ext$t
-  }
 
   if (nrow(x) == 0) {
     return(x)
   }
 
   # temporal filtering
-  if (!identical(t_ext, c(0, 1))) {
+  if (!identical(ext$t, c(0, 1))) {
+    t_ext <- ext$t * 366
     if (t_ext[1] <= t_ext[2]) {
-      x <- x[x$date > t_ext[1] & x$date <= t_ext[2], ]
+      x <- x[x$day_of_year > t_ext[1] & x$day_of_year <= t_ext[2], ]
     } else {
-      x <- x[x$date > t_ext[1] | x$date <= t_ext[2], ]
+      x <- x[x$day_of_year > t_ext[1] | x$day_of_year <= t_ext[2], ]
     }
   }
 
@@ -67,10 +58,10 @@ ebirdst_subset.data.frame <- function(x, ext) {
   e_ll <- project_extent(ext, crs = 4326)
   if (ext$type == "bbox") {
     b <- e_ll$extent
-    x <- x[x$lon > b["xmin"] & x$lon <= b["xmax"] &
-             x$lat > b["ymin"] & x$lat <= b["ymax"], ]
+    x <- x[x$longitude > b["xmin"] & x$longitude <= b["xmax"] &
+             x$latitude > b["ymin"] & x$latitude <= b["ymax"], ]
   } else if (ext$type == "polygon") {
-    x_sf <- sf::st_as_sf(x, coords = c("lon", "lat"), crs = 4326)
+    x_sf <- sf::st_as_sf(x, coords = c("longitude", "latitude"), crs = 4326)
     is_in <- suppressMessages(
       sf::st_intersects(x_sf, e_ll$extent, sparse = FALSE)
     )
@@ -88,26 +79,16 @@ ebirdst_subset.data.frame <- function(x, ext) {
 #' @export
 #' @describeIn ebirdst_subset  PI or PD data as an `sf` object
 ebirdst_subset.sf <- function(x, ext) {
-  stopifnot("date" %in% names(x))
+  stopifnot("day_of_year" %in% names(x))
   stopifnot(inherits(ext, "ebirdst_extent"))
-
-  if (!all(x$date <= 1)) {
-    if (all(x$date >= 0) && all(x$date <= 366.5)) {
-      t_ext <- ext$t * 366
-    } else {
-      stop("Format of date column is unknown, should be day of year encoded ",
-           "either as 0-1 or 1-366.")
-    }
-  } else {
-    t_ext <- ext$t
-  }
 
   # temporal filtering
   if (!identical(ext$t, c(0, 1))) {
-    if (ext$t[1] <= ext$t[2]) {
-      x <- x[x$date > ext$t[1] & x$date <= ext$t[2], ]
+    t_ext <- ext$t * 366
+    if (t_ext[1] <= t_ext[2]) {
+      x <- x[x$day_of_year > t_ext[1] & x$day_of_year <= t_ext[2], ]
     } else {
-      x <- x[x$date > ext$t[1] | x$date <= ext$t[2], ]
+      x <- x[x$day_of_year > t_ext[1] | x$day_of_year <= t_ext[2], ]
     }
   }
 
