@@ -189,7 +189,7 @@ get_species_path <- function(species,
       stop(sprintf("species = %s does not uniquely identify a species.",
                    species))
     }
-    run <- ebirdst::ebirdst_runs$run_name[row_id]
+    run <- ebirdst::ebirdst_runs$species_code[row_id]
   }
   species_path <- path.expand(file.path(path, run))
   if (!dir.exists(species_path)) {
