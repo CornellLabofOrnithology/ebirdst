@@ -67,15 +67,15 @@ sql <- str_glue("DELETE FROM predictions ",
 dbSendStatement(pred_con, sql)
 # get sampling event ids that fall in polygon
 sid <- tbl(pred_con, "predictions") %>%
-  select(sampling_event_id, latitude, longitude) %>%
+  select(checklist_id, latitude, longitude) %>%
   collect() %>%
   st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>%
   st_intersection(state_mi_ll) %>%
   st_drop_geometry()
 copy_to(pred_con, sid)
 # drop rows from other tables out of bounds of
-sql <- str_glue("DELETE FROM predictions WHERE sampling_event_id NOT IN ",
-                "(SELECT sampling_event_id FROM sid);")
+sql <- str_glue("DELETE FROM predictions WHERE checklist_id NOT IN ",
+                "(SELECT checklist_id FROM sid);")
 dbSendStatement(pred_con, sql)
 dbSendStatement(pred_con, "DROP TABLE sid;")
 dbSendStatement(pred_con, "vacuum;")
