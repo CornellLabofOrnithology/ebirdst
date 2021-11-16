@@ -47,8 +47,7 @@
 #'   predictor importance and directionality for each predictor for each week of
 #'   the year. The columns are:
 #'   - `predictor`: the name of the predictor
-#'   - `date`: the week centroid expressed as a continuous value between 0-1.
-#'   See [ebirdst_weeks] to convert these values to ISO dates.
+#'   - `week`: the date of the center of the week, expressed as "MM-DD".
 #'   - `importance`: the relative importance of the predictor, these values are
 #'   scaled so they sum to 1 within each week.
 #'   - `prob_pos_slope`: the predicted probability that the slope of the PD
@@ -212,7 +211,7 @@ ebirdst_habitat <- function(path, ext, data = NULL) {
                              check_width = 7 / 366)
   pd_smooth$data <- NULL
   pd_smooth <- tidyr::unnest(pd_smooth, .data$smooth)
-  names(pd_smooth) <- c("predictor", "day_of_year", "prob_pos_slope")
+  names(pd_smooth) <- c("predictor", "week_midpoint", "prob_pos_slope")
 
   # categorize positive and negative directionalities
   pd_smooth$prob_pos_slope <- pmin(pmax(0, pd_smooth$prob_pos_slope), 1)
@@ -242,14 +241,21 @@ ebirdst_habitat <- function(path, ext, data = NULL) {
   pi_smooth <- dplyr::mutate(pi_smooth,
                              y = .data$y / sum(.data$y, na.rm = TRUE))
   pi_smooth <- dplyr::ungroup(pi_smooth)
-  names(pi_smooth) <- c("predictor", "day_of_year", "importance")
+  names(pi_smooth) <- c("predictor", "week_midpoint", "importance")
   rm(pis)
 
   # multiply importance and direction
   pipd <- dplyr::inner_join(pi_smooth, pd_smooth,
-                            by = c("predictor", "day_of_year"))
+                            by = c("predictor", "week_midpoint"))
   rm(pi_smooth, pd_smooth)
-  structure(pipd,
+
+  # assign correct dates
+  w <-  ebirdst::ebirdst_weeks
+  pipd$week <- format(w$date[match(pipd$week_midpoint, w$week_midpoint)],
+                      "%m-%d")
+
+  structure(pipd[, c("predictor", "week", "importance",
+                     "prob_pos_slope", "direction")],
             class = c("ebirdst_habitat", class(pipd)),
             extent = ext)
 }
@@ -259,47 +265,31 @@ ebirdst_habitat <- function(path, ext, data = NULL) {
 #' @param n_habitat_types number of habitat types to include in the cake plot.
 #'   The most important set of predictors will be chosen based on the maximum
 #'   weekly importance value across the whole year.
-#' @param date_range the range of dates for plotting; a 2-element vector of the
-#'   start and end dates of the date range, provided either as dates (Date
-#'   objects or strings in ISO format "YYYY-MM-DD") or numbers between 0 and 1
-#'   representing the fraction of the year. When providing dates as a string,
-#'   the year can be omitted (i.e. "MM-DD"). By default the full year of data
-#'   are plotted.
 #' @param ... ignored.
 #'
 #' @export
 #' @rdname ebirdst_habitat
-plot.ebirdst_habitat <- function(x, n_habitat_types = 15,
-                                 date_range = c(0, 1),
-                                 ...) {
+plot.ebirdst_habitat <- function(x, n_habitat_types = 15, ...) {
   stopifnot(is.numeric(n_habitat_types), length(n_habitat_types) == 1,
             n_habitat_types > 0)
 
-  # convert temporal extent
-  date_range <- process_t_extent(date_range)
-  data_date_range <- range(x$day_of_year, na.rm = TRUE)
-  if (date_range[1] >= date_range[2]) {
-    stop("Dates in date_range must be sequential.")
-  }
-  date_range[1] <- max(date_range[1], data_date_range[1])
-  date_range[2] <- min(date_range[2], data_date_range[2])
-  date_range <- from_srd_date(date_range)
+  # convert to date
+  x$week <- as.Date(paste(ebirdst_version()["data_version"],
+                          x$week, sep = "-"))
+  date_range <- as.Date(paste(ebirdst_version()["data_version"],
+                              c("01-01", "12-31"), sep = "-"))
 
   # subset to top predictors
   x <- subset_top_predictors(x, n_habitat_types = n_habitat_types)
 
   # max weekly stack height
-  y_max <- dplyr::group_by(x, .data$date,
+  y_max <- dplyr::group_by(x, .data$week,
                            direction = sign(.data$habitat_association))
   y_max <- dplyr::summarise(y_max,
                             height = sum(.data$habitat_association,
                                          na.rm = TRUE),
                             .groups = "drop")
   y_max <- max(abs(y_max$height), na.rm = TRUE)
-
-  # assign weeks
-  w <- ebirdst::ebirdst_weeks
-  x$iso_date <- w$date[match(x$date, w$week_midpoint)]
 
   # order by importance
   x$habitat_code <- stats::reorder(x$habitat_code,
@@ -311,7 +301,7 @@ plot.ebirdst_habitat <- function(x, n_habitat_types = 15,
 
   # cake plot
   g <- ggplot2::ggplot(x) +
-    ggplot2::aes_string(x = "iso_date", y = "habitat_association",
+    ggplot2::aes_string(x = "week", y = "habitat_association",
                         fill = "habitat_code",
                         group = "habitat_code",
                         order = "habitat_code") +
@@ -428,7 +418,7 @@ subset_top_predictors <- function(x, n_habitat_types = 15) {
   x <- dplyr::group_by(x,
                        habitat_code = .data$lc_class,
                        habitat_name = .data$lc_class_label,
-                       .data$date)
+                       .data$week)
   x <- dplyr::summarise(x,
                         importance = sum(.data$importance, na.rm = TRUE),
                         habitat_association = sum(.data$habitat_association,

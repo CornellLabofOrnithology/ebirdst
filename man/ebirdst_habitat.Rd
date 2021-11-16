@@ -7,7 +7,7 @@
 \usage{
 ebirdst_habitat(path, ext, data = NULL)
 
-\method{plot}{ebirdst_habitat}(x, n_habitat_types = 15, date_range = c(0, 1), ...)
+\method{plot}{ebirdst_habitat}(x, n_habitat_types = 15, ...)
 }
 \arguments{
 \item{path}{character; directory that the Status and Trends data for a given
@@ -38,13 +38,6 @@ arguments and simply provide \code{path} instead.}}
 The most important set of predictors will be chosen based on the maximum
 weekly importance value across the whole year.}
 
-\item{date_range}{the range of dates for plotting; a 2-element vector of the
-start and end dates of the date range, provided either as dates (Date
-objects or strings in ISO format "YYYY-MM-DD") or numbers between 0 and 1
-representing the fraction of the year. When providing dates as a string,
-the year can be omitted (i.e. "MM-DD"). By default the full year of data
-are plotted.}
-
 \item{...}{ignored.}
 }
 \value{
@@ -53,8 +46,7 @@ predictor importance and directionality for each predictor for each week of
 the year. The columns are:
 \itemize{
 \item \code{predictor}: the name of the predictor
-\item \code{date}: the week centroid expressed as a continuous value between 0-1.
-See \link{ebirdst_weeks} to convert these values to ISO dates.
+\item \code{week}: the date of the center of the week, expressed as "MM-DD".
 \item \code{importance}: the relative importance of the predictor, these values are
 scaled so they sum to 1 within each week.
 \item \code{prob_pos_slope}: the predicted probability that the slope of the PD

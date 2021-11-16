@@ -424,7 +424,7 @@ load_pis <- function(path, ext, model = c("occurrence", "count"),
   # clean up names
   pis <- pis[, c("stixel_id", "latitude", "longitude", "day_of_year",
                  "covariate", "pi")]
-  pis <- dplyr::rename(pis, importance = "pi")
+  pis <- dplyr::rename(pis, predictor = "covariate", importance = "pi")
 
   # check for missing stixels centroid
   has_centroid <- stats::complete.cases(pis[, c("latitude", "longitude",
@@ -528,6 +528,7 @@ load_pds <- function(path, ext, model = c("occurrence", "count"),
   # clean up names
   pds <- pds[, c("stixel_id", "latitude", "longitude", "day_of_year",
                  "covariate", "predictor_value", "response")]
+  pds <- dplyr::rename(pds, predictor = "covariate")
 
   # check for missing stixels centroid
   has_centroid <- stats::complete.cases(pds[, c("latitude", "longitude",
@@ -769,9 +770,10 @@ sql_extent_subset <- function(ext) {
 
   # spatial filtering
   b <- sf::st_bbox(ext$extent)
-  sql <- stringr::str_glue("WHERE ",
-                           "s.lon > {b['xmin']} AND s.lon <= {b['xmax']} AND ",
-                           "s.lat > {b['ymin']} AND s.lat <= {b['ymax']}")
+  sql <- stringr::str_glue("WHERE s.longitude > {b['xmin']} ",
+                           "AND s.longitude <= {b['xmax']} ",
+                           "AND s.latitude > {b['ymin']} ",
+                           "AND s.latitude <= {b['ymax']}")
 
 
   # temporal filtering
