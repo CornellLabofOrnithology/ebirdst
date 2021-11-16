@@ -83,10 +83,10 @@ ebirdst_habitat <- function(path, ext, data = NULL) {
     pds <- data[["pds"]]
     stixel_coverage <- data[["stixels"]]
 
-    col_names <- c("stixel_id", "date", "predictor", "importance")
+    col_names <- c("stixel_id", "day_of_year", "predictor", "importance")
     stopifnot(is.data.frame(pis), all(col_names %in% names(pis)))
 
-    col_names <- c("stixel_id", "date", "predictor",
+    col_names <- c("stixel_id", "day_of_year", "predictor",
                    "predictor_value", "response")
     stopifnot(is.data.frame(pds), all(col_names %in% names(pds)))
 
@@ -184,7 +184,7 @@ ebirdst_habitat <- function(path, ext, data = NULL) {
   pds <- pds[pds$predictor %in% preds, ]
 
   # calculate pd slopes
-  pd_slope <- pds[, c("stixel_id", "date", "predictor",
+  pd_slope <- pds[, c("stixel_id", "day_of_year", "predictor",
                       "predictor_value", "response")]
   rm(pds)
   pd_slope <- tidyr::nest(pd_slope, data = c("predictor_value", "response"))
@@ -197,7 +197,7 @@ ebirdst_habitat <- function(path, ext, data = NULL) {
 
   # temporal smoothing of pds
   pd_smooth <- dplyr::select(pd_slope, .data$predictor,
-                             x = .data$date, y = .data$slope,
+                             x = .data$day_of_year, y = .data$slope,
                              .data$weight)
   # convert from day of year to year fraction
   pd_smooth[["x"]] <- pd_smooth[["x"]] / 366
@@ -212,7 +212,7 @@ ebirdst_habitat <- function(path, ext, data = NULL) {
                              check_width = 7 / 366)
   pd_smooth$data <- NULL
   pd_smooth <- tidyr::unnest(pd_smooth, .data$smooth)
-  names(pd_smooth) <- c("predictor", "date", "prob_pos_slope")
+  names(pd_smooth) <- c("predictor", "day_of_year", "prob_pos_slope")
 
   # categorize positive and negative directionalities
   pd_smooth$prob_pos_slope <- pmin(pmax(0, pd_smooth$prob_pos_slope), 1)
@@ -222,7 +222,7 @@ ebirdst_habitat <- function(path, ext, data = NULL) {
 
   # temporal smoothing of pis
   pi_smooth <- dplyr::select(pis, .data$predictor,
-                             x = .data$date, y = .data$importance)
+                             x = .data$day_of_year, y = .data$importance)
   # convert from day of year to year fraction
   pi_smooth[["x"]] <- pi_smooth[["x"]] / 366
   # log transform
@@ -242,11 +242,12 @@ ebirdst_habitat <- function(path, ext, data = NULL) {
   pi_smooth <- dplyr::mutate(pi_smooth,
                              y = .data$y / sum(.data$y, na.rm = TRUE))
   pi_smooth <- dplyr::ungroup(pi_smooth)
-  names(pi_smooth) <- c("predictor", "date", "importance")
+  names(pi_smooth) <- c("predictor", "day_of_year", "importance")
   rm(pis)
 
   # multiply importance and direction
-  pipd <- dplyr::inner_join(pi_smooth, pd_smooth, by = c("predictor", "date"))
+  pipd <- dplyr::inner_join(pi_smooth, pd_smooth,
+                            by = c("predictor", "day_of_year"))
   rm(pi_smooth, pd_smooth)
   structure(pipd,
             class = c("ebirdst_habitat", class(pipd)),
@@ -276,7 +277,7 @@ plot.ebirdst_habitat <- function(x, n_habitat_types = 15,
 
   # convert temporal extent
   date_range <- process_t_extent(date_range)
-  data_date_range <- range(x$date, na.rm = TRUE)
+  data_date_range <- range(x$day_of_year, na.rm = TRUE)
   if (date_range[1] >= date_range[2]) {
     stop("Dates in date_range must be sequential.")
   }
