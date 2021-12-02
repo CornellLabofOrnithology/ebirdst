@@ -64,7 +64,7 @@
   <a href="../reference/index.html">Function Reference</a>
 </li>
 <li>
-  <a href="../articles/product-changelog.html">Changelog</a>
+  <a href="../articles/product-changelog.html#2019-changelog">Changelog</a>
 </li>
 <li>
   <a href="../news/index.html">Version History</a>
@@ -93,7 +93,7 @@
       <h1 data-toc-skip>Generating Seasonal Abundance and Range Maps and Stats</h1>
                         <h4 data-toc-skip class="author">Matt Strimas-Mackey, Tom Auer, Daniel Fink</h4>
             
-            <h4 data-toc-skip class="date">2021-11-12</h4>
+            <h4 data-toc-skip class="date">2021-12-02</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-advanced-mapping.Rmd" class="external-link"><code>vignettes/ebirdst-advanced-mapping.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-advanced-mapping.Rmd</code></div>
@@ -151,7 +151,7 @@
 <span class="co"># download natural earth data</span>
 <span class="va">temp_gpkg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".gpkg"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"https://github.com/CornellLabofOrnithology/ebirdst/raw/"</span>,
-          <span class="st">"master/data-raw/ebirdst_gis-data.gpkg"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+          <span class="st">"main/data-raw/ebirdst_gis-data.gpkg"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="va">temp_gpkg</span><span class="op">)</span>
 
 <span class="co"># land polygon</span>
@@ -460,14 +460,14 @@
 <span class="co">#&gt; CRS:           +proj=eck4 +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs</span>
 <span class="co">#&gt; Precision:     1e+06 </span>
 <span class="co">#&gt;                   season           layer                       geometry</span>
-<span class="co">#&gt; 1            nonbreeding           range MULTIPOLYGON (((461201.1 52...</span>
-<span class="co">#&gt; 2  prebreeding_migration           range MULTIPOLYGON (((632561.1 53...</span>
-<span class="co">#&gt; 3               breeding           range MULTIPOLYGON (((461201.1 52...</span>
-<span class="co">#&gt; 4 postbreeding_migration           range MULTIPOLYGON (((592241.1 52...</span>
-<span class="co">#&gt; 5            nonbreeding prediction_area MULTIPOLYGON (((632561.1 53...</span>
-<span class="co">#&gt; 6  prebreeding_migration prediction_area MULTIPOLYGON (((632561.1 53...</span>
-<span class="co">#&gt; 7               breeding prediction_area MULTIPOLYGON (((632561.1 53...</span>
-<span class="co">#&gt; 8 postbreeding_migration prediction_area MULTIPOLYGON (((632561.1 53...</span></code></pre></div>
+<span class="co">#&gt; 1            nonbreeding           range MULTIPOLYGON (((269681.1 52...</span>
+<span class="co">#&gt; 2  prebreeding_migration           range MULTIPOLYGON (((27761.15 56...</span>
+<span class="co">#&gt; 3               breeding           range MULTIPOLYGON (((47921.15 56...</span>
+<span class="co">#&gt; 4 postbreeding_migration           range MULTIPOLYGON (((68081.15 56...</span>
+<span class="co">#&gt; 5            nonbreeding prediction_area MULTIPOLYGON (((27761.15 56...</span>
+<span class="co">#&gt; 6  prebreeding_migration prediction_area MULTIPOLYGON (((27761.15 56...</span>
+<span class="co">#&gt; 7               breeding prediction_area MULTIPOLYGON (((27761.15 56...</span>
+<span class="co">#&gt; 8 postbreeding_migration prediction_area MULTIPOLYGON (((27761.15 56...</span></code></pre></div>
 <p>Converting from raster to polygons frequently yields tiny fragments of polygons and jagged polygon edges, which result in maps that aren’t very aesthetically pleasing. To address this, we’ll apply some algorithms from the <code>smoothr</code> package to clean up the polygons.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># clean and smooth</span>

@@ -75,7 +75,7 @@ proj <- "+proj=eck4 +lon_0=-90 +x_0=0 +y_0=0 +ellps=WGS84"
 # download natural earth data
 temp_gpkg <- tempfile(fileext = ".gpkg")
 file.path("https://github.com/CornellLabofOrnithology/ebirdst/raw/",
-          "master/data-raw/ebirdst_gis-data.gpkg") %>% 
+          "main/data-raw/ebirdst_gis-data.gpkg") %>% 
   download.file(temp_gpkg)
 
 # land polygon

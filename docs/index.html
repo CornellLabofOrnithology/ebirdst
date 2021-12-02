@@ -134,7 +134,7 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
 <li>
 <a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-advanced-mapping.html">Advanced mapping</a>: shows how to reproduce the seasonal abundance maps, range polygons, and statistics on the <a href="https://ebird.org/science/status-and-trends" class="external-link">eBird Status and Trends website</a>.</li>
 <li>
-<a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-pipd.html">Non-raster data</a>: covers working with the non-raster data in the <code>ebirst</code> data packages, including exploring <strong>predictor importance</strong>, plotting <strong>partial dependence</strong> curves for model predictors, and assessing model quality with <strong>predictive performance metrics</strong>.</li>
+<a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-non-raster.html">Non-raster data</a>: covers working with the non-raster data in the <code>ebirst</code> data packages, including exploring <strong>predictor importance</strong>, plotting <strong>partial dependence</strong> curves for model predictors, and assessing model quality with <strong>predictive performance metrics</strong>.</li>
 </ul>
 </div>
 <div id="quick-start" class="section level2">
@@ -167,15 +167,14 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
 <span class="co"># get a date vector specifying which week each raster layer corresponds to</span>
 <span class="va">weeks</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/parse_raster_dates.html">parse_raster_dates</a></span><span class="op">(</span><span class="va">abd</span><span class="op">)</span>
 <span class="fu"><a href="https://www.math.uzh.ch/pages/spam//reference/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">weeks</span><span class="op">)</span>
-<span class="co">#&gt;  [1] "2019-01-04" "2019-01-11" "2019-01-18" "2019-01-25" "2019-02-01" "2019-02-08"</span>
-<span class="co">#&gt;  [7] "2019-02-15" "2019-02-22" "2019-03-01" "2019-03-08" "2019-03-15" "2019-03-22"</span>
-<span class="co">#&gt; [13] "2019-03-29" "2019-04-05" "2019-04-12" "2019-04-19" "2019-04-26" "2019-05-03"</span>
-<span class="co">#&gt; [19] "2019-05-10" "2019-05-17" "2019-05-24" "2019-05-31" "2019-06-07" "2019-06-14"</span>
-<span class="co">#&gt; [25] "2019-06-21" "2019-06-28" "2019-07-06" "2019-07-13" "2019-07-20" "2019-07-27"</span>
-<span class="co">#&gt; [31] "2019-08-03" "2019-08-10" "2019-08-17" "2019-08-24" "2019-08-31" "2019-09-07"</span>
-<span class="co">#&gt; [37] "2019-09-14" "2019-09-21" "2019-09-28" "2019-10-05" "2019-10-12" "2019-10-19"</span>
-<span class="co">#&gt; [43] "2019-10-26" "2019-11-02" "2019-11-09" "2019-11-16" "2019-11-23" "2019-11-30"</span>
-<span class="co">#&gt; [49] "2019-12-07" "2019-12-14" "2019-12-21" "2019-12-28"</span>
+<span class="co">#&gt;  [1] "2019-01-04" "2019-01-11" "2019-01-18" "2019-01-25" "2019-02-01" "2019-02-08" "2019-02-15"</span>
+<span class="co">#&gt;  [8] "2019-02-22" "2019-03-01" "2019-03-08" "2019-03-15" "2019-03-22" "2019-03-29" "2019-04-05"</span>
+<span class="co">#&gt; [15] "2019-04-12" "2019-04-19" "2019-04-26" "2019-05-03" "2019-05-10" "2019-05-17" "2019-05-24"</span>
+<span class="co">#&gt; [22] "2019-05-31" "2019-06-07" "2019-06-14" "2019-06-21" "2019-06-28" "2019-07-06" "2019-07-13"</span>
+<span class="co">#&gt; [29] "2019-07-20" "2019-07-27" "2019-08-03" "2019-08-10" "2019-08-17" "2019-08-24" "2019-08-31"</span>
+<span class="co">#&gt; [36] "2019-09-07" "2019-09-14" "2019-09-21" "2019-09-28" "2019-10-05" "2019-10-12" "2019-10-19"</span>
+<span class="co">#&gt; [43] "2019-10-26" "2019-11-02" "2019-11-09" "2019-11-16" "2019-11-23" "2019-11-30" "2019-12-07"</span>
+<span class="co">#&gt; [50] "2019-12-14" "2019-12-21" "2019-12-28"</span>
 
 <span class="co"># select a week in the middle of the year</span>
 <span class="va">abd</span> <span class="op">&lt;-</span> <span class="va">abd</span><span class="op">[[</span><span class="fl">26</span><span class="op">]</span><span class="op">]</span>

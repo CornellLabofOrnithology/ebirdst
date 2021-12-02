@@ -778,7 +778,7 @@ sql_extent_subset <- function(ext) {
 
 dl_example_data <- function(path, tifs_only, force, show_progress) {
   base_dir <- paste0("https://raw.githubusercontent.com/CornellLabofOrnithology/",
-                     "ebirdst/master/example-data/")
+                     "ebirdst/main/example-data/")
   # get file list from github
   fl <- system.file("extdata", "example-data_file-list.txt",
                     package = "ebirdst")
