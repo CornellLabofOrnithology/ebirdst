@@ -57,7 +57,7 @@ For full package documentation, including a series of vignettes covering the ful
 - [Introduction](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst.html): details data access and the structure of the results. 
 - [Introductory mapping](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html): covers the basic of making abundance maps using the eBird Status and Trends data. 
 - [Advanced mapping](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-advanced-mapping.html): shows how to reproduce the seasonal abundance maps, range polygons, and statistics on the [eBird Status and Trends website](https://ebird.org/science/status-and-trends).
-- [Non-raster data](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-pipd.html): covers working with the non-raster data in the `ebirst` data packages, including exploring **predictor importance**, plotting **partial dependence** curves for model predictors, and assessing model quality with **predictive performance metrics**.
+- [Non-raster data](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-non-raster.html): covers working with the non-raster data in the `ebirst` data packages, including exploring **predictor importance**, plotting **partial dependence** curves for model predictors, and assessing model quality with **predictive performance metrics**.
 
 ## Quick Start
 
