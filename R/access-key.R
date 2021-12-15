@@ -66,7 +66,8 @@ get_ebirdst_access_key <- function() {
             "https://ebird.org/st/request\n",
             "2. Save the key using set_ebirdst_access_key()\n",
             "3. Restart R to load the key")
-    stop("eBird Status and Trends access key not found.")
+    stop("Valid eBird Status and Trends access key not found. ",
+         "Note that keys expire after 1 month, you may need a new key.")
   }
   invisible(key)
 }
