@@ -1,3 +1,7 @@
+# ebirdst 0.3.4
+
+- rename master branch to main on GitHub requires different download path for example data
+
 # ebirdst 0.3.3
 
 - move example data to GitHub
