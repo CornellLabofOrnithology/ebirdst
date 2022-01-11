@@ -42,6 +42,9 @@
 #' range_polygons <- generate_range(abd)
 #' }
 generate_range <- function(x, smooth = TRUE) {
+  if (is.character(x) || inherits(x, "SpatRaster")) {
+    x <- raster::stack(x)
+  }
   stopifnot(inherits(x, "Raster"))
   stopifnot(is.logical(smooth), length(smooth) == 1, !is.na(smooth))
 
