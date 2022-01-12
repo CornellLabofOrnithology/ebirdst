@@ -22,6 +22,12 @@
 #'   proportion of the focal region that the given stixel overlaps. Ignored if
 #'   `path` is provided. **In most cases, users will want to avoid using these
 #'   arguments and simply provide `path` instead.**
+#' @param stationary_associations logical; when the habitat association should
+#'   be assumed to vary throughout the year and estimates should be made for
+#'   each week of the year (the default) or habitat associations should be
+#'   assumed constant throughout the year and a single set of estimates made for
+#'   the full year. Annual estimates should only be made when you expect the
+#'   associations to be constant throughout the year, e.g. for resident species.
 #'
 #' @details The Status and Trends models use both effort (e.g. number of
 #'   observers, length of checklist) and habitat (e.g. elevation, percent forest
@@ -47,7 +53,8 @@
 #'   predictor importance and directionality for each predictor for each week of
 #'   the year. The columns are:
 #'   - `predictor`: the name of the predictor
-#'   - `week`: the date of the center of the week, expressed as "MM-DD".
+#'   - `week`: the date of the center of the week, expressed as "MM-DD". This
+#'   column will be missing if `stationary_associations = TRUE`.
 #'   - `importance`: the relative importance of the predictor, these values are
 #'   scaled so they sum to 1 within each week.
 #'   - `prob_pos_slope`: the predicted probability that the slope of the PD
@@ -75,7 +82,10 @@
 #' # produce a cake plot
 #' plot(habitat)
 #' }
-ebirdst_habitat <- function(path, ext, data = NULL) {
+ebirdst_habitat <- function(path, ext, data = NULL,
+                            stationary_associations = FALSE) {
+  stopifnot(is.logical(stationary_associations),
+            length(stationary_associations) == 1)
   if (missing(path)) {
     stopifnot(is.list(data), all(c("pis", "pds", "stixels") %in% names(data)))
     pis <- data[["pis"]]
@@ -198,20 +208,29 @@ ebirdst_habitat <- function(path, ext, data = NULL) {
   pd_smooth <- dplyr::select(pd_slope, .data$predictor,
                              x = .data$day_of_year, y = .data$slope,
                              .data$weight)
-  # convert from day of year to year fraction
-  pd_smooth[["x"]] <- pd_smooth[["x"]] / 366
-  rm(pd_slope)
-  pd_smooth <- tidyr::drop_na(pd_smooth)
-  pd_smooth <- tidyr::nest(pd_smooth, data = c("x", "y", "weight"))
-  pred_weeks <- ebirdst::ebirdst_weeks$week_midpoint
-  pd_smooth$smooth <- lapply(pd_smooth[["data"]],
-                             FUN = loess_smooth,
-                             predict_to = pred_weeks,
-                             na_value = NA_real_,
-                             check_width = 7 / 366)
-  pd_smooth$data <- NULL
-  pd_smooth <- tidyr::unnest(pd_smooth, .data$smooth)
-  names(pd_smooth) <- c("predictor", "week_midpoint", "prob_pos_slope")
+  if (isTRUE(stationary_associations)) {
+    # for stationary assocations, simply calculate the weighted average
+    pd_smooth <- dplyr::group_by(pd_smooth, .data$predictor)
+    pd_smooth <- dplyr::summarise(pd_smooth,
+                                  prob_pos_slope = weighted_mean(.data$y,
+                                                                 .data$weight))
+    pd_smooth <- dplyr::ungroup(pd_smooth)
+  } else {
+    # convert from day of year to year fraction
+    pd_smooth[["x"]] <- pd_smooth[["x"]] / 366
+    rm(pd_slope)
+    pd_smooth <- tidyr::drop_na(pd_smooth)
+    pd_smooth <- tidyr::nest(pd_smooth, data = c("x", "y", "weight"))
+    pred_weeks <- ebirdst::ebirdst_weeks$week_midpoint
+    pd_smooth$smooth <- lapply(pd_smooth[["data"]],
+                               FUN = loess_smooth,
+                               predict_to = pred_weeks,
+                               na_value = NA_real_,
+                               check_width = 7 / 366)
+    pd_smooth$data <- NULL
+    pd_smooth <- tidyr::unnest(pd_smooth, .data$smooth)
+    names(pd_smooth) <- c("predictor", "week_midpoint", "prob_pos_slope")
+  }
 
   # categorize positive and negative directionalities
   pd_smooth$prob_pos_slope <- pmin(pmax(0, pd_smooth$prob_pos_slope), 1)
@@ -220,42 +239,60 @@ ebirdst_habitat <- function(path, ext, data = NULL) {
   pd_smooth$direction[pd_smooth$prob_pos_slope <= 0.3] <- -1
 
   # temporal smoothing of pis
-  pi_smooth <- dplyr::select(pis, .data$predictor,
-                             x = .data$day_of_year, y = .data$importance)
-  # convert from day of year to year fraction
-  pi_smooth[["x"]] <- pi_smooth[["x"]] / 366
-  # log transform
-  pi_smooth$y <- log(pi_smooth$y + 0.001)
-  pi_smooth <- tidyr::nest(pi_smooth, data = -dplyr::all_of("predictor"))
-  pi_smooth$smooth <- lapply(pi_smooth[["data"]],
-                             FUN = loess_smooth,
-                             predict_to = pred_weeks,
-                             na_value = 0,
-                             check_width = 7 / 366)
-  pi_smooth$data <- NULL
-  pi_smooth <- tidyr::unnest(pi_smooth, .data$smooth)
-  # back transform
-  pi_smooth$y <- exp(pi_smooth$y)
-  # scale pis
-  pi_smooth <- dplyr::group_by(pi_smooth, .data$x)
-  pi_smooth <- dplyr::mutate(pi_smooth,
-                             y = .data$y / sum(.data$y, na.rm = TRUE))
-  pi_smooth <- dplyr::ungroup(pi_smooth)
-  names(pi_smooth) <- c("predictor", "week_midpoint", "importance")
-  rm(pis)
+  pi_smooth <- dplyr::inner_join(pis, stixel_coverage, by = "stixel_id")
+  pi_smooth <- dplyr::select(pi_smooth, .data$predictor,
+                             x = .data$day_of_year, y = .data$importance,
+                             .data$weight)
+  if (isTRUE(stationary_associations)) {
+    # for stationary assocations, simply calculate the weighted average
+    pi_smooth <- dplyr::group_by(pi_smooth, .data$predictor)
+    pi_smooth <- dplyr::summarise(pi_smooth,
+                                  importance = weighted_mean(.data$y,
+                                                             .data$weight))
+    pi_smooth <- dplyr::ungroup(pi_smooth)
+    # scale pis
+    total_importance <- sum(pi_smooth$importance, na.rm = TRUE)
+    pi_smooth$importance <- pi_smooth$importance / total_importance
+  } else {
+    # convert from day of year to year fraction
+    pi_smooth[["x"]] <- pi_smooth[["x"]] / 366
+    # log transform
+    pi_smooth$y <- log(pi_smooth$y + 0.001)
+    pi_smooth <- tidyr::nest(pi_smooth, data = -dplyr::all_of("predictor"))
+    pi_smooth$smooth <- lapply(pi_smooth[["data"]],
+                               FUN = loess_smooth,
+                               predict_to = pred_weeks,
+                               na_value = 0,
+                               check_width = 7 / 366)
+    pi_smooth$data <- NULL
+    pi_smooth <- tidyr::unnest(pi_smooth, .data$smooth)
+    # back transform
+    pi_smooth$y <- exp(pi_smooth$y)
+    # scale pis
+    pi_smooth <- dplyr::group_by(pi_smooth, .data$x)
+    pi_smooth <- dplyr::mutate(pi_smooth,
+                               y = .data$y / sum(.data$y, na.rm = TRUE))
+    pi_smooth <- dplyr::ungroup(pi_smooth)
+    names(pi_smooth) <- c("predictor", "week_midpoint", "importance")
+    rm(pis)
+  }
 
-  # multiply importance and direction
-  pipd <- dplyr::inner_join(pi_smooth, pd_smooth,
-                            by = c("predictor", "week_midpoint"))
-  rm(pi_smooth, pd_smooth)
+  output_cols <- c("predictor", "week", "importance",
+                   "prob_pos_slope", "direction")
+  if (isTRUE(stationary_associations)) {
+    pipd <- dplyr::inner_join(pi_smooth, pd_smooth, by = "predictor")
+    output_cols <- setdiff(output_cols, "week")
+  } else {
+    # multiply importance and direction
+    pipd <- dplyr::inner_join(pi_smooth, pd_smooth,
+                              by = c("predictor", "week_midpoint"))
+    # assign correct dates
+    w <-  ebirdst::ebirdst_weeks
+    pipd$week <- format(w$date[match(pipd$week_midpoint, w$week_midpoint)],
+                        "%m-%d")
+  }
 
-  # assign correct dates
-  w <-  ebirdst::ebirdst_weeks
-  pipd$week <- format(w$date[match(pipd$week_midpoint, w$week_midpoint)],
-                      "%m-%d")
-
-  structure(pipd[, c("predictor", "week", "importance",
-                     "prob_pos_slope", "direction")],
+  structure(pipd[, output_cols],
             class = c("ebirdst_habitat", class(pipd)),
             extent = ext)
 }
@@ -272,6 +309,10 @@ ebirdst_habitat <- function(path, ext, data = NULL) {
 plot.ebirdst_habitat <- function(x, n_habitat_types = 15, ...) {
   stopifnot(is.numeric(n_habitat_types), length(n_habitat_types) == 1,
             n_habitat_types > 0)
+  if (!"week" %in% names(x)) {
+    stop("Habitat association plots are only possible with ",
+         "stationary_associations = FALSE")
+  }
 
   # convert to date
   x$week <- as.Date(paste(ebirdst_version()["data_version"],
@@ -446,4 +487,8 @@ subset_top_predictors <- function(x, n_habitat_types = 15) {
 
   # subset to top predictors
   x[x$habitat_code %in% top_pis$habitat_code, ]
+}
+
+weighted_mean <- function(x, weight) {
+  sum(x * weight, na.rm = TRUE) / sum(weight, na.rm = TRUE)
 }
