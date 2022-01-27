@@ -77,7 +77,7 @@ generate_range <- function(x, smooth = TRUE, drop_fill = TRUE) {
   rng_pa <- rbind(rng, pa)
   if (isTRUE(smooth)) {
     # drop holes and polygons smaller than 1.5 times the cell size
-    if (isTRUE(drop_smooth)) {
+    if (isTRUE(drop_fill)) {
       ca <- units::set_units(1.5 * prod(raster::res(x)), "m^2")
       rng_smooth <- smoothr::drop_crumbs(rng_pa, threshold = ca)
       rng_smooth <- smoothr::fill_holes(rng_smooth, threshold = ca)
