@@ -81,6 +81,8 @@ generate_range <- function(x, smooth = TRUE, drop_fill = TRUE) {
       ca <- units::set_units(1.5 * prod(raster::res(x)), "m^2")
       rng_smooth <- smoothr::drop_crumbs(rng_pa, threshold = ca)
       rng_smooth <- smoothr::fill_holes(rng_smooth, threshold = ca)
+    } else {
+      rng_smooth <- rng_pa
     }
 
     # smooth
