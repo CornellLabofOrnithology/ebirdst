@@ -11,6 +11,8 @@
 #'   fragments consisting of single raster cells. Smoothing is done via the
 #'   `smoothr` package. If `smooth = TRUE`, but the raw and smoothed polygons
 #'   are returned as separate features.
+#' @param drop_fill logical; whether to drop small polygon fragments and fill
+#'   small holes in polygons.
 #'
 #' @details  The raw polygons will have sharp edges since they're being
 #' converted from a square raster grid; however, by using `smooth = TRUE`, a set
@@ -41,12 +43,13 @@
 #' # convert to ranges
 #' range_polygons <- generate_range(abd)
 #' }
-generate_range <- function(x, smooth = TRUE) {
+generate_range <- function(x, smooth = TRUE, drop_fill = TRUE) {
   if (is.character(x) || inherits(x, "SpatRaster")) {
     x <- raster::stack(x)
   }
   stopifnot(inherits(x, "Raster"))
   stopifnot(is.logical(smooth), length(smooth) == 1, !is.na(smooth))
+  stopifnot(is.logical(drop_fill), length(drop_fill) == 1, !is.na(drop_fill))
 
   # suggests check
   if (!requireNamespace("smoothr", quietly = TRUE)) {
@@ -74,9 +77,11 @@ generate_range <- function(x, smooth = TRUE) {
   rng_pa <- rbind(rng, pa)
   if (isTRUE(smooth)) {
     # drop holes and polygons smaller than 1.5 times the cell size
-    ca <- units::set_units(1.5 * prod(raster::res(x)), "m^2")
-    rng_smooth <- smoothr::drop_crumbs(rng_pa, threshold = ca)
-    rng_smooth <- smoothr::fill_holes(rng_smooth, threshold = ca)
+    if (isTRUE(drop_smooth)) {
+      ca <- units::set_units(1.5 * prod(raster::res(x)), "m^2")
+      rng_smooth <- smoothr::drop_crumbs(rng_pa, threshold = ca)
+      rng_smooth <- smoothr::fill_holes(rng_smooth, threshold = ca)
+    }
 
     # smooth
     rng_smooth <- smoothr::smooth(rng_smooth, method = "ksmooth",

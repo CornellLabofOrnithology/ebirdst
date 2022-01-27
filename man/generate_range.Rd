@@ -4,7 +4,7 @@
 \alias{generate_range}
 \title{Generate range polygons from an abundance raster}
 \usage{
-generate_range(x, smooth = TRUE)
+generate_range(x, smooth = TRUE, drop_fill = TRUE)
 }
 \arguments{
 \item{x}{\code{RasterStack}; the input raster to convert to polygons.}
@@ -13,6 +13,9 @@ generate_range(x, smooth = TRUE)
 fragments consisting of single raster cells. Smoothing is done via the
 \code{smoothr} package. If \code{smooth = TRUE}, but the raw and smoothed polygons
 are returned as separate features.}
+
+\item{drop_fill}{logical; whether to drop small polygon fragments and fill
+small holes in polygons.}
 }
 \value{
 An \code{sf} object containing the polygons defining the range. The range
