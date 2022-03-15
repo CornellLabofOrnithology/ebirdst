@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.4</span>
       </span>
     </div>
 
@@ -87,34 +87,34 @@
 
       
 
-      </header><script src="product-changelog_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>eBird Status Data Products Changelog</h1>
                         <h4 data-toc-skip class="author">Tom Auer</h4>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/product-changelog.Rmd" class="external-link"><code>vignettes/product-changelog.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/HEAD/vignettes/product-changelog.Rmd" class="external-link"><code>vignettes/product-changelog.Rmd</code></a></small>
       <div class="hidden name"><code>product-changelog.Rmd</code></div>
 
     </div>
 
     
     
-<div id="changelog" class="section level2">
-<h2 class="hasAnchor">
-<a href="#changelog" class="anchor" aria-hidden="true"></a>2020 Changelog</h2>
+<div class="section level2">
+<h2 id="changelog">2020 Changelog<a class="anchor" aria-label="anchor" href="#changelog"></a>
+</h2>
 <p><strong>Data Version:</strong> 2020 (available June 2022)</p>
 <strong>Citation:</strong>
 <blockquote>
 Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. Hochachka, L. Jaromczyk, C. Wood, I. Davies, M. Iliff, L. Seitz. 2021. eBird Status and Trends, Data Version: 2020; Released: 2021. Cornell Lab of Ornithology, Ithaca, New York. <a href="https://doi.org/10.2173/ebirdst.2020" class="external-link uri">https://doi.org/10.2173/ebirdst.2020</a>
 </blockquote>
-<div id="data-inputs" class="section level3">
-<h3 class="hasAnchor">
-<a href="#data-inputs" class="anchor" aria-hidden="true"></a>Data Inputs</h3>
-<div id="ebird-checklists" class="section level4">
-<h4 class="hasAnchor">
-<a href="#ebird-checklists" class="anchor" aria-hidden="true"></a>eBird Checklists</h4>
+<div class="section level3">
+<h3 id="data-inputs">Data Inputs<a class="anchor" aria-label="anchor" href="#data-inputs"></a>
+</h3>
+<div class="section level4">
+<h4 id="ebird-checklists">eBird Checklists<a class="anchor" aria-label="anchor" href="#ebird-checklists"></a>
+</h4>
 <ul>
 <li>CHANGED: checklists are included for January 1 2006 through December 31 2020, updated from January 1 2005 through April 15 2020.</li>
 <li>CHANGED: all species now use all data globally and are not run for spatial subsets. Previously, primarily Western Hemisphere species were run only for that spatial extent.</li>
@@ -123,9 +123,9 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
 <li>FIXED: Previously, some historical checklists that lacked complete effort information had been included. These have now been excluded.</li>
 </ul>
 </div>
-<div id="environmental-covariates" class="section level4">
-<h4 class="hasAnchor">
-<a href="#environmental-covariates" class="anchor" aria-hidden="true"></a>Environmental Covariates</h4>
+<div class="section level4">
+<h4 id="environmental-covariates">Environmental Covariates<a class="anchor" aria-label="anchor" href="#environmental-covariates"></a>
+</h4>
 <ul>
 <li>CHANGED: SRTM15+ <a href="https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2019EA000658" class="external-link">~250m elevation and bathymetry</a> replaces the ~1 kilometer SRTM30+ elevation and bathymetry product.</li>
 <li>CHANGED: The single year of Nighttime Lights has been replaced with by-year assignment for 2014-2020 using the <a href="https://eogdata.mines.edu/products/vnl/" class="external-link">EOG Annual VNL v2 product</a>.</li>
@@ -137,27 +137,27 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
 </ul>
 </div>
 </div>
-<div id="workflow-and-code-changes" class="section level3">
-<h3 class="hasAnchor">
-<a href="#workflow-and-code-changes" class="anchor" aria-hidden="true"></a>Workflow and Code Changes</h3>
-<div id="spatiotemporal-partitioning" class="section level4">
-<h4 class="hasAnchor">
-<a href="#spatiotemporal-partitioning" class="anchor" aria-hidden="true"></a>Spatiotemporal Partitioning</h4>
+<div class="section level3">
+<h3 id="workflow-and-code-changes">Workflow and Code Changes<a class="anchor" aria-label="anchor" href="#workflow-and-code-changes"></a>
+</h3>
+<div class="section level4">
+<h4 id="spatiotemporal-partitioning">Spatiotemporal Partitioning<a class="anchor" aria-label="anchor" href="#spatiotemporal-partitioning"></a>
+</h4>
 <ul>
 <li>CHANGED: The adaptive partitioning algorithm (AdaSTEM) now uses an Icosahedron Gnomic projection that generates partitions with largely conformal stixel boundaries across the globe.</li>
 <li>CHANGED: The temporal width of AdaSTEM partitions has been changed from 30.5 days to 28 days.</li>
 </ul>
 </div>
-<div id="model-ensemble" class="section level4">
-<h4 class="hasAnchor">
-<a href="#model-ensemble" class="anchor" aria-hidden="true"></a>Model Ensemble</h4>
+<div class="section level4">
+<h4 id="model-ensemble">Model Ensemble<a class="anchor" aria-label="anchor" href="#model-ensemble"></a>
+</h4>
 <ul>
 <li>CHANGED: The percent above threshold (PAT) cutoff for 3km grid cells to be reported as present has changed from 0.1 to 0.143, to accommodate increased occurrence rates as a result of including hourly weather to account for variation in detection rates.</li>
 </ul>
 </div>
-<div id="resident-methodology" class="section level4">
-<h4 class="hasAnchor">
-<a href="#resident-methodology" class="anchor" aria-hidden="true"></a>Resident Methodology</h4>
+<div class="section level4">
+<h4 id="resident-methodology">Resident Methodology<a class="anchor" aria-label="anchor" href="#resident-methodology"></a>
+</h4>
 <ul>
 <li>CHANGED: Residents now have a suite of independent settings designed for species with strong spatiotemporal stationarity. These include the following:
 <ul>
@@ -168,9 +168,9 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
 </li>
 </ul>
 </div>
-<div id="data-products" class="section level4">
-<h4 class="hasAnchor">
-<a href="#data-products" class="anchor" aria-hidden="true"></a>Data Products</h4>
+<div class="section level4">
+<h4 id="data-products">Data Products<a class="anchor" aria-label="anchor" href="#data-products"></a>
+</h4>
 <ul>
 <li>CHANGED: The count model prediction values for effort variables are now set at 1 hour and 1 kilometer. Previously, the effort variables used for the count model prediction were the same as those used for the occurrence model, which sought to maximize detection by optimizing the distance and duration effort variables to capture as much signal as possible, up to 12 hours (6 hours in this version) and 10 kilometers.</li>
 <li>CHANGED: Zeroes in data products that are outside of the prediction area for species (also known as assumed zeroes) now require, on average, across the up-to 100 models in the ensemble, 0.5% of 3km grid cells filled with at least 1 checklist for a given week to be reported as zero. Previously, this was 0.1% of 3km grid cells. This has been adjusted to offer a more appropriately conservative representation of where absence can be assumed based on overall data volume.</li>
@@ -187,29 +187,29 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
 <li>CHANGED: Habitat and regional abundance and range statistical summaries are now computed for all species, globally, using the <a href="https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-1-states-provinces/" class="external-link">Natural Earth Data Admin 1 data</a> for summarization.</li>
 </ul>
 </div>
-<div id="expert-review" class="section level4">
-<h4 class="hasAnchor">
-<a href="#expert-review" class="anchor" aria-hidden="true"></a>Expert Review</h4>
+<div class="section level4">
+<h4 id="expert-review">Expert Review<a class="anchor" aria-label="anchor" href="#expert-review"></a>
+</h4>
 <ul>
 <li>CHANGED: Animations are no longer being reviewed for resident species.</li>
 </ul>
 </div>
 </div>
 </div>
-<div id="changelog-1" class="section level2">
-<h2 class="hasAnchor">
-<a href="#changelog-1" class="anchor" aria-hidden="true"></a>2019 Changelog</h2>
+<div class="section level2">
+<h2 id="changelog-1">2019 Changelog<a class="anchor" aria-label="anchor" href="#changelog-1"></a>
+</h2>
 <p><strong>Data Version:</strong> 2019 (currently available)</p>
 <strong>Citation:</strong>
 <blockquote>
 Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. Hochachka, C. Wood, I. Davies, M. Iliff, L. Seitz. 2020. eBird Status and Trends, Data Version: 2019; Released: 2020. Cornell Lab of Ornithology, Ithaca, New York. <a href="https://doi.org/10.2173/ebirdst.2019" class="external-link uri">https://doi.org/10.2173/ebirdst.2019</a>
 </blockquote>
-<div id="data-inputs-1" class="section level3">
-<h3 class="hasAnchor">
-<a href="#data-inputs-1" class="anchor" aria-hidden="true"></a>Data Inputs</h3>
-<div id="ebird-checklists-1" class="section level4">
-<h4 class="hasAnchor">
-<a href="#ebird-checklists-1" class="anchor" aria-hidden="true"></a>eBird Checklists</h4>
+<div class="section level3">
+<h3 id="data-inputs-1">Data Inputs<a class="anchor" aria-label="anchor" href="#data-inputs-1"></a>
+</h3>
+<div class="section level4">
+<h4 id="ebird-checklists-1">eBird Checklists<a class="anchor" aria-label="anchor" href="#ebird-checklists-1"></a>
+</h4>
 <ul>
 <li>CHANGED: Checklists are included for January 1, 2005 through April 15, 2020, updated from January 1, 2014 through December 31, 2018.</li>
 <li>ADDED: Include checklists from the <a href="https://www.manomet.org/project/international-shorebird-survey/" class="external-link">International Shorebird Survey (ISS)</a> as complete for shorebird species.</li>
@@ -217,21 +217,21 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
 <li>FIXED: Subspecies did not always roll up to species-level correctly.</li>
 </ul>
 </div>
-<div id="environmental-covariates-1" class="section level4">
-<h4 class="hasAnchor">
-<a href="#environmental-covariates-1" class="anchor" aria-hidden="true"></a>Environmental Covariates</h4>
+<div class="section level4">
+<h4 id="environmental-covariates-1">Environmental Covariates<a class="anchor" aria-label="anchor" href="#environmental-covariates-1"></a>
+</h4>
 <ul>
 <li>CHANGED: <a href="https://lpdaac.usgs.gov/products/astwbdv001/" class="external-link">ASTER Global Water Bodies Database</a> at 30m for ocean, river, and lakes replaces <a href="https://lpdaac.usgs.gov/products/mod44wv006/" class="external-link">MOD44W</a> which was 500m resolution, had only land or water classification, and only ran through 2015.</li>
 <li>ADDED: <a href="https://www.globio.info/download-grip-dataset" class="external-link">GLOBIO Global Roads Inventory Project (GRIP)</a> as road density (m/km2) for five classes of roads.</li>
 </ul>
 </div>
 </div>
-<div id="workflow-and-code-changes-1" class="section level3">
-<h3 class="hasAnchor">
-<a href="#workflow-and-code-changes-1" class="anchor" aria-hidden="true"></a>Workflow and Code Changes</h3>
-<div id="spatiotemporal-partitioning-1" class="section level4">
-<h4 class="hasAnchor">
-<a href="#spatiotemporal-partitioning-1" class="anchor" aria-hidden="true"></a>Spatiotemporal Partitioning</h4>
+<div class="section level3">
+<h3 id="workflow-and-code-changes-1">Workflow and Code Changes<a class="anchor" aria-label="anchor" href="#workflow-and-code-changes-1"></a>
+</h3>
+<div class="section level4">
+<h4 id="spatiotemporal-partitioning-1">Spatiotemporal Partitioning<a class="anchor" aria-label="anchor" href="#spatiotemporal-partitioning-1"></a>
+</h4>
 <ul>
 <li>CHANGED: The adaptive partitioning algorithm (AdaSTEM) now uses projected coordinates (sinusoidal) and meters instead of unprojected coordinates and degrees.</li>
 <li>CHANGED: AdaSTEM partitions are now 1500 kilometers on a side at their largest and 187 kilometers on a side at their smallest.</li>
@@ -239,32 +239,32 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
 <li>CHANGED: AdaSTEM now reverts individual partitions back to the next largest size if any of the partition children contain less than 500 checklists and are not mostly open water. Partitions are never allowed to revert back to partitions that are 1500 kilometers or more on a side.</li>
 </ul>
 </div>
-<div id="model-ensemble-1" class="section level4">
-<h4 class="hasAnchor">
-<a href="#model-ensemble-1" class="anchor" aria-hidden="true"></a>Model Ensemble</h4>
+<div class="section level4">
+<h4 id="model-ensemble-1">Model Ensemble<a class="anchor" aria-label="anchor" href="#model-ensemble-1"></a>
+</h4>
 <ul>
 <li>ADDED: Individual models now report 0 for predictions if the training data set contains less than 10 positive observations of a species and the mean spatial coverage within the model is greater than or equal to 5%.</li>
 <li>CHANGED: Range boundaries are now set weekly to have the highest level of ensemble support, between 50% and 95% of models, while including at least 99.5% of positive observations, changed from being fixed at 75% of models in previous versions.</li>
 <li>CHANGED: Zeroes in data products that are outside of the prediction area for species (also known as assumed zeroes) are now based on the mean spatial coverage of checklists within those areas. For locations where species-specific models did not report zero or non-zero predictions, locations need to have, on average, across the up-to 100 models in the ensemble, 0.1% of 3km grid cells filled with at least 1 checklist for a given week to be reported as zero. Previously, these locations required 95% of models at a given location to have had at least 50 complete checklists for the given week.</li>
 </ul>
 </div>
-<div id="seasonal-products" class="section level4">
-<h4 class="hasAnchor">
-<a href="#seasonal-products" class="anchor" aria-hidden="true"></a>Seasonal Products</h4>
+<div class="section level4">
+<h4 id="seasonal-products">Seasonal Products<a class="anchor" aria-label="anchor" href="#seasonal-products"></a>
+</h4>
 <ul>
 <li>ADDED: When averaging weekly estimates to represent resident species, reviewers select a subset of weeks, as opposed to having previously averaged the entire year.</li>
 </ul>
 </div>
-<div id="data-products-1" class="section level4">
-<h4 class="hasAnchor">
-<a href="#data-products-1" class="anchor" aria-hidden="true"></a>Data Products</h4>
+<div class="section level4">
+<h4 id="data-products-1">Data Products<a class="anchor" aria-label="anchor" href="#data-products-1"></a>
+</h4>
 <ul>
 <li>ADDED: There are now 184 species modeled at a fully global extent. The overall species total is now 807.</li>
 </ul>
 </div>
-<div id="expert-review-1" class="section level4">
-<h4 class="hasAnchor">
-<a href="#expert-review-1" class="anchor" aria-hidden="true"></a>Expert Review</h4>
+<div class="section level4">
+<h4 id="expert-review-1">Expert Review<a class="anchor" aria-label="anchor" href="#expert-review-1"></a>
+</h4>
 <ul>
 <li>ADDED: Expert reviewers now assign quality scores for the full-year, animations, and all seasons.</li>
 </ul>
@@ -285,12 +285,12 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by <a href="http://strimas.com" class="external-link external-link">Matthew Strimas-Mackey</a>, Shawn Ligocki, <a href="http://twitter.com/tom_auer" class="external-link external-link">Tom Auer</a>, Daniel Fink.</p>
+<p>Developed by <a href="http://strimas.com" class="external-link">Matthew Strimas-Mackey</a>, Shawn Ligocki, <a href="http://twitter.com/tom_auer" class="external-link">Tom Auer</a>, Daniel Fink.</p>
 </div>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9001.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>

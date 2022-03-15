@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.4</span>
       </span>
     </div>
 
@@ -87,24 +87,24 @@
 
       
 
-      </header><script src="ebirdst-advanced-mapping_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Generating Seasonal Abundance and Range Maps and Stats</h1>
                         <h4 data-toc-skip class="author">Matt Strimas-Mackey, Tom Auer, Daniel Fink</h4>
             
-            <h4 data-toc-skip class="date">2021-12-20</h4>
+            <h4 data-toc-skip class="date">2022-03-15</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-advanced-mapping.Rmd" class="external-link"><code>vignettes/ebirdst-advanced-mapping.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/HEAD/vignettes/ebirdst-advanced-mapping.Rmd" class="external-link"><code>vignettes/ebirdst-advanced-mapping.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-advanced-mapping.Rmd</code></div>
 
     </div>
 
     
     
-<div id="outline" class="section level1">
-<h1 class="hasAnchor">
-<a href="#outline" class="anchor" aria-hidden="true"></a>Outline</h1>
+<div class="section level2">
+<h2 id="outline">Outline<a class="anchor" aria-label="anchor" href="#outline"></a>
+</h2>
 <ol style="list-style-type: decimal">
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#data-download">Data Download</a></li>
@@ -114,9 +114,9 @@
 <li><a href="#regional-statistics">Regional Statistics</a></li>
 </ol>
 </div>
-<div id="introduction" class="section level1">
-<h1 class="hasAnchor">
-<a href="#introduction" class="anchor" aria-hidden="true"></a>Introduction</h1>
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
 <p>This vignette describes how to recreate the seasonal map products found on the <a href="https://ebird.org/science/status-and-trends" class="external-link">eBird Status and Trends pages</a>. First, the vignette will cover how to average the abundance data seasonally, then it will proceed with examples of making abundance maps, aggregating and smoothing data for range maps, and, finally, provide examples of calculating regional summary statistic. Throughout this vignette we will use the simplified example dataset available through the <code><a href="../reference/ebirdst_download.html">ebirdst_download()</a></code> function, which consists of the Yellow-bellied Sapsucker data spatially subset to the state of Michigan. However, these methods can be applied to the full datasets for any of the eBird Status and Trends species.</p>
 <p>Let’s begin by loading all the packages we’ll need for this vignette.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -131,12 +131,11 @@
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>
 <span class="co"># resolve namespace conflicts</span>
 <span class="va">select</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="va"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span>
-<span class="fu"><a href="https://r-spatial.github.io/sf/reference/s2.html" class="external-link">sf_use_s2</a></span><span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span>
-<span class="co">#&gt; Spherical geometry (s2) switched off</span></code></pre></div>
+<span class="fu"><a href="https://r-spatial.github.io/sf/reference/s2.html" class="external-link">sf_use_s2</a></span><span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="data-download" class="section level1">
-<h1 class="hasAnchor">
-<a href="#data-download" class="anchor" aria-hidden="true"></a>Data Download</h1>
+<div class="section level2">
+<h2 id="data-download">Data Download<a class="anchor" aria-label="anchor" href="#data-download"></a>
+</h2>
 <p>Before we do anything else, we’ll need to download and load the example abundance data for Yellow-bellied Sapsucker.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">sp_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span>species <span class="op">=</span> <span class="st">"example_data"</span><span class="op">)</span>
@@ -175,9 +174,9 @@
   <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="va">proj</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="seasonal-abundance" class="section level1">
-<h1 class="hasAnchor">
-<a href="#seasonal-abundance" class="anchor" aria-hidden="true"></a>Seasonal Abundance</h1>
+<div class="section level2">
+<h2 id="seasonal-abundance">Seasonal Abundance<a class="anchor" aria-label="anchor" href="#seasonal-abundance"></a>
+</h2>
 <p>Generally, the seasons for eBird Status and Trends products are defined on a species-specific basis through expert review. For information on the details of defining seasons, please see the <a href="https://ebird.org/science/status-and-trends/faq#seasons" class="external-link">seasons section of the FAQ</a>. While it is certainly possible to define your own seasons when making seasonal abundance and range maps, if you want to recreate the products with the same seasons as the website, you’ll need to use the definitions included in the <code>ebirdst_runs</code> data frame included in this package.</p>
 <p>Let’s start by getting the seasonal definitions for Yellow-bellied Sapsucker and transforming the data into a more usable format. For some species, expert review may have indicated that the models are poor in certain seasons. These problematic seasons are identified by missing dates in <code>ebirdst_runs</code> for the season in question. Although all seasons passed review for Yellow-bellied Sapsucker, for generality I’ll add an additional column (<code>passed</code>) indicating whether a seasonal model passed review.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -197,13 +196,13 @@
 <span class="va">quality_rating</span> <span class="op">&lt;-</span> <span class="va">run_review</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">yebsap_dates</span><span class="op">$</span><span class="va">season</span>, <span class="st">"_quality"</span><span class="op">)</span><span class="op">]</span>
 <span class="va">yebsap_dates</span><span class="op">$</span><span class="va">pass</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">quality_rating</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">1</span>
 <span class="va">yebsap_dates</span>
-<span class="co">#&gt; # A tibble: 4 × 4</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 4</span></span>
 <span class="co">#&gt;   season                 start_dt   end_dt     pass </span>
-<span class="co">#&gt;   &lt;chr&gt;                  &lt;date&gt;     &lt;date&gt;     &lt;lgl&gt;</span>
-<span class="co">#&gt; 1 breeding               2019-05-24 2019-09-07 TRUE </span>
-<span class="co">#&gt; 2 nonbreeding            2019-11-23 2019-03-08 TRUE </span>
-<span class="co">#&gt; 3 postbreeding_migration 2019-09-14 2019-11-16 TRUE </span>
-<span class="co">#&gt; 4 prebreeding_migration  2019-03-15 2019-05-17 TRUE</span></code></pre></div>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> breeding               2019-05-24 2019-09-07 TRUE </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> nonbreeding            2019-11-23 2019-03-08 TRUE </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> postbreeding_migration 2019-09-14 2019-11-16 TRUE </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> prebreeding_migration  2019-03-15 2019-05-17 TRUE</span></code></pre></div>
 <p>Now, we’ll use these season definitions to assign each of the weekly abundance layers to a season.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># dates for each abundance layer</span>
@@ -255,9 +254,9 @@
 <span class="co">#&gt; min values :           0,                     0,          0,                      0 </span>
 <span class="co">#&gt; max values :  0.09554554,            1.93999040, 1.93377865,             0.62279958</span></code></pre></div>
 </div>
-<div id="abundance-maps" class="section level1">
-<h1 class="hasAnchor">
-<a href="#abundance-maps" class="anchor" aria-hidden="true"></a>Abundance Maps</h1>
+<div class="section level2">
+<h2 id="abundance-maps">Abundance Maps<a class="anchor" aria-label="anchor" href="#abundance-maps"></a>
+</h2>
 <p>Before we create maps of seasonal relative abundance we need to account for two addition considerations that the online maps make: whether to split pre- and post-breeding migration and whether to explicitly show the year-round distribution as a separate color. For species that use different paths for their two migrations (less than 40% overlap) we show pre-breeding migration (green) and post-breeding migration (yellow) separately.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">migration_threshold</span> <span class="op">&lt;-</span> <span class="fl">0.4</span>
@@ -415,9 +414,9 @@
       line <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>, cex.main <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
 <p><img src="ebirdst-advanced-mapping_files/figure-html/abd-map-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
-<div id="range-maps" class="section level1">
-<h1 class="hasAnchor">
-<a href="#range-maps" class="anchor" aria-hidden="true"></a>Range Maps</h1>
+<div class="section level2">
+<h2 id="range-maps">Range Maps<a class="anchor" aria-label="anchor" href="#range-maps"></a>
+</h2>
 <p>The eBird Status and Trends range maps delineate the boundary of regions with non-zero relative abundance for a given species. We’ll start by aggregating the raster layers to a coarser resolution to speed up processing, then convert the boundaries of non-zero abundance regions to polygons. We’ll also convert the prediction areas to polygons so we can distinguish where the species is predicted to not occur from where it was not modeled.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># aggregate</span>
@@ -450,9 +449,9 @@
     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>season <span class="op">=</span> <span class="va">s</span>, layer <span class="op">=</span> <span class="st">"prediction_area"</span><span class="op">)</span>
 <span class="op">}</span>
 <span class="co"># combine the sf objects for all seasons</span>
-<span class="va">range</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://www.math.uzh.ch/pages/spam//reference/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">range</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">pred_area</span><span class="op">)</span><span class="op">)</span>
+<span class="va">range</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://www.math.uzh.ch/pages/spam/reference/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">range</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">pred_area</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/row.names.html" class="external-link">row.names</a></span><span class="op">(</span><span class="va">range</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">NULL</span>
-<span class="fu"><a href="https://www.math.uzh.ch/pages/spam//reference/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">range</span><span class="op">)</span>
+<span class="fu"><a href="https://www.math.uzh.ch/pages/spam/reference/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">range</span><span class="op">)</span>
 <span class="co">#&gt; Simple feature collection with 8 features and 2 fields</span>
 <span class="co">#&gt; Geometry type: MULTIPOLYGON</span>
 <span class="co">#&gt; Dimension:     XY</span>
@@ -481,7 +480,7 @@
   <span class="fu"><a href="https://strimas.com/smoothr/reference/smooth.html" class="external-link">smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"ksmooth"</span>, smoothness <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
 <span class="co"># clip zeros to land border, range to buffered land to handle coastal species</span>
 <span class="va">range_split</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/split.html" class="external-link">split</a></span><span class="op">(</span><span class="va">range_smooth</span>, <span class="va">range_smooth</span><span class="op">$</span><span class="va">layer</span><span class="op">)</span>
-<span class="va">range_smooth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://www.math.uzh.ch/pages/spam//reference/cbind.html" class="external-link">rbind</a></span><span class="op">(</span>
+<span class="va">range_smooth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://www.math.uzh.ch/pages/spam/reference/cbind.html" class="external-link">rbind</a></span><span class="op">(</span>
   <span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html" class="external-link">st_intersection</a></span><span class="op">(</span><span class="va">range_split</span><span class="op">$</span><span class="va">range</span>, <span class="va">ne_land_buffer</span><span class="op">)</span>,
   <span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html" class="external-link">st_intersection</a></span><span class="op">(</span><span class="va">range_split</span><span class="op">$</span><span class="va">prediction_area</span>, <span class="va">ne_land</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>Finally, we can produce a seasonal range map in a similar fashion to the abundance map above.</p>
@@ -548,9 +547,9 @@
       line <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>, cex.main <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
 <p><img src="ebirdst-advanced-mapping_files/figure-html/range-map-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
-<div id="regional-statistics" class="section level1">
-<h1 class="hasAnchor">
-<a href="#regional-statistics" class="anchor" aria-hidden="true"></a>Regional Statistics</h1>
+<div class="section level2">
+<h2 id="regional-statistics">Regional Statistics<a class="anchor" aria-label="anchor" href="#regional-statistics"></a>
+</h2>
 <p>In addition to maps and visualizations, the eBird Status and Trends website provides a set of statistics summarizing the spatial data over regions. In the US and Canada, statistics are provided for each state and province, and throughout North America they are provided for <a href="https://nabci-us.org/resources/bird-conservation-regions-map/" class="external-link">Bird Conservation Regions (BCRs)</a>. The five regional statistics are:</p>
 <ol style="list-style-type: decimal">
 <li>
@@ -578,9 +577,9 @@
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">abd_season_mr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">sp_path</span>, <span class="st">"abundance_seasonal"</span>, resolution <span class="op">=</span> <span class="st">"mr"</span><span class="op">)</span>
 <span class="va">abd_mr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">sp_path</span>, <span class="st">"abundance"</span>, resolution <span class="op">=</span> <span class="st">"mr"</span><span class="op">)</span></code></pre></div>
-<div id="mean-relative-abundance" class="section level2">
-<h2 class="hasAnchor">
-<a href="#mean-relative-abundance" class="anchor" aria-hidden="true"></a>Mean Relative Abundance</h2>
+<div class="section level3">
+<h3 id="mean-relative-abundance">Mean Relative Abundance<a class="anchor" aria-label="anchor" href="#mean-relative-abundance"></a>
+</h3>
 <p>Mean relative abundance is the easiest statistics to calculate: we simply average all the raster cells within each region polygon.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">abd_mean_region</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">abd_season_mr</span>, <span class="va">mi_counties</span>, 
@@ -622,9 +621,9 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></code></pre></div>
 <p><img src="ebirdst-advanced-mapping_files/figure-html/mean-rel-abd-map-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
-<div id="days-of-occupation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#days-of-occupation" class="anchor" aria-hidden="true"></a>Days of Occupation</h2>
+<div class="section level3">
+<h3 id="days-of-occupation">Days of Occupation<a class="anchor" aria-label="anchor" href="#days-of-occupation"></a>
+</h3>
 <p>Days of occupation is the most challenging statistic to calculate because it involves several steps. First, for each week, we need to determine if a region (i.e. a county) is “occupied”. We define occupied as at least 5% of the cells within the region having a non-zero abundance.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">threshold_occupied</span> <span class="op">&lt;-</span> <span class="fl">0.05</span>
@@ -654,15 +653,15 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>days_occ <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fl">7</span> <span class="op">*</span> <span class="va">weeks_occ</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/pkg/raster/man/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">county_code</span>, <span class="va">season</span>, <span class="va">days_occ</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/raster/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">days_occupation</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 × 3</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span>
 <span class="co">#&gt;   county_code season                 days_occ</span>
-<span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;                     &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 US.MI.AC    breeding                    112</span>
-<span class="co">#&gt; 2 US.MI.AC    nonbreeding                   0</span>
-<span class="co">#&gt; 3 US.MI.AC    postbreeding_migration       35</span>
-<span class="co">#&gt; 4 US.MI.AC    prebreeding_migration        49</span>
-<span class="co">#&gt; 5 US.MI.AG    breeding                    112</span>
-<span class="co">#&gt; 6 US.MI.AG    nonbreeding                   0</span></code></pre></div>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> US.MI.AC    breeding                    112</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> US.MI.AC    nonbreeding                   0</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> US.MI.AC    postbreeding_migration       35</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> US.MI.AC    prebreeding_migration        49</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> US.MI.AG    breeding                    112</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> US.MI.AG    nonbreeding                   0</span></code></pre></div>
 <p>Finally, let’s produce a map comparing days occupation in the breeding and non-breeding season.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># join back to county boundaries</span>
@@ -699,12 +698,12 @@
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by <a href="http://strimas.com" class="external-link external-link">Matthew Strimas-Mackey</a>, Shawn Ligocki, <a href="http://twitter.com/tom_auer" class="external-link external-link">Tom Auer</a>, Daniel Fink.</p>
+<p>Developed by <a href="http://strimas.com" class="external-link">Matthew Strimas-Mackey</a>, Shawn Ligocki, <a href="http://twitter.com/tom_auer" class="external-link">Tom Auer</a>, Daniel Fink.</p>
 </div>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9001.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>

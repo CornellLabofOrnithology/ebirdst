@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.4</span>
       </span>
     </div>
 
@@ -87,15 +87,15 @@
 
       
 
-      </header><script src="ebirdst-intro-mapping_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Introduction to loading, mapping, and plotting</h1>
                         <h4 data-toc-skip class="author">Tom Auer, Daniel Fink</h4>
             
-            <h4 data-toc-skip class="date">2021-12-20</h4>
+            <h4 data-toc-skip class="date">2022-03-15</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/master/vignettes/ebirdst-intro-mapping.Rmd" class="external-link"><code>vignettes/ebirdst-intro-mapping.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/HEAD/vignettes/ebirdst-intro-mapping.Rmd" class="external-link"><code>vignettes/ebirdst-intro-mapping.Rmd</code></a></small>
       <div class="hidden name"><code>ebirdst-intro-mapping.Rmd</code></div>
 
     </div>
@@ -107,18 +107,18 @@
     width: 50%;
 }
 </style>
-<div id="outline" class="section level1">
-<h1 class="hasAnchor">
-<a href="#outline" class="anchor" aria-hidden="true"></a>Outline</h1>
+<div class="section level2">
+<h2 id="outline">Outline<a class="anchor" aria-label="anchor" href="#outline"></a>
+</h2>
 <ol style="list-style-type: decimal">
 <li><a href="#loading-rasters">Loading Rasters</a></li>
 <li><a href="#mapping-occurrence-and-abundance">Mapping Occurrence and Abundance</a></li>
 <li><a href="#extracting-trajectories-with-uncertainty">Extracting Trajectories with Uncertainty</a></li>
 </ol>
 </div>
-<div id="loading-rasters" class="section level1">
-<h1 class="hasAnchor">
-<a href="#loading-rasters" class="anchor" aria-hidden="true"></a>Loading Rasters</h1>
+<div class="section level2">
+<h2 id="loading-rasters">Loading Rasters<a class="anchor" aria-label="anchor" href="#loading-rasters"></a>
+</h2>
 <p>Once you have downloaded a set of eBird Status and Trends products, one of the first tasks is to load one of the abundance, count, or occurrence estimate and plot it. Each estimate is stored in a multi-band GeoTiff file that is most appropriately loaded as a <code>RasterStack</code> object in R. These “cubes” come with areas of predicted and assumed zeroes, such that any cells that are NA represent areas outside of the area of estimation. All cubes have 52 weeks, even if some weeks are all NA (such as those species that winter entirely outside of North America). The following code example shows how to load an estimate raster and assign names.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/CornellLabofOrnithology/ebirdst" class="external-link">ebirdst</a></span><span class="op">)</span>
@@ -141,7 +141,7 @@
 
 <span class="co"># use parse_raster_dates() to get actual date objects for each layer</span>
 <span class="va">date_vector</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_raster_dates.html">parse_raster_dates</a></span><span class="op">(</span><span class="va">abd</span><span class="op">)</span>
-<span class="fu"><a href="https://www.math.uzh.ch/pages/spam//reference/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">date_vector</span><span class="op">)</span>
+<span class="fu"><a href="https://www.math.uzh.ch/pages/spam/reference/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">date_vector</span><span class="op">)</span>
 <span class="co">#&gt;  [1] "2019-01-04" "2019-01-11" "2019-01-18" "2019-01-25" "2019-02-01"</span>
 <span class="co">#&gt;  [6] "2019-02-08" "2019-02-15" "2019-02-22" "2019-03-01" "2019-03-08"</span>
 <span class="co">#&gt; [11] "2019-03-15" "2019-03-22" "2019-03-29" "2019-04-05" "2019-04-12"</span>
@@ -172,13 +172,13 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">abd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">sp_path</span>, <span class="st">"abundance"</span>, resolution <span class="op">=</span> <span class="st">"mr"</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="mapping-relative-abundance" class="section level1">
-<h1 class="hasAnchor">
-<a href="#mapping-relative-abundance" class="anchor" aria-hidden="true"></a>Mapping Relative Abundance</h1>
+<div class="section level2">
+<h2 id="mapping-relative-abundance">Mapping Relative Abundance<a class="anchor" aria-label="anchor" href="#mapping-relative-abundance"></a>
+</h2>
 <p>One of the most common tasks with eBird Status and Trends products is to make maps of relative abundance. Basic maps can easily be produced with limited code, but to make high-quality, presentation-ready maps requires extra work. This section describes some functions in the <code>ebirdst</code> package intended to assist with mapping.</p>
-<div id="projections" class="section level2">
-<h2 class="hasAnchor">
-<a href="#projections" class="anchor" aria-hidden="true"></a>Projections</h2>
+<div class="section level3">
+<h3 id="projections">Projections<a class="anchor" aria-label="anchor" href="#projections"></a>
+</h3>
 <p>The sinusoidal projection that NASA provides MODIS data in, while functional because of its equal-area property, is not good for mapping because of the significant distortion of land masses across the globe. Instead, we’ll use the Eckert IV for mapping because of its pleasing conformal properties across the globe, ease of projection configuration within R and its proj4string construction, and the ease of setting central meridians that best display the Western Hemisphere. It is worth noting that while projecting to a more visually appealing projection is ideal for mapping, it is not necessary for quantitative analysis of eBird Status and Trends products, for which purposes the results can be left in the original Sinusoidal projection.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># define an eckert iv projection centered on the western hemisphere</span>
@@ -200,9 +200,9 @@
 <p><img src="ebirdst-intro-mapping_files/figure-html/project_stack-1.png" width="100%" style="display: block; margin: auto;"></p>
 <p>If working with a full set of data for a species, mapping the layer at the full spatial extent of the analysis area makes for a small map. The raster cube has zeroes for our prediction extent and NAs for the entire Western Hemisphere, unifying the weeks in a cube to the same extent. However, this also means that mapping defaults to the full spatial extent of NAs, the Western Hemisphere. To assist with this, project the <code>RasterStack</code> or <code>RasterLayer</code> to Eckert IV, calculate the full annual spatial extent for the species with the <code><a href="../reference/calc_full_extent.html">calc_full_extent()</a></code> function, and then map, showing an extent that works for the entire full-annual cycle of the species.</p>
 </div>
-<div id="mapping-occurrence" class="section level2">
-<h2 class="hasAnchor">
-<a href="#mapping-occurrence" class="anchor" aria-hidden="true"></a>Mapping Occurrence</h2>
+<div class="section level3">
+<h3 id="mapping-occurrence">Mapping Occurrence<a class="anchor" aria-label="anchor" href="#mapping-occurrence"></a>
+</h3>
 <p>Most examples in this vignette focus primarily on relative abundance estimates, as they’re the most novel and informative. However, we also provide estimates for the probability of occurrence. These are much simpler to map than abundance in terms of color scales and binning, as values range between 0 and 1 throughout the year.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">occ</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">sp_path</span>, <span class="st">"occurrence"</span>, resolution <span class="op">=</span> <span class="st">"mr"</span><span class="op">)</span>
@@ -224,9 +224,9 @@
      legend.width <span class="op">=</span> <span class="fl">2</span>, legend.shrink <span class="op">=</span> <span class="fl">0.97</span><span class="op">)</span></code></pre></div>
 <p><img src="ebirdst-intro-mapping_files/figure-html/map_occurrence-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
-<div id="calculating-abundance-bins" class="section level2">
-<h2 class="hasAnchor">
-<a href="#calculating-abundance-bins" class="anchor" aria-hidden="true"></a>Calculating Abundance Bins</h2>
+<div class="section level3">
+<h3 id="calculating-abundance-bins">Calculating Abundance Bins<a class="anchor" aria-label="anchor" href="#calculating-abundance-bins"></a>
+</h3>
 <p>Mapping relative abundance estimates across the full-annual cycle presents a challenge, in that patterns of concentration and dispersal in abundance change throughout the year, making it difficult to define color bins that suit all seasons and accurately reflect the detail of abundance predictions. To address this, when mapping the relative abundance data, we recommend using quantile bins based on the underlying count distribution, adjusted according to the relative abundance distribution. The function <code><a href="../reference/calc_bins.html">calc_bins()</a></code> will generate bins using this method.</p>
 <p>To compare, we first scale the colors linearly, based on the maximum from the entire year. Since the max is quite high, times of the year with low concentration appear flat.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -290,9 +290,9 @@
                       line <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="ebirdst-intro-mapping_files/figure-html/map_bins-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
-<div id="mapping-abundance" class="section level2">
-<h2 class="hasAnchor">
-<a href="#mapping-abundance" class="anchor" aria-hidden="true"></a>Mapping Abundance</h2>
+<div class="section level3">
+<h3 id="mapping-abundance">Mapping Abundance<a class="anchor" aria-label="anchor" href="#mapping-abundance"></a>
+</h3>
 <p>As seen in the map above, the <code>calc_bins</code> method excludes zeroes. However, with color bins that accurately represent the data distribution, we can add in details about zeroes, tweak the legend, and add some reference data to make a complete map. Like the quick start guide, this will show you how to download example data and plot abundance values similar to how they are plotted for the <a href="https://ebird.org/science/status-and-trends/woothr/abundance-map-weekly" class="external-link">eBird Status and Trends Abundance animations</a>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># to add context, let's pull in some reference data to add</span>
@@ -348,9 +348,9 @@
 <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">wh_states</span>, border <span class="op">=</span> <span class="st">"white"</span>, lwd <span class="op">=</span> <span class="fl">1.5</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="ebirdst-intro-mapping_files/figure-html/map_w_es-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
-<div id="mapping-abundance-confidence-intervals" class="section level2">
-<h2 class="hasAnchor">
-<a href="#mapping-abundance-confidence-intervals" class="anchor" aria-hidden="true"></a>Mapping Abundance Confidence Intervals</h2>
+<div class="section level3">
+<h3 id="mapping-abundance-confidence-intervals">Mapping Abundance Confidence Intervals<a class="anchor" aria-label="anchor" href="#mapping-abundance-confidence-intervals"></a>
+</h3>
 <p>In addition to occurrence and abundance estimates, we also provide confidence intervals at an upper value of 90% and lower value of 10%. These can be used to calculate and map a confidence band width.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># load lower and upper stacks</span>
@@ -369,9 +369,9 @@
 <p><img src="ebirdst-intro-mapping_files/figure-html/map_confidence_band-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 </div>
-<div id="extracting-trajectories-with-uncertainty" class="section level1">
-<h1 class="hasAnchor">
-<a href="#extracting-trajectories-with-uncertainty" class="anchor" aria-hidden="true"></a>Extracting Trajectories with Uncertainty</h1>
+<div class="section level2">
+<h2 id="extracting-trajectories-with-uncertainty">Extracting Trajectories with Uncertainty<a class="anchor" aria-label="anchor" href="#extracting-trajectories-with-uncertainty"></a>
+</h2>
 <p>With <code>RasterStacks</code> for relative abundance estimates, as well as upper and lower confidence intervals, we can extract an abundance trajectory with uncertainty intervals and plot them across the year for a single location.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># set a point</span>
@@ -448,12 +448,12 @@
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by <a href="http://strimas.com" class="external-link external-link">Matthew Strimas-Mackey</a>, Shawn Ligocki, <a href="http://twitter.com/tom_auer" class="external-link external-link">Tom Auer</a>, Daniel Fink.</p>
+<p>Developed by <a href="http://strimas.com" class="external-link">Matthew Strimas-Mackey</a>, Shawn Ligocki, <a href="http://twitter.com/tom_auer" class="external-link">Tom Auer</a>, Daniel Fink.</p>
 </div>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9001.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>
