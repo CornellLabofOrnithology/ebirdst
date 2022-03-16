@@ -21,13 +21,13 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # simple toy example
 #' r <- raster::raster(nrow = 100, ncol = 100)
 #' r[5025:5075] <- 1
 #' raster::extent(r)
 #' calc_full_extent(r)
 #'
-#' \dontrun{
 #' # download example data
 #' path <- ebirdst_download("example_data")
 #' # or get the path if you already have the data downloaded

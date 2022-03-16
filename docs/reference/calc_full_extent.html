@@ -111,23 +111,13 @@ will be extremely long.</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># simple toy example</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
+<span class="r-in"><span class="co"># simple toy example</span></span>
 <span class="r-in"><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">100</span>, ncol <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">r</span><span class="op">[</span><span class="fl">5025</span><span class="op">:</span><span class="fl">5075</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
 <span class="r-in"><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> class      : Extent </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> xmin       : -180 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> xmax       : 180 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ymin       : -90 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ymax       : 90 </span>
 <span class="r-in"><span class="fu">calc_full_extent</span><span class="op">(</span><span class="va">r</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> class      : Extent </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> xmin       : -93.6 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> xmax       : 90 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ymin       : -1.8 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ymax       : 3.6 </span>
 <span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># download example data</span></span>
 <span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span>
 <span class="r-in"><span class="co"># or get the path if you already have the data downloaded</span></span>
