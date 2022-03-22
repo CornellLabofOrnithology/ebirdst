@@ -133,16 +133,17 @@ ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 7) {
   # binary / range ppms
   binary_stat_names <- c("mc_iteration", "sample_size",
                          "mean", "auc", "pcc", "kappa",
-                         "bernoulli_dev", "sensitivity", "specificity")
+                         "bernoulli_dev", "sensitivity", "specificity",
+                         "pr_auc")
   # within range: occurrence rate ppms
   occ_stat_names <- c("mc_iteration", "sample_size",
                       "mean", "threshold", "auc", "pcc", "kappa",
-                      "bernoulli_dev", "sensitivity", "specificity")
+                      "bernoulli_dev", "sensitivity", "specificity", "pr_auc")
   # within range: expected count ppms
   count_stat_names <- c("mc_iteration", "sample_size", "mean",
                         "poisson_dev_abd", "poisson_dev_occ",
                         "spearman_abd", "spearman_occ",
-                        "spearman_count", "pearson_count")
+                        "spearman_count", "pearson_count_log")
 
   # compute monte carlo sample of ppms for spatiotemporal subset
   # split data into within range and out of range
@@ -219,6 +220,10 @@ ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 7) {
                                            st.dev = FALSE)
       bde <- as.numeric(bernoulli_dev(obs = pa_df$obs, pred = pa_df$pred))[3]
       bs$bernoulli_dev[i_mc] <- bde
+
+      binary_curve <- precrec::evalmod(scores = test_sample$pat,
+                                       labels = as.numeric(test_sample$obs > 0))
+      bs$pr_auc[i_mc] <- precrec::auc(binary_curve)$aucs[2]
     }
 
     # within range, occurrence rate ppms
@@ -251,6 +256,10 @@ ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 7) {
       os$auc[i_mc] <- as.numeric(pa_mets$AUC[opt_thresh_idx])
       os$bernoulli_dev[i_mc] <- bernoulli_dev(obs = pa_df$obs,
                                               pred = pa_df$pred)[3]
+
+      occ_curve <- precrec::evalmod(scores = test_inrng$pi_median,
+                                    labels = as.numeric(test_inrng$obs > 0))
+      os$pr_auc[i_mc] <- precrec::auc(occ_curve)$aucs[2]
     }
 
     # within range, expected count ppms
@@ -281,7 +290,8 @@ ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 7) {
         mean(test_cnt$obs, na.rm = TRUE) >= count_min_mean) {
       cs$spearman_count[i_mc] <- stats::cor(test_cnt$mu_median, test_cnt$obs,
                                             method = "spearman")
-      cs$pearson_count[i_mc] <- stats::cor(test_cnt$mu_median, test_cnt$obs,
+      cs$pearson_count_log[i_mc] <- stats::cor(log(test_cnt$mu_median + 1),
+                                               log(test_cnt$obs + 1),
                                            method = "pearson")
     }
   }
@@ -316,9 +326,9 @@ plot.ebirdst_ppms <- function(x, ...) {
   ppms <- list()
   for (t in names(x)) {
     vars <- c("type", "auc", "pcc", "kappa", "bernoulli_dev",
-              "sensitivity", "specificity",
+              "sensitivity", "specificity", "pr_auc",
               "poisson_dev_abd", "spearman_abd",
-              "spearman_count", "pearson_count")
+              "spearman_count", "pearson_count_log")
     vars <- intersect(vars, names(x[[t]]))
     if (t == "binary_ppms") {
       vars <- setdiff(vars, "bernoulli_dev")
@@ -677,7 +687,8 @@ binom_test_p <- function(x, pat_cutoff = 1 / 10) {
 # apply nicer labels
 ppm_labels <- function(x) {
   dplyr::case_when(
-    x == "auc" ~ "AUC",
+    x == "auc" ~ "ROC AUC",
+    x == "pr_auc" ~ "Precision-Recall AUC",
     x == "pcc" ~ "PCC",
     x == "kappa" ~ "Kappa",
     x == "bernoulli_dev" ~ "Bernoulli Deviance",
@@ -689,6 +700,6 @@ ppm_labels <- function(x) {
     x == "spearman_occ" ~ "Spearman",
     x == "spearman_abd" ~ "Abundance Spearman",
     x == "spearman_count" ~ "Count Spearman",
-    x == "pearson_count" ~ "Count Pearson",
+    x == "pearson_count_log" ~ "Log Count Pearson",
     TRUE ~ x)
 }

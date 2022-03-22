@@ -60,7 +60,8 @@ Imports:
     tools,
     utils,
     viridisLite,
-    xml2
+    xml2,
+    precrec
 Suggests: 
     smoothr,
     covr,
