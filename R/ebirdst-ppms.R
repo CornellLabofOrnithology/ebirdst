@@ -221,9 +221,14 @@ ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 7) {
       bde <- as.numeric(bernoulli_dev(obs = pa_df$obs, pred = pa_df$pred))[3]
       bs$bernoulli_dev[i_mc] <- bde
 
-      binary_curve <- precrec::evalmod(scores = test_sample$pat,
-                                       labels = as.numeric(test_sample$obs > 0))
-      bs$pr_auc[i_mc] <- precrec::auc(binary_curve)$aucs[2]
+      obs_positive <- test_sample$obs > 0
+      if (any(obs_positive)) {
+        binary_curve <- precrec::evalmod(scores = test_sample$pat,
+                                         labels = as.numeric(obs_positive))
+        bs$pr_auc[i_mc] <- precrec::auc(binary_curve)$aucs[2]
+      } else {
+        bs$pr_auc[i_mc] <- NA_real_
+      }
     }
 
     # within range, occurrence rate ppms
@@ -257,9 +262,14 @@ ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 7) {
       os$bernoulli_dev[i_mc] <- bernoulli_dev(obs = pa_df$obs,
                                               pred = pa_df$pred)[3]
 
-      occ_curve <- precrec::evalmod(scores = test_inrng$pi_median,
-                                    labels = as.numeric(test_inrng$obs > 0))
-      os$pr_auc[i_mc] <- precrec::auc(occ_curve)$aucs[2]
+      obs_positive <- test_inrng$obs > 0
+      if (any(obs_positive)) {
+        occ_curve <- precrec::evalmod(scores = test_inrng$pi_median,
+                                      labels = as.numeric(obs_positive))
+        os$pr_auc[i_mc] <- precrec::auc(occ_curve)$aucs[2]
+      } else {
+        os$pr_auc[i_mc] <- NA_real_
+      }
     }
 
     # within range, expected count ppms
