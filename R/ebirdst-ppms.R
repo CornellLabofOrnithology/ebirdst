@@ -67,7 +67,7 @@
 #' ppms <- ebirdst_ppms(path = path, ext = e)
 #' plot(ppms)
 #' }
-ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 10) {
+ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 7) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
   stopifnot(is.numeric(pat_cutoff), length(pat_cutoff) == 1,
             pat_cutoff > 0, pat_cutoff < 1)
