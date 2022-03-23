@@ -2,28 +2,16 @@ Type: Package
 Package: ebirdst
 Title: Access and Analyze eBird Status and Trends Data
 Version: 0.4.0
-Authors@R: 
-    c(person(given = "Matthew",
-             family = "Strimas-Mackey",
-             role = c("aut", "cre"),
-             email = "mes335@cornell.edu",
-             comment = c(ORCID = "0000-0001-8929-7776")),
-      person(given = "Shawn",
-             family = "Ligocki",
-             role = "aut",
-             email = "sligocki@cornell.edu"),
-      person(given = "Tom",
-             family = "Auer",
-             role = "aut",
-             email = "mta45@cornell.edu",
-             comment = c(ORCID = "0000-0001-8619-7147")),
-      person(given = "Daniel",
-             family = "Fink",
-             role = "aut",
-             email = "df36@cornell.edu",
-             comment = c(ORCID = "0000-0002-8368-1248")),
-      person(given = "Cornell Lab of Ornithology",
-             role = "cph"))
+Authors@R: c(
+    person("Matthew", "Strimas-Mackey", , "mes335@cornell.edu", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-8929-7776")),
+    person("Shawn", "Ligocki", , "sligocki@cornell.edu", role = "aut"),
+    person("Tom", "Auer", , "mta45@cornell.edu", role = "aut",
+           comment = c(ORCID = "0000-0001-8619-7147")),
+    person("Daniel", "Fink", , "df36@cornell.edu", role = "aut",
+           comment = c(ORCID = "0000-0002-8368-1248")),
+    person("Cornell Lab of Ornithology", role = "cph")
+  )
 Description: Tools to download, map, plot and analyze eBird Status and
     Trends data (<https://ebird.org/science/status-and-trends>). eBird
     (<https://ebird.org/home>) is a global database of bird observations
@@ -42,11 +30,12 @@ Imports:
     gbm,
     ggplot2,
     grDevices,
-    jsonlite,
     gridExtra,
+    jsonlite,
     magrittr,
     methods,
     mgcv,
+    precrec,
     PresenceAbsence,
     rappdirs,
     raster,
@@ -60,15 +49,14 @@ Imports:
     tools,
     utils,
     viridisLite,
-    xml2,
-    precrec
+    xml2
 Suggests: 
-    smoothr,
     covr,
     fields,
     knitr,
     rmarkdown,
     rnaturalearth,
+    smoothr,
     testthat,
     units
 VignetteBuilder: 

@@ -36,7 +36,7 @@ ebirdst_subset <- function(x, ext) {
 #' @describeIn ebirdst_subset PI or PD data
 ebirdst_subset.data.frame <- function(x, ext) {
   stopifnot(all(c("day_of_year", "longitude", "latitude") %in% names(x)))
-  stopifnot(is.numeric(x$day_of_year) || is.integer(day_of_year),
+  stopifnot(is.numeric(x$day_of_year) || is.integer(x$day_of_year),
             all(x$day_of_year >= 0), all(x$day_of_year <= 366.5))
   stopifnot(inherits(ext, "ebirdst_extent"))
 
