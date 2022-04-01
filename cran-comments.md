@@ -1,6 +1,6 @@
-# ebirdst 0.3.4
+# ebirdst 0.3.5
 
-- rename master branch to main on GitHub requires different download path for example data
+- bug fix: API update is causing all data downloads to fail
 
 ## Test environments
 

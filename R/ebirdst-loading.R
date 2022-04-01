@@ -76,7 +76,7 @@ ebirdst_download <- function(species,
     api_url <- "https://st-download.ebird.org/v1/"
 
     # get file list for this species
-    list_obj_url <- stringr::str_glue("{api_url}/list-obj/{species}?key={key}")
+    list_obj_url <- stringr::str_glue("{api_url}list-obj/{species}?key={key}")
     files <- tryCatch(suppressWarnings({
       jsonlite::read_json(list_obj_url, simplifyVector = TRUE)
     }), error = function(e) NULL)
