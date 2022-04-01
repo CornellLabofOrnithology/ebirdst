@@ -20,4 +20,4 @@
 0 errors | 0 warnings | 1 notes
 
 notes:
-- DOI link incorrectly identified as possibly invalid
+- DOI link (https://doi.org/10.1002/eap.2056) incorrectly identified as possibly invalid
