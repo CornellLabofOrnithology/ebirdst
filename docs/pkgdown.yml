@@ -2,11 +2,12 @@ pandoc: 2.14.0.3
 pkgdown: 2.0.2
 pkgdown_sha: ~
 articles:
+  ebirdst-advanced-mapping: ebirdst-advanced-mapping.html
   ebirdst-intro-mapping: ebirdst-intro-mapping.html
   ebirdst-non-raster: ebirdst-non-raster.html
   ebirdst: ebirdst.html
   product-changelog: product-changelog.html
-last_built: 2022-04-01T10:29Z
+last_built: 2022-04-01T11:10Z
 urls:
   reference: https://cornelllabofornithology.github.io/ebirdst/reference
   article: https://cornelllabofornithology.github.io/ebirdst/articles
