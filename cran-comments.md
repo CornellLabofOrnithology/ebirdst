@@ -1,6 +1,6 @@
 # Re-submission
 
-- fixing broken URL
+- fixing broken URL (hopefully for real this time)
 
 # ebirdst 0.3.5
 
