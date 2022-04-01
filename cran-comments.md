@@ -16,4 +16,4 @@
 0 errors | 0 warnings | 1 notes
 
 notes:
-- eBird was incorrectly identified as a misspelled word
+- DOI link incorrectly identified as possibly invalid
