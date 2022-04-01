@@ -1,3 +1,7 @@
+# Re-submission
+
+- fixing broken URL
+
 # ebirdst 0.3.5
 
 - bug fix: API update is causing all data downloads to fail

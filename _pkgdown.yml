@@ -13,8 +13,6 @@ navbar:
       menu:
       - text: Introduction to Mapping
         href: articles/ebirdst-intro-mapping.html
-      - text: Advanced Mapping
-        href: articles/ebirdst-advanced-mapping.html
       - text: Non-raster Data
         href: articles/ebirdst-non-raster.html
     reference:
