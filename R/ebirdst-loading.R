@@ -65,18 +65,16 @@ ebirdst_download <- function(species,
     return(invisible(run_path))
   } else {
     species <- get_species(species)
-    which_run <- which(ebirdst::ebirdst_runs$species_code == species)
-    run <- ebirdst::ebirdst_runs$run_name[which_run]
-    if (is.na(run) || length(run) != 1) {
+    if (is.na(species) || length(species) != 1) {
       stop("species does not uniquely identify a Status and Trends run.")
     }
-
+    run <- paste0("2019/", species)
     # api url and key
     key <- get_ebirdst_access_key()
     api_url <- "https://st-download.ebird.org/v1/"
 
     # get file list for this species
-    list_obj_url <- stringr::str_glue("{api_url}list-obj/{species}?key={key}")
+    list_obj_url <- stringr::str_glue("{api_url}list-obj/{run}?key={key}")
     files <- tryCatch(suppressWarnings({
       jsonlite::read_json(list_obj_url, simplifyVector = TRUE)
     }), error = function(e) NULL)
@@ -175,7 +173,7 @@ get_species_path <- function(species,
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
 
   if (species == "example_data") {
-    run <- "yebsap-ERD2019-STATUS-20200930-8d36d265-example"
+    run <- "2019/yebsap_example"
   } else {
     species <- get_species(species)
     row_id <- which(ebirdst::ebirdst_runs$species_code == species)
@@ -183,7 +181,7 @@ get_species_path <- function(species,
       stop(sprintf("species = %s does not uniquely identify a species.",
                    species))
     }
-    run <- ebirdst::ebirdst_runs$run_name[row_id]
+    run <- paset0("2019/", species)
   }
   species_path <- path.expand(file.path(path, run))
   if (!dir.exists(species_path)) {
@@ -783,7 +781,7 @@ dl_example_data <- function(path, tifs_only, force, show_progress) {
   fl <- system.file("extdata", "example-data_file-list.txt",
                     package = "ebirdst")
   files <- readLines(fl)
-  run <- stringr::str_split(files[1], "/")[[1]][1]
+  run <- paste(stringr::str_split(files[1], "/")[[1]][1:2], collapse = "/")
   run_path <- normalizePath(file.path(path, run), mustWork = FALSE)
   dir.create(run_path, recursive = TRUE, showWarnings = FALSE)
 
