@@ -1,4 +1,4 @@
-library(raster)
+library(terra)
 library(fs)
 library(sf)
 library(rnaturalearth)
@@ -6,21 +6,23 @@ library(tidyverse)
 library(glue)
 library(DBI)
 library(RSQLite)
-select <- dplyr::select
 
+year <- "2020"
 # source data
-root_path <- path(rappdirs::user_data_dir("ebirdst"), "v2020")
+root_path <- path(ebirdst::ebirdst_data_dir(), year)
 species <- "yebsap"
 sp_path <- path(root_path, species)
 
 # destination
-ex_species <- "yebsap_example"
+ex_species <- "yebsap-example"
 ex_dir <- path(root_path, ex_species)
-ex_cubes_dir <- path(ex_dir, "cubes")
+ex_weekly_dir <- path(ex_dir, "weekly")
 ex_seasonal_dir <- path(ex_dir, "seasonal")
+ex_ranges_dir <- path(ex_dir, "ranges")
 dir_create(ex_dir)
-dir_create(ex_cubes_dir)
+dir_create(ex_weekly_dir)
 dir_create(ex_seasonal_dir)
+dir_create(ex_ranges_dir)
 
 # copy config file and databases
 dir_ls(sp_path, regexp = "(json|db)$", recurse = FALSE, type = "file") %>%
@@ -28,7 +30,7 @@ dir_ls(sp_path, regexp = "(json|db)$", recurse = FALSE, type = "file") %>%
 
 # raster template
 r_tmplt <- path(sp_path, "srd_raster_template.tif") %>%
-  raster()
+  rast()
 
 # region for subsetting from rnaturalearth
 state_mi_ll <- ne_states(iso_a2 = "US", returnclass = "sf") %>%
@@ -36,22 +38,31 @@ state_mi_ll <- ne_states(iso_a2 = "US", returnclass = "sf") %>%
   st_geometry()
 bb <- st_bbox(state_mi_ll)
 state_mi <- state_mi_ll %>%
-  st_transform(crs = projection(r_tmplt)) %>%
-  as_Spatial()
+  st_transform(crs = st_crs(r_tmplt)) %>%
+  vect()
 
 # crop and mask rasters
-tifs <- dir_ls(sp_path, regexp = "tif$", recurse = TRUE, type = "file")
+tifs <- dir_ls(sp_path, regexp = "_lr_.*tif$", recurse = TRUE, type = "file")
 for (f in tifs) {
   f_out <- str_replace_all(f, species, ex_species)
   r_ex <- f %>%
-    stack() %>%
+    rast() %>%
     crop(state_mi) %>%
     mask(state_mi) %>%
     writeRaster(filename = f_out, overwrite = TRUE,
-                options = c("COMPRESS=DEFLATE","TILED=YES"))
+                datatype = "FLT4S",
+                gdal = c("COMPRESS=DEFLATE",
+                         "TILED=YES",
+                         "COPY_SRC_OVERVIEWS=YES"))
 }
-dir_ls(path(sp_path, "cubes"), regexp = "csv$", recurse = FALSE, type = "file") %>%
-  file_copy(ex_cubes_dir)
+
+# copy csv files and geopackages
+dir_ls(path(sp_path, "weekly"), regexp = "csv$", recurse = FALSE, type = "file") %>%
+  file_copy(ex_weekly_dir)
+dir_ls(path(sp_path, "seasonal"), regexp = "csv$", recurse = FALSE, type = "file") %>%
+  file_copy(ex_seasonal_dir)
+dir_ls(path(sp_path, "ranges"), regexp = "_lr_.*gpkg$", recurse = FALSE, type = "file") %>%
+  file_copy(ex_ranges_dir)
 
 # database connections
 pipd_db <- path(ex_dir, "stixel_summary.db")
@@ -66,9 +77,11 @@ sql <- str_glue("DELETE FROM predictions ",
                 "OR latitude < {bb['ymin']} OR  latitude > {bb['ymax']};")
 dbSendStatement(pred_con, sql)
 # get sampling event ids that fall in polygon
+# only retain 10000 points
 sid <- tbl(pred_con, "predictions") %>%
   select(checklist_id, latitude, longitude) %>%
   collect() %>%
+  sample_n(size = min(10000, nrow(.))) %>%
   st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>%
   st_intersection(state_mi_ll) %>%
   st_drop_geometry()
@@ -83,14 +96,16 @@ dbDisconnect(pred_con)
 
 # pipd
 sql <- str_glue("DELETE FROM stixel_summary ",
-                "WHERE lon < {bb['xmin']} OR  lon > {bb['xmax']} ",
-                "OR lat < {bb['ymin']} OR  lat > {bb['ymax']};")
+                "WHERE longitude < {bb['xmin']} OR  longitude > {bb['xmax']} ",
+                "OR latitude < {bb['ymin']} OR latitude > {bb['ymax']};")
 dbSendStatement(pipd_con, sql)
 # get stixels centroids that fall in polygon
+# only retain 250 stixels
 stixels <- tbl(pipd_con, "stixel_summary") %>%
-  select(stixel_id, lat, lon) %>%
+  select(stixel_id, longitude, latitude) %>%
   collect() %>%
-  st_as_sf(coords = c("lon", "lat"), crs = 4326) %>%
+  sample_n(size = min(250, nrow(.))) %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>%
   st_intersection(state_mi_ll) %>%
   st_drop_geometry()
 copy_to(pipd_con, stixels)
@@ -98,6 +113,7 @@ copy_to(pipd_con, stixels)
 for (t in c("occurrence_pds", "occurrence_pis",
             "count_pds", "count_pis",
             "stixel_summary")) {
+  message("Processing ", t)
   sql <- str_glue("DELETE FROM {t} WHERE stixel_id NOT IN ",
                   "(SELECT stixel_id FROM stixels);")
   dbSendStatement(pipd_con, sql)
@@ -109,25 +125,15 @@ dbDisconnect(pipd_con)
 
 # copy to repo dir ---
 
-repo_dir <- path("example-data", basename(ex_dir))
+repo_dir <- path("example-data", year, basename(ex_dir))
 dir_copy(ex_dir, repo_dir)
 
-# compress db files to meet GH size constrains
-to_compress <- dir_ls(repo_dir, glob = "*.db")
-wd <- getwd()
-for (f in to_compress) {
-  setwd(dirname(to_compress))
-  zip(paste0(basename(f), ".zip"), basename(f))
-  file_delete(basename(f))
-  setwd(wd)
-}
-
-# file sizes must be below 100 mb
+# file sizes must be below 50 mb
 sizes <- dir_ls(repo_dir, type = "file", recurse = TRUE) %>%
   file_size() %>%
   as.numeric() %>%
   units::set_units("bytes")
-stopifnot(sizes < units::set_units(90, "megabytes"))
+stopifnot(sizes < units::set_units(50, "megabytes"))
 
 # file list
 file_list <- dir_ls(repo_dir, type = "file", recurse = TRUE) %>%

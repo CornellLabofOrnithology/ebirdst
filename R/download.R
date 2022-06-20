@@ -1,0 +1,304 @@
+#' Download eBird Status and Trends Data Products
+#'
+#' Download an eBird Status and Trends data package for a single species, or for
+#' an example species. Accessing Status and Trends data requires an access key,
+#' consult [set_ebirdst_access_key()] for instructions on how to obtain and
+#' store this key. The example data consist of the results for Yellow-bellied
+#' Sapsucker subset to Michigan and are much smaller than the full dataset,
+#' making these data quicker to download and process. Only the low resolution
+#' data are available for the example data In addition, the example data are
+#' accessible without an access key.
+#'
+#' @param species character; a single species given as a scientific name, common
+#'   name or six-letter species code (e.g. woothr). The full list of valid
+#'   species is can be viewed in the [ebirdst_runs] data frame included in this
+#'   package. To download the example dataset, use "example_data".
+#' @param path character; directory to download the data to. All downloaded
+#'   files will be placed in a sub-directory of this directory named for the
+#'   data version year, e.g. "2020" for the 2020 Status Data Products. Each species'
+#'   data package will then appear in a directory named with the eBird species
+#'   code. Defaults to a persistent data directory, which can be found by
+#'   calling `ebirdst_data_dir()`.
+#' @param tifs_only logical; whether to only download the GeoTIFFs for
+#'   abundance and occurrence (the default), or download the entire data
+#'   package, including data for predictor importance, partial dependence, and
+#'   predictive performance metrics.
+#' @param force logical; if the data have already been downloaded, should a
+#'   fresh copy be downloaded anyway.
+#' @param show_progress logical; whether to print download progress information.
+#'
+#' @return Path to the folder containing the downloaded data package for the
+#'   given species.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # download the example data
+#' ebirdst_download("example_data")
+#'
+#' # download the data package for wood thrush, geotiffs only
+#' ebirdst_download("woothr")
+#' # download the data package for wood thrush, all data
+#' ebirdst_download("woothr", tifs_only = FALSE)
+#' }
+ebirdst_download <- function(species,
+                             path = ebirdst_data_dir(),
+                             tifs_only = TRUE,
+                             force = FALSE,
+                             show_progress = TRUE) {
+  stopifnot(is.character(species), length(species) == 1)
+  stopifnot(is.character(path), length(path) == 1)
+  stopifnot(is.logical(tifs_only), length(tifs_only) == 1)
+  stopifnot(is.logical(force), length(force) == 1)
+  stopifnot(is.logical(show_progress), length(show_progress) == 1)
+  species <- tolower(species)
+
+  # append version to path
+  path <- file.path(path, paste0("v", ebirdst_version()["data_version"]))
+  if (!dir.exists(path)) {
+    dir.create(path, recursive = TRUE)
+  }
+
+  # example data or a real run
+  if (species == "example_data") {
+    run_path <- dl_example_data(path = path,
+                                tifs_only = tifs_only,
+                                force = force,
+                                show_progress = show_progress)
+    return(invisible(run_path))
+  } else {
+    species <- get_species(species)
+    run <- dplyr::filter(ebirdst::ebirdst_runs,
+                         .data$species_code == species)
+    if (nrow(run) != 1) {
+      stop("species does not uniquely identify a Status and Trends run.")
+    }
+
+    # api url and key
+    key <- get_ebirdst_access_key()
+    api_url <- "https://st-download.ebird.org/v1/"
+
+    # get file list for this species
+    list_obj_url <- stringr::str_glue("{api_url}/list-obj/{species}?key={key}")
+    files <- tryCatch(suppressWarnings({
+      jsonlite::read_json(list_obj_url, simplifyVector = TRUE)
+    }), error = function(e) NULL)
+    if (is.null(files)) {
+      stop("Cannot access Status and Trends data URL. Ensure that you have ",
+           "a working internet connection and a valid API key for the Status ",
+           "and Trends data.")
+    }
+    files <- data.frame(file = files)
+  }
+  if (nrow(files) == 0) {
+    stop("No data found for species ", species)
+  }
+
+  # only download databases when explicitly requested
+  if (isTRUE(tifs_only)) {
+    files <- files[!stringr::str_detect(files$file, "\\.db$"), , drop = FALSE]
+  }
+
+  # prepare download paths
+  if (species == "example_data") {
+    files$src_path <- paste0(api_url, files$file)
+  } else {
+    files$src_path <- stringr::str_glue("{api_url}fetch?objKey={files$file}",
+                                        "&key={key}")
+  }
+  files$dest_path <- file.path(path, files$file)
+  files$exists <- file.exists(files$dest_path)
+  # create necessary directories
+  dirs <- unique(dirname(files$dest_path))
+  for (d in dirs) {
+    dir.create(d, showWarnings = FALSE, recursive = TRUE)
+  }
+
+  # check if already exists
+  if (all(files$exists)) {
+    if (!isTRUE(force)) {
+      message("Data already exists, use force = TRUE to re-download.")
+      return(invisible(normalizePath(file.path(path, run))))
+    }
+  } else if (any(files$exists)) {
+    if (!isTRUE(force)) {
+      message(paste("Some files already exist, only downloading new files.",
+                    "\nUse force = TRUE to re-download all files."))
+      files <- files[!files$exists, ]
+    }
+  }
+
+  # download
+  old_timeout <- getOption("timeout")
+  options(timeout = max(3000, old_timeout))
+  for (i in seq_len(nrow(files))) {
+    dl_response <- utils::download.file(files$src_path[i],
+                                        files$dest_path[i],
+                                        quiet = !show_progress,
+                                        mode = "wb")
+    if (dl_response != 0) {
+      stop("Error downloading file: ", files$file[i])
+    }
+  }
+  options(timeout = old_timeout)
+  return(invisible(normalizePath(file.path(path, run))))
+}
+
+
+#' Get the path to the data package for a given species
+#'
+#' This helper function can be used to get the path to a data package for a
+#' given species to be used by the various data loading functions.
+#'
+#' @inheritParams ebirdst_download
+#'
+#' @return The path to the data package directory.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # download the example data
+#' ebirdst_download("example_data")
+#'
+#' # get the path
+#' path <- get_species_path("example_data")
+#'
+#' # use it to load data
+#' abd <- load_raster(path, "abundance")
+#'
+#' # get the path to the full data package for yellow-bellied sapsucker
+#' # common name, scientific name, or species code can be used
+#' path <- get_species_path("Yellow-bellied Sapsucker")
+#' path <- get_species_path("Sphyrapicus varius")
+#' path <- get_species_path("yebsap")
+#' }
+get_species_path <- function(species, path = ebirdst_data_dir()) {
+  stopifnot(is.character(species), length(species) == 1)
+  stopifnot(is.character(path), length(path) == 1, dir.exists(path))
+
+  # append version to path
+  path <- file.path(path, ebirdst_version()["version_year"])
+
+  if (species == "example_data") {
+    run <- "yebsap_example"
+  } else {
+    species <- get_species(species)
+    row_id <- which(ebirdst::ebirdst_runs$species_code == species)
+    if (length(row_id) != 1) {
+      stop(sprintf("species = %s does not uniquely identify a species.",
+                   species))
+    }
+    run <- ebirdst::ebirdst_runs$species_code[row_id]
+  }
+  species_path <- path.expand(file.path(path, run))
+  if (!dir.exists(species_path)) {
+    stop(paste("No data package found for species:", species))
+  }
+  return(species_path)
+}
+
+
+#' Path to eBird Status and Trends data download directory
+#'
+#' Identify and return the path to the default download directory for eBird
+#' Status and Trends data products. This directory can be defined by setting the
+#' environment variable `EBIRDST_DATA_DIR`, otherwise the directory returned by
+#' `tools::R_user_dir("ebirdst", which = "data")` will be used.
+#'
+#' @return The path to the data download directory.
+#' @export
+#'
+#' @examples
+#' ebirdst_data_dir()
+ebirdst_data_dir <- function() {
+  env_var <- Sys.getenv("EBIRDST_DATA_DIR")
+  if (is.null(env_var) || env_var == "") {
+    return(tools::R_user_dir("ebirdst", which = "data"))
+  } else {
+    return(env_var)
+  }
+}
+
+
+#' eBird Status and Trends Data Products version
+#'
+#' Identify the version of the eBird Status and Trends Data Products that this
+#' version of the R package works with. Versions are defined by the year that
+#' all model estimates are made for. In addition, the release data and end date
+#' for access of this version of the data are provided. Note that after the
+#' given access end data you will no longer be able to download this version of
+#' the data and will be required to update the R package and transition to using
+#' a newer data version.
+#'
+#' @return A list with three components: `version_year` is the year the model
+#'   estimates are made for in this version of the data, `release_date` is the
+#'   date this version of the data were released, and `access_end_date` is the
+#'   last date that users will be able to download this version of the data.
+#' @export
+#'
+#' @examples
+#' ebirdst_version()
+ebirdst_version <- function() {
+  list(version_year = 2020,
+       release_date = as.Date("2022-07-01"),
+       access_end_date = as.Date("2023-05-31"))
+}
+
+
+# internal functions ----
+
+dl_example_data <- function(path, tifs_only, force, show_progress) {
+  base_dir <- paste0("https://raw.githubusercontent.com/CornellLabofOrnithology/",
+                     "ebirdst/dev_erd2021/example-data/")
+  # get file list from github
+  fl <- system.file("extdata", "example-data_file-list.txt",
+                    package = "ebirdst")
+  files <- readLines(fl)
+  run <- stringr::str_split(files[1], "/")[[1]][1]
+  run_path <- normalizePath(file.path(path, run), mustWork = FALSE)
+  dir.create(run_path, recursive = TRUE, showWarnings = FALSE)
+
+  # drop database files
+  if (isTRUE(tifs_only)) {
+    files <- files[!stringr::str_detect(files, "\\.zip$")]
+  }
+
+  # check for files already existing
+  dst_files <- file.path(path, files)
+  dst_files <- stringr::str_remove(dst_files, "\\.zip$")
+  fe <- file.exists(dst_files)
+  if (any(fe)) {
+    if (isTRUE(force)) {
+      file.remove(dst_files[fe])
+    } else {
+      files <- files[!fe]
+      if (length(files) == 0) {
+        message("Example data already downloaded")
+        return(invisible(run_path))
+      }
+    }
+  }
+
+  # download
+  src_files <- file.path(base_dir, files)
+  dst_files <- file.path(path, files)
+  for (d in unique(dirname(dst_files))) {
+    dir.create(d, recursive = TRUE, showWarnings = FALSE)
+  }
+  for (i in seq_along(src_files)) {
+    dl_response <- utils::download.file(src_files[i], dst_files[i],
+                                        quiet = !show_progress,
+                                        mode = "wb")
+    if (dl_response != 0) {
+      stop("Error downloading file: ", files[i])
+    }
+    # unzip
+    if (stringr::str_detect(dst_files[i], "\\.zip")) {
+      uz <- utils::unzip(dst_files[i], exdir = dirname(dst_files[i]))
+      fm <- file.remove(dst_files[i])
+    }
+  }
+
+  return(invisible(run_path))
+}
