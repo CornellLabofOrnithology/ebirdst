@@ -105,6 +105,8 @@ parse_raster_dates(abd_weekly)
 abd_seasonal <- load_raster(path, "abundance",
                             period = "seasonal", metric = "max",
                             resolution = "lr")
+# available seasons in stack
+names(abd_seasonal)
 # subset to just breeding season abundance
 abd_seasonal[["breeding"]]
 }

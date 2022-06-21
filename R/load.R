@@ -88,6 +88,8 @@
 #' abd_seasonal <- load_raster(path, "abundance",
 #'                             period = "seasonal", metric = "max",
 #'                             resolution = "lr")
+#' # available seasons in stack
+#' names(abd_seasonal)
 #' # subset to just breeding season abundance
 #' abd_seasonal[["breeding"]]
 #' }
@@ -117,7 +119,13 @@ load_raster <- function(path,
     stop("The example data only contains low-resolution (lr) estimates.")
   }
 
-  # contruct file name and path
+  # full year products only available for migrants
+  if (p$is_resident && period == "full-year") {
+    stop("Full-year products are not available for residents, use ",
+         "period = 'seasonal' instead.")
+  }
+
+  # construct file name and path
   if (period == "weekly") {
     # assess which metric is being requested
     if (is.null(metric)) {
