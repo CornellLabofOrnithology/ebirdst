@@ -3,7 +3,8 @@ library(jsonlite)
 
 pl <- file.path("data-raw", "config.json") %>%
   read_json(simplifyVector = TRUE) %>%
-  pluck("PREDICTOR_LIST")
+  pluck("PREDICTOR_LIST") %>%
+  ebirdst:::transform_predictor_names()
 
 # weather labels
 wv <- read_csv("data-raw/weather-variables.csv") %>%
@@ -11,10 +12,7 @@ wv <- read_csv("data-raw/weather-variables.csv") %>%
 
 # predictors
 ebirdst_predictors <- tibble(predictor = pl) %>%
-  mutate(predictor_tidy = str_to_lower(predictor) %>%
-           str_replace_all("\\.", "_") %>%
-           str_replace("^i_", "is_"),
-         lc_class = str_remove_all(predictor_tidy, "_1500_[a-z]+$"),
+  mutate(lc_class = str_remove_all(predictor, "_1500_[a-z]+$"),
          lc_class = if_else(str_detect(lc_class, "_fs_") |
                               str_detect(lc_class, "ntl") |
                               str_detect(lc_class, "gp_rtp"),
@@ -65,18 +63,20 @@ ebirdst_predictors <- tibble(predictor = pl) %>%
   mutate(
     predictor_label = lc_class_label,
     predictor_label = coalesce(predictor_label,
-                               str_replace_all(predictor_tidy, "_", " ") %>%
+                               str_replace_all(predictor, "_", " ") %>%
                                  str_to_title()),
-    predictor_label = if_else(str_detect(predictor, "(ED|PLAND)$"),
+    predictor_label = if_else(str_detect(predictor, "(ed|pland)$"),
                               paste(predictor_label,
-                                    str_extract(predictor, "(ED|PLAND)$")),
+                                    str_to_upper(str_extract(predictor, "(ed|pland)$"))),
                               predictor_label),
-    predictor_label = str_replace(predictor_label, "I ", ""),
     predictor_label = str_replace(predictor_label, "Km", "(km)"),
     predictor_label = str_replace(predictor_label, "Hrs", "Hours"),
     predictor_label = str_replace(predictor_label, "Elev", "Elevation"),
     predictor_label = str_replace(predictor_label, "Sd", "SD"),
-    predictor_label = ifelse(predictor == "CCI", "CCI", predictor_label),
+    predictor_label = ifelse(predictor == "cci", "CCI", predictor_label),
+    predictor_label = ifelse(predictor == "solar_noon_diff_mid",
+                             "Checklist Midpoint Time (Hours from Solar Noon)",
+                             predictor_label),
     lc_class = if_else(str_detect(lc_class, "gp_rtp"),
                        "gp_rtp", lc_class),
     lc_class_label =  if_else(str_detect(lc_class, "gp_rtp"),
@@ -85,6 +85,6 @@ ebirdst_predictors <- tibble(predictor = pl) %>%
   left_join(wv, by = "predictor") %>%
   mutate(predictor_label = coalesce(label, predictor_label),
          lc_class_label = coalesce(label, lc_class_label)) %>%
-  select(predictor, predictor_tidy, predictor_label, lc_class, lc_class_label)
+  select(predictor, predictor, predictor_label, lc_class, lc_class_label)
 
 usethis::use_data(ebirdst_predictors, overwrite = TRUE)

@@ -25,7 +25,7 @@
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #'
 #' # load and subset raster data
-#' abd <- load_raster(path, product = "abundance")
+#' abd <- load_raster(path, product = "abundance", resolution = "lr")
 #' abd_ss <- ebirdst_subset(abd, ext = e)
 #' }
 ebirdst_subset <- function(x, ext) {
@@ -147,6 +147,8 @@ ebirdst_subset.Raster <- function(x, ext) {
   return(x)
 }
 
+
+# internal ----
 
 bbox_to_extent <- function(x) {
   raster::extent(x[["xmin"]], x[["xmax"]], x[["ymin"]], x[["ymax"]])

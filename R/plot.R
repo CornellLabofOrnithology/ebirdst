@@ -38,7 +38,7 @@
 #' bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #'
-#' top_pred <- plot_pis(pis, ext = e, by_cover_class = TRUE, n_top_pred = 10)
+#' top_pred <- plot_pis(pis, ext = e, n_top_pred = 10)
 #' top_pred
 #' }
 plot_pis <- function(pis, ext,
@@ -54,10 +54,6 @@ plot_pis <- function(pis, ext,
   stopifnot(is.logical(pretty_names), length(pretty_names) == 1)
   stopifnot(is.logical(plot), length(plot) == 1)
 
-  if (all(c(0, 1) == round(ext$t, 2))) {
-    stop("Must subset temporally, results not meaningful for full year.")
-  }
-
   # were these occurrence or count pis
   m <- attr(pis, "model")
 
@@ -65,7 +61,7 @@ plot_pis <- function(pis, ext,
   pis <- ebirdst_subset(pis, ext = ext)
 
   # if aggregating by cover class aggregate the fragstats metrics
-  lc <- dplyr::tibble(predictor = unique(pis$predictor))
+  lc <- dplyr::distinct(pis, .data$predictor)
   lc$predictor_class <- convert_classes(lc$predictor,
                                         by_cover_class = by_cover_class,
                                         pretty = pretty_names)
@@ -87,7 +83,7 @@ plot_pis <- function(pis, ext,
                                 .groups = "drop")
   pi_median <- dplyr::arrange(pi_median, dplyr::desc(.data$importance))
 
-  # find the top preds based on function variable n_top_pred
+  # find the top predictors
   pi_median <- dplyr::arrange(pi_median, dplyr::desc(.data$importance))
   top_names <- dplyr::top_n(pi_median, n = n_top_pred, wt = .data$importance)
 
@@ -96,7 +92,7 @@ plot_pis <- function(pis, ext,
                              .data$predictor %in% top_names$predictor)
   pis_top <- dplyr::filter(pis, .data$predictor %in% top_names$predictor)
 
-  # pis have have spurious large values, NAs and NaNs
+  # pis can have spurious large values, NAs and NaNs
   # so clean up, trim, and check for complete cases
   p98 <- stats::quantile(pis_top$importance, probs = 0.98, na.rm = TRUE)
   pis_top <- pis_top[pis_top$importance < p98, ]
@@ -186,7 +182,7 @@ plot_pis <- function(pis, ext,
 #' pds <- load_pds(path)
 #'
 #' # define a spatiotemporal extent to plot data from
-#' bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
+#' bb_vec <- c(xmin = -90, xmax = -82, ymin = 41, ymax = 48)
 #' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 #'
 #' # for testing, run with 5 bootstrap iterations for speed
@@ -216,9 +212,7 @@ plot_pds <- function(pds, predictor, ext,
             ci_alpha > 0, ci_alpha < 0.5)
   stopifnot(is_integer(gbm_n_trees), length(gbm_n_trees) == 1, gbm_n_trees > 0)
   stopifnot(is.logical(plot), length(plot) == 1)
-  if (all(c(0, 1) == round(ext$t, 2))) {
-    stop("Must subset temporally, results not meaningful for full year.")
-  }
+
   if (!is.null(ylim)) {
     stopifnot(is.numeric(ylim), length(ylim) == 2, ylim[1] < ylim[2])
   }
@@ -231,18 +225,16 @@ plot_pds <- function(pds, predictor, ext,
 
   # match predictor
   p <- ebirdst::ebirdst_predictors
-  predictor <- stringr::str_to_lower(predictor)
-  predictor <- stringr::str_replace_all(predictor, "\\.", "_")
-  if (!predictor %in% p$predictor_tidy) {
+  predictor <- transform_predictor_names(predictor)
+  if (!predictor %in% p$predictor) {
     stop(paste(predictor, "is not a valid predictor variable."))
   }
-  predictor_raw <- match(predictor, p$predictor_tidy)
-  predictor_label <- p$predictor_label[predictor_raw]
-  predictor_raw <- p$predictor_tidy[predictor_raw]
+  predictor_idx <- match(predictor, p$predictor)
+  predictor_label <- p$predictor_label[predictor_idx]
 
   # subset pd
   pds <- ebirdst_subset(pds, ext = ext)
-  pds <- pds[pds$predictor == predictor_raw, ]
+  pds <- pds[pds$predictor == predictor, ]
   pds <- pds[, c("stixel_id", "predictor_value", "response")]
   names(pds) <- c("stixel_id", "x", "y")
 
@@ -411,6 +403,8 @@ plot_pds <- function(pds, predictor, ext,
 }
 
 
+# internal ----
+
 #' Converts cryptic cover class names to readable land cover names
 #'
 #' Internal function that converts the cryptic predictor class names to
@@ -426,31 +420,31 @@ plot_pds <- function(pds, predictor, ext,
 #' @keywords internal
 #'
 #' @examples
-#' predictors <- c("MCD12Q1_LCCS1_FS_C1_1500_ED", "MOD44W_OIC_FS_C3_1500_ED",
-#'                 "ELEV_SD")
+#' predictors <- c("MCD12Q1_LCCS1_FS_C1_1500_ED", "astwbd_fs_c1_1500_pland",
+#'                 "elev_250m_sd")
 #' ebirdst:::convert_classes(predictors, pretty = TRUE)
 convert_classes <- function(x, by_cover_class = FALSE, pretty = FALSE) {
   stopifnot(is.character(x))
   stopifnot(is.logical(by_cover_class), length(by_cover_class) == 1)
   stopifnot(is.logical(pretty), length(pretty) == 1)
 
-  x <- stringr::str_replace_all(stringr::str_to_lower(x), "\\.", "_")
+  x <- transform_predictor_names(x)
   predictors_df <- ebirdst::ebirdst_predictors
-  idx <- match(x, predictors_df$predictor_tidy)
+  idx <- match(x, predictors_df$predictor)
 
   if (isTRUE(by_cover_class)) {
     if (isTRUE(pretty)) {
       y <- dplyr::coalesce(predictors_df$lc_class_label[idx], x)
     } else {
       y <- dplyr::coalesce(predictors_df$lc_class[idx],
-                           predictors_df$predictor_tidy[idx],
+                           predictors_df$predictor[idx],
                            x)
     }
   } else {
     if (isTRUE(pretty)) {
       y <- dplyr::coalesce(predictors_df$predictor_label[idx], x)
     } else {
-      y <- dplyr::coalesce(predictors_df$predictor_tidy[idx], x)
+      y <- dplyr::coalesce(predictors_df$predictor[idx], x)
     }
   }
   return(y)

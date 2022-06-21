@@ -26,9 +26,16 @@
 #' @param force logical; if the data have already been downloaded, should a
 #'   fresh copy be downloaded anyway.
 #' @param show_progress logical; whether to print download progress information.
+#' @param pattern character; regular expression pattern to supply to
+#'   [str_detect()][stringr::str_detect()] to filter files to download. Note
+#'   that some files are mandatory and will always be downloaded.
+#' @param dry_run logical; whether to do a dry run, just listing files that will
+#'   be downloaded. This can be useful when testing the use of `pattern` to
+#'   filter the files to download.
 #'
 #' @return Path to the folder containing the downloaded data package for the
-#'   given species.
+#'   given species. If `dry_run = TRUE` a list of files to download will be
+#'   returned.
 #'
 #' @export
 #'
@@ -41,70 +48,109 @@
 #' ebirdst_download("woothr")
 #' # download the data package for wood thrush, all data
 #' ebirdst_download("woothr", tifs_only = FALSE)
+#'
+#' # use pattern to only download low resolution data
+#' # dry_run can be used to see what files will be downloaded
+#' ebirdst_download("lobcur", pattern = "_lr_", dry_run = TRUE)
+#' # use pattern to only download the high res weekly abundance data
+#' ebirdst_download("lobcur", pattern = "abundance_median_hr", dry_run = TRUE)
 #' }
 ebirdst_download <- function(species,
                              path = ebirdst_data_dir(),
                              tifs_only = TRUE,
                              force = FALSE,
-                             show_progress = TRUE) {
+                             show_progress = TRUE,
+                             pattern = NULL,
+                             dry_run = FALSE) {
   stopifnot(is.character(species), length(species) == 1)
   stopifnot(is.character(path), length(path) == 1)
   stopifnot(is.logical(tifs_only), length(tifs_only) == 1)
   stopifnot(is.logical(force), length(force) == 1)
   stopifnot(is.logical(show_progress), length(show_progress) == 1)
-  species <- tolower(species)
+  stopifnot(is.logical(dry_run), length(dry_run) == 1)
 
-  # append version to path
-  path <- file.path(path, paste0("v", ebirdst_version()["data_version"]))
-  if (!dir.exists(path)) {
-    dir.create(path, recursive = TRUE)
-  }
+  species <- tolower(species)
+  is_example <- (species == "example_data")
 
   # example data or a real run
-  if (species == "example_data") {
-    run_path <- dl_example_data(path = path,
-                                tifs_only = tifs_only,
-                                force = force,
-                                show_progress = show_progress)
-    return(invisible(run_path))
+  if (is_example) {
+    api_url <- paste0("https://raw.githubusercontent.com/",
+                     "CornellLabofOrnithology/",
+                     "ebirdst/dev_erd2021/example-data/")
+    # file list
+    fl <- system.file("extdata", "example-data_file-list.txt",
+                      package = "ebirdst")
+    files <- readLines(fl)
+    year_species <- stringr::str_split(files[1], "/")[[1]][1:2]
+    version_year <- year_species[1]
+    species <- year_species[2]
   } else {
+    # version of the data products that this package version corresponds to
+    version_year <- ebirdst_version()[["version_year"]]
     species <- get_species(species)
-    run <- dplyr::filter(ebirdst::ebirdst_runs,
-                         .data$species_code == species)
-    if (nrow(run) != 1) {
+    if (is.na(species)) {
       stop("species does not uniquely identify a Status and Trends run.")
     }
 
     # api url and key
     key <- get_ebirdst_access_key()
-    api_url <- "https://st-download.ebird.org/v1/"
+    api_url <- "https://st-download.ebird.org/v1"
 
     # get file list for this species
-    list_obj_url <- stringr::str_glue("{api_url}/list-obj/{species}?key={key}")
+    list_obj_url <- stringr::str_glue("{api_url}/list-obj/{version_year}/",
+                                      "{species}?key={key}")
     files <- tryCatch(suppressWarnings({
       jsonlite::read_json(list_obj_url, simplifyVector = TRUE)
     }), error = function(e) NULL)
     if (is.null(files)) {
       stop("Cannot access Status and Trends data URL. Ensure that you have ",
            "a working internet connection and a valid API key for the Status ",
-           "and Trends data.")
+           "and Trends data. Note that the API keys expire after 1 month, so ",
+           "may need to update your key. Visit https://ebird.org/st/request")
     }
-    files <- data.frame(file = files)
+
+    # remove web_download folder
+    web_down <- stringr::str_detect(dirname(files), pattern = "web_download")
   }
-  if (nrow(files) == 0) {
+
+  if (length(files) == 0) {
     stop("No data found for species ", species)
   }
 
+  # path to data package
+  run_path <- file.path(path, version_year, species)
+
   # only download databases when explicitly requested
   if (isTRUE(tifs_only)) {
-    files <- files[!stringr::str_detect(files$file, "\\.db$"), , drop = FALSE]
+    files <- files[!stringr::str_detect(files, "\\.db$")]
+  }
+
+  # apply pattern
+  if (!is.null(pattern)) {
+    stopifnot(is.character(pattern), length(pattern) == 1, !is.na(pattern))
+    pat_match <- stringr::str_detect(basename(files), pattern = pattern)
+    if (all(!pat_match)) {
+      stop("No files matched pattern")
+    }
+
+    # always download config file
+    is_config <- stringr::str_detect(basename(files), pattern = "config.json$")
+    files <- files[pat_match | is_config]
+  }
+
+  # print files to download for dry run
+  if (dry_run) {
+    message("Downloading data package for ", species, " to:\n  ", path)
+    message(paste(c("File list:", files), collapse = "\n  "))
+    return(invisible(files))
   }
 
   # prepare download paths
-  if (species == "example_data") {
+  files <- data.frame(file = files)
+  if (is_example) {
     files$src_path <- paste0(api_url, files$file)
   } else {
-    files$src_path <- stringr::str_glue("{api_url}fetch?objKey={files$file}",
+    files$src_path <- stringr::str_glue("{api_url}/fetch?objKey={files$file}",
                                         "&key={key}")
   }
   files$dest_path <- file.path(path, files$file)
@@ -119,7 +165,7 @@ ebirdst_download <- function(species,
   if (all(files$exists)) {
     if (!isTRUE(force)) {
       message("Data already exists, use force = TRUE to re-download.")
-      return(invisible(normalizePath(file.path(path, run))))
+      return(invisible(normalizePath(run_path)))
     }
   } else if (any(files$exists)) {
     if (!isTRUE(force)) {
@@ -142,7 +188,7 @@ ebirdst_download <- function(species,
     }
   }
   options(timeout = old_timeout)
-  return(invisible(normalizePath(file.path(path, run))))
+  return(invisible(normalizePath(run_path)))
 }
 
 
@@ -181,7 +227,7 @@ get_species_path <- function(species, path = ebirdst_data_dir()) {
   path <- file.path(path, ebirdst_version()["version_year"])
 
   if (species == "example_data") {
-    run <- "yebsap_example"
+    run <- "yebsap-example"
   } else {
     species <- get_species(species)
     row_id <- which(ebirdst::ebirdst_runs$species_code == species)
@@ -232,8 +278,8 @@ ebirdst_data_dir <- function() {
 #' a newer data version.
 #'
 #' @return A list with three components: `version_year` is the year the model
-#'   estimates are made for in this version of the data, `release_date` is the
-#'   date this version of the data were released, and `access_end_date` is the
+#'   estimates are made for in this version of the data, `release_year` is the
+#'   year this version of the data were released, and `access_end_date` is the
 #'   last date that users will be able to download this version of the data.
 #' @export
 #'
@@ -241,64 +287,6 @@ ebirdst_data_dir <- function() {
 #' ebirdst_version()
 ebirdst_version <- function() {
   list(version_year = 2020,
-       release_date = as.Date("2022-07-01"),
+       release_year = 2021,
        access_end_date = as.Date("2023-05-31"))
-}
-
-
-# internal functions ----
-
-dl_example_data <- function(path, tifs_only, force, show_progress) {
-  base_dir <- paste0("https://raw.githubusercontent.com/CornellLabofOrnithology/",
-                     "ebirdst/dev_erd2021/example-data/")
-  # get file list from github
-  fl <- system.file("extdata", "example-data_file-list.txt",
-                    package = "ebirdst")
-  files <- readLines(fl)
-  run <- stringr::str_split(files[1], "/")[[1]][1]
-  run_path <- normalizePath(file.path(path, run), mustWork = FALSE)
-  dir.create(run_path, recursive = TRUE, showWarnings = FALSE)
-
-  # drop database files
-  if (isTRUE(tifs_only)) {
-    files <- files[!stringr::str_detect(files, "\\.zip$")]
-  }
-
-  # check for files already existing
-  dst_files <- file.path(path, files)
-  dst_files <- stringr::str_remove(dst_files, "\\.zip$")
-  fe <- file.exists(dst_files)
-  if (any(fe)) {
-    if (isTRUE(force)) {
-      file.remove(dst_files[fe])
-    } else {
-      files <- files[!fe]
-      if (length(files) == 0) {
-        message("Example data already downloaded")
-        return(invisible(run_path))
-      }
-    }
-  }
-
-  # download
-  src_files <- file.path(base_dir, files)
-  dst_files <- file.path(path, files)
-  for (d in unique(dirname(dst_files))) {
-    dir.create(d, recursive = TRUE, showWarnings = FALSE)
-  }
-  for (i in seq_along(src_files)) {
-    dl_response <- utils::download.file(src_files[i], dst_files[i],
-                                        quiet = !show_progress,
-                                        mode = "wb")
-    if (dl_response != 0) {
-      stop("Error downloading file: ", files[i])
-    }
-    # unzip
-    if (stringr::str_detect(dst_files[i], "\\.zip")) {
-      uz <- utils::unzip(dst_files[i], exdir = dirname(dst_files[i]))
-      fm <- file.remove(dst_files[i])
-    }
-  }
-
-  return(invisible(run_path))
 }

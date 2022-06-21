@@ -52,7 +52,7 @@ bb_vec <- c(xmin = -86, xmax = -83, ymin = 41.5, ymax = 43.5)
 e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
 
 # load and subset raster data
-abd <- load_raster(path, product = "abundance")
+abd <- load_raster(path, product = "abundance", resolution = "lr")
 abd_ss <- ebirdst_subset(abd, ext = e)
 }
 }

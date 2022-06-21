@@ -132,7 +132,7 @@ get_species <- function(x) {
 }
 
 
-# internal functions ----
+# internal ----
 
 # convert from an iso date to a 0-1 srd date
 to_srd_date <- function(x) {
@@ -162,7 +162,7 @@ from_srd_date <- function(x, year, iso_date = TRUE) {
   stopifnot(is.logical(iso_date), length(iso_date) == 1)
 
   if (missing(year)) {
-    y <- ebirdst_version()["data_version"]
+    y <- ebirdst_version()[["version_year"]]
   } else {
     y <- year
   }

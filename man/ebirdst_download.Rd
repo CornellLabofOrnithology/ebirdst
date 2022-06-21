@@ -9,7 +9,9 @@ ebirdst_download(
   path = ebirdst_data_dir(),
   tifs_only = TRUE,
   force = FALSE,
-  show_progress = TRUE
+  show_progress = TRUE,
+  pattern = NULL,
+  dry_run = FALSE
 )
 }
 \arguments{
@@ -34,10 +36,19 @@ predictive performance metrics.}
 fresh copy be downloaded anyway.}
 
 \item{show_progress}{logical; whether to print download progress information.}
+
+\item{pattern}{character; regular expression pattern to supply to
+\link[stringr:str_detect]{str_detect()} to filter files to download. Note
+that some files are mandatory and will always be downloaded.}
+
+\item{dry_run}{logical; whether to do a dry run, just listing files that will
+be downloaded. This can be useful when testing the use of \code{pattern} to
+filter the files to download.}
 }
 \value{
 Path to the folder containing the downloaded data package for the
-given species.
+given species. If \code{dry_run = TRUE} a list of files to download will be
+returned.
 }
 \description{
 Download an eBird Status and Trends data package for a single species, or for
@@ -58,5 +69,11 @@ ebirdst_download("example_data")
 ebirdst_download("woothr")
 # download the data package for wood thrush, all data
 ebirdst_download("woothr", tifs_only = FALSE)
+
+# use pattern to only download low resolution data
+# dry_run can be used to see what files will be downloaded
+ebirdst_download("lobcur", pattern = "_lr_", dry_run = TRUE)
+# use pattern to only download the high res weekly abundance data
+ebirdst_download("lobcur", pattern = "abundance_median_hr", dry_run = TRUE)
 }
 }

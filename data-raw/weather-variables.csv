@@ -1,15 +1,15 @@
 variable,description,unit,label
-CDS_U10,"wind speed, e-w direction, > 0 from west",m/s,Wind Speed (E-W)
-CDS_V10,"wind speed, n-s direction, > 0 from south",m/s,Wind Speed (N-S)
-CDS_I10FG,instantaneous wind gust,m/s,Wind Gust
-CDS_D2M,dewpoint temperature,celcius,Dewpoint
-CDS_T2M,temperature,celcius,Temperature
-CDS_CBH,cloud base height,m,Cloud Base Height
-CDS_HCC,high cloud cover,%,High Cloud Cover
-CDS_MCC,medium cloud cover,%,Medium Cloud Cover
-CDS_LCC,low cloud cover,%,Low Cloud Cover
-CDS_MSL,"sea level pressure, mean",Pa,Sea Level Pressure (Mean)
-CDS_SLC,"sea level pressure, change",Pa,Sea Level Pressure (Change)
-CDS_SF,"snow fall, water equivalent",m,Snowfall
-CDS_RF,rain fall,m,Rainfall
-CDS_TP,total precipitation,m,Total Precipitation
+cds_u10,"wind speed, e-w direction, > 0 from west",m/s,Wind Speed (E-W)
+cds_v10,"wind speed, n-s direction, > 0 from south",m/s,Wind Speed (N-S)
+cds_i10fg,instantaneous wind gust,m/s,Wind Gust
+cds_d2m,dewpoint temperature,celcius,Dewpoint
+cds_t2m,temperature,celcius,Temperature
+cds_cbh,cloud base height,m,Cloud Base Height
+cds_hcc,high cloud cover,%,High Cloud Cover
+cds_mcc,medium cloud cover,%,Medium Cloud Cover
+cds_lcc,low cloud cover,%,Low Cloud Cover
+cds_msl,"sea level pressure, mean",Pa,Sea Level Pressure (Mean)
+cds_slc,"sea level pressure, change",Pa,Sea Level Pressure (Change)
+cds_sf,"snow fall, water equivalent",m,Snowfall
+cds_rf,rain fall,m,Rainfall
+cds_tp,total precipitation,m,Total Precipitation

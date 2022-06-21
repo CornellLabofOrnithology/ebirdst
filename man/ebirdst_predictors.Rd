@@ -8,8 +8,6 @@
 A data frame with 74 rows and 5 columns:
 \describe{
 \item{predictor}{Predictor variable name.}
-\item{predictor_tidy}{Predictor variable name, tidied to only contain
-lowercase letters and underscores.}
 \item{predictor_label}{Descriptive labels for predictors for plotting and
 translating the cryptic variables names (e.g. \code{umd_fs_c1} is
 Evergreen Needleleaf Forest.}

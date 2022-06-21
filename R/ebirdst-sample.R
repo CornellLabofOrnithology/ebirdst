@@ -173,6 +173,9 @@ sample_case_control.data.frame <- function(x, res, t_res, n = 1,
                          replace = replace, jitter = jitter)
 }
 
+
+# internal ----
+
 safe_sample <- function(x, size, ...) {
   stopifnot(is.numeric(size), length(size) == 1, size >= 1)
   if (length(x) <= size || length(x) == 1) {

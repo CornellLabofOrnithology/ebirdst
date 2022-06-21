@@ -198,6 +198,8 @@ print.ebirdst_extent <- function(x, ...) {
   invisible(x)
 }
 
+
+# internal ----
 process_t_extent <- function(t) {
   stopifnot(length(t) == 2, all(!is.na(t)))
 

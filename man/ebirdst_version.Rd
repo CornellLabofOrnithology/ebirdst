@@ -8,8 +8,8 @@ ebirdst_version()
 }
 \value{
 A list with three components: \code{version_year} is the year the model
-estimates are made for in this version of the data, \code{release_date} is the
-date this version of the data were released, and \code{access_end_date} is the
+estimates are made for in this version of the data, \code{release_year} is the
+year this version of the data were released, and \code{access_end_date} is the
 last date that users will be able to download this version of the data.
 }
 \description{

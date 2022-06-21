@@ -4,6 +4,7 @@ library(sf)
 library(rnaturalearth)
 library(tidyverse)
 library(glue)
+library(jsonlite)
 library(DBI)
 library(RSQLite)
 
@@ -27,6 +28,12 @@ dir_create(ex_ranges_dir)
 # copy config file and databases
 dir_ls(sp_path, regexp = "(json|db)$", recurse = FALSE, type = "file") %>%
   file_copy(ex_dir)
+
+# change species code
+p <- read_json(path(ex_dir, "config.json"), simplifyVector = TRUE)
+p[["SPECIES_CODE"]] <- ex_species
+write_json(p, path(ex_dir, "config.json"),
+           pretty = TRUE, digits = NA)
 
 # raster template
 r_tmplt <- path(sp_path, "srd_raster_template.tif") %>%

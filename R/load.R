@@ -1,26 +1,42 @@
 #' Load eBird Status and Trends raster data cubes
 #'
-#' Each of the eBird Status and Trends products is packaged as a GeoTIFF file
-#' (referred to as a "cube) with 52 bands, one for each week of the year. This
-#' function loads the cube for a given product and species as a `RasterStack`
+#' Each of the eBird Status and Trends raster products is packaged as a GeoTIFF
+#' file representing predictions on a regular grid. The core products are
+#' occurrence, count, relative abundance, and percent of population. This
+#' function loads one of the available data products into R as a `RasterStack`
 #' object.
 #'
 #' @param path character; directory that the Status and Trends data for a given
 #'   species was downloaded to. This path is returned by `ebirdst_download()`
 #'   or `get_species_path()`.
-#' @param product character; Status and Trends product to load, see Details for
-#'   available products. It is also possible to return a template raster with no
-#'   data.
+#' @param product character; Status and Trends product to load: occurrence,
+#'   count, relative abundance, or percent of population. See Details for a
+#'   detailed explanation of each of these products.
+#' @param period character; temporal period of the estimation. The Status and
+#'   Trends models make predictions for each week of the year; however, as a
+#'   convenience, data are also provided summarized at the seasonal or annual
+#'   ("full-year") level.
+#' @param metric character; by default, the weekly products provide estimates of
+#'   the median value (`metric = "median"`) and the summarized products are the
+#'   cell-wise mean across the weeks within the season (`metric = "mean"`).
+#'   However, additional variants exist for some of the products. For the weekly
+#'   relative abundance, confidence intervals are provided: specify `metric =
+#'   "lower"` to get the 10th quantile or `metric = "upper"` to get the 90th
+#'   quantile. For the seasonal and annual products, the cell-wise maximum
+#'   values across weeks can be obtained with `metric = "max"`.
 #' @param resolution character; the resolution of the raster data to load. The
 #'   default is to load the native ~3 km resolution (`"hr"`); however, for some
 #'   applications 9 km (`"mr"`) or 27 km (`"lr"`) data may be suitable.
 #'
-#' @details The available Status and Trends data cubes are as follows:
+#' @details The core Status and Trends data products provide weekly estimates
+#'   across a regular spatial grid. They are packaged as rasters with 52 layers,
+#'   each corresponding to estimates for a week of the year, and we refer to
+#'   them as "cubes" (e.g. the "relative abundance cube"). These products are:
 #'
-#' - `occurrence`: the expected probability of occurrence of the species,
-#' ranging from 0 to 1, on an eBird Traveling Count by a skilled eBirder
-#' starting at the optimal time of day with the optimal search duration and
-#' distance that maximizes detection of that species in a region.
+#' - `occurrence`: the expected probability (0-1) of occurrence a species on
+#' an eBird Traveling Count by a skilled eBirder starting at the optimal time of
+#' day with the optimal search duration and distance that maximizes detection of
+#' that species in a region.
 #' - `count`: the expected count of a species, conditional on its occurrence at
 #' the given location, on an eBird Traveling Count by a skilled eBirder
 #' starting at the optimal time of day with the optimal search duration and
@@ -30,27 +46,28 @@
 #' species on an eBird Traveling Count by a skilled eBirder starting at the
 #' optimal time of day with the optimal search duration and distance that
 #' maximizes detection of that species in a region.
-#' - `abundance_lower`: the lower 10th quantile of the expected relative
-#' abundance of the species on an eBird Traveling Count by a skilled eBirder
-#' starting at the optimal time of day with the optimal search duration and
-#' distance that maximizes detection of that species in a region.
-#' - `abundance_upper`: the upper 90th quantile of the expected relative
-#' abundance of the species on an eBird Traveling Count by a skilled eBirder
-#' starting at the optimal time of day with the optimal search duration and
-#' distance that maximizes detection of that species in a region.
+#' - `percent-population`: the percent of the total relative abundance within
+#' each cell. This is a derived product calculated by dividing each cell value
+#' in the relative abundance raster with the total abundance summed across all
+#' cells.
 #'
-#' In addition to these cubes with 52 layers (one for each week), it is possible
-#' to load:
-#' - `abundance_seasonal`: the expected relative abundance averaged across the
-#' weeks within each season. The date boundaries used for the seasonal
-#' definitions appear in `ebirdst_runs` and if a season failed review no
-#' associated layer will be included.
-#' - `template`: a template raster covering the whole Earth and without any
-#' data.
+#' In addition to these weekly data cubes, this function provides access to data
+#' summarized over different periods. Seasonal cubes are produced by taking the
+#' cell-wise mean or max across the weeks within each season. The boundary dates
+#' for each season are species specific and are available in `ebirdst_runs`, and
+#' if a season failed review no associated layer will be included in the cube.
+#' In addition, full-year summaries provide the mean or max across all weeks of
+#' the year that fall within a season that passed review. Note that this is not
+#' necessarily all 52 weeks of the year. For example, if the estimates for the
+#' non-breeding season failed expert review for a given species, the full-year
+#' summary for that species will not include the weeks that would fall within
+#' the non-breeding season.
+
 #'
-#' @return A `RasterStack` with 52 layers for the given product, labeled by
-#'   week. Seasonal abundance will have up to four layers labeled according to
-#'   the seasons. The template raster will be returned as a `RasterLayer`.
+#' @return For the weekly cubes, a `RasterStack` with 52 layers for the given
+#'   product, labeled by week. Seasonal cubes will have up to four layers
+#'   labeled according to the seasons. The full-year products will have a single
+#'   layer.
 #'
 #' @export
 #'
@@ -61,83 +78,97 @@
 #' # or get the path if you already have the data downloaded
 #' path <- get_species_path("example_data")
 #'
-#' # load data
-#' load_raster(path, "abundance")
+#' # weekly relative abundance
+#' # note that only low resolution (lr) data are available for the example data
+#' abd_weekly <- load_raster(path, "abundance", resolution = "lr")
+#' # identify the weeks for each layer
+#' parse_raster_dates(abd_weekly)
+#'
+#' # max seasonal abundance
+#' abd_seasonal <- load_raster(path, "abundance",
+#'                             period = "seasonal", metric = "max",
+#'                             resolution = "lr")
+#' # subset to just breeding season abundance
+#' abd_seasonal[["breeding"]]
 #' }
 load_raster <- function(path,
                         product = c("abundance",
-                                    "abundance_seasonal",
                                     "count",
                                     "occurrence",
-                                    "abundance_lower",
-                                    "abundance_upper",
-                                    "template"),
+                                    "percent-population"),
+                        period = c("weekly",
+                                   "seasonal",
+                                   "full-year"),
+                        metric = NULL,
                         resolution = c("hr", "mr", "lr")) {
 
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
   product <- match.arg(product)
+  period <- match.arg(period)
   resolution <- match.arg(resolution)
 
-  if (product %in% c("abundance", "count", "occurrence")) {
-    product <- paste0(product, "_median")
+  # load config file
+  p <- load_config(path)
+  species_code <- p[["species_code"]]
+  v <- ebirdst_version()[["version_year"]]
+  is_example <- stringr::str_detect(species_code, "-example")
+
+  if (is_example && !resolution == "lr") {
+    stop("The example data only contains low-resolution (lr) estimates.")
   }
 
-  # load raster
-  if (product == "template") {
-    if (resolution != "hr") {
-      stop("For the raster template, resolution must be 'hr'")
+  # contruct file name and path
+  if (period == "weekly") {
+    # assess which metric is being requested
+    if (is.null(metric)) {
+      metric <- "median"
     }
-    # template raster
-    tif_path <- file.path(path, "srd_raster_template.tif")
-    if (length(tif_path) != 1 || !file.exists(tif_path)) {
-      stop("Error locating the raster template")
-    }
-    return(suppressWarnings(raster::raster(tif_path)))
-  } else if (product == "abundance_seasonal") {
-    # seasonal abundance
-    pat <- stringr::str_glue("abundance.*{resolution}.*\\.tif$")
-    tif_path <- list.files(file.path(path, "seasonal"),
-                           pattern = pat,
-                           full.names = TRUE)
-    # drop core seasons
-    is_core <- stringr::str_detect(tif_path, "_core_")
-    tif_path <- tif_path[!is_core]
-    if (any(!file.exists(tif_path))) {
-      stop("Error locating seasonal abundance GeoTIFFs")
-    } else if (length(tif_path) == 0) {
-      stop("No seasonal abundance GeoTIFFs found")
-    }
-    season_order <- c("breeding", "postbreeding_migration",
-                      "nonbreeding", "prebreeding_migration",
-                      "resident")
-    seasons <- stringr::str_extract(tif_path,
-                                    "(?<=_abundance_)[-a-z]+")
-    seasons <- stringr::str_replace_all(seasons, "-", "_")
-    r <- suppressWarnings(raster::stack(tif_path))
-    names(r) <- seasons
-    return(r[[intersect(season_order, seasons)]])
-  } else {
-    # weekly stack
-    pat <- stringr::str_glue("{product}_{resolution}.*\\.tif$")
-    tif_path <- list.files(file.path(path, "cubes"),
-                           pattern = pat,
-                           full.names = TRUE)
-    if (length(tif_path) != 1 || !file.exists(tif_path)) {
-      stop(paste("Error locating GeoTIFF file for:", product))
-    }
-    r <- suppressWarnings(raster::stack(tif_path))
-
-    # label
-    if (raster::nlayers(r) == 52) {
-      r <- label_raster_stack(r)
+    if (product == "abundance") {
+      if (!metric %in% c("median", "lower", "upper")) {
+        stop("Valid metrics for weekly abundance data are 'median', 'lower', ",
+             "or 'upper'")
+      }
     } else {
-      l <- load_config(path)
-      weeks <- paste0(l$SRD_PRED_YEAR, "-", l$DATE_NAMES)
-      weeks <- as.Date(weeks, "%Y-%m-%d")
-      r <- label_raster_stack(r, weeks = weeks)
+      if (metric != "median") {
+        stop("For this product, metric must be 'median'")
+      }
     }
-    return(r)
+
+    # construct filename
+    file <- stringr::str_glue("{species_code}_{product}_{metric}",
+                              "_{resolution}_{v}.tif")
+    file <- file.path(path, "weekly", file)
+  } else {
+    # assess which metric is being requested
+    if (is.null(metric)) {
+      metric <- "mean"
+    }
+    if (!metric %in% c("mean", "max")) {
+      stop("Valid metrics for seasonal or full-year data are 'mean' or 'max.'")
+    }
+
+    # construct filename
+    file <- stringr::str_glue("{species_code}_{product}_{period}_{metric}",
+                              "_{resolution}_{v}.tif")
+    file <- file.path(path, "seasonal", file)
   }
+
+  # check existence of target file
+  if (!file.exists(file)) {
+    stop("The file for the requested product does not exist: \n  ", file)
+  }
+
+  # load raster stack
+  r <- suppressWarnings(raster::stack(file))
+
+  # name with weeks
+  if (period == "weekly") {
+    weeks <- paste0(p$srd_pred_year, "-", p$date_names)
+    weeks <- as.Date(weeks, "%Y-%m-%d")
+    r <- label_raster_stack(r, weeks = weeks)
+  }
+
+  return(r)
 }
 
 
@@ -146,7 +177,7 @@ load_raster <- function(path,
 #' Loads the predictor importance (PI) data from the stixel_summary.db sqlite
 #' database. PI estimates are provided for each stixel over which a model was
 #' run and are identified by a unique stixel ID in addition to the coordinates
-#' of the stixel centroid. PI estimates are for the occurrence model only.
+#' of the stixel centroid.
 #'
 #' @inheritParams load_raster
 #' @param ext [ebirdst_extent] object; the spatiotemporal extent to filter the
@@ -158,13 +189,14 @@ load_raster <- function(path,
 #'   rather then the default data frame.
 #'
 #' @return Data frame, or [sf] object if `return_sf = TRUE`, containing PI
-#'   estimates for each stixel for both the occurrence and relative abundance
-#'   models. The data are provided in a 'wide' format, with each row
-#'   corresponding to the PI estimates for a give stixel for the occurrence
-#'   count model, and the relative importance of each predictor in columns.
-#'   Stixels are identified by a unique `stixel_id`, the centroid of the stixel
-#'   in space and time is specified by the `lat`, `lon`, and `date` column,
-#'   which expresses the day of year as a value from 0-1.
+#'   estimates for each stixel for either the occurrence or count models. The
+#'   data are provided in a 'wide' format, with each row corresponding to the PI
+#'   estimates for a give stixel for the occurrence count model, and the
+#'   relative importance of each predictor in columns. Stixels are identified by
+#'   a unique `stixel_id`, and the centroid of the stixel in space and time is
+#'   specified by the `latitude`, `longitude`, and `day_of_year` columns. The
+#'   column `predictor` provides a code specifying the predictor variable. These
+#'   codes can be looked up in `ebirdst_predictors` for a brief description.
 #'
 #' @export
 #'
@@ -175,7 +207,7 @@ load_raster <- function(path,
 #' # or get the path if you already have the data downloaded
 #' path <- get_species_path("example_data")
 #'
-#' # load predictor importance
+#' # load predictor importance for the occurrence model
 #' pis <- load_pis(path)
 #'
 #' # plot the top 15 predictor importances
@@ -224,6 +256,7 @@ load_pis <- function(path, ext, model = c("occurrence", "count"),
   pis <- pis[, c("stixel_id", "latitude", "longitude", "day_of_year",
                  "covariate", "pi")]
   pis <- dplyr::rename(pis, predictor = "covariate", importance = "pi")
+  pis[["predictor"]] <- transform_predictor_names(pis[["predictor"]])
 
   # check for missing stixels centroid
   has_centroid <- stats::complete.cases(pis[, c("latitude", "longitude",
@@ -257,18 +290,17 @@ load_pis <- function(path, ext, model = c("occurrence", "count"),
 #' @inheritParams load_pis
 #'
 #' @return Data frame, or [sf] object if `return_sf = TRUE`, containing PD
-#'   estimates for each stixel for either the occurrence and relative model. The
+#'   estimates for each stixel for either the occurrence or count model. The
 #'   data frame will have the following columns:
 #'   - `stixel_id`: unique stixel identifier
-#'   - `lat` and `lon`: stixel centroid
-#'   - `date`: day of year, expressed as a value from 0-1, of the stixel center
+#'   - `latitude` and `longitude`: stixel centroid
+#'   - `day_of_year`: center day of year for stixel
 #'   - `predictor`: name of the predictor that the PD data correspond to, for a
 #'   full list of predictors consult the [ebirdst_predictors] data frame
 #'   - `predictor_value`: value of the predictor variable at which PD is
 #'   evaluated
-#'   - `response`: predicted response, occurrence or relative abundance, at the
-#'   given value of the predictor averaged across all the values of the other
-#'   predictors
+#'   - `response`: predicted response, occurrence or count, at the given value
+#'   of the predictor averaged across all the values of the other predictors
 #'
 #' @export
 #'
@@ -279,7 +311,7 @@ load_pis <- function(path, ext, model = c("occurrence", "count"),
 #' # or get the path if you already have the data downloaded
 #' path <- get_species_path("example_data")
 #'
-#' # load partial dependence data
+#' # load partial dependence data for occurrence model
 #' pds <- load_pds(path)
 #'
 #' # plot the top 15 predictor importances
@@ -328,6 +360,7 @@ load_pds <- function(path, ext, model = c("occurrence", "count"),
   pds <- pds[, c("stixel_id", "latitude", "longitude", "day_of_year",
                  "covariate", "predictor_value", "response")]
   pds <- dplyr::rename(pds, predictor = "covariate")
+  pds[["predictor"]] <- transform_predictor_names(pds[["predictor"]])
 
   # check for missing stixels centroid
   has_centroid <- stats::complete.cases(pds[, c("latitude", "longitude",
@@ -410,6 +443,9 @@ load_stixels <- function(path, ext, return_sf = FALSE) {
   stx <- dplyr::tibble(stx)
   DBI::dbDisconnect(db)
 
+  # clean names
+  names(stx) <- stringr::str_to_lower(names(stx))
+
   # check for missing stixels centroid
   has_centroid <- stats::complete.cases(stx[, c("latitude", "longitude",
                                                 "day_of_year")])
@@ -436,13 +472,13 @@ load_stixels <- function(path, ext, return_sf = FALSE) {
 #' During eBird Status and Trends modeling, predictions are made for checklists
 #' in a test dataset that is not included in the model fitting process. This
 #' function loads these predictions in addition to the actual observed count on
-#' the associated checklist. These data are used by [ebirdst_ppms()] to get for
+#' the associated checklist. These data are used by [ebirdst_ppms()] for
 #' calculating predictive performance metrics.
 #'
 #' @inheritParams load_pis
 #'
 #' @return Data frame, or [sf] object if `return_sf = TRUE`, containing
-#'   observed counts and model predictiosn for the test data.
+#'   observed counts and model predictions for the test data.
 #'
 #' @export
 #'
@@ -507,10 +543,12 @@ load_config <- function(path) {
   stopifnot(dir.exists(path))
   cfg_file <- file.path(path, "config.json")
   if(!file.exists(cfg_file)) {
-    stop("The file 'config.rds' does not exist in: ", path)
+    stop("The file 'config.json' does not exist in: ", path)
   }
   # load configuration file
-  jsonlite::read_json(cfg_file, simplifyVector = TRUE)
+  p <- jsonlite::read_json(cfg_file, simplifyVector = TRUE)
+  names(p) <- tolower(names(p))
+  return(p)
 }
 
 
@@ -532,7 +570,8 @@ load_config <- function(path) {
 #' - `res`: a numeric vector with 2 elements giving the target resolution of
 #'    raster in the custom projection.
 #' - `fa_extent_sinu`: the extent in sinusoidal projection
-#' - `abundance_bins`: abundance bins for the full annual cycle
+#' - `weekly_bins`: weekly abundance bins for the full annual cycle
+#' - `seasonal_bins`: seasonal abundance bins for the full annual cycle
 #'
 #' @export
 #'
@@ -556,8 +595,12 @@ load_fac_map_parameters <- function(path) {
        fa_extent = raster::extent(p$projection$extent),
        res = p$projection$res,
        fa_extent_sinu = raster::extent(unlist(p$bbox_sinu)),
-       abundance_bins = p$bins$hr$breaks)
+       weekly_bins = p$bins$hr$breaks,
+       seasonal_bins = p$bins_seasonal$hr$breaks)
 }
+
+
+# internal ----
 
 sql_extent_subset <- function(ext) {
   stopifnot(inherits(ext, "ebirdst_extent"))
@@ -589,4 +632,14 @@ sql_extent_subset <- function(ext) {
     }
   }
   return(sql)
+}
+
+
+transform_predictor_names <- function(x) {
+  x <- stringr::str_to_lower(x)
+  x <- stringr::str_replace_all(x, "\\.", "_")
+  x[x == "i_stationary"] <- "is_stationary"
+  x[x == "lon"] <- "longitude"
+  x[x == "lat"] <- "latitude"
+  return(x)
 }

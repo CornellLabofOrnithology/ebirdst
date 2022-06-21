@@ -31,6 +31,12 @@ for (s in seasons) {
   }
 }
 
+# default residents to full year
+fy_resident <- runs$resident & runs$resident_quality > 0 &
+  is.na(runs$resident_start) & is.na(runs$resident_end)
+runs$resident_start[fy_resident] <- "01-04"
+runs$resident_end[fy_resident] <- "12-28"
+
 # clean up
 ebirdst_runs <- runs %>%
   select(-common_name) %>%

@@ -315,9 +315,9 @@ plot.ebirdst_habitat <- function(x, n_habitat_types = 15, ...) {
   }
 
   # convert to date
-  x$week <- as.Date(paste(ebirdst_version()["data_version"],
+  x$week <- as.Date(paste(ebirdst_version()[["version_year"]],
                           x$week, sep = "-"))
-  date_range <- as.Date(paste(ebirdst_version()["data_version"],
+  date_range <- as.Date(paste(ebirdst_version()[["version_year"]],
                               c("01-01", "12-31"), sep = "-"))
 
   # subset to top predictors
