@@ -7,12 +7,12 @@
 
 ## Test environments
 
-- local OS X install, R 4.1
-- OS X (github actions), R 4.1
-- Windows (github actions), R 4.1
-- ubuntu 14.04 (github actions), R 4.1
+- local OS X install, R 4.2
+- OS X (github actions), R 4.2
+- Windows (github actions), R 4.2
+- ubuntu 14.04 (github actions), R 4.2
 - win-builder (devel and release)
-- R-hub (Solaris), R 4.1
+- R-hub (Solaris), R 4.2
 
 ## R CMD check results
 
