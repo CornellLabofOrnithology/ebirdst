@@ -8,21 +8,21 @@ test_that("load_pis", {
   expect_gt(nrow(pis), 0)
 
   # columns
-  expect_named(pis, c("stixel_id", "lat", "lon", "date",
+  expect_named(pis, c("stixel_id", "latitude", "longitude", "day_of_year",
                       "predictor", "importance"))
 
   # predictors
   expect_true(all(sort(unique(pis$predictor)) ==
-                    sort(ebirdst_predictors$predictor_tidy)))
+                    sort(ebirdst_predictors$predictor)))
 
   # return sf object
   pis <- load_pis(path, return_sf = TRUE)
   expect_is(pis, "sf")
   expect_gt(nrow(pis), 0)
-  expect_named(pis, c("stixel_id", "date",
+  expect_named(pis, c("stixel_id", "day_of_year",
                       "predictor", "importance", "geometry"))
   expect_true(all(sort(unique(pis$predictor)) ==
-                    sort(ebirdst_predictors$predictor_tidy)))
+                    sort(ebirdst_predictors$predictor)))
 
   # invalid path
   expect_error(load_pis("/invalid/path"))
@@ -34,14 +34,14 @@ test_that("load_pds", {
   expect_gt(nrow(pds), 0)
 
   # columns
-  expect_named(pds, c("stixel_id", "lat", "lon", "date",
+  expect_named(pds, c("stixel_id", "latitude", "longitude", "day_of_year",
                       "predictor", "predictor_value", "response"))
 
   # return sf object
   pds <- load_pds(path, return_sf = TRUE)
   expect_is(pds, "sf")
   expect_gt(nrow(pds), 0)
-  expect_named(pds, c("stixel_id", "date",
+  expect_named(pds, c("stixel_id", "day_of_year",
                       "predictor", "predictor_value", "response",
                       "geometry"))
 
@@ -124,10 +124,6 @@ test_that("plot_pis", {
   expect_error(plot_pis(pis = pis))
   expect_error(plot_pis(pis = 1:10, ext = e))
   expect_error(plot_pis(pis = data.frame(), ext = e))
-
-  # missing temporal info
-  nt <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 45))
-  expect_error(plot_pis(pis = pis, ext = nt))
 })
 
 test_that("plot_pds", {

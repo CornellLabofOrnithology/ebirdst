@@ -26,19 +26,16 @@ Depends:
 Imports: 
     DBI,
     dplyr (>= 1.0.0),
-    fasterize,
     gbm,
     ggplot2,
     grDevices,
     gridExtra,
     jsonlite,
     magrittr,
-    methods,
     mgcv,
     precrec,
     PresenceAbsence,
     raster,
-    rgdal,
     rlang,
     RSQLite,
     sf (>= 1.0-0),
@@ -47,17 +44,13 @@ Imports:
     tidyr (>= 1.0.0),
     tools,
     utils,
-    viridisLite,
-    xml2
+    viridisLite
 Suggests: 
-    covr,
     fields,
     knitr,
     rmarkdown,
     rnaturalearth,
-    smoothr,
     testthat,
-    units,
     withr
 VignetteBuilder: 
     knitr

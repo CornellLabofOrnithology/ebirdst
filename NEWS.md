@@ -1,6 +1,17 @@
-# ebirdst 0.4.0
+# ebirdst 1.0.0
 
-- updates for eBird Status Data Products v2020
+- major update to align with the new eBird Status and Trends API
+- update to align with the 2020 eBird Status Data Products
+- transition from rappdirs to tools::R_user_dir() for handling download directories
+- all new vignettes
+
+# ebirdst 0.3.5
+
+- bug fix: API update is causing all data downloads to fail
+
+# ebirdst 0.3.4
+
+- rename master branch to main on GitHub requires different download path for example data
 
 # ebirdst 0.3.3
 
@@ -9,6 +20,10 @@
 # ebirdst 0.3.2
 
 - again try to prevent tests and examples from leaving files behind to pass CRAN checks
+
+# ebirdst 0.3.1
+
+- prevent tests and examples from leaving files behind to pass CRAN checks
 
 # ebirdst 0.3.1
 

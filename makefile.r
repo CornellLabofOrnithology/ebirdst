@@ -9,7 +9,7 @@ devtools::install()
 
 # local tests and checks
 devtools::test()
-devtools::check(run_dont_test = TRUE)
+devtools::check()
 
 # vignettes, readme, site
 Sys.setenv(BUILD_VIGNETTES = TRUE)

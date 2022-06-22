@@ -1,6 +1,9 @@
-# ebirdst 0.4.0
+# ebirdst 1.0.0
 
-- updates for eBird Status Data Products v2020
+- major update to align with the new eBird Status and Trends API
+- update to align with the 2020 eBird Status Data Products
+- transition from rappdirs to tools::R_user_dir() for handling download directories
+- all new vignettes
 
 ## Test environments
 
