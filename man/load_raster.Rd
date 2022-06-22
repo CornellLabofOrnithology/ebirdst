@@ -55,21 +55,16 @@ object.
 The core Status and Trends data products provide weekly estimates
 across a regular spatial grid. They are packaged as rasters with 52 layers,
 each corresponding to estimates for a week of the year, and we refer to
-them as "cubes" (e.g. the "relative abundance cube"). These products are:
+them as "cubes" (e.g. the "relative abundance cube"). All estimates are the
+median expected value for a standard 1km, 1 hour eBird Traveling Count by
+an expert eBird observer at the optimal time of day and for optimal weather
+conditions to observe the given species. These products are:
 \itemize{
-\item \code{occurrence}: the expected probability (0-1) of occurrence a species on
-an eBird Traveling Count by a skilled eBirder starting at the optimal time of
-day with the optimal search duration and distance that maximizes detection of
-that species in a region.
+\item \code{occurrence}: the expected probability (0-1) of occurrence a species.
 \item \code{count}: the expected count of a species, conditional on its occurrence at
-the given location, on an eBird Traveling Count by a skilled eBirder
-starting at the optimal time of day with the optimal search duration and
-distance that maximizes detection of that species in a region.
-\item \code{abundance}: the expected relative abundance, computed as the product of
-the probability of occurrence and the count conditional on occurrence, of the
-species on an eBird Traveling Count by a skilled eBirder starting at the
-optimal time of day with the optimal search duration and distance that
-maximizes detection of that species in a region.
+the given location.
+\item \code{abundance}: the expected relative abundance of a species, computed as the product of
+the probability of occurrence and the count conditional on occurrence.
 \item \code{percent-population}: the percent of the total relative abundance within
 each cell. This is a derived product calculated by dividing each cell value
 in the relative abundance raster with the total abundance summed across all

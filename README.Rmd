@@ -34,13 +34,13 @@ Install `ebirdst` from GitHub with:
 remotes::install_github("CornellLabofOrnithology/ebirdst")
 ```
 
-The current version of `ebirdst` is designed for working with the eBird Status and Trends data products that make estimates for 2020, with visualizations being released on the web in November 2021, and data access being made available in June 2022 **Users are strongly discouraged from comparing Status and Trends results between years due to methodological differences between versions.** If you have accessed and used previous versions and/or may need access to previous versions for reasons related to reproducibility, please contact ebird@cornell.edu and your request will be considered.
+This version of `ebirdst` is designed to work with the eBird Status Data Products estimated for the year `r ebirdst::ebirdst_version()[["version_year"]]`, with visualizations being released on the web in November 2021, and data access being made available in June 2022 **Users are strongly discouraged from comparing Status and Trends results between years due to methodological differences between versions.** If you have accessed and used previous versions and/or may need access to previous versions for reasons related to reproducibility, please contact ebird@cornell.edu and your request will be considered.
 
 ## Data access
 
-As of July 2021, data access is now granted through a Access Request Form at: https://ebird.org/st/request. Access with this form generates a key to be used with this R package and is provided immediately (as long as commercial use is not requested). Our terms of use have been updated to be more permissive in many cases, particularly academic and research use. When requesting data access, please be sure to carefully read the terms of use and ensure that your intended use is not restricted. Data are no longer publicly available via AWS, aside from an example dataset.
+Data access is granted through an Access Request Form at: https://ebird.org/st/request. Access with this form generates a key to be used with this R package and is provided immediately (as long as commercial use is not requested). Our terms of use have been designed to be quite permissive in many cases, particularly academic and research use. When requesting data access, please be sure to carefully read the terms of use and ensure that your intended use is not restricted.
 
-After completing the Access Request Form, you will be provided a Status and Trends access key, which you will need when downloading data. To store the key so the package can access it when downloading data, use the function `set_ebirdst_access_key("XXXXX")`, where `"XXXXX"` is the access key provided to you.
+After completing the Access Request Form, you will be provided a Status and Trends access key, which you will need when downloading data. To store the key so the package can access it when downloading data, use the function `set_ebirdst_access_key("XXXXX")`, where `"XXXXX"` is the access key provided to you. **Restart R after setting the access key.**
 
 ## Citation
 
@@ -61,7 +61,7 @@ For full package documentation, including a series of vignettes covering the ful
 
 ## Quick Start
 
-This quick start guide shows how to download data and plot abundance values similar to how they are plotted for the [eBird Status and Trends Abundance animated maps](https://ebird.org/science/status-and-trends/yebsap/abundance-map-weekly). In this guide, and throughout all package documentation, a simplified example dataset is used consisting of Yellow-bellied Sapsucker in Michigan. For a full list of the species available for download, look at the data frame `ebirst_runs`, which is included in this package.
+This quick start guide shows how to download data and plot abundance values similar to how they are plotted for the [eBird Status and Trends weekly abundance animations](https://ebird.org/science/status-and-trends/yebsap/abundance-map-weekly). In this guide, and throughout all package documentation, a simplified example dataset is used consisting of Yellow-bellied Sapsucker in Michigan. For a full list of the species available for download, look at the data frame `ebirst_runs`, which is included in this package.
 
 **Important note: after downloading the results, do not change the file structure.** All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package.
 
@@ -73,19 +73,19 @@ library(fields)
 library(rnaturalearth)
 
 # download example data, yellow-bellied sapsucker in michigan
-dl_path <- ebirdst_download(species = "example_data")
+path <- ebirdst_download(species = "example_data")
 
 # load relative abundance raster stack with 52 layers, one for each week
-abd <- load_raster("abundance", path = dl_path)
+abd <- load_raster(path = path, resolution = "lr")
 
 # load species specific mapping parameters
-pars <- load_fac_map_parameters(dl_path)
+pars <- load_fac_map_parameters(path)
 # custom coordinate reference system
 crs <- pars$custom_projection
 # legend breaks
-breaks <- pars$abundance_bins
+breaks <- pars$weekly_bins
 # legend labels for top, middle, and bottom
-labels <- attr(breaks, "labels")
+labels <- pars$weekly_labels
 
 # get a date vector specifying which week each raster layer corresponds to
 weeks <- parse_raster_dates(abd)

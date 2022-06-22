@@ -31,21 +31,16 @@
 #' @details The core Status and Trends data products provide weekly estimates
 #'   across a regular spatial grid. They are packaged as rasters with 52 layers,
 #'   each corresponding to estimates for a week of the year, and we refer to
-#'   them as "cubes" (e.g. the "relative abundance cube"). These products are:
+#'   them as "cubes" (e.g. the "relative abundance cube"). All estimates are the
+#'   median expected value for a standard 1km, 1 hour eBird Traveling Count by
+#'   an expert eBird observer at the optimal time of day and for optimal weather
+#'   conditions to observe the given species. These products are:
 #'
-#' - `occurrence`: the expected probability (0-1) of occurrence a species on
-#' an eBird Traveling Count by a skilled eBirder starting at the optimal time of
-#' day with the optimal search duration and distance that maximizes detection of
-#' that species in a region.
+#' - `occurrence`: the expected probability (0-1) of occurrence a species.
 #' - `count`: the expected count of a species, conditional on its occurrence at
-#' the given location, on an eBird Traveling Count by a skilled eBirder
-#' starting at the optimal time of day with the optimal search duration and
-#' distance that maximizes detection of that species in a region.
-#' - `abundance`: the expected relative abundance, computed as the product of
-#' the probability of occurrence and the count conditional on occurrence, of the
-#' species on an eBird Traveling Count by a skilled eBirder starting at the
-#' optimal time of day with the optimal search duration and distance that
-#' maximizes detection of that species in a region.
+#' the given location.
+#' - `abundance`: the expected relative abundance of a species, computed as the product of
+#' the probability of occurrence and the count conditional on occurrence.
 #' - `percent-population`: the percent of the total relative abundance within
 #' each cell. This is a derived product calculated by dividing each cell value
 #' in the relative abundance raster with the total abundance summed across all
@@ -177,6 +172,66 @@ load_raster <- function(path,
   }
 
   return(r)
+}
+
+
+#' Load seasonal eBird Status and Trends range polygons
+#'
+#' Range polygons are defined as the boundaries of non-zero seasonal relative
+#' abundance estimates, which are then (optionally) smoothed to produce more
+#' aesthetically pleasing polygons using the `smoothr` package.
+#'
+#' @inheritParams load_raster
+#' @param resolution character; the raster resolution from which the range
+#'   polygons were derived.
+#' @param smoothed logical; whether smoothed or unsmoothed ranges should be
+#'   loaded.
+#'
+#' @return An `sf` update containing the seasonal range boundaries, with each
+#'   season provided as a different feature.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # download example data
+#' path <- ebirdst_download("example_data")
+#' # or get the path if you already have the data downloaded
+#' path <- get_species_path("example_data")
+#'
+#' # load smoothed ranges
+#' # note that only low res data are provided for the example data
+#' ranges <- load_range(path, resolution = "lr")
+#' }
+load_ranges <- function(path, resolution = c("mr", "lr"), smoothed = TRUE) {
+  stopifnot(is.character(path), length(path) == 1, dir.exists(path))
+  stopifnot(is.logical(smoothed), length(smoothed) == 1)
+  resolution <- match.arg(resolution)
+
+  # load config file
+  p <- load_config(path)
+  species_code <- p[["species_code"]]
+  v <- ebirdst_version()[["version_year"]]
+  is_example <- stringr::str_detect(species_code, "-example")
+
+  if (is_example && !resolution == "lr") {
+    stop("The example data only contains low-resolution (lr) estimates.")
+  }
+
+  # define filename
+  label <- ifelse(smoothed, "smooth", "raw")
+  file <- stringr::str_glue("{species_code}_range_{label}",
+                            "_{resolution}_{v}.gpkg")
+  file <- file.path(path, "ranges", file)
+
+  # check existence of target file
+  if (!file.exists(file)) {
+    stop("The file for the requested product does not exist: \n  ", file)
+  }
+
+  # load polygons
+  p <- sf::read_sf(dsn = file, layer = "range")
+
+  return(p)
 }
 
 
@@ -578,8 +633,10 @@ load_config <- function(path) {
 #' - `res`: a numeric vector with 2 elements giving the target resolution of
 #'    raster in the custom projection.
 #' - `fa_extent_sinu`: the extent in sinusoidal projection
-#' - `weekly_bins`: weekly abundance bins for the full annual cycle
-#' - `seasonal_bins`: seasonal abundance bins for the full annual cycle
+#' - `weekly_bins`/`weekly_labels`: weekly abundance bins and labels for the
+#' full annual cycle
+#' - `seasonal_bins`/`seasonal_labels: seasonal abundance bins and labels for
+#' the full annual cycle
 #'
 #' @export
 #'
@@ -599,12 +656,16 @@ load_fac_map_parameters <- function(path) {
   # load configuration file
   p <- load_config(path)
 
+  seasonal_bins <-
+
   list(custom_projection = p$projection$crs,
        fa_extent = raster::extent(p$projection$extent),
        res = p$projection$res,
        fa_extent_sinu = raster::extent(unlist(p$bbox_sinu)),
        weekly_bins = p$bins$hr$breaks,
-       seasonal_bins = p$bins_seasonal$hr$breaks)
+       weekly_labels = p$bins$hr$labels,
+       seasonal_bins = p$bins_seasonal$hr$breaks,
+       seasonal_labels = p$bins_seasonal$hr$labels)
 }
 
 

@@ -70,6 +70,11 @@ dir_ls(path(sp_path, "seasonal"), regexp = "csv$", recurse = FALSE, type = "file
   file_copy(ex_seasonal_dir)
 dir_ls(path(sp_path, "ranges"), regexp = "_lr_.*gpkg$", recurse = FALSE, type = "file") %>%
   file_copy(ex_ranges_dir)
+# fix species code
+to_copy <- dir_ls(ex_dir, recurse = TRUE, regexp = paste0("/", species, "_"))
+to_copy %>%
+  str_replace_all(paste0("/", species, "_"), paste0("/", ex_species, "_")) %>%
+  file_move(to_copy, .)
 
 # database connections
 pipd_db <- path(ex_dir, "stixel_summary.db")

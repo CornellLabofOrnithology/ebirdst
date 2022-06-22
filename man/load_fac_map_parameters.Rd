@@ -21,8 +21,10 @@ data for the given species in the custom projection
 \item \code{res}: a numeric vector with 2 elements giving the target resolution of
 raster in the custom projection.
 \item \code{fa_extent_sinu}: the extent in sinusoidal projection
-\item \code{weekly_bins}: weekly abundance bins for the full annual cycle
-\item \code{seasonal_bins}: seasonal abundance bins for the full annual cycle
+\item \code{weekly_bins}/\code{weekly_labels}: weekly abundance bins and labels for the
+full annual cycle
+\item \code{seasonal_bins}/`seasonal_labels: seasonal abundance bins and labels for
+the full annual cycle
 }
 }
 \description{

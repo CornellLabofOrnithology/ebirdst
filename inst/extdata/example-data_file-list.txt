@@ -1,7 +1,7 @@
 2020/yebsap-example/config.json
 2020/yebsap-example/predictions.db
-2020/yebsap-example/ranges/yebsap_range_raw_lr_2020.gpkg
-2020/yebsap-example/ranges/yebsap_range_smooth_lr_2020.gpkg
+2020/yebsap-example/ranges/yebsap-example_range_raw_lr_2020.gpkg
+2020/yebsap-example/ranges/yebsap-example_range_smooth_lr_2020.gpkg
 2020/yebsap-example/seasonal/band-seasons.csv
 2020/yebsap-example/seasonal/yebsap-example_abundance_full-year_max_lr_2020.tif
 2020/yebsap-example/seasonal/yebsap-example_abundance_full-year_mean_lr_2020.tif
@@ -24,7 +24,7 @@
 2020/yebsap-example/weekly/yebsap-example_abundance_lower_lr_2020.tif
 2020/yebsap-example/weekly/yebsap-example_abundance_median_lr_2020.tif
 2020/yebsap-example/weekly/yebsap-example_abundance_upper_lr_2020.tif
+2020/yebsap-example/weekly/yebsap-example_centroids.csv
 2020/yebsap-example/weekly/yebsap-example_count_median_lr_2020.tif
 2020/yebsap-example/weekly/yebsap-example_occurrence_median_lr_2020.tif
 2020/yebsap-example/weekly/yebsap-example_percent-population_median_lr_2020.tif
-2020/yebsap-example/weekly/yebsap_centroids.csv
