@@ -2,8 +2,6 @@ context("Loading functions")
 
 skip_on_cran()
 
-path <- ebirdst_download("example_data", tifs_only = TRUE)
-
 test_that("get_species_path", {
   p <- get_species_path("example_data")
   expect_true(dir.exists(p))
@@ -11,30 +9,31 @@ test_that("get_species_path", {
 })
 
 test_that("load_config", {
-  l <- load_config(path)
-  expect_is(l, "list")
-  expect_true(all(c("bins", "bins_seasonal", "SRD_PRED_YEAR") %in% names(l)))
+  p <- load_config(path)
+  expect_is(p, "list")
+  expect_true(all(c("bins", "bins_seasonal", "srd_pred_year") %in% names(p)))
   expect_error(load_config("/invalid/path/"))
 })
 
 
 test_that("load_fac_map_parameters", {
-  l <- load_fac_map_parameters(path)
-  expect_is(l, "list")
-  expect_named(l, c("custom_projection", "fa_extent", "res",
-                    "fa_extent_sinu", "abundance_bins"))
+  p <- load_fac_map_parameters(path)
+  expect_is(p, "list")
+  expect_named(p, c("custom_projection", "fa_extent", "res", "fa_extent_sinu",
+                    "weekly_bins", "seasonal_bins"))
 
   # check components
   # projection
-  expect_is(raster::projection(l$custom_projection), "character")
+  expect_is(raster::projection(p$custom_projection), "character")
   # extent
-  expect_is(l$fa_extent, "Extent")
+  expect_is(p$fa_extent, "Extent")
   # resolution
-  expect_is(l$res, c("numeric", "integer"))
+  expect_is(p$res, c("numeric", "integer"))
   # sinusoidal extent
-  expect_is(l$fa_extent_sinu, "Extent")
+  expect_is(p$fa_extent_sinu, "Extent")
   # bins
-  expect_is(l$abundance_bins, "numeric")
+  expect_is(p$weekly_bins, "numeric")
+  expect_is(p$seasonal_bins, "numeric")
 
   expect_error(load_config("/invalid/path/"))
 })

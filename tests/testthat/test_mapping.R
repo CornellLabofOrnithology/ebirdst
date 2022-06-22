@@ -2,12 +2,11 @@ context("Mapping functions")
 
 skip_on_cran()
 
-path <- ebirdst_download("example_data", tifs_only = TRUE)
 e <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 45),
                     t = c(0.5, 0.6))
 
 test_that("calc_full_extent", {
-  abd <- load_raster(path, "abundance")
+  abd <- load_raster(path, "abundance", resolution = "lr")
   abd <- ebirdst_subset(abd, e)
   fe <- calc_full_extent(abd)
 
@@ -21,8 +20,8 @@ test_that("calc_full_extent", {
 })
 
 test_that("calc_bins", {
-  abd <- load_raster(path, "abundance")
-  cnt <- load_raster(path, "count")
+  abd <- load_raster(path, "abundance", resolution = "lr")
+  cnt <- load_raster(path, "count", resolution = "lr")
   abd <- ebirdst_subset(abd, e)
   cnt <- ebirdst_subset(cnt, e)
 

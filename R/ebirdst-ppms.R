@@ -13,7 +13,7 @@
 #'   cutoff values are calculated for each week during the modeling process and
 #'   stored in the data package for each species. **In general, you should not
 #'   specify a value for `es_cutoff` and instead allow the function to use the
-#'   species-specific model-base values.**
+#'   species-specific model-based values.**
 #' @param pat_cutoff numeric between 0-1; percent above threshold.
 #'
 #' @details During the eBird Status and Trends modeling process, a subset of
@@ -60,8 +60,8 @@
 #' path <- get_species_path("example_data")
 #'
 #' # define a spatiotemporal extent to calculate ppms over
-#' bb_vec <- c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5)
-#' e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
+#' bb_vec <- c(xmin = -90, xmax = -82, ymin = 41, ymax = 48)
+#' e <- ebirdst_extent(bb_vec, t = c("05-01", "07-31"))
 #'
 #' # compute predictive performance metrics
 #' ppms <- ebirdst_ppms(path = path, ext = e)
@@ -76,13 +76,13 @@ ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 7) {
   }
 
   # load configuration file
-  l <- load_config(path)
-  l_es_cutoff <- stats::setNames(l[["es_cutoff"]][["cutoff"]],
-                                 l[["es_cutoff"]][["week"]])
+  p <- load_config(path)
+  p_es_cutoff <- stats::setNames(p[["es_cutoff"]][["cutoff"]],
+                                 p[["es_cutoff"]][["week"]])
 
   if (missing(es_cutoff)) {
     # get dynamic es cutoff
-    es_cutoff <- dplyr::coalesce(l_es_cutoff, 0.75)
+    es_cutoff <- dplyr::coalesce(p_es_cutoff, 0.75)
   } else {
     stopifnot(is.numeric(es_cutoff), length(es_cutoff) == 1,
               es_cutoff > 0, es_cutoff < 1)
@@ -147,7 +147,7 @@ ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 7) {
 
   # compute monte carlo sample of ppms for spatiotemporal subset
   # split data into within range and out of range
-  is_zero <- (preds$pi_es / l$FOLD_N) < preds$es_cutoff | is.na(preds$pi_es)
+  is_zero <- (preds$pi_es / p$fold_n) < preds$es_cutoff | is.na(preds$pi_es)
   zeroes <- preds[is_zero, ]
   preds <- preds[!is_zero, ]
 
@@ -466,7 +466,7 @@ plot.ebirdst_ppms <- function(x, ...) {
 #' path <- get_species_path("example_data")
 #'
 #' # define a spatial extent to calculate ppms over
-#' e <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5))
+#' e <- ebirdst_extent(c(xmin = -90, xmax = -82, ymin = 41, ymax = 48))
 #'
 #' # compute predictive performance metrics, summarized by months
 #' ppms <- ebirdst_ppms_ts(path = path, ext = e, summarize_by = "months")
@@ -498,7 +498,7 @@ ebirdst_ppms_ts <- function(path, ext, summarize_by = c("weeks", "months"),
                                     "week_start", "week_end")]
     names(d) <- c("week_number", "date", "start", "end")
   } else if (summarize_by == "months") {
-    y <- load_config(path)[["SRD_PRED_YEAR"]]
+    y <- load_config(path)[["srd_pred_year"]]
     s <- as.Date(paste(y, 1:12, "01", sep = "-"), format = "%Y-%m-%d")
     e <- s[c(2:length(s), 1)] - 1
     e <- as.Date(format(e, format = paste0(y, "-%m-%d")), format = "%Y-%m-%d")
@@ -620,7 +620,7 @@ plot.ebirdst_ppms_ts <- function(x,
 }
 
 
-# internal functions ----
+# internal ----
 
 #' Poisson deviance
 #'

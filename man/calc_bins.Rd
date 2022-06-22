@@ -30,16 +30,19 @@ according to the relative abundance distribution. To access pre-calculated
 bins for the full annual cycle use \code{\link[=load_fac_map_parameters]{load_fac_map_parameters()}}.
 }
 \examples{
-\donttest{
+\dontrun{
 # download example data
 path <- ebirdst_download("example_data")
 # or get the path if you already have the data downloaded
 path <- get_species_path("example_data")
 
 # abundance data
-abd <- load_raster(path, "abundance")
+# note that only low resolution (lr) data are available for the example data
+abd <- load_raster(path, "abundance", resolution = "lr")
+abd <- abd[[15:20]]
 # count data
-cnt <- load_raster(path, "count")
+cnt <- load_raster(path, "count", resolution = "lr")
+cnt <- cnt[[15:20]]
 
 # calculate bins for a single week for this example
 bins <- calc_bins(abd, cnt)

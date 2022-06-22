@@ -57,7 +57,8 @@ Suggests:
     rnaturalearth,
     smoothr,
     testthat,
-    units
+    units,
+    withr
 VignetteBuilder: 
     knitr
 Encoding: UTF-8

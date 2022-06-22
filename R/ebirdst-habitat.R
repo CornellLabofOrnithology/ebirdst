@@ -73,8 +73,7 @@
 #' path <- get_species_path("example_data")
 #'
 #' # define a spatial extent to calculate ppms over
-#' bb_vec <- c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5)
-#' e <- ebirdst_extent(bb_vec)
+#' e <- ebirdst_extent(c(xmin = -90, xmax = -82, ymin = 41, ymax = 48))
 #'
 #' # compute habitat associations
 #' habitat <- ebirdst_habitat(path = path, ext = e)
@@ -182,7 +181,7 @@ ebirdst_habitat <- function(path, ext, data = NULL,
   }
 
   # subset to cover classes
-  preds <- ebirdst::ebirdst_predictors$predictor_tidy
+  preds <- ebirdst::ebirdst_predictors$predictor
   preds <- preds[stringr::str_detect(preds,
                                      "^(intertidal|mcd12q1|gp_rtp|astwbd|ntl)")]
   # drop variation metrics
@@ -371,6 +370,8 @@ plot.ebirdst_habitat <- function(x, n_habitat_types = 15, ...) {
 
 # internal functions ----
 
+
+
 lm_slope <- function(data) {
   stopifnot(is.data.frame(data), ncol(data) == 2)
   names(data) <- c("x", "y")
@@ -446,7 +447,7 @@ train_check <- function(x, x_train, x_range, check_width) {
 subset_top_predictors <- function(x, n_habitat_types = 15) {
   # bring in pretty names
   lc <- dplyr::select(ebirdst::ebirdst_predictors,
-                      predictor = .data$predictor_tidy,
+                      predictor = .data$predictor,
                       .data$predictor_label,
                       .data$lc_class,
                       .data$lc_class_label)

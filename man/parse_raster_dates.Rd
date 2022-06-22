@@ -19,10 +19,15 @@ week dates in the format of "wYYYY.MM.DD", because of constraints in the
 compliant Date vector.
 }
 \examples{
-\donttest{
-# download and load example abundance data
-sp_path <- ebirdst_download("example_data")
-abd <- load_raster(sp_path, "abundance")
+\dontrun{
+# download example data
+path <- ebirdst_download("example_data")
+# or get the path if you already have the data downloaded
+path <- get_species_path("example_data")
+
+# weekly relative abundance
+# note that only low resolution (lr) data are available for the example data
+abd <- load_raster(path, "abundance", resolution = "lr")
 
 # parse dates
 parse_raster_dates(abd)

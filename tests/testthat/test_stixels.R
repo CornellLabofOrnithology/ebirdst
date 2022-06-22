@@ -2,7 +2,6 @@ context("Stixel functions")
 
 skip_on_cran()
 
-path <- ebirdst_download("example_data", tifs_only = FALSE)
 e <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42, ymax = 45),
                     t = c(0.5, 0.6))
 stx <- load_stixels(path)

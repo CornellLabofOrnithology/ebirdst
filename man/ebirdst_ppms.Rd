@@ -22,7 +22,7 @@ distinguishing zero and non-zero predictions. Optimal ensemble support
 cutoff values are calculated for each week during the modeling process and
 stored in the data package for each species. \strong{In general, you should not
 specify a value for \code{es_cutoff} and instead allow the function to use the
-species-specific model-base values.}}
+species-specific model-based values.}}
 
 \item{pat_cutoff}{numeric between 0-1; percent above threshold.}
 
@@ -78,8 +78,8 @@ path <- ebirdst_download("example_data", tifs_only = FALSE)
 path <- get_species_path("example_data")
 
 # define a spatiotemporal extent to calculate ppms over
-bb_vec <- c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5)
-e <- ebirdst_extent(bb_vec, t = c("05-01", "05-31"))
+bb_vec <- c(xmin = -90, xmax = -82, ymin = 41, ymax = 48)
+e <- ebirdst_extent(bb_vec, t = c("05-01", "07-31"))
 
 # compute predictive performance metrics
 ppms <- ebirdst_ppms(path = path, ext = e)

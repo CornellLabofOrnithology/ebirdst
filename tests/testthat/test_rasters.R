@@ -2,32 +2,18 @@ context("Loading and subsetting raster data")
 
 skip_on_cran()
 
-path <- ebirdst_download("example_data", tifs_only = TRUE)
-
 test_that("load_raster", {
   # weekly
-  abd <- load_raster(path, "abundance")
+  abd <- load_raster(path, "abundance", resolution = "lr")
   expect_is(abd, "RasterStack")
   expect_equal(raster::nlayers(abd), 52)
 
   # seasonal
-  abd <- load_raster(path, "abundance_seasonal")
+  abd <- load_raster(path, "abundance", period = "seasonal", resolution = "lr")
   expect_is(abd, "RasterStack")
   expect_equal(raster::nlayers(abd), 4)
-  expect_named(abd, c("breeding", "postbreeding_migration",
-                      "nonbreeding", "prebreeding_migration"))
-
-  # template
-  t <- load_raster(path, "template")
-  expect_is(t, "RasterLayer")
-  expect_equal(raster::nlayers(t), 1)
-
-  # resolutions
-  hr <- load_raster(path, "abundance", resolution = "hr")
-  mr <- load_raster(path, "abundance", resolution = "mr")
-  lr <- load_raster(path, "abundance", resolution = "lr")
-  expect_equal(round(raster::res(hr) * 3), round(raster::res(mr)))
-  expect_equal(round(raster::res(hr) * 9), round(raster::res(lr)))
+  expect_named(abd, c("breeding", "nonbreeding",
+                      "prebreeding_migration", "postbreeding_migration"))
 })
 
 test_that("load_raster error", {
@@ -37,7 +23,7 @@ test_that("load_raster error", {
 })
 
 test_that("label_raster_stack", {
-  abd <- load_raster(path, "abundance")
+  abd <- load_raster(path, "abundance", resolution = "lr")
 
   # expected
   expect_match(names(abd), "^w[0-9]{4}\\.[0-9]{2}\\.[0-9]{2}")
@@ -52,7 +38,7 @@ test_that("label_raster_stack", {
 })
 
 test_that("subset raster", {
-  abd <- load_raster(path, "abundance")
+  abd <- load_raster(path, "abundance", resolution = "lr")
   e <- ebirdst_extent(c(xmin = -86, xmax = -83,ymin = 42, ymax = 45),
                       t = c(0.5, 0.6))
   abd_sub <- ebirdst_subset(abd, e)

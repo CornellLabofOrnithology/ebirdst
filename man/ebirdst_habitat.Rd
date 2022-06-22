@@ -100,8 +100,7 @@ path <- ebirdst_download("example_data", tifs_only = FALSE)
 path <- get_species_path("example_data")
 
 # define a spatial extent to calculate ppms over
-bb_vec <- c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5)
-e <- ebirdst_extent(bb_vec)
+e <- ebirdst_extent(c(xmin = -90, xmax = -82, ymin = 41, ymax = 48))
 
 # compute habitat associations
 habitat <- ebirdst_habitat(path = path, ext = e)

@@ -27,20 +27,22 @@
 #' raster::extent(r)
 #' calc_full_extent(r)
 #'
-#' \donttest{
+#' \dontrun{
 #' # download example data
 #' path <- ebirdst_download("example_data")
 #' # or get the path if you already have the data downloaded
 #' path <- get_species_path("example_data")
 #'
 #' # load abundance data
-#' abd <- load_raster(path, "abundance")
+#' # note that only low resolution (lr) data are available for the example data
+#' abd <- load_raster(path, "abundance", resolution = "lr")
+#' abd <- abd[[15:20]]
 #'
 #' # calculate full extent
 #' map_extent <- calc_full_extent(abd)
 #'
 #' # plot
-#' raster::plot(abd[[20]], axes = FALSE, ext = map_extent)
+#' raster::plot(abd[[5]], axes = FALSE, ext = map_extent)
 #' }
 calc_full_extent <- function(x, aggregate = TRUE) {
   stopifnot(inherits(x, "Raster"))
@@ -103,16 +105,19 @@ calc_full_extent <- function(x, aggregate = TRUE) {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # download example data
 #' path <- ebirdst_download("example_data")
 #' # or get the path if you already have the data downloaded
 #' path <- get_species_path("example_data")
 #'
 #' # abundance data
-#' abd <- load_raster(path, "abundance")
+#' # note that only low resolution (lr) data are available for the example data
+#' abd <- load_raster(path, "abundance", resolution = "lr")
+#' abd <- abd[[15:20]]
 #' # count data
-#' cnt <- load_raster(path, "count")
+#' cnt <- load_raster(path, "count", resolution = "lr")
+#' cnt <- cnt[[15:20]]
 #'
 #' # calculate bins for a single week for this example
 #' bins <- calc_bins(abd, cnt)

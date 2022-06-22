@@ -67,7 +67,7 @@ path <- ebirdst_download("example_data", tifs_only = FALSE)
 path <- get_species_path("example_data")
 
 # define a spatial extent to calculate ppms over
-e <- ebirdst_extent(c(xmin = -86, xmax = -83, ymin = 42.5, ymax = 44.5))
+e <- ebirdst_extent(c(xmin = -90, xmax = -82, ymin = 41, ymax = 48))
 
 # compute predictive performance metrics, summarized by months
 ppms <- ebirdst_ppms_ts(path = path, ext = e, summarize_by = "months")

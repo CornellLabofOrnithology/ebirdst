@@ -2,8 +2,6 @@ context("PIs and PDs")
 
 skip_on_cran()
 
-path <- ebirdst_download("example_data", tifs_only = FALSE)
-
 test_that("load_pis", {
   pis <- load_pis(path)
   expect_is(pis, "data.frame")
