@@ -1,11 +1,11 @@
 ---
-title: "Getting Started with eBird Status & Trends Data"
+title: "Get Started with eBird Status & Trends Data"
 author: "Tom Auer, Daniel Fink"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteEncoding{UTF-8}
-  %\VignetteIndexEntry{Getting Started with eBird Status & Trends Data}
+  %\VignetteIndexEntry{Get Started with eBird Status & Trends Data}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   chunk_output_type: console
@@ -34,13 +34,13 @@ knitr::opts_chunk$set(eval = nzchar(Sys.getenv("BUILD_VIGNETTES")))
 
 1. [Background](#background)
 2. [Data Access](#data-access)
-3. [Data Types and Structure](#data-types-and-structure)
-4. [Vignettes](#vignettes)
-5. [Conversion to Flat Format](#conversion-to-flat-format)
+3. [Species List](#species-list)
+4. [Data Types and Structure](#data-types-and-structure)
+5. [Vignettes](#vignettes)
 
 # Background
 
-The study and conservation of the natural world relies on detailed information about the distributions, abundances, environmental associations, and population trends of species over time. For many taxa, this information is challenging to obtain at relevant geographic scales. The goal of the eBird Status and Trends project is to use data from [eBird](https://ebird.org/home), the global community science bird monitoring program administered by The Cornell Lab of Ornithology, to generate a reliable, standardized source of biodiversity information for the world’s bird populations. To translate the eBird observations into robust data products, we use statistical models to fill spatiotemporal gaps, using local land cover descriptions derived from NASA MODIS and other remote sensing data, while controlling for biases inherent in species observations collected by community scientists.
+The study and conservation of the natural world relies on detailed information about the distributions, abundances, environmental associations, and population trends of species over time. For many taxa, this information is challenging to obtain at relevant geographic scales. The goal of the eBird Status and Trends project is to use data from [eBird](https://ebird.org/home), the global community science bird monitoring program administered by The Cornell Lab of Ornithology, to generate a reliable, standardized source of biodiversity information for the world’s bird populations. To translate the eBird observations into robust data products, we use machine learning to fill spatiotemporal gaps, using local land cover descriptions derived from NASA MODIS and other remote sensing data, while controlling for biases inherent in species observations collected by community scientists.
 
 This data set provides estimates of the full annual cycle distributions, abundances, and environmental associations for `r `scales::comma(nrow(ebirdst::ebirdst_runs))` species for the year `r ebirdst::ebirdst_version()[["version_year"]]`. For each species, distribution and abundance estimates are available for all 52 weeks of the year across a regular grid of locations that cover the globe at a resolution of 2.96 km X 2.96 km. Variation in detectability associated with the search effort is controlled by standardizing the estimates as the expected occurrence rate and count of the species on a 1 hour, 1 km checklist by an expert eBird observer at the optimal time of day for detecting the species.
 
@@ -66,7 +66,29 @@ path <- ebirdst_download(species = "example_data")
 
 By default, `ebirdst_download()` downloads data to a sensible persistent directory on your computer. You can see what that directory is with the function `ebirdst_data_dir()`. You can change the default download location to a directory of your choosing by setting the environment variable `EBIRDST_DATA_DIR`, for example by calling `usethis::edit_r_environ()` and adding a line such as `EBIRDST_DATA_DIR=/custom/download/directory/`.
 
-For a full list of the species available for download, look at the data frame `ebirdst_runs`, which is included in this package. Provide the species code, English common name, or scientific name to `ebirdst_download()` to download the data package for a species. Note that data for all other species requires an API key to access. **IMPORTANT: after downloading a data package, do not change the file structure or rename files. Doing so will prevent you from being able to work with the data in R.**
+To download the data package for a species, provide the species code, English common name, or scientific name to `ebirdst_download()`. Note that data for all other species requires an API key to access. **IMPORTANT: after downloading a data package, do not change the file structure or rename files. Doing so will prevent you from being able to work with the data in R.**
+
+# Species List
+
+The full list of the species with data available for download is available in the data frame `ebirdst_runs`.
+
+```{r species}
+glimpse(ebirdst_runs)
+```
+
+which is included in this package. If you’re working in RStudio, you can use `View()` to interactively explore this data frame. You can also consult the [Status and Trends landing page](https://science.ebird.org/en/status-and-trends/) to see the full list of species.
+
+All species go through a process of expert human review prior to being released. The `ebirdst_runs` data frame also contains information from this review process. Reviewers assess each of the four seasons: breeding, non-breeding, pre-breeding migration, and post-breeding migration. Resident (i.e., non-migratory) species are identified by having `TRUE` in the `resident` column of `ebirdst_runs`, and these species are assessed across the whole year rather than seasonally. `ebirdst_runs` contains two important pieces of information for each season: a **quality** rating and **seasonal dates**.
+
+The **seasonal dates** define the weeks that fall within each season. Breeding and non-breeding season dates are defined for each species as the weeks during those seasons when the species’ population does not move. For this reason, these seasons are also described as stationary periods. Migration periods are defined as the periods of movement between the stationary non-breeding and breeding seasons. Note that for many species these migratory periods include not only movement from breeding grounds to non-breeding grounds, but also post-breeding dispersal, molt migration, and other movements. 
+
+Reviewers also examine the model estimates for each season to assess the amount of extrapolation or omission present in the model, and assign an associated quality rating ranging from 0 (lowest quality) to 3 (highest quality). Extrapolation refers to cases where the model predicts occurrence where the species is known to be absent, while omission refers to the model failing to predict occurrence where a species is known to be present.
+
+A rating of 0 implies this season failed review and model results should not be used at all for this period. Ratings of 1-3 correspond to a gradient of more to less extrapolation and/or omission, and we often use a traffic light analogy when referring to them:
+
+1. **Red light**: low quality, extensive extrapolation and/or omission and noise, but at least some regions have estimates that are accurate; can be used with caution in certain regions.
+2. **Yellow light**: medium quality, some extrapolation and/or omission; use with caution.
+3. **Green light**: high quality, very little or no extrapolation and/or omission; these seasons can be safely used.
 
 # Data Types and Structure
 
@@ -129,7 +151,7 @@ The GeoTIFFs use the same Sinusoidal projection as NASA MODIS data. This project
 
 ## Seasonal raster estimates
 
-The seasonal raster estimates are provided for the same set of products and at the same resolutions as the weekly estimates. They're derived from the weekly data by taking the cell-wise mean or max across the weeks within each season. The seasonal boundary dates are defined through a process of expert review of each species, and are available in the data frame `ebirdst_runs`. Each season is also given a quality score from 0 (fail) to 3 (high quality), and seasons with a score of 0 are not provided.
+The seasonal raster estimates are provided for the same set of products and at the same three resolutions as the weekly estimates. They're derived from the weekly data by taking the cell-wise mean or max across the weeks within each season. The seasonal boundary dates are defined through a process of expert review of each species, and are available in the data frame `ebirdst_runs`. Each season is also given a quality score from 0 (fail) to 3 (high quality), and seasons with a score of 0 are not provided.
 
 The seasonal GeoTIFFs use the following naming convention:
 
