@@ -150,10 +150,9 @@ intervals.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># \donttest{</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># download example data</span></span>
 <span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span>, tifs_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Data already exists, use force = TRUE to re-download.</span>
 <span class="r-in"><span class="co"># or get the path if you already have the data downloaded</span></span>
 <span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_species_path.html">get_species_path</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span>
 <span class="r-in"></span>
@@ -167,15 +166,8 @@ intervals.</p>
 <span class="r-in"><span class="co"># for testing, run with 5 bootstrap iterations for speed</span></span>
 <span class="r-in"><span class="co"># in practice, best to run with the default number of iterations (100)</span></span>
 <span class="r-in"><span class="va">pd_smooth</span> <span class="op">&lt;-</span> <span class="fu">plot_pds</span><span class="op">(</span><span class="va">pds</span>, <span class="st">"solar_noon_diff_mid"</span>, ext <span class="op">=</span> <span class="va">e</span>, n_bs <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
-<span class="r-plt img"><img src="plot_pds-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">pd_smooth</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Rows: 25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Columns: 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $ x         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> -11.9944444, -10.7082870, -9.4221296, -8.1359722, -6.8498148…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $ pd_median <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0.0131795610, 0.0134402805, 0.0137222427, 0.0139740677, 0.01…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $ pd_lower  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 1.114701e-02, 1.144798e-02, 1.178877e-02, 1.212955e-02, 1.24…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $ pd_upper  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0.015375328, 0.014975079, 0.014651944, 0.014337330, 0.014254…</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 </code></pre></div>
     </div>
   </div>

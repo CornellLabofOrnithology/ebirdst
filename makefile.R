@@ -1,7 +1,5 @@
 # clean up
 unlink(list.files("man", full.names = TRUE))
-devtools::clean_vignettes()
-pkgdown::clean_site()
 
 # rebuild docs and install
 devtools::document()
@@ -12,6 +10,8 @@ devtools::test()
 devtools::check()
 
 # vignettes, readme, site
+devtools::clean_vignettes()
+pkgdown::clean_site()
 Sys.setenv(BUILD_VIGNETTES = TRUE)
 rmarkdown::render("README.Rmd")
 unlink("README.html")

@@ -98,36 +98,16 @@ observed counts and model predictions for the test data.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># \donttest{</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># download example data</span></span>
 <span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span>, tifs_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Data already exists, use force = TRUE to re-download.</span>
 <span class="r-in"><span class="co"># or get the path if you already have the data downloaded</span></span>
 <span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_species_path.html">get_species_path</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># test data</span></span>
 <span class="r-in"><span class="va">test_predictions</span> <span class="op">&lt;-</span> <span class="fu">load_predictions</span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">test_predictions</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Rows: 3,957</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Columns: 17</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $ checklist_id <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 12192107, 16346853, 17321687, 18120612, 18470355, 2197840…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $ longitude    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> -83.58705, -83.48770, -87.39221, -86.63545, -84.65429, -8…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $ latitude     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 42.55456, 42.50743, 46.57694, 41.87892, 43.85849, 42.9326…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $ year         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 2012, 2014, 2014, 2014, 2014, 2015, 2015, 2015, 2015, 201…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $ day_of_year  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 335, 12, 62, 117, 139, 50, 57, 170, 287, 121, 125, 142, 3…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $ obs          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, …</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $ pi_median    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0.017098979, 0.014735862, 0.000000000, 0.216364320, 0.136…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $ pi_upper     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 1.879680e-02, 1.518799e-02, 0.000000e+00, 2.318359e-01, 1…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $ pi_lower     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0.0133285605, 0.0143584140, 0.0000000000, 0.2027811183, 0…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $ mu_median    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0.5040556, 0.6581802, 0.0000000, 0.7195000, 0.8437222, 0.…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $ mu_upper     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0.56353360, 0.67739975, 0.07533333, 0.76729548, 0.8743574…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $ mu_lower     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0.44815020, 0.63547546, 0.00000000, 0.68132176, 0.8094534…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $ pi_mu_median <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0.0076253127, 0.0099057700, 0.0000000000, 0.1472941760, 0…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $ pi_mu_upper  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 8.153959e-03, 1.128323e-02, 0.000000e+00, 1.553675e-01, 1…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $ pi_mu_lower  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0.0070662970, 0.0075329506, 0.0000000000, 0.1408915149, 0…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $ pat          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0.01, 0.00, 0.00, 0.04, 0.11, 0.00, 0.00, 0.00, 0.00, 0.0…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $ pi_es        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 100, 100, 28, 100, 100, 100, 100, 93, 100, 100, 100, 100,…</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 </code></pre></div>
     </div>
   </div>

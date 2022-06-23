@@ -34,7 +34,7 @@ stixels, the number of observations within each stixel, and a suite of
 predictive performance metrics (PPMs) for the model fit within that stixel.
 }
 \examples{
-\donttest{
+\dontrun{
 # download example data
 path <- ebirdst_download("example_data", tifs_only = FALSE)
 # or get the path if you already have the data downloaded

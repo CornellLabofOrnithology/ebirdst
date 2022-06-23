@@ -108,10 +108,9 @@ but subset in space and time.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># \donttest{</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># download example data</span></span>
 <span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Data already exists, use force = TRUE to re-download.</span>
 <span class="r-in"><span class="co"># or get the path if you already have the data downloaded</span></span>
 <span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_species_path.html">get_species_path</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span>
 <span class="r-in"></span>
@@ -122,7 +121,7 @@ but subset in space and time.</p>
 <span class="r-in"><span class="co"># load and subset raster data</span></span>
 <span class="r-in"><span class="va">abd</span> <span class="op">&lt;-</span> <span class="fu"><a href="load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">path</span>, product <span class="op">=</span> <span class="st">"abundance"</span>, resolution <span class="op">=</span> <span class="st">"lr"</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">abd_ss</span> <span class="op">&lt;-</span> <span class="fu">ebirdst_subset</span><span class="op">(</span><span class="va">abd</span>, ext <span class="op">=</span> <span class="va">e</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 </code></pre></div>
     </div>
   </div>

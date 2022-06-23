@@ -20,7 +20,7 @@ configuration file is mostly for internal use and contains a variety of
 parameters used in the modeling process.
 }
 \examples{
-\donttest{
+\dontrun{
 # download example data
 path <- ebirdst_download("example_data")
 # or get the path if you already have the data downloaded

@@ -115,10 +115,9 @@ data subset to just the top predictors, grouped and renamed according to
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># \donttest{</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># download example data</span></span>
 <span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span>, tifs_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Data already exists, use force = TRUE to re-download.</span>
 <span class="r-in"><span class="co"># or get the path if you already have the data downloaded</span></span>
 <span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_species_path.html">get_species_path</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span>
 <span class="r-in"></span>
@@ -130,23 +129,8 @@ data subset to just the top predictors, grouped and renamed according to
 <span class="r-in"><span class="va">e</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_extent.html">ebirdst_extent</a></span><span class="op">(</span><span class="va">bb_vec</span>, t <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"05-01"</span>, <span class="st">"05-31"</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="va">top_pred</span> <span class="op">&lt;-</span> <span class="fu">plot_pis</span><span class="op">(</span><span class="va">pis</span>, ext <span class="op">=</span> <span class="va">e</span>, n_top_pred <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
-<span class="r-plt img"><img src="plot_pis-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span class="va">top_pred</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 49 × 3</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    stixel_id      predictor            importance</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 20-132.8-PR221 CCI                       0.756</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> 20-132.8-PR221 Day                       0.225</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> 20-132.8-PR221 Eastness 90m Median       0.883</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> 20-132.8-PR221 Effort Distance (km)      0.324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> 20-132.8-PR221 Effort Hours              1.18 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> 20-132.8-PR221 Nighttime Lights          0.378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> 20-132.8-PR221 Northness 1km Median      0.852</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> 20-132.8-PR221 Northness 90m SD          0.643</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> 20-132.8-PR221 Open Forests              1.13 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> 20-132.8-PR221 Sparse Forests            0.476</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 39 more rows</span></span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 </code></pre></div>
     </div>
   </div>

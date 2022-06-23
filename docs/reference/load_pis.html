@@ -110,10 +110,9 @@ codes can be looked up in <code>ebirdst_predictors</code> for a brief descriptio
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># \donttest{</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># download example data</span></span>
 <span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span>, tifs_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Data already exists, use force = TRUE to re-download.</span>
 <span class="r-in"><span class="co"># or get the path if you already have the data downloaded</span></span>
 <span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_species_path.html">get_species_path</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span>
 <span class="r-in"></span>
@@ -125,8 +124,7 @@ codes can be looked up in <code>ebirdst_predictors</code> for a brief descriptio
 <span class="r-in"><span class="va">bb_vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>xmin <span class="op">=</span> <span class="op">-</span><span class="fl">86.6</span>, xmax <span class="op">=</span> <span class="op">-</span><span class="fl">82.2</span>, ymin <span class="op">=</span> <span class="fl">41.5</span>, ymax <span class="op">=</span> <span class="fl">43.5</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">e</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_extent.html">ebirdst_extent</a></span><span class="op">(</span><span class="va">bb_vec</span>, t <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"05-01"</span>, <span class="st">"05-31"</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="plot_pis.html">plot_pis</a></span><span class="op">(</span><span class="va">pis</span>, ext <span class="op">=</span> <span class="va">e</span>, n_top_pred <span class="op">=</span> <span class="fl">15</span>, by_cover_class <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-plt img"><img src="load_pis-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 </code></pre></div>
     </div>
   </div>

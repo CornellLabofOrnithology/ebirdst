@@ -159,10 +159,9 @@ the direction of the relationship.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># \donttest{</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># download example data</span></span>
 <span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span>, tifs_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Data already exists, use force = TRUE to re-download.</span>
 <span class="r-in"><span class="co"># or get the path if you already have the data downloaded</span></span>
 <span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_species_path.html">get_species_path</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span>
 <span class="r-in"></span>
@@ -172,24 +171,9 @@ the direction of the relationship.</p>
 <span class="r-in"><span class="co"># compute habitat associations</span></span>
 <span class="r-in"><span class="va">habitat</span> <span class="op">&lt;-</span> <span class="fu">ebirdst_habitat</span><span class="op">(</span>path <span class="op">=</span> <span class="va">path</span>, ext <span class="op">=</span> <span class="va">e</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="https://www.math.uzh.ch/pages/spam/reference/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">habitat</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 832 × 5</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    predictor               week  importance prob_pos_slope direction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BCBCBC;">*</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> astwbd_fs_c3_1500_pland 01-04     0.057<span style="text-decoration: underline;">3</span>         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> astwbd_fs_c3_1500_pland 01-11     0.032<span style="text-decoration: underline;">3</span>         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> astwbd_fs_c3_1500_pland 01-18     0.032<span style="text-decoration: underline;">3</span>         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> astwbd_fs_c3_1500_pland 01-25     0.059<span style="text-decoration: underline;">1</span>         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> astwbd_fs_c3_1500_pland 02-01     0.059<span style="text-decoration: underline;">6</span>         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> astwbd_fs_c3_1500_pland 02-08     0.060<span style="text-decoration: underline;">2</span>         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> astwbd_fs_c3_1500_pland 02-15     0.060<span style="text-decoration: underline;">6</span>         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> astwbd_fs_c3_1500_pland 02-22     0.061<span style="text-decoration: underline;">0</span>         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> astwbd_fs_c3_1500_pland 03-01     0.061<span style="text-decoration: underline;">2</span>          0.413        <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> astwbd_fs_c3_1500_pland 03-08     0.061<span style="text-decoration: underline;">4</span>         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 822 more rows</span></span>
 <span class="r-in"><span class="co"># produce a cake plot</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">habitat</span><span class="op">)</span></span>
-<span class="r-plt img"><img src="ebirdst_habitat-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span class="op">}</span></span>
 </code></pre></div>
     </div>
   </div>
