@@ -54,7 +54,6 @@ for (f in tifs) {
   f_out <- str_replace_all(f, species, ex_species)
   r_ex <- f %>%
     rast() %>%
-    crop(state_mi) %>%
     mask(state_mi) %>%
     writeRaster(filename = f_out, overwrite = TRUE,
                 datatype = "FLT4S",
