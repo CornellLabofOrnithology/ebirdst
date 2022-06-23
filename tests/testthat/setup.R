@@ -15,7 +15,7 @@ path <- ebirdst_download("example_data",
 # cleanup the mess we made above
 cleanup <- function() {
   Sys.setenv(EBIRDST_DATA_DIR = old_dir)
-  unlink(temp_dir)
+  unlink(temp_dir, recursive = TRUE)
 }
 # run cleanup after tests are complete
 withr::defer(cleanup(), teardown_env())

@@ -21,31 +21,30 @@ Install `ebirdst` from GitHub with:
 remotes::install_github("CornellLabofOrnithology/ebirdst")
 ```
 
-The current version of `ebirdst` is designed for working with the eBird
-Status and Trends data products that make estimates for 2019, with
-visualizations being released on the web in December 2020, and data
-access being made available in August 2021. **Users are strongly
-discouraged from comparing Status and Trends results between years due
-to methodological differences between versions.** To request access to
-previous versions, please contact <ebird@cornell.edu>.
+This version of `ebirdst` is designed to work with the eBird Status Data
+Products estimated for the year 2020, with visualizations being released
+on the web in November 2021, and data access being made available in
+June 2022 **Users are strongly discouraged from comparing Status and
+Trends results between years due to methodological differences between
+versions.** If you have accessed and used previous versions and/or may
+need access to previous versions for reasons related to reproducibility,
+please contact <ebird@cornell.edu> and your request will be considered.
 
 ## Data access
 
-As of July 2021, data access is now granted through a Access Request
-Form at: <https://ebird.org/st/request>. Access with this form generates
-a key to be used with this R package and is provided immediately (as
-long as commercial use is not requested). Our terms of use have been
-updated to be more permissive in many cases, particularly academic and
-research use. When requesting data access, please be sure to carefully
-read the terms of use and ensure that your intended use is not
-restricted. Data are no longer publicly available via AWS, aside from an
-example dataset.
+Data access is granted through an Access Request Form at:
+<https://ebird.org/st/request>. Access with this form generates a key to
+be used with this R package and is provided immediately (as long as
+commercial use is not requested). Our terms of use have been designed to
+be quite permissive in many cases, particularly academic and research
+use. When requesting data access, please be sure to carefully read the
+terms of use and ensure that your intended use is not restricted.
 
 After completing the Access Request Form, you will be provided a Status
 and Trends access key, which you will need when downloading data. To
 store the key so the package can access it when downloading data, use
 the function `set_ebirdst_access_key("XXXXX")`, where `"XXXXX"` is the
-access key provided to you.
+access key provided to you. **Restart R after setting the access key.**
 
 ## Citation
 
@@ -53,10 +52,10 @@ If you use the the eBird Status & Trends data please cite it with:
 
 <blockquote>
 Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S.
-Ligocki, W. Hochachka, C. Wood, I. Davies, M. Iliff, L. Seitz. 2020.
-eBird Status and Trends, Data Version: 2019; Released: 2020, Cornell Lab
-of Ornithology, Ithaca, New York.
-<a href="https://doi.org/10.2173/ebirdst.2019" class="uri">https://doi.org/10.2173/ebirdst.2019</a>
+Ligocki, W. Hochachka, L. Jaromczyk, C. Wood, I. Davies, M. Iliff, L.
+Seitz. 2021. eBird Status and Trends, Data Version: 2020; Released:
+2021. Cornell Lab of Ornithology, Ithaca, New York.
+<a href="https://doi.org/10.2173/ebirdst.2020" class="uri">https://doi.org/10.2173/ebirdst.2020</a>
 </blockquote>
 
 ## Vignettes
@@ -78,7 +77,7 @@ There are four available vignettes are:
     and statistics on the [eBird Status and Trends
     website](https://ebird.org/science/status-and-trends).
 -   [Non-raster
-    data](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-pipd.html):
+    data](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-non-raster.html):
     covers working with the non-raster data in the `ebirst` data
     packages, including exploring **predictor importance**, plotting
     **partial dependence** curves for model predictors, and assessing
@@ -88,8 +87,8 @@ There are four available vignettes are:
 
 This quick start guide shows how to download data and plot abundance
 values similar to how they are plotted for the [eBird Status and Trends
-Abundance animated
-maps](https://ebird.org/science/status-and-trends/yebsap/abundance-map-weekly).
+weekly abundance
+animations](https://ebird.org/science/status-and-trends/yebsap/abundance-map-weekly).
 In this guide, and throughout all package documentation, a simplified
 example dataset is used consisting of Yellow-bellied Sapsucker in
 Michigan. For a full list of the species available for download, look at
@@ -108,31 +107,32 @@ library(fields)
 library(rnaturalearth)
 
 # download example data, yellow-bellied sapsucker in michigan
-dl_path <- ebirdst_download(species = "example_data")
+path <- ebirdst_download(species = "example_data")
 
 # load relative abundance raster stack with 52 layers, one for each week
-abd <- load_raster("abundance", path = dl_path)
+abd <- load_raster(path = path, resolution = "lr")
 
 # load species specific mapping parameters
-pars <- load_fac_map_parameters(dl_path)
+pars <- load_fac_map_parameters(path)
 # custom coordinate reference system
 crs <- pars$custom_projection
 # legend breaks
-breaks <- pars$abundance_bins
+breaks <- pars$weekly_bins
 # legend labels for top, middle, and bottom
-labels <- attr(breaks, "labels")
+labels <- pars$weekly_labels
 
 # get a date vector specifying which week each raster layer corresponds to
 weeks <- parse_raster_dates(abd)
 print(weeks)
-#>  [1] "2019-01-04" "2019-01-11" "2019-01-18" "2019-01-25" "2019-02-01" "2019-02-08" "2019-02-15"
-#>  [8] "2019-02-22" "2019-03-01" "2019-03-08" "2019-03-15" "2019-03-22" "2019-03-29" "2019-04-05"
-#> [15] "2019-04-12" "2019-04-19" "2019-04-26" "2019-05-03" "2019-05-10" "2019-05-17" "2019-05-24"
-#> [22] "2019-05-31" "2019-06-07" "2019-06-14" "2019-06-21" "2019-06-28" "2019-07-06" "2019-07-13"
-#> [29] "2019-07-20" "2019-07-27" "2019-08-03" "2019-08-10" "2019-08-17" "2019-08-24" "2019-08-31"
-#> [36] "2019-09-07" "2019-09-14" "2019-09-21" "2019-09-28" "2019-10-05" "2019-10-12" "2019-10-19"
-#> [43] "2019-10-26" "2019-11-02" "2019-11-09" "2019-11-16" "2019-11-23" "2019-11-30" "2019-12-07"
-#> [50] "2019-12-14" "2019-12-21" "2019-12-28"
+#>  [1] "2020-01-04" "2020-01-11" "2020-01-18" "2020-01-25" "2020-02-01" "2020-02-08"
+#>  [7] "2020-02-15" "2020-02-22" "2020-03-01" "2020-03-08" "2020-03-15" "2020-03-22"
+#> [13] "2020-03-29" "2020-04-05" "2020-04-12" "2020-04-19" "2020-04-26" "2020-05-03"
+#> [19] "2020-05-10" "2020-05-17" "2020-05-24" "2020-05-31" "2020-06-07" "2020-06-14"
+#> [25] "2020-06-21" "2020-06-28" "2020-07-06" "2020-07-13" "2020-07-20" "2020-07-27"
+#> [31] "2020-08-03" "2020-08-10" "2020-08-17" "2020-08-24" "2020-08-31" "2020-09-07"
+#> [37] "2020-09-14" "2020-09-21" "2020-09-28" "2020-10-05" "2020-10-12" "2020-10-19"
+#> [43] "2020-10-26" "2020-11-02" "2020-11-09" "2020-11-16" "2020-11-23" "2020-11-30"
+#> [49] "2020-12-07" "2020-12-14" "2020-12-21" "2020-12-28"
 
 # select a week in the middle of the year
 abd <- abd[[26]]

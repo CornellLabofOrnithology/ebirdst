@@ -20,7 +20,8 @@ test_that("load_fac_map_parameters", {
   p <- load_fac_map_parameters(path)
   expect_is(p, "list")
   expect_named(p, c("custom_projection", "fa_extent", "res", "fa_extent_sinu",
-                    "weekly_bins", "seasonal_bins"))
+                    "weekly_bins", "weekly_labels",
+                    "seasonal_bins", "seasonal_labels"))
 
   # check components
   # projection
