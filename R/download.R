@@ -111,6 +111,7 @@ ebirdst_download <- function(species,
 
     # remove web_download folder
     web_down <- stringr::str_detect(dirname(files), pattern = "web_download")
+    files <- files[!web_down]
   }
 
   if (length(files) == 0) {

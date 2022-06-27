@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteEncoding{UTF-8}
-  %\VignetteIndexEntry{Get Started with eBird Status & Trends Data}
+  %\VignetteIndexEntry{Introduction to eBird Status & Trends Data}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   chunk_output_type: console

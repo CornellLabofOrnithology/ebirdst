@@ -8,6 +8,13 @@ navbar:
     intro:
       text: Get Started
       href: articles/ebirdst.html
+    articles:
+      text: Vignettes
+      menu:
+      - text: Introduction to eBird Status & Trends Data
+        href: articles/ebirdst.html
+      - text: Working with Raster Data
+        href: articles/rasters.html
     reference:
       text: Function Reference
       href: reference/index.html
