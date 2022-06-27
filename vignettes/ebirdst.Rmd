@@ -1,6 +1,6 @@
 ---
-title: "Get Started with eBird Status & Trends Data"
-author: "Tom Auer, Daniel Fink"
+title: "Introduction to eBird Status & Trends Data"
+author: "Matt Strimas-Mackey, Tom Auer, Daniel Fink"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -33,12 +33,11 @@ knitr::opts_chunk$set(eval = nzchar(Sys.getenv("BUILD_VIGNETTES")))
 # Outline
 
 1. [Background](#background)
-2. [Data Access](#data-access)
-3. [Species List](#species-list)
-4. [Data Types and Structure](#data-types-and-structure)
-5. [Vignettes](#vignettes)
+2. [Data access](#access)
+3. [Species list](#species)
+4. [Data types and structure](#types)
 
-# Background
+# Background {#background}
 
 The study and conservation of the natural world relies on detailed information about the distributions, abundances, environmental associations, and population trends of species over time. For many taxa, this information is challenging to obtain at relevant geographic scales. The goal of the eBird Status and Trends project is to use data from [eBird](https://ebird.org/home), the global community science bird monitoring program administered by The Cornell Lab of Ornithology, to generate a reliable, standardized source of biodiversity information for the world’s bird populations. To translate the eBird observations into robust data products, we use machine learning to fill spatiotemporal gaps, using local land cover descriptions derived from NASA MODIS and other remote sensing data, while controlling for biases inherent in species observations collected by community scientists.
 
@@ -46,7 +45,7 @@ This data set provides estimates of the full annual cycle distributions, abundan
 
 To describe how each species is associated with features of its local environment, estimates of the relative importance of each remotely sensed variable (e.g. land cover, elevation, etc), are available throughout the year at a monthly temporal and regional spatial resolution. Additionally, to assess estimate quality, we provide upper and lower confidence bounds for abundance estimates and regional-seasonal scale validation metrics for the underlying statistical models.  For more information about the data products see the [FAQ and summaries](https://ebird.org/science/status-and-trends/faq). See Fink et al. (2019) for more information about the analysis used to generate these data.
 
-# Data Access
+# Data access {#access}
 
 Data access is granted through an Access Request Form at: https://ebird.org/st/request. Access with this form generates a key to be used with this R package and is provided immediately (as long as commercial use is not requested). Our terms of use have been designed to be quite permissive in many cases, particularly academic and research use. When requesting data access, please be sure to carefully read the terms of use and ensure that your intended use is not restricted.
 
@@ -68,7 +67,7 @@ By default, `ebirdst_download()` downloads data to a sensible persistent directo
 
 To download the data package for a species, provide the species code, English common name, or scientific name to `ebirdst_download()`. Note that data for all other species requires an API key to access. **IMPORTANT: after downloading a data package, do not change the file structure or rename files. Doing so will prevent you from being able to work with the data in R.**
 
-# Species List
+# Species list {#species}
 
 The full list of the species with data available for download is available in the data frame `ebirdst_runs`.
 
@@ -90,7 +89,7 @@ A rating of 0 implies this season failed review and model results should not be 
 2. **Yellow light**: medium quality, some extrapolation and/or omission; use with caution.
 3. **Green light**: high quality, very little or no extrapolation and/or omission; these seasons can be safely used.
 
-# Data Types and Structure
+# Data types and structure {#types}
 
 eBird Status and Trends data packages are identified by the 6-letter eBird species code (e.g. `yepsap` for Yellow-bellied Sapsucker) and the Status and Trends estimation year (`r ebirdst::ebirdst_version()[["version_year"]]` for this version of the R package). They are stored within sub-directories that correspond to these variables, and you can get the path to this directory with:
 
@@ -114,14 +113,14 @@ The vignette will cover the raster and range data. Consult the [non-raster data 
 
 The core raster data products are the weekly estimates of occurrence, count, relative abundance, and percent of population. These are all stored in the widely used GeoTIFF raster format, and we refer to them as "weekly cubes" (e.g. the "weekly abundance cube"). All cubes have 52 weeks and cover the entire globe, even for species with ranges only covering a small region. They come with areas of predicted and assumed zeroes, such that any cells that are `NA` represent areas where we didn't produce model estimates.
 
-All estimates are the median expected value for a standard 1km, 1 hour eBird Traveling Count by an expert eBird observer at the optimal time of day and for optimal weather conditions to observe the given species.
+All estimates are the median expected value for a 1km, 1 hour eBird Traveling Count by an expert eBird observer at the optimal time of day and for optimal weather conditions to observe the given species.
 
-- **Occurrence** `occurrence`: the expected probability (0-1) of occurrence of a 
+- **Occurrence** `occurrence`: the expected probability of encountering a species.
 - **Count** `count`: the expected count of a species, conditional on its occurrence at the given location.
-- **Relative abundnace** `abundance`: the expected relative abundance of a species, computed as the product of the probability of occurrence and the count conditional on occurrence. In addition to the median relative abundance, upper and lower confidence intervals (CIs) are provided, defined at the 10th and 90th quantile of relative abundance, respectively.
-- **Percent of population** `precent-population`: the percent of the total relative abundance within each cell. This is a derived product calculated by dividing each cell value
+- **Relative abundance** `abundance`: the expected relative abundance of a species, computed as the product of the probability of occurrence and the count conditional on occurrence. In addition to the median relative abundance, upper and lower confidence intervals (CIs) are provided, defined at the 10th and 90th quantile of relative abundance, respectively.
+- **Percent of population** `precent-population`: the percent of the total relative abundance within each cell. This is a derived product calculated by dividing each cell value in the relative abundance raster by the sum of all cell values
 
-All predictions are made on a standard 2.96 x 2.96 km grid, however, for convenience lower resolution GeoTIFFs are also provided, which are typically much faster to work with. However, note that to keep file sizes small, **the example dataset only contains low resolution data**. The three resolutions are:
+All predictions are made on a standard 2.96 x 2.96 km global grid, however, for convenience lower resolution GeoTIFFs are also provided, which are typically much faster to work with. However, note that to keep file sizes small, **the example dataset only contains low resolution data**. The three resolutions are:
 
 - High resolution (`hr`): the native 2.96 km resolution data
 - Medium resolution (`mr`): the `hr` data aggregated by a factor of 3 in each direction resulting in a resolution of 8.89 km
@@ -175,6 +174,15 @@ occ_seasonal_max <- load_raster(path, product = "occurrence",
                                 resolution = "lr")
 ```
 
+Finally, as a convenience, the data products include year-roudn rasters summarizing the mean or max across all weeks that fall within a season that passed the expert review process.  These can be accessed similarly to the seasonal products, just with `period = "full-year"` instead. For example, these can layers be used in conservation planning to assess the most important sites across the full range and full annual cycle of a species.
+
+```{rtypes_fullyear}
+# full year, low res, maximum relative abundance
+abd_fy_max <- load_raster(path, product = "abundance", 
+                           period = "full-year", metric = "max", 
+                           resolution = "lr")
+```
+
 ## Range boundaries
 
 Seasonal range polygons are defined as the boundaries of non-zero seasonal relative abundance estimates, which are then (optionally) smoothed to produce more aesthetically pleasing polygons using the `smoothr` package. They are provided in the widely used GeoPackage format, with file naming convention:
@@ -194,11 +202,7 @@ range_breeding <- filter(ranges, season == "breeding")
 
 ## Habitat association and PPM data
 
-The two SQLite database contained within the species data package, provide tabular data with information about modeled relationships between observations and the ecological covariates, as well as data that can be used to assess predictive performance. For information about working with these data, consult the [non-raster data vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-non-raster.html). Note that these SQLite databases are quite large (many GBs in size) and are therefore note downloaded by default. To access these tabular data, you must use the parameter `tifs_only = FALSE` in the `ebirdst_download()` function.
-
-# Vignettes
-
-Beyond this introduction to the eBird Status and Trends products and data, we have written multiple vignettes to help guide users in using the data and the functionality provided by this package. An [intro mapping vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html) expands upon the quick start readme and shows the basic mapping moves. The [advanced mapping  vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-advanced-mapping.html) shows how to reproduce the seasonal maps and statistics on the [eBird Status and Trends website](https://ebird.org/science/status-and-trends). Finally, the [non-raster data vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-non-raster.html) details how to access additional information from the model results about predictor importance and directionality, as well as predictive performance metrics. 
+The two SQLite database contained within the species data package, provide tabular data with information about modeled relationships between observations and the ecological covariates, as well as data that can be used to assess predictive performance. Note that these SQLite databases are quite large (many GBs in size) and are therefore note downloaded by default. To access these tabular data, you must use the parameter `tifs_only = FALSE` in the `ebirdst_download()` function.
 
 ## References
 

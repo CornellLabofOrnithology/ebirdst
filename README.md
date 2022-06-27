@@ -18,7 +18,7 @@ Install `ebirdst` from GitHub with:
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("CornellLabofOrnithology/ebirdst")
+remotes::install_github("ebird/ebirdst", build = FALSE)
 ```
 
 This version of `ebirdst` is designed to work with the eBird Status Data
@@ -63,25 +63,15 @@ Seitz. 2021. eBird Status and Trends, Data Version: 2020; Released:
 For full package documentation, including a series of vignettes covering
 the full spectrum from introductory to advanced usage, please see the
 package [website](https://cornelllabofornithology.github.io/ebirdst).
-There are four available vignettes are:
+The available vignettes are:
 
--   [Introduction](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst.html):
-    details data access and the structure of the results.
--   [Introductory
-    mapping](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html):
-    covers the basic of making abundance maps using the eBird Status and
-    Trends data.
--   [Advanced
-    mapping](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-advanced-mapping.html):
-    shows how to reproduce the seasonal abundance maps, range polygons,
-    and statistics on the [eBird Status and Trends
-    website](https://ebird.org/science/status-and-trends).
--   [Non-raster
-    data](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-non-raster.html):
-    covers working with the non-raster data in the `ebirst` data
-    packages, including exploring **predictor importance**, plotting
-    **partial dependence** curves for model predictors, and assessing
-    model quality with **predictive performance metrics**.
+-   [Introduction to eBird Status & Trends
+    Data](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst.html):
+    covers data access, available data products, and structure and
+    format of data files.
+-   [Working with Raster
+    Data](https://cornelllabofornithology.github.io/ebirdst/articles/rasters.html):
+    loading and analysing the raster data products.
 
 ## Quick Start
 
@@ -124,15 +114,6 @@ labels <- pars$weekly_labels
 # get a date vector specifying which week each raster layer corresponds to
 weeks <- parse_raster_dates(abd)
 print(weeks)
-#>  [1] "2020-01-04" "2020-01-11" "2020-01-18" "2020-01-25" "2020-02-01" "2020-02-08"
-#>  [7] "2020-02-15" "2020-02-22" "2020-03-01" "2020-03-08" "2020-03-15" "2020-03-22"
-#> [13] "2020-03-29" "2020-04-05" "2020-04-12" "2020-04-19" "2020-04-26" "2020-05-03"
-#> [19] "2020-05-10" "2020-05-17" "2020-05-24" "2020-05-31" "2020-06-07" "2020-06-14"
-#> [25] "2020-06-21" "2020-06-28" "2020-07-06" "2020-07-13" "2020-07-20" "2020-07-27"
-#> [31] "2020-08-03" "2020-08-10" "2020-08-17" "2020-08-24" "2020-08-31" "2020-09-07"
-#> [37] "2020-09-14" "2020-09-21" "2020-09-28" "2020-10-05" "2020-10-12" "2020-10-19"
-#> [43] "2020-10-26" "2020-11-02" "2020-11-09" "2020-11-16" "2020-11-23" "2020-11-30"
-#> [49] "2020-12-07" "2020-12-14" "2020-12-21" "2020-12-28"
 
 # select a week in the middle of the year
 abd <- abd[[26]]
@@ -179,5 +160,3 @@ image.plot(zlim = c(0, 1), breaks = label_breaks, col = pal,
                             labels = round(labels, 2),
                             cex.axis = 0.9, lwd.ticks = 0))
 ```
-
-<img src="man/figures/README-quick_start-1.png" width="100%" />

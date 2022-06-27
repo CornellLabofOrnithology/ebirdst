@@ -57,6 +57,9 @@
 <li>
       <a href="articles/product-changelog.html">eBird Status Data Products Changelog</a>
     </li>
+    <li>
+      <a href="articles/rasters.html">Working with Raster Data</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -99,7 +102,7 @@
 <p>Install <code>ebirdst</code> from GitHub with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># install.packages("remotes")</span>
-<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"CornellLabofOrnithology/ebirdst"</span><span class="op">)</span></code></pre></div>
+<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ebird/ebirdst"</span>, build <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <p>This version of <code>ebirdst</code> is designed to work with the eBird Status Data Products estimated for the year 2020, with visualizations being released on the web in November 2021, and data access being made available in June 2022 <strong>Users are strongly discouraged from comparing Status and Trends results between years due to methodological differences between versions.</strong> If you have accessed and used previous versions and/or may need access to previous versions for reasons related to reproducibility, please contact <a href="mailto:ebird@cornell.edu" class="email">ebird@cornell.edu</a> and your request will be considered.</p>
 </div>
 <div class="section level2">
@@ -119,16 +122,12 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
 <div class="section level2">
 <h2 id="vignettes">Vignettes<a class="anchor" aria-label="anchor" href="#vignettes"></a>
 </h2>
-<p>For full package documentation, including a series of vignettes covering the full spectrum from introductory to advanced usage, please see the package <a href="https://cornelllabofornithology.github.io/ebirdst">website</a>. There are four available vignettes are:</p>
+<p>For full package documentation, including a series of vignettes covering the full spectrum from introductory to advanced usage, please see the package <a href="https://cornelllabofornithology.github.io/ebirdst">website</a>. The available vignettes are:</p>
 <ul>
 <li>
-<a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst.html">Introduction</a>: details data access and the structure of the results.</li>
+<a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst.html">Introduction to eBird Status &amp; Trends Data</a>: covers data access, available data products, and structure and format of data files.</li>
 <li>
-<a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html">Introductory mapping</a>: covers the basic of making abundance maps using the eBird Status and Trends data.</li>
-<li>
-<a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-advanced-mapping.html">Advanced mapping</a>: shows how to reproduce the seasonal abundance maps, range polygons, and statistics on the <a href="https://ebird.org/science/status-and-trends" class="external-link">eBird Status and Trends website</a>.</li>
-<li>
-<a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-non-raster.html">Non-raster data</a>: covers working with the non-raster data in the <code>ebirst</code> data packages, including exploring <strong>predictor importance</strong>, plotting <strong>partial dependence</strong> curves for model predictors, and assessing model quality with <strong>predictive performance metrics</strong>.</li>
+<a href="https://cornelllabofornithology.github.io/ebirdst/articles/rasters.html">Working with Raster Data</a>: loading and analysing the raster data products.</li>
 </ul>
 </div>
 <div class="section level2">
@@ -161,15 +160,6 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
 <span class="co"># get a date vector specifying which week each raster layer corresponds to</span>
 <span class="va">weeks</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/parse_raster_dates.html">parse_raster_dates</a></span><span class="op">(</span><span class="va">abd</span><span class="op">)</span>
 <span class="fu"><a href="https://www.math.uzh.ch/pages/spam/reference/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">weeks</span><span class="op">)</span>
-<span class="co">#&gt;  [1] "2020-01-04" "2020-01-11" "2020-01-18" "2020-01-25" "2020-02-01" "2020-02-08"</span>
-<span class="co">#&gt;  [7] "2020-02-15" "2020-02-22" "2020-03-01" "2020-03-08" "2020-03-15" "2020-03-22"</span>
-<span class="co">#&gt; [13] "2020-03-29" "2020-04-05" "2020-04-12" "2020-04-19" "2020-04-26" "2020-05-03"</span>
-<span class="co">#&gt; [19] "2020-05-10" "2020-05-17" "2020-05-24" "2020-05-31" "2020-06-07" "2020-06-14"</span>
-<span class="co">#&gt; [25] "2020-06-21" "2020-06-28" "2020-07-06" "2020-07-13" "2020-07-20" "2020-07-27"</span>
-<span class="co">#&gt; [31] "2020-08-03" "2020-08-10" "2020-08-17" "2020-08-24" "2020-08-31" "2020-09-07"</span>
-<span class="co">#&gt; [37] "2020-09-14" "2020-09-21" "2020-09-28" "2020-10-05" "2020-10-12" "2020-10-19"</span>
-<span class="co">#&gt; [43] "2020-10-26" "2020-11-02" "2020-11-09" "2020-11-16" "2020-11-23" "2020-11-30"</span>
-<span class="co">#&gt; [49] "2020-12-07" "2020-12-14" "2020-12-21" "2020-12-28"</span>
 
 <span class="co"># select a week in the middle of the year</span>
 <span class="va">abd</span> <span class="op">&lt;-</span> <span class="va">abd</span><span class="op">[[</span><span class="fl">26</span><span class="op">]</span><span class="op">]</span>
@@ -215,7 +205,6 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
            axis.args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.5</span>, <span class="fl">1</span><span class="op">)</span>, 
                             labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">labels</span>, <span class="fl">2</span><span class="op">)</span>,
                             cex.axis <span class="op">=</span> <span class="fl">0.9</span>, lwd.ticks <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-quick_start-1.png" width="100%"></p>
 </div>
 </div>
   </div>

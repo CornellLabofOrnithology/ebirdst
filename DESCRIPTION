@@ -35,7 +35,7 @@ Imports:
     mgcv,
     precrec,
     PresenceAbsence,
-    raster,
+    raster (>= 3.1-5),
     rlang,
     RSQLite,
     sf (>= 1.0-0),
@@ -46,6 +46,7 @@ Imports:
     utils,
     viridisLite
 Suggests: 
+    exactextractr,
     fields,
     knitr,
     rmarkdown,
