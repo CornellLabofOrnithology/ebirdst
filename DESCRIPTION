@@ -36,6 +36,7 @@ Imports:
     precrec,
     PresenceAbsence,
     raster (>= 3.1-5),
+    rgdal,
     rlang,
     RSQLite,
     sf (>= 1.0-0),

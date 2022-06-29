@@ -31,7 +31,7 @@ Install `ebirdst` from GitHub with:
 
 ```{r gh-installation, eval = FALSE}
 # install.packages("remotes")
-remotes::install_github("ebird/ebirdst", build = FALSE)
+remotes::install_github("cornelllabofornithology/ebirdst", build = FALSE)
 ```
 
 This version of `ebirdst` is designed to work with the eBird Status Data Products estimated for the year `r ebirdst::ebirdst_version()[["version_year"]]`, with visualizations being released on the web in November 2021, and data access being made available in June 2022 **Users are strongly discouraged from comparing Status and Trends results between years due to methodological differences between versions.** If you have accessed and used previous versions and/or may need access to previous versions for reasons related to reproducibility, please contact ebird@cornell.edu and your request will be considered.

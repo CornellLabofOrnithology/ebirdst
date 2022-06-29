@@ -18,7 +18,7 @@ Install `ebirdst` from GitHub with:
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("ebird/ebirdst", build = FALSE)
+remotes::install_github("cornelllabofornithology/ebirdst", build = FALSE)
 ```
 
 This version of `ebirdst` is designed to work with the eBird Status Data
