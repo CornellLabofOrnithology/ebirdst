@@ -12,12 +12,12 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Access and Analyze eBird Status and Trends Data">
-<meta property="og:description" content="Tools to download, map, plot and analyze eBird Status and
-    Trends data (&lt;https://ebird.org/science/status-and-trends&gt;). eBird
+<meta property="og:description" content="Tools to download, load, plot, and analyze eBird Status and
+    Trends Data Products (&lt;https://science.ebird.org/en/status-and-trends&gt;). eBird
     (&lt;https://ebird.org/home&gt;) is a global database of bird observations
-    collected by citizen scientists. eBird Status and Trends uses these
-    data to model continental bird abundances, range boundaries, habitat
-    associations, and trends.">
+    collected by member of the public. eBird Status and Trends uses these
+    data to model global bird abundances, range boundaries, and habitat
+    associations at a high spatial and temporal resolution.">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.0</span>
       </span>
     </div>
 
@@ -97,6 +97,11 @@
 <!-- badges: start -->
 
 <div class="section level2">
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
+<p>The <a href="https://science.ebird.org/en/status-and-trends" class="external-link">eBird Status and Trends project</a> project at the <a href="https://www.birds.cornell.edu/" class="external-link">Cornell Lab of Ornithology</a> uses machine-learning models to produce estimates of range boundaries, occurrence rate, and relative abundance at high spatial and temporal resolution across the full annual cycle of 1,009 bird species globally. These models learn the relationships between bird observations collected through <a href="https://ebird.org/" class="external-link">eBird</a> and a suite of remotely sensed habitat variables, while accounting for the noise and bias inherent in community science datasets, including variation in observer behavior and effort. Interactive maps and visualizations of these model estimates can be explored <a href="https://science.ebird.org/en/status-and-trends" class="external-link">online</a>, and the <a href="https://science.ebird.org/en/status-and-trends/download-data" class="external-link">Status and Trends Data Products</a> provide access to the data behind these maps and visualizations. The <code>ebirdst</code> R package provides a set of tools for downloading these data products, loading them into R, and using them for visualizing and analysis.</p>
+</div>
+<div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>Install <code>ebirdst</code> from GitHub with:</p>
@@ -110,6 +115,12 @@
 </h2>
 <p>Data access is granted through an Access Request Form at: <a href="https://ebird.org/st/request" class="external-link uri">https://ebird.org/st/request</a>. Access with this form generates a key to be used with this R package and is provided immediately (as long as commercial use is not requested). Our terms of use have been designed to be quite permissive in many cases, particularly academic and research use. When requesting data access, please be sure to carefully read the terms of use and ensure that your intended use is not restricted.</p>
 <p>After completing the Access Request Form, you will be provided a Status and Trends access key, which you will need when downloading data. To store the key so the package can access it when downloading data, use the function <code>set_ebirdst_access_key("XXXXX")</code>, where <code>"XXXXX"</code> is the access key provided to you. <strong>Restart R after setting the access key.</strong></p>
+<p><strong>For those interested in accessing these data outside of R</strong>, the most widely used data products are available for direct download through the <a href="%5Bhttps://science.ebird.org/en/status-and-trends" class="external-link">Status and Trends website</a>. Spatial data are accessible in widely adopted GeoTIFF and GeoPackage formats, which can be opened in QGIS, ArcGIS, or other GIS software.</p>
+</div>
+<div class="section level2">
+<h2 id="versions">Versions<a class="anchor" aria-label="anchor" href="#versions"></a>
+</h2>
+<p>The Status and Trends Data Products provide estimates of relative abundance, and other variables, for a particular year. This estimation year is used to identify the version of the data products. Each version of this R package is associated with a particular version of the data. For example, the current version of the R package is 1.2020.0 and, as indicated by the year in the version number, it is designed to work with the 2020 data products. Every year, typically in November, the Status and Trends Data Products are updated, and users are encouraged to update this R package and transition to using the new version of the data products. After the data products are updated, there will be a brief period where access to the previous version is also provided, allowsing users to finish any analyses with this previous version. If you inteded to continue using the older data products during this period you must not update the R package.</p>
 </div>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>

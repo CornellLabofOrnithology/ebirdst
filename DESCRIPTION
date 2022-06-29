@@ -1,7 +1,7 @@
 Type: Package
 Package: ebirdst
 Title: Access and Analyze eBird Status and Trends Data
-Version: 1.0.0
+Version: 1.2020.0
 Authors@R: c(
     person("Matthew", "Strimas-Mackey", , "mes335@cornell.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-8929-7776")),
@@ -12,12 +12,12 @@ Authors@R: c(
            comment = c(ORCID = "0000-0002-8368-1248")),
     person("Cornell Lab of Ornithology", role = "cph")
   )
-Description: Tools to download, map, plot and analyze eBird Status and
-    Trends data (<https://ebird.org/science/status-and-trends>). eBird
+Description: Tools to download, load, plot, and analyze eBird Status and
+    Trends Data Products (<https://science.ebird.org/en/status-and-trends>). eBird
     (<https://ebird.org/home>) is a global database of bird observations
-    collected by citizen scientists. eBird Status and Trends uses these
-    data to model continental bird abundances, range boundaries, habitat
-    associations, and trends.
+    collected by member of the public. eBird Status and Trends uses these
+    data to model global bird abundances, range boundaries, and habitat
+    associations at a high spatial and temporal resolution.
 License: GPL-3
 URL: https://github.com/CornellLabofOrnithology/ebirdst
 BugReports: https://github.com/CornellLabofOrnithology/ebirdst/issues

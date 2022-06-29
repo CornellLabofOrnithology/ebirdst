@@ -1,4 +1,4 @@
-# ebirdst 1.0.0
+# ebirdst 1.2020.0
 
 - major update to align with the new eBird Status and Trends API
 - update to align with the 2020 eBird Status Data Products

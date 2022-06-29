@@ -104,6 +104,13 @@ load_raster <- function(path,
   period <- match.arg(period)
   resolution <- match.arg(resolution)
 
+  # check that the geotiff driver is installed
+  drv <- rgdal::gdalDrivers()
+  if (!drv[["create"]][drv[["name"]] == "GTiff"]) {
+    stop("rgdal does not have GeoTIFF support. GeoTIFF support is required to ",
+         "load Status and Trends raster data.")
+  }
+
   # load config file
   p <- load_config(path)
   species_code <- p[["species_code"]]

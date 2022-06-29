@@ -25,6 +25,10 @@ knitr::opts_chunk$set(
 [![CRAN status](https://www.r-pkg.org/badges/version/ebirdst)](https://cran.r-project.org/package=ebirdst)
 <!-- badges: end -->
 
+## Overview
+
+The [eBird Status and Trends project](https://science.ebird.org/en/status-and-trends) project at the [Cornell Lab of Ornithology](https://www.birds.cornell.edu/) uses machine-learning models to produce estimates of range boundaries, occurrence rate, and relative abundance at high spatial and temporal resolution across the full annual cycle of `r scales::comma(nrow(ebirdst::ebirdst_runs))` bird species globally. These models learn the relationships between bird observations collected through [eBird](https://ebird.org/) and a suite of remotely sensed habitat variables, while accounting for the noise and bias inherent in community science datasets, including variation in observer behavior and effort. Interactive maps and visualizations of these model estimates can be explored [online](https://science.ebird.org/en/status-and-trends), and the [Status and Trends Data Products](https://science.ebird.org/en/status-and-trends/download-data) provide access to the data behind these maps and visualizations. The `ebirdst` R package provides a set of tools for downloading these data products, loading them into R, and using them for visualizing and analysis.
+
 ## Installation
 
 Install `ebirdst` from GitHub with:
@@ -41,6 +45,12 @@ This version of `ebirdst` is designed to work with the eBird Status Data Product
 Data access is granted through an Access Request Form at: https://ebird.org/st/request. Access with this form generates a key to be used with this R package and is provided immediately (as long as commercial use is not requested). Our terms of use have been designed to be quite permissive in many cases, particularly academic and research use. When requesting data access, please be sure to carefully read the terms of use and ensure that your intended use is not restricted.
 
 After completing the Access Request Form, you will be provided a Status and Trends access key, which you will need when downloading data. To store the key so the package can access it when downloading data, use the function `set_ebirdst_access_key("XXXXX")`, where `"XXXXX"` is the access key provided to you. **Restart R after setting the access key.**
+
+**For those interested in accessing these data outside of R**, the most widely used data products are available for direct download through the [Status and Trends website]([https://science.ebird.org/en/status-and-trends). Spatial data are accessible in widely adopted GeoTIFF and GeoPackage formats, which can be opened in QGIS, ArcGIS, or other GIS software.
+
+## Versions
+
+The Status and Trends Data Products provide estimates of relative abundance, and other variables, for a particular year. This estimation year is used to identify the version of the data products. Each version of this R package is associated with a particular version of the data. For example, the current version of the R package is `r utils::packageVersion("ebirdst")` and, as indicated by the year in the version number, it is designed to work with the `r ebirdst::ebirdst_version()[["version_year"]]` data products. Every year, typically in November, the Status and Trends Data Products are updated, and users are encouraged to update this R package and transition to using the new version of the data products. After the data products are updated, there will be a brief period where access to the previous version is also provided, allowsing users to finish any analyses with this previous version. If you inteded to continue using the older data products during this period you must not update the R package.
 
 ## Citation
 
