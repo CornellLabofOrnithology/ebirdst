@@ -160,15 +160,14 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
 <span class="co"># get a date vector specifying which week each raster layer corresponds to</span>
 <span class="va">weeks</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/parse_raster_dates.html">parse_raster_dates</a></span><span class="op">(</span><span class="va">abd</span><span class="op">)</span>
 <span class="fu"><a href="https://www.math.uzh.ch/pages/spam/reference/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">weeks</span><span class="op">)</span>
-<span class="co">#&gt;  [1] "2020-01-04" "2020-01-11" "2020-01-18" "2020-01-25" "2020-02-01" "2020-02-08"</span>
-<span class="co">#&gt;  [7] "2020-02-15" "2020-02-22" "2020-03-01" "2020-03-08" "2020-03-15" "2020-03-22"</span>
-<span class="co">#&gt; [13] "2020-03-29" "2020-04-05" "2020-04-12" "2020-04-19" "2020-04-26" "2020-05-03"</span>
-<span class="co">#&gt; [19] "2020-05-10" "2020-05-17" "2020-05-24" "2020-05-31" "2020-06-07" "2020-06-14"</span>
-<span class="co">#&gt; [25] "2020-06-21" "2020-06-28" "2020-07-06" "2020-07-13" "2020-07-20" "2020-07-27"</span>
-<span class="co">#&gt; [31] "2020-08-03" "2020-08-10" "2020-08-17" "2020-08-24" "2020-08-31" "2020-09-07"</span>
-<span class="co">#&gt; [37] "2020-09-14" "2020-09-21" "2020-09-28" "2020-10-05" "2020-10-12" "2020-10-19"</span>
-<span class="co">#&gt; [43] "2020-10-26" "2020-11-02" "2020-11-09" "2020-11-16" "2020-11-23" "2020-11-30"</span>
-<span class="co">#&gt; [49] "2020-12-07" "2020-12-14" "2020-12-21" "2020-12-28"</span>
+<span class="co">#&gt;  [1] "2020-01-04" "2020-01-11" "2020-01-18" "2020-01-25" "2020-02-01" "2020-02-08" "2020-02-15"</span>
+<span class="co">#&gt;  [8] "2020-02-22" "2020-03-01" "2020-03-08" "2020-03-15" "2020-03-22" "2020-03-29" "2020-04-05"</span>
+<span class="co">#&gt; [15] "2020-04-12" "2020-04-19" "2020-04-26" "2020-05-03" "2020-05-10" "2020-05-17" "2020-05-24"</span>
+<span class="co">#&gt; [22] "2020-05-31" "2020-06-07" "2020-06-14" "2020-06-21" "2020-06-28" "2020-07-06" "2020-07-13"</span>
+<span class="co">#&gt; [29] "2020-07-20" "2020-07-27" "2020-08-03" "2020-08-10" "2020-08-17" "2020-08-24" "2020-08-31"</span>
+<span class="co">#&gt; [36] "2020-09-07" "2020-09-14" "2020-09-21" "2020-09-28" "2020-10-05" "2020-10-12" "2020-10-19"</span>
+<span class="co">#&gt; [43] "2020-10-26" "2020-11-02" "2020-11-09" "2020-11-16" "2020-11-23" "2020-11-30" "2020-12-07"</span>
+<span class="co">#&gt; [50] "2020-12-14" "2020-12-21" "2020-12-28"</span>
 
 <span class="co"># select a week in the middle of the year</span>
 <span class="va">abd</span> <span class="op">&lt;-</span> <span class="va">abd</span><span class="op">[[</span><span class="fl">26</span><span class="op">]</span><span class="op">]</span>

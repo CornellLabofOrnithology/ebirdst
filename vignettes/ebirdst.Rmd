@@ -130,7 +130,7 @@ The weekly cubes use the following naming convention:
 
 `weekly/<species_code>_<product>_<metric>_<resolution>_<year>.tif`
 
-where `metic` is typically `median`, except for the relative abundance CIs, which use `lower` and `upper`. The function `load_raster()` is used to load these data into R and takes arguments for `product`, `metric` and `resolution`. For example,
+where `metric` is typically `median`, except for the relative abundance CIs, which use `lower` and `upper`. The function `load_raster()` is used to load these data into R and takes arguments for `product`, `metric` and `resolution`. For example,
 
 ```{r types_weekly}
 # weekly, low res, median occurrence
