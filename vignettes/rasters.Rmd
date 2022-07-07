@@ -133,7 +133,7 @@ plot(abd_projected, axes = FALSE)
 
 ## Abundance bins
 
-The relative abundance data are not uniformly distributed, which can lead to challenges distinguishing areas of differing levels of abundance. To address this, we'll use a quantile bins for the map, where each color in the legend corresponds to an equal number of cells in the raster. We'll define these bins excluding zeros, then assign a seperate color to the zeros. We can also use the function `abundance_palette()` to get the same set of colors we use in the legends on the eBird Status and Trends website.
+The relative abundance data are not uniformly distributed, which can lead to challenges distinguishing areas of differing levels of abundance. To address this, we'll use a quantile bins for the map, where each color in the legend corresponds to an equal number of cells in the raster. We'll define these bins excluding zeros, then assign a separate color to the zeros. We can also use the function `abundance_palette()` to get the same set of colors we use in the legends on the eBird Status and Trends website.
 
 ```{r map_bins, echo=-1}
 par(mar = c(0.25, 0.25, 0.25, 2))

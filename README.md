@@ -86,8 +86,8 @@ the 2020 data products. Every year, typically in November, the Status
 and Trends Data Products are updated, and users are encouraged to update
 this R package and transition to using the new version of the data
 products. After the data products are updated, there will be a brief
-period where access to the previous version is also provided, allowsing
-users to finish any analyses with this previous version. If you inteded
+period where access to the previous version is also provided, allowing
+users to finish any analyses with this previous version. If you intended
 to continue using the older data products during this period you must
 not update the R package.
 
@@ -116,7 +116,7 @@ The available vignettes are:
     format of data files.
 -   [Working with Raster
     Data](https://cornelllabofornithology.github.io/ebirdst/articles/rasters.html):
-    loading and analysing the raster data products.
+    loading and analyzing the raster data products.
 
 ## Quick Start
 

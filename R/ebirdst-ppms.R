@@ -30,7 +30,7 @@
 #'   meaning the comparison between observations and predictions is only made
 #'   within the range where the species occurs.
 #'
-#'   Prior to calculating PPMS, the test dataset is subsampled spatiotemporally
+#'   Prior to calculating PPMs, the test dataset is subsampled spatiotemporally
 #'   using [ebirdst_subset()]. This process is performed for 25 monte carlo
 #'   iterations resulting in 25 estimates of each PPM.
 #'
@@ -38,7 +38,7 @@
 #'   `binary_ppms`, `occ_ppms`, and `abd_ppms`. These data frames have 25 rows
 #'   corresponding to 25 Monte Carlo iterations each estimating the PPMs using a
 #'   spatiotemporal subsample of the test data. Columns correspond to the
-#'   different PPMS. `binary_ppms` contains binary or range-based PPMS,
+#'   different PPMs. `binary_ppms` contains binary or range-based PPMs,
 #'   `occ_ppms` contains within-range occurrence probability PPMs, and
 #'   `abd_ppms` contains within-range abundance PPMs. In some cases, PPMs may be
 #'   missing, either because there isn't a large enough test set within the
@@ -447,8 +447,8 @@ plot.ebirdst_ppms <- function(x, ...) {
 #' @return An `ebirdst_pppms_ts` object containing a list of three data frames:
 #'   `binary_ppms`, `occ_ppms`, and `abd_ppms`. Each row of these data frames
 #'   corresponds to the PPMs from one Monte Carlo iteration for a given time
-#'   period. Columns correspond to the different PPMS. `binary_ppms` contains
-#'   binary or range-based PPMS, `occ_ppms` contains within-range occurrence
+#'   period. Columns correspond to the different PPMs. `binary_ppms` contains
+#'   binary or range-based PPMs, `occ_ppms` contains within-range occurrence
 #'   probability PPMs, and `abd_ppms` contains within-range abundance PPMs. In
 #'   some cases, PPMs may be missing, either because there isn't a large enough
 #'   test set within the spatiotemporal extent or because average occurrence or

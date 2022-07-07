@@ -11,7 +11,7 @@ sample_case_control(x, res, t_res, n = 1, replace = FALSE, jitter = TRUE)
 }
 \arguments{
 \item{x}{data frame or \link{sf} object; the points to subsample. If \code{x} is a data
-frame the coordiantes should be provided as columns \code{lat} and \code{lon}. The
+frame the coordinates should be provided as columns \code{lat} and \code{lon}. The
 day of year should be expressed as a proportion from 0-1 and stored in the
 column \code{date}.}
 

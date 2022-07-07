@@ -35,7 +35,7 @@ An \code{ebirdst_pppms} object containing a list of three data frames:
 \code{binary_ppms}, \code{occ_ppms}, and \code{abd_ppms}. These data frames have 25 rows
 corresponding to 25 Monte Carlo iterations each estimating the PPMs using a
 spatiotemporal subsample of the test data. Columns correspond to the
-different PPMS. \code{binary_ppms} contains binary or range-based PPMS,
+different PPMs. \code{binary_ppms} contains binary or range-based PPMs,
 \code{occ_ppms} contains within-range occurrence probability PPMs, and
 \code{abd_ppms} contains within-range abundance PPMs. In some cases, PPMs may be
 missing, either because there isn't a large enough test set within the
@@ -66,7 +66,7 @@ abundance. Both the occurrence and count PPMs are within-range metrics,
 meaning the comparison between observations and predictions is only made
 within the range where the species occurs.
 
-Prior to calculating PPMS, the test dataset is subsampled spatiotemporally
+Prior to calculating PPMs, the test dataset is subsampled spatiotemporally
 using \code{\link[=ebirdst_subset]{ebirdst_subset()}}. This process is performed for 25 monte carlo
 iterations resulting in 25 estimates of each PPM.
 }

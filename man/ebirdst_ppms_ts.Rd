@@ -44,8 +44,8 @@ possible metrics varies by PPM type:
 An \code{ebirdst_pppms_ts} object containing a list of three data frames:
 \code{binary_ppms}, \code{occ_ppms}, and \code{abd_ppms}. Each row of these data frames
 corresponds to the PPMs from one Monte Carlo iteration for a given time
-period. Columns correspond to the different PPMS. \code{binary_ppms} contains
-binary or range-based PPMS, \code{occ_ppms} contains within-range occurrence
+period. Columns correspond to the different PPMs. \code{binary_ppms} contains
+binary or range-based PPMs, \code{occ_ppms} contains within-range occurrence
 probability PPMs, and \code{abd_ppms} contains within-range abundance PPMs. In
 some cases, PPMs may be missing, either because there isn't a large enough
 test set within the spatiotemporal extent or because average occurrence or

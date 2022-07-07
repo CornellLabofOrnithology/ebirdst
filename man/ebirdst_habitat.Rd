@@ -81,7 +81,7 @@ these are calculated within a 1.5 km radius of each checklist:
 \item Land cover: percent of each landcover class
 \item Water cover: percent of each watercover class
 \item Intertidal: percent cover of intertidal mudflats
-\item Nighttime lights: total refelctance of nighttime lights
+\item Nighttime lights: total reflectance of nighttime lights
 \item Roads: road density. There are 5 covariates distinguishing between
 different road types; however, these are grouped together for the sake of
 the habitat associations.

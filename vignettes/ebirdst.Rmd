@@ -79,7 +79,7 @@ which is included in this package. If you’re working in RStudio, you can use `
 
 All species go through a process of expert human review prior to being released. The `ebirdst_runs` data frame also contains information from this review process. Reviewers assess each of the four seasons: breeding, non-breeding, pre-breeding migration, and post-breeding migration. Resident (i.e., non-migratory) species are identified by having `TRUE` in the `resident` column of `ebirdst_runs`, and these species are assessed across the whole year rather than seasonally. `ebirdst_runs` contains two important pieces of information for each season: a **quality** rating and **seasonal dates**.
 
-The **seasonal dates** define the weeks that fall within each season. Breeding and non-breeding season dates are defined for each species as the weeks during those seasons when the species’ population does not move. For this reason, these seasons are also described as stationary periods. Migration periods are defined as the periods of movement between the stationary non-breeding and breeding seasons. Note that for many species these migratory periods include not only movement from breeding grounds to non-breeding grounds, but also post-breeding dispersal, molt migration, and other movements. 
+The **seasonal dates** define the weeks that fall within each season. Breeding and non-breeding season dates are defined for each species as the weeks during those seasons when the species' population does not move. For this reason, these seasons are also described as stationary periods. Migration periods are defined as the periods of movement between the stationary non-breeding and breeding seasons. Note that for many species these migratory periods include not only movement from breeding grounds to non-breeding grounds, but also post-breeding dispersal, molt migration, and other movements. 
 
 Reviewers also examine the model estimates for each season to assess the amount of extrapolation or omission present in the model, and assign an associated quality rating ranging from 0 (lowest quality) to 3 (highest quality). Extrapolation refers to cases where the model predicts occurrence where the species is known to be absent, while omission refers to the model failing to predict occurrence where a species is known to be present.
 
@@ -103,7 +103,7 @@ Within this data package directory, the following files and directories will be 
 - `weekly/`: a directory containing weekly estimates of occurrence, count, relative abundance, and percent of population on a regular grid in GeoTIFF format at three resolutions. See below for more details.
 - `seasonal/`: a directory containing seasonal estimates of occurrence, count, relative abundance, and percent of population on a regular grid in GeoTIFF format at three resolutions. These are derived from the corresponding weekly raster data. Dates defining the boundary of each season are set on a species-specific basis by an expert reviewer familiar with the species. These dates are available in the `ebirdst_runs` data frame. Only seasons that passed the expert review process are included. See below for more details.
 - `ranges/`: a directory containing GeoPackages storing range boundary polygons. See below for more details.
-- `stixel_summary.db`: an SQLite database containing information on habitat associations, including perdictor importance (PI) and partial dependence (PD) estimates.
+- `stixel_summary.db`: an SQLite database containing information on habitat associations, including predictor importance (PI) and partial dependence (PD) estimates.
 - `predictions.db`: model predictions for a test dataset held out of the model fitting. These predictions are used for calculating predictive performance metrics (PPMs) using the `ebirdst_ppms()` function.
 - `config.json`: run-specific parameters, mostly for internal use, but also containing useful parameters for mapping the abundance data. These parameters can be loaded with `load_fac_map_parameters()`.
 
@@ -174,7 +174,7 @@ occ_seasonal_max <- load_raster(path, product = "occurrence",
                                 resolution = "lr")
 ```
 
-Finally, as a convenience, the data products include year-roudn rasters summarizing the mean or max across all weeks that fall within a season that passed the expert review process.  These can be accessed similarly to the seasonal products, just with `period = "full-year"` instead. For example, these can layers be used in conservation planning to assess the most important sites across the full range and full annual cycle of a species.
+Finally, as a convenience, the data products include year-round rasters summarizing the mean or max across all weeks that fall within a season that passed the expert review process.  These can be accessed similarly to the seasonal products, just with `period = "full-year"` instead. For example, these can layers be used in conservation planning to assess the most important sites across the full range and full annual cycle of a species.
 
 ```{rtypes_fullyear}
 # full year, low res, maximum relative abundance

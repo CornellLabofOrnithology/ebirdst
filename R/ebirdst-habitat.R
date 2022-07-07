@@ -39,7 +39,7 @@
 #'    - Land cover: percent of each landcover class
 #'    - Water cover: percent of each watercover class
 #'    - Intertidal: percent cover of intertidal mudflats
-#'    - Nighttime lights: total refelctance of nighttime lights
+#'    - Nighttime lights: total reflectance of nighttime lights
 #'    - Roads: road density. There are 5 covariates distinguishing between
 #'    different road types; however, these are grouped together for the sake of
 #'    the habitat associations.

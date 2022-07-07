@@ -50,7 +50,7 @@ After completing the Access Request Form, you will be provided a Status and Tren
 
 ## Versions
 
-The Status and Trends Data Products provide estimates of relative abundance, and other variables, for a particular year. This estimation year is used to identify the version of the data products. Each version of this R package is associated with a particular version of the data. For example, the current version of the R package is `r utils::packageVersion("ebirdst")` and, as indicated by the year in the version number, it is designed to work with the `r ebirdst::ebirdst_version()[["version_year"]]` data products. Every year, typically in November, the Status and Trends Data Products are updated, and users are encouraged to update this R package and transition to using the new version of the data products. After the data products are updated, there will be a brief period where access to the previous version is also provided, allowsing users to finish any analyses with this previous version. If you inteded to continue using the older data products during this period you must not update the R package.
+The Status and Trends Data Products provide estimates of relative abundance, and other variables, for a particular year. This estimation year is used to identify the version of the data products. Each version of this R package is associated with a particular version of the data. For example, the current version of the R package is `r utils::packageVersion("ebirdst")` and, as indicated by the year in the version number, it is designed to work with the `r ebirdst::ebirdst_version()[["version_year"]]` data products. Every year, typically in November, the Status and Trends Data Products are updated, and users are encouraged to update this R package and transition to using the new version of the data products. After the data products are updated, there will be a brief period where access to the previous version is also provided, allowing users to finish any analyses with this previous version. If you intended to continue using the older data products during this period you must not update the R package.
 
 ## Citation
 
@@ -65,7 +65,7 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
 For full package documentation, including a series of vignettes covering the full spectrum from introductory to advanced usage, please see the package [website](https://cornelllabofornithology.github.io/ebirdst). The available vignettes are:
 
 - [Introduction to eBird Status & Trends Data](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst.html): covers data access, available data products, and structure and format of data files.
-- [Working with Raster Data](https://cornelllabofornithology.github.io/ebirdst/articles/rasters.html): loading and analysing the raster data products. 
+- [Working with Raster Data](https://cornelllabofornithology.github.io/ebirdst/articles/rasters.html): loading and analyzing the raster data products. 
 
 ## Quick Start
 

@@ -311,7 +311,7 @@ expert review process are included. See below for more details.</li>
 range boundary polygons. See below for more details.</li>
 <li>
 <code>stixel_summary.db</code>: an SQLite database containing
-information on habitat associations, including perdictor importance (PI)
+information on habitat associations, including predictor importance (PI)
 and partial dependence (PD) estimates.</li>
 <li>
 <code>predictions.db</code>: model predictions for a test dataset
@@ -461,7 +461,7 @@ and <code>resolution</code>. For example,</p>
 <span class="va">occ_seasonal_max</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">path</span>, product <span class="op">=</span> <span class="st">"occurrence"</span>, 
                                 period <span class="op">=</span> <span class="st">"seasonal"</span>, metric <span class="op">=</span> <span class="st">"max"</span>, 
                                 resolution <span class="op">=</span> <span class="st">"lr"</span><span class="op">)</span></code></pre></div>
-<p>Finally, as a convenience, the data products include year-roudn
+<p>Finally, as a convenience, the data products include year-round
 rasters summarizing the mean or max across all weeks that fall within a
 season that passed the expert review process. These can be accessed
 similarly to the seasonal products, just with

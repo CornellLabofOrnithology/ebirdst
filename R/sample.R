@@ -6,7 +6,7 @@
 #' independently.
 #'
 #' @param x data frame or [sf] object; the points to subsample. If `x` is a data
-#'   frame the coordiantes should be provided as columns `lat` and `lon`. The
+#'   frame the coordinates should be provided as columns `lat` and `lon`. The
 #'   day of year should be expressed as a proportion from 0-1 and stored in the
 #'   column `date`.
 #' @param res numeric; the size in meters of the grid to sample from. This can
