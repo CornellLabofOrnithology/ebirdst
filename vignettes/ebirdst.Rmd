@@ -105,9 +105,9 @@ Within this data package directory, the following files and directories will be 
 - `ranges/`: a directory containing GeoPackages storing range boundary polygons. See below for more details.
 - `stixel_summary.db`: an SQLite database containing information on habitat associations, including perdictor importance (PI) and partial dependence (PD) estimates.
 - `predictions.db`: model predictions for a test dataset held out of the model fitting. These predictions are used for calculating predictive performance metrics (PPMs) using the `ebirdst_ppms()` function.
-- `config.rds`: run-specific parameters, mostly for internal use, but also containing useful parameters for mapping the abundance data. These parameters can be loaded with `load_fac_map_parameters()`.
+- `config.json`: run-specific parameters, mostly for internal use, but also containing useful parameters for mapping the abundance data. These parameters can be loaded with `load_fac_map_parameters()`.
 
-The vignette will cover the raster and range data. Consult the [non-raster data vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-non-raster.html) for information on habitat associations and PPMs.
+The vignette will cover the raster and range data.
 
 ## Weekly raster estimates
 
