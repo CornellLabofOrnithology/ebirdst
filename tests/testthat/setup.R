@@ -3,7 +3,6 @@
 # set download directory to a temporary directory
 old_dir <- Sys.getenv("EBIRDST_DATA_DIR")
 temp_dir <- file.path(tempdir(), "ebirdst_temp_dir")
-temp_dir <- file.path("~/Desktop/", "ebirdst_temp_dir")
 dir.create(temp_dir, recursive = TRUE, showWarnings = FALSE)
 Sys.setenv(EBIRDST_DATA_DIR = temp_dir)
 

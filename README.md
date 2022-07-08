@@ -80,7 +80,7 @@ The Status and Trends Data Products provide estimates of relative
 abundance, and other variables, for a particular year. This estimation
 year is used to identify the version of the data products. Each version
 of this R package is associated with a particular version of the data.
-For example, the current version of the R package is 1.2020.0 and, as
+For example, the current version of the R package is 1.2020.1 and, as
 indicated by the year in the version number, it is designed to work with
 the 2020 data products. Every year, typically in November, the Status
 and Trends Data Products are updated, and users are encouraged to update
