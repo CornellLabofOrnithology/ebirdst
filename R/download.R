@@ -89,7 +89,8 @@ ebirdst_download <- function(species,
     version_year <- ebirdst_version()[["version_year"]]
     species <- get_species(species)
     if (is.na(species)) {
-      stop("species does not uniquely identify a Status and Trends run.")
+      stop("The requested species was not modeled by Status and Trends. ",
+           "Consult ebirdst_runs for a complete list of available species.")
     }
 
     # api url and key

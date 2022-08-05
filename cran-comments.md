@@ -1,6 +1,4 @@
-# ebirdst 1.2020.1
-
-- CRAN checks found files created and left behind in ~/Desktop, relocated test files to tempdir() and deleting after test completion with withr::defer()
+# ebirdst 1.2020.2
 
 ## Test environments
 
