@@ -1,7 +1,7 @@
 Type: Package
 Package: ebirdst
 Title: Access and Analyze eBird Status and Trends Data
-Version: 1.2020.1
+Version: 1.2020.2
 Authors@R: c(
     person("Matthew", "Strimas-Mackey", , "mes335@cornell.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-8929-7776")),
