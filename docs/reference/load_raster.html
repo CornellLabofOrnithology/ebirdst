@@ -21,7 +21,7 @@ object."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mat
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.2</span>
       </span>
     </div>
 
@@ -80,13 +80,13 @@ object.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">load_raster</span><span class="op">(</span>
-  <span class="va">path</span>,
-  product <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"abundance"</span>, <span class="st">"count"</span>, <span class="st">"occurrence"</span>, <span class="st">"percent-population"</span><span class="op">)</span>,
-  period <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weekly"</span>, <span class="st">"seasonal"</span>, <span class="st">"full-year"</span><span class="op">)</span>,
-  metric <span class="op">=</span> <span class="cn">NULL</span>,
-  resolution <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"hr"</span>, <span class="st">"mr"</span>, <span class="st">"lr"</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">load_raster</span><span class="op">(</span></span>
+<span>  <span class="va">path</span>,</span>
+<span>  product <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"abundance"</span>, <span class="st">"count"</span>, <span class="st">"occurrence"</span>, <span class="st">"percent-population"</span><span class="op">)</span>,</span>
+<span>  period <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weekly"</span>, <span class="st">"seasonal"</span>, <span class="st">"full-year"</span><span class="op">)</span>,</span>
+<span>  metric <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  resolution <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"hr"</span>, <span class="st">"mr"</span>, <span class="st">"lr"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -95,15 +95,21 @@ object.</p>
 <dd><p>character; directory that the Status and Trends data for a given
 species was downloaded to. This path is returned by <code><a href="ebirdst_download.html">ebirdst_download()</a></code>
 or <code><a href="get_species_path.html">get_species_path()</a></code>.</p></dd>
+
+
 <dt>product</dt>
 <dd><p>character; Status and Trends product to load: occurrence,
 count, relative abundance, or percent of population. See Details for a
 detailed explanation of each of these products.</p></dd>
+
+
 <dt>period</dt>
 <dd><p>character; temporal period of the estimation. The Status and
 Trends models make predictions for each week of the year; however, as a
 convenience, data are also provided summarized at the seasonal or annual
 ("full-year") level.</p></dd>
+
+
 <dt>metric</dt>
 <dd><p>character; by default, the weekly products provide estimates of
 the median value (<code>metric = "median"</code>) and the summarized products are the
@@ -112,14 +118,19 @@ However, additional variants exist for some of the products. For the weekly
 relative abundance, confidence intervals are provided: specify <code>metric = "lower"</code> to get the 10th quantile or <code>metric = "upper"</code> to get the 90th
 quantile. For the seasonal and annual products, the cell-wise maximum
 values across weeks can be obtained with <code>metric = "max"</code>.</p></dd>
+
+
 <dt>resolution</dt>
 <dd><p>character; the resolution of the raster data to load. The
 default is to load the native ~3 km resolution (<code>"hr"</code>); however, for some
 applications 9 km (<code>"mr"</code>) or 27 km (<code>"lr"</code>) data may be suitable.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>For the weekly cubes, a <code>RasterStack</code> with 52 layers for the given
+    
+
+<p>For the weekly cubes, a <code>RasterStack</code> with 52 layers for the given
 product, labeled by week. Seasonal cubes will have up to four layers
 labeled according to the seasons. The full-year products will have a single
 layer.</p>
@@ -156,27 +167,27 @@ the non-breeding season.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># download example data</span></span>
-<span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># or get the path if you already have the data downloaded</span></span>
-<span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_species_path.html">get_species_path</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># weekly relative abundance</span></span>
-<span class="r-in"><span class="co"># note that only low resolution (lr) data are available for the example data</span></span>
-<span class="r-in"><span class="va">abd_weekly</span> <span class="op">&lt;-</span> <span class="fu">load_raster</span><span class="op">(</span><span class="va">path</span>, <span class="st">"abundance"</span>, resolution <span class="op">=</span> <span class="st">"lr"</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># identify the weeks for each layer</span></span>
-<span class="r-in"><span class="fu"><a href="parse_raster_dates.html">parse_raster_dates</a></span><span class="op">(</span><span class="va">abd_weekly</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># max seasonal abundance</span></span>
-<span class="r-in"><span class="va">abd_seasonal</span> <span class="op">&lt;-</span> <span class="fu">load_raster</span><span class="op">(</span><span class="va">path</span>, <span class="st">"abundance"</span>,</span>
-<span class="r-in">                            period <span class="op">=</span> <span class="st">"seasonal"</span>, metric <span class="op">=</span> <span class="st">"max"</span>,</span>
-<span class="r-in">                            resolution <span class="op">=</span> <span class="st">"lr"</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># available seasons in stack</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/pkg/raster/man/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">abd_seasonal</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># subset to just breeding season abundance</span></span>
-<span class="r-in"><span class="va">abd_seasonal</span><span class="op">[[</span><span class="st">"breeding"</span><span class="op">]</span><span class="op">]</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># download example data</span></span></span>
+<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># or get the path if you already have the data downloaded</span></span></span>
+<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_species_path.html">get_species_path</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># weekly relative abundance</span></span></span>
+<span class="r-in"><span><span class="co"># note that only low resolution (lr) data are available for the example data</span></span></span>
+<span class="r-in"><span><span class="va">abd_weekly</span> <span class="op">&lt;-</span> <span class="fu">load_raster</span><span class="op">(</span><span class="va">path</span>, <span class="st">"abundance"</span>, resolution <span class="op">=</span> <span class="st">"lr"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># identify the weeks for each layer</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="parse_raster_dates.html">parse_raster_dates</a></span><span class="op">(</span><span class="va">abd_weekly</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># max seasonal abundance</span></span></span>
+<span class="r-in"><span><span class="va">abd_seasonal</span> <span class="op">&lt;-</span> <span class="fu">load_raster</span><span class="op">(</span><span class="va">path</span>, <span class="st">"abundance"</span>,</span></span>
+<span class="r-in"><span>                            period <span class="op">=</span> <span class="st">"seasonal"</span>, metric <span class="op">=</span> <span class="st">"max"</span>,</span></span>
+<span class="r-in"><span>                            resolution <span class="op">=</span> <span class="st">"lr"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># available seasons in stack</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">abd_seasonal</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># subset to just breeding season abundance</span></span></span>
+<span class="r-in"><span><span class="va">abd_seasonal</span><span class="op">[[</span><span class="st">"breeding"</span><span class="op">]</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -191,7 +202,7 @@ the non-breeding season.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

@@ -18,7 +18,7 @@ given species to be used by the various data loading functions."><!-- mathjax --
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.2</span>
       </span>
     </div>
 
@@ -74,7 +74,7 @@ given species to be used by the various data loading functions.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">get_species_path</span><span class="op">(</span><span class="va">species</span>, path <span class="op">=</span> <span class="fu"><a href="ebirdst_data_dir.html">ebirdst_data_dir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_species_path</span><span class="op">(</span><span class="va">species</span>, path <span class="op">=</span> <span class="fu"><a href="ebirdst_data_dir.html">ebirdst_data_dir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -84,6 +84,8 @@ given species to be used by the various data loading functions.</p>
 name or six-letter species code (e.g. woothr). The full list of valid
 species is can be viewed in the <a href="ebirdst_runs.html">ebirdst_runs</a> data frame included in this
 package. To download the example dataset, use "example_data".</p></dd>
+
+
 <dt>path</dt>
 <dd><p>character; directory to download the data to. All downloaded
 files will be placed in a sub-directory of this directory named for the
@@ -91,30 +93,33 @@ data version year, e.g. "2020" for the 2020 Status Data Products. Each species'
 data package will then appear in a directory named with the eBird species
 code. Defaults to a persistent data directory, which can be found by
 calling <code><a href="ebirdst_data_dir.html">ebirdst_data_dir()</a></code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>The path to the data package directory.</p>
+    
+
+<p>The path to the data package directory.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># download the example data</span></span>
-<span class="r-in"><span class="fu"><a href="ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># get the path</span></span>
-<span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu">get_species_path</span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># use it to load data</span></span>
-<span class="r-in"><span class="va">abd</span> <span class="op">&lt;-</span> <span class="fu"><a href="load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">path</span>, <span class="st">"abundance"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># get the path to the full data package for yellow-bellied sapsucker</span></span>
-<span class="r-in"><span class="co"># common name, scientific name, or species code can be used</span></span>
-<span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu">get_species_path</span><span class="op">(</span><span class="st">"Yellow-bellied Sapsucker"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu">get_species_path</span><span class="op">(</span><span class="st">"Sphyrapicus varius"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu">get_species_path</span><span class="op">(</span><span class="st">"yebsap"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># download the example data</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># get the path</span></span></span>
+<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu">get_species_path</span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># use it to load data</span></span></span>
+<span class="r-in"><span><span class="va">abd</span> <span class="op">&lt;-</span> <span class="fu"><a href="load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">path</span>, <span class="st">"abundance"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># get the path to the full data package for yellow-bellied sapsucker</span></span></span>
+<span class="r-in"><span><span class="co"># common name, scientific name, or species code can be used</span></span></span>
+<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu">get_species_path</span><span class="op">(</span><span class="st">"Yellow-bellied Sapsucker"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu">get_species_path</span><span class="op">(</span><span class="st">"Sphyrapicus varius"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu">get_species_path</span><span class="op">(</span><span class="st">"yebsap"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -129,7 +134,7 @@ calling <code><a href="ebirdst_data_dir.html">ebirdst_data_dir()</a></code>.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

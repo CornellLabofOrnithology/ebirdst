@@ -18,7 +18,7 @@ The spatiotemporal extent should be defined using ebirdst_extent()."><!-- mathja
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.2</span>
       </span>
     </div>
 
@@ -74,16 +74,16 @@ The spatiotemporal extent should be defined using <code><a href="ebirdst_extent.
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">ebirdst_subset</span><span class="op">(</span><span class="va">x</span>, <span class="va">ext</span><span class="op">)</span>
-
-<span class="co"># S3 method for data.frame</span>
-<span class="fu">ebirdst_subset</span><span class="op">(</span><span class="va">x</span>, <span class="va">ext</span><span class="op">)</span>
-
-<span class="co"># S3 method for sf</span>
-<span class="fu">ebirdst_subset</span><span class="op">(</span><span class="va">x</span>, <span class="va">ext</span><span class="op">)</span>
-
-<span class="co"># S3 method for Raster</span>
-<span class="fu">ebirdst_subset</span><span class="op">(</span><span class="va">x</span>, <span class="va">ext</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ebirdst_subset</span><span class="op">(</span><span class="va">x</span>, <span class="va">ext</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for data.frame</span></span>
+<span><span class="fu">ebirdst_subset</span><span class="op">(</span><span class="va">x</span>, <span class="va">ext</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for sf</span></span>
+<span><span class="fu">ebirdst_subset</span><span class="op">(</span><span class="va">x</span>, <span class="va">ext</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for Raster</span></span>
+<span><span class="fu">ebirdst_subset</span><span class="op">(</span><span class="va">x</span>, <span class="va">ext</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -92,39 +92,44 @@ The spatiotemporal extent should be defined using <code><a href="ebirdst_extent.
 <dd><p>eBird Status and Trends data to subset; either a <code>RasterStack</code>
 object with 52 layers (one for each week) or a data frame with PI or PD
 data.</p></dd>
+
+
 <dt>ext</dt>
 <dd><p><a href="ebirdst_extent.html">ebirdst_extent</a> object; the spatiotemporal extent to filter the
 data to.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>eBird Status and Trends data in the same format as the input data,
+    
+
+<p>eBird Status and Trends data in the same format as the input data,
 but subset in space and time.</p>
     </div>
     <div id="methods-by-class-">
     <h2>Methods (by class)</h2>
     
-<ul><li><p><code>data.frame</code>: PI or PD data</p></li>
-<li><p><code>sf</code>: PI or PD data as an <code>sf</code> object</p></li>
-<li><p><code>Raster</code>: Status and Trends rasters</p></li>
+<ul><li><p><code>ebirdst_subset(data.frame)</code>: PI or PD data</p></li>
+<li><p><code>ebirdst_subset(sf)</code>: PI or PD data as an <code>sf</code> object</p></li>
+<li><p><code>ebirdst_subset(Raster)</code>: Status and Trends rasters</p></li>
 </ul></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># download example data</span></span>
-<span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># or get the path if you already have the data downloaded</span></span>
-<span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_species_path.html">get_species_path</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># bbox for southern michigan in may</span></span>
-<span class="r-in"><span class="va">bb_vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>xmin <span class="op">=</span> <span class="op">-</span><span class="fl">86</span>, xmax <span class="op">=</span> <span class="op">-</span><span class="fl">83</span>, ymin <span class="op">=</span> <span class="fl">41.5</span>, ymax <span class="op">=</span> <span class="fl">43.5</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">e</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_extent.html">ebirdst_extent</a></span><span class="op">(</span><span class="va">bb_vec</span>, t <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"05-01"</span>, <span class="st">"05-31"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># load and subset raster data</span></span>
-<span class="r-in"><span class="va">abd</span> <span class="op">&lt;-</span> <span class="fu"><a href="load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">path</span>, product <span class="op">=</span> <span class="st">"abundance"</span>, resolution <span class="op">=</span> <span class="st">"lr"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">abd_ss</span> <span class="op">&lt;-</span> <span class="fu">ebirdst_subset</span><span class="op">(</span><span class="va">abd</span>, ext <span class="op">=</span> <span class="va">e</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># download example data</span></span></span>
+<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># or get the path if you already have the data downloaded</span></span></span>
+<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_species_path.html">get_species_path</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># bbox for southern michigan in may</span></span></span>
+<span class="r-in"><span><span class="va">bb_vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>xmin <span class="op">=</span> <span class="op">-</span><span class="fl">86</span>, xmax <span class="op">=</span> <span class="op">-</span><span class="fl">83</span>, ymin <span class="op">=</span> <span class="fl">41.5</span>, ymax <span class="op">=</span> <span class="fl">43.5</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">e</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_extent.html">ebirdst_extent</a></span><span class="op">(</span><span class="va">bb_vec</span>, t <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"05-01"</span>, <span class="st">"05-31"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># load and subset raster data</span></span></span>
+<span class="r-in"><span><span class="va">abd</span> <span class="op">&lt;-</span> <span class="fu"><a href="load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">path</span>, product <span class="op">=</span> <span class="st">"abundance"</span>, resolution <span class="op">=</span> <span class="st">"lr"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">abd_ss</span> <span class="op">&lt;-</span> <span class="fu">ebirdst_subset</span><span class="op">(</span><span class="va">abd</span>, ext <span class="op">=</span> <span class="va">e</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -139,7 +144,7 @@ but subset in space and time.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

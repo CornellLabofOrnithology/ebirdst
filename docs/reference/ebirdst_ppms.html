@@ -18,7 +18,7 @@ Status and Trends model of a given species within a spatiotemporal extent."><!--
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.2</span>
       </span>
     </div>
 
@@ -74,10 +74,10 @@ Status and Trends model of a given species within a spatiotemporal extent.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">ebirdst_ppms</span><span class="op">(</span><span class="va">path</span>, <span class="va">ext</span>, <span class="va">es_cutoff</span>, pat_cutoff <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">7</span><span class="op">)</span>
-
-<span class="co"># S3 method for ebirdst_ppms</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ebirdst_ppms</span><span class="op">(</span><span class="va">path</span>, <span class="va">ext</span>, <span class="va">es_cutoff</span>, pat_cutoff <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">7</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for ebirdst_ppms</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -86,9 +86,13 @@ Status and Trends model of a given species within a spatiotemporal extent.</p>
 <dd><p>character; directory that the Status and Trends data for a given
 species was downloaded to. This path is returned by <code><a href="ebirdst_download.html">ebirdst_download()</a></code>
 or <code><a href="get_species_path.html">get_species_path()</a></code>.</p></dd>
+
+
 <dt>ext</dt>
 <dd><p><a href="ebirdst_extent.html">ebirdst_extent</a> object (optional); the spatiotemporal extent over
 which to calculate the PPMs.</p></dd>
+
+
 <dt>es_cutoff</dt>
 <dd><p>fraction between 0-1; the ensemble support cutoff to use in
 distinguishing zero and non-zero predictions. Optimal ensemble support
@@ -96,16 +100,25 @@ cutoff values are calculated for each week during the modeling process and
 stored in the data package for each species. <strong>In general, you should not
 specify a value for <code>es_cutoff</code> and instead allow the function to use the
 species-specific model-based values.</strong></p></dd>
+
+
 <dt>pat_cutoff</dt>
 <dd><p>numeric between 0-1; percent above threshold.</p></dd>
+
+
 <dt>x</dt>
 <dd><p>ebirdst_ppms object; PPMs as calculated by <code>ebirdst_ppms()</code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>ignored.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An <code>ebirdst_pppms</code> object containing a list of three data frames:
+    
+
+<p>An <code>ebirdst_pppms</code> object containing a list of three data frames:
 <code>binary_ppms</code>, <code>occ_ppms</code>, and <code>abd_ppms</code>. These data frames have 25 rows
 corresponding to 25 Monte Carlo iterations each estimating the PPMs using a
 spatiotemporal subsample of the test data. Columns correspond to the
@@ -114,8 +127,13 @@ different PPMs. <code>binary_ppms</code> contains binary or range-based PPMs,
 <code>abd_ppms</code> contains within-range abundance PPMs. In some cases, PPMs may be
 missing, either because there isn't a large enough test set within the
 spatiotemporal extent or because average occurrence or abundance is too
-low. In these cases, try increasing the size of the <a href="ebirdst_extent.html">ebirdst_extent</a>object.
-<code><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot()</a></code> can be called on the returned <code>ebirdst_ppms</code> object to produce a
+low. In these cases, try increasing the size of the <a href="ebirdst_extent.html">ebirdst_extent</a></p>
+
+
+<p>object.</p>
+
+
+<p><code><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot()</a></code> can be called on the returned <code>ebirdst_ppms</code> object to produce a
 boxplot of PPMs in all three categories: Binary Occurrence, Occurrence
 Probability, and Abundance.</p>
     </div>
@@ -140,20 +158,20 @@ iterations resulting in 25 estimates of each PPM.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># download example data</span></span>
-<span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span>, tifs_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># or get the path if you already have the data downloaded</span></span>
-<span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_species_path.html">get_species_path</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># define a spatiotemporal extent to calculate ppms over</span></span>
-<span class="r-in"><span class="va">bb_vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>xmin <span class="op">=</span> <span class="op">-</span><span class="fl">90</span>, xmax <span class="op">=</span> <span class="op">-</span><span class="fl">82</span>, ymin <span class="op">=</span> <span class="fl">41</span>, ymax <span class="op">=</span> <span class="fl">48</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">e</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_extent.html">ebirdst_extent</a></span><span class="op">(</span><span class="va">bb_vec</span>, t <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"05-01"</span>, <span class="st">"07-31"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># compute predictive performance metrics</span></span>
-<span class="r-in"><span class="va">ppms</span> <span class="op">&lt;-</span> <span class="fu">ebirdst_ppms</span><span class="op">(</span>path <span class="op">=</span> <span class="va">path</span>, ext <span class="op">=</span> <span class="va">e</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ppms</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># download example data</span></span></span>
+<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span>, tifs_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># or get the path if you already have the data downloaded</span></span></span>
+<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_species_path.html">get_species_path</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># define a spatiotemporal extent to calculate ppms over</span></span></span>
+<span class="r-in"><span><span class="va">bb_vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>xmin <span class="op">=</span> <span class="op">-</span><span class="fl">90</span>, xmax <span class="op">=</span> <span class="op">-</span><span class="fl">82</span>, ymin <span class="op">=</span> <span class="fl">41</span>, ymax <span class="op">=</span> <span class="fl">48</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">e</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_extent.html">ebirdst_extent</a></span><span class="op">(</span><span class="va">bb_vec</span>, t <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"05-01"</span>, <span class="st">"07-31"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># compute predictive performance metrics</span></span></span>
+<span class="r-in"><span><span class="va">ppms</span> <span class="op">&lt;-</span> <span class="fu">ebirdst_ppms</span><span class="op">(</span>path <span class="op">=</span> <span class="va">path</span>, ext <span class="op">=</span> <span class="va">e</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ppms</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -168,7 +186,7 @@ iterations resulting in 25 estimates of each PPM.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

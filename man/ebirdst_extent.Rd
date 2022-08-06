@@ -72,15 +72,15 @@ or January.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bbox}: bounding box created with \code{\link[=st_bbox]{st_bbox()}}
+\item \code{ebirdst_extent(bbox)}: bounding box created with \code{\link[=st_bbox]{st_bbox()}}
 
-\item \code{numeric}: bounding box given as edges
+\item \code{ebirdst_extent(numeric)}: bounding box given as edges
 
-\item \code{sfc}: polygons as \link{sfc} spatial feature column
+\item \code{ebirdst_extent(sfc)}: polygons as \link{sfc} spatial feature column
 
-\item \code{sf}: polygons as \link{sf} object
+\item \code{ebirdst_extent(sf)}: polygons as \link{sf} object
+
 }}
-
 \examples{
 # bounding box of the north eastern united stats as a numeric vector
 bb_vec <- c(xmin = -80, xmax = -70, ymin = 40, ymax = 47)

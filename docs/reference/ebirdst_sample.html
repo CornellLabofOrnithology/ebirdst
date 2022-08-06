@@ -20,7 +20,7 @@ independently."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/l
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.2</span>
       </span>
     </div>
 
@@ -78,9 +78,9 @@ independently.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">sample_grid</span><span class="op">(</span><span class="va">x</span>, <span class="va">res</span>, <span class="va">t_res</span>, n <span class="op">=</span> <span class="fl">1</span>, replace <span class="op">=</span> <span class="cn">FALSE</span>, jitter <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="fu">sample_case_control</span><span class="op">(</span><span class="va">x</span>, <span class="va">res</span>, <span class="va">t_res</span>, n <span class="op">=</span> <span class="fl">1</span>, replace <span class="op">=</span> <span class="cn">FALSE</span>, jitter <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sample_grid</span><span class="op">(</span><span class="va">x</span>, <span class="va">res</span>, <span class="va">t_res</span>, n <span class="op">=</span> <span class="fl">1</span>, replace <span class="op">=</span> <span class="cn">FALSE</span>, jitter <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">sample_case_control</span><span class="op">(</span><span class="va">x</span>, <span class="va">res</span>, <span class="va">t_res</span>, n <span class="op">=</span> <span class="fl">1</span>, replace <span class="op">=</span> <span class="cn">FALSE</span>, jitter <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -90,58 +90,71 @@ independently.</p>
 frame the coordinates should be provided as columns <code>lat</code> and <code>lon</code>. The
 day of year should be expressed as a proportion from 0-1 and stored in the
 column <code>date</code>.</p></dd>
+
+
 <dt>res</dt>
 <dd><p>numeric; the size in meters of the grid to sample from. This can
 be a 2 element vector indicating the x and y dimensions of the cells.</p></dd>
+
+
 <dt>t_res</dt>
 <dd><p>numeric; the temporal resolution for sampling expressed as a
 proportion of the year. For example, <code>7 / 365</code> would result in sampling
 from each week.</p></dd>
+
+
 <dt>n</dt>
 <dd><p>integer; the number of points to sample from each grid cell.</p></dd>
+
+
 <dt>replace</dt>
 <dd><p>logical; whether to sample with replacement.</p></dd>
+
+
 <dt>jitter</dt>
 <dd><p>logical; to avoid always using the same grid for sampling, the
 grid can be jittered so that the origin is different each time this
 function is called.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Logical vector indicating which rows are selected.</p>
+    
+
+<p>Logical vector indicating which rows are selected.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># download example data</span></span>
-<span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span>, tifs_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># or get the path if you already have the data downloaded</span></span>
-<span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_species_path.html">get_species_path</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># test data to sample</span></span>
-<span class="r-in"><span class="va">preds</span> <span class="op">&lt;-</span> <span class="fu"><a href="load_predictions.html">load_predictions</a></span><span class="op">(</span><span class="va">path</span>, return_sf <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># sample on a 250km, 4 month grid</span></span>
-<span class="r-in"><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu">sample_grid</span><span class="op">(</span><span class="va">preds</span>, res <span class="op">=</span> <span class="fl">100000</span>, t_res <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">4</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">preds_grid</span> <span class="op">&lt;-</span> <span class="va">preds</span><span class="op">[</span><span class="va">s</span>, <span class="op">]</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># case control sampling independently samples presence and absence</span></span>
-<span class="r-in"><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu">sample_case_control</span><span class="op">(</span><span class="va">preds</span>, res <span class="op">=</span> <span class="fl">1000000</span>, t_res <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">12</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">preds_cc</span> <span class="op">&lt;-</span> <span class="va">preds</span><span class="op">[</span><span class="va">s</span>, <span class="op">]</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># grid sampling preserves the presence/absence ratio</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">preds</span><span class="op">$</span><span class="va">obs</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">preds</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">preds_grid</span><span class="op">$</span><span class="va">obs</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">preds_grid</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># while case control sampling increases the prevelance of presences</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">preds_cc</span><span class="op">$</span><span class="va">obs</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">preds_cc</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># plot</span></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
-<span class="r-in"><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://r-spatial.github.io/sf/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">preds</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"black"</span>, pch <span class="op">=</span> <span class="fl">19</span>, cex <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://r-spatial.github.io/sf/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">preds_cc</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"red"</span>, pch <span class="op">=</span> <span class="fl">19</span>, cex <span class="op">=</span> <span class="fl">0.5</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># download example data</span></span></span>
+<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span>, tifs_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># or get the path if you already have the data downloaded</span></span></span>
+<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_species_path.html">get_species_path</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># test data to sample</span></span></span>
+<span class="r-in"><span><span class="va">preds</span> <span class="op">&lt;-</span> <span class="fu"><a href="load_predictions.html">load_predictions</a></span><span class="op">(</span><span class="va">path</span>, return_sf <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># sample on a 250km, 4 month grid</span></span></span>
+<span class="r-in"><span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu">sample_grid</span><span class="op">(</span><span class="va">preds</span>, res <span class="op">=</span> <span class="fl">100000</span>, t_res <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">4</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">preds_grid</span> <span class="op">&lt;-</span> <span class="va">preds</span><span class="op">[</span><span class="va">s</span>, <span class="op">]</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># case control sampling independently samples presence and absence</span></span></span>
+<span class="r-in"><span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu">sample_case_control</span><span class="op">(</span><span class="va">preds</span>, res <span class="op">=</span> <span class="fl">1000000</span>, t_res <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">12</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">preds_cc</span> <span class="op">&lt;-</span> <span class="va">preds</span><span class="op">[</span><span class="va">s</span>, <span class="op">]</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># grid sampling preserves the presence/absence ratio</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">preds</span><span class="op">$</span><span class="va">obs</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">preds</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">preds_grid</span><span class="op">$</span><span class="va">obs</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">preds_grid</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># while case control sampling increases the prevelance of presences</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">preds_cc</span><span class="op">$</span><span class="va">obs</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">preds_cc</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># plot</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">preds</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"black"</span>, pch <span class="op">=</span> <span class="fl">19</span>, cex <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">preds_cc</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"red"</span>, pch <span class="op">=</span> <span class="fl">19</span>, cex <span class="op">=</span> <span class="fl">0.5</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -156,7 +169,7 @@ function is called.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

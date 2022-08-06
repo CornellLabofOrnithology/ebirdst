@@ -33,13 +33,13 @@ The spatiotemporal extent should be defined using \code{\link[=ebirdst_extent]{e
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{data.frame}: PI or PD data
+\item \code{ebirdst_subset(data.frame)}: PI or PD data
 
-\item \code{sf}: PI or PD data as an \code{sf} object
+\item \code{ebirdst_subset(sf)}: PI or PD data as an \code{sf} object
 
-\item \code{Raster}: Status and Trends rasters
+\item \code{ebirdst_subset(Raster)}: Status and Trends rasters
+
 }}
-
 \examples{
 \dontrun{
 # download example data

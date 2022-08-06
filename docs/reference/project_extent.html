@@ -19,7 +19,7 @@ extent to the sinusoidal CRS used by the eBird Status and Trends rasters."><!-- 
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.2</span>
       </span>
     </div>
 
@@ -76,41 +76,46 @@ extent to the sinusoidal CRS used by the eBird Status and Trends rasters.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">project_extent</span><span class="op">(</span><span class="va">x</span>, <span class="va">crs</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">project_extent</span><span class="op">(</span><span class="va">x</span>, <span class="va">crs</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p><a href="ebirdst_extent.html">ebirdst_extent</a> object; a spatiotemporal extent.</p></dd>
+
+
 <dt>crs</dt>
 <dd><p>coordinate references system, given either as a proj4string, an
 integer EPSG code, or a <code>crs</code> object generated with <code><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs()</a></code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An <a href="ebirdst_extent.html">ebirdst_extent</a> object in the new CRS.</p>
+    
+
+<p>An <a href="ebirdst_extent.html">ebirdst_extent</a> object in the new CRS.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># construct an ebirdst_extent object</span></span>
-<span class="r-in"><span class="va">bb_vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>xmin <span class="op">=</span> <span class="op">-</span><span class="fl">80</span>, xmax <span class="op">=</span> <span class="op">-</span><span class="fl">70</span>, ymin <span class="op">=</span> <span class="fl">40</span>, ymax <span class="op">=</span> <span class="fl">47</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">bb</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="va">bb_vec</span>, crs <span class="op">=</span> <span class="fl">4326</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">bb_ext</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_extent.html">ebirdst_extent</a></span><span class="op">(</span><span class="va">bb</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># transform to sinusoidal projection of rasters</span></span>
-<span class="r-in"><span class="va">sinu</span> <span class="op">&lt;-</span> <span class="st">"+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007 +b=6371007 +units=m +no_defs"</span></span>
-<span class="r-in"><span class="fu">project_extent</span><span class="op">(</span><span class="va">bb_ext</span>, crs <span class="op">=</span> <span class="va">sinu</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># construct an ebirdst_extent object</span></span></span>
+<span class="r-in"><span><span class="va">bb_vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>xmin <span class="op">=</span> <span class="op">-</span><span class="fl">80</span>, xmax <span class="op">=</span> <span class="op">-</span><span class="fl">70</span>, ymin <span class="op">=</span> <span class="fl">40</span>, ymax <span class="op">=</span> <span class="fl">47</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">bb</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="va">bb_vec</span>, crs <span class="op">=</span> <span class="fl">4326</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">bb_ext</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_extent.html">ebirdst_extent</a></span><span class="op">(</span><span class="va">bb</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># transform to sinusoidal projection of rasters</span></span></span>
+<span class="r-in"><span><span class="va">sinu</span> <span class="op">&lt;-</span> <span class="st">"+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007 +b=6371007 +units=m +no_defs"</span></span></span>
+<span class="r-in"><span><span class="fu">project_extent</span><span class="op">(</span><span class="va">bb_ext</span>, crs <span class="op">=</span> <span class="va">sinu</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> eBird Status &amp; Trends extent: </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Bounding box: xmin -6814428; ymin 4447802; xmax -5308439; ymax 5226167</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   CRS: +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +R=6371007 +units=m +no_defs </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Temporal extent: 01-01  -  12-31 </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># also works on polygon extents</span></span>
-<span class="r-in"><span class="va">poly</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">read_sf</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"shape/nc.shp"</span>, package<span class="op">=</span><span class="st">"sf"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">poly_ext</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_extent.html">ebirdst_extent</a></span><span class="op">(</span><span class="va">poly</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">project_extent</span><span class="op">(</span><span class="va">poly_ext</span>, crs <span class="op">=</span> <span class="va">sinu</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># also works on polygon extents</span></span></span>
+<span class="r-in"><span><span class="va">poly</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">read_sf</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"shape/nc.shp"</span>, package<span class="op">=</span><span class="st">"sf"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">poly_ext</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_extent.html">ebirdst_extent</a></span><span class="op">(</span><span class="va">poly</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">project_extent</span><span class="op">(</span><span class="va">poly_ext</span>, crs <span class="op">=</span> <span class="va">sinu</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> eBird Status &amp; Trends extent: </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Polygon: 1 MULTIPOLYGON features</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Bounding box: xmin -7681725; ymin 3767510; xmax -6777465; ymax 4068588</span>
@@ -130,7 +135,7 @@ integer EPSG code, or a <code>crs</code> object generated with <code><a href="ht
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

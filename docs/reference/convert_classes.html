@@ -18,7 +18,7 @@ readable land cover names."><!-- mathjax --><script src="https://cdnjs.cloudflar
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.2</span>
       </span>
     </div>
 
@@ -74,29 +74,36 @@ readable land cover names.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">convert_classes</span><span class="op">(</span><span class="va">x</span>, by_cover_class <span class="op">=</span> <span class="cn">FALSE</span>, pretty <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">convert_classes</span><span class="op">(</span><span class="va">x</span>, by_cover_class <span class="op">=</span> <span class="cn">FALSE</span>, pretty <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>character; vector of land cover variable names to convert.</p></dd>
+
+
 <dt>by_cover_class</dt>
 <dd><p>logical; whether to replace FRAGSTATS cover class name
 with a name for the cover class as whole.</p></dd>
+
+
 <dt>pretty</dt>
 <dd><p>logical; whether to convert from capital case to title case.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A vector of converted names.</p>
+    
+
+<p>A vector of converted names.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">predictors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MCD12Q1_LCCS1_FS_C1_1500_ED"</span>, <span class="st">"astwbd_fs_c1_1500_pland"</span>,</span>
-<span class="r-in">                <span class="st">"elev_250m_sd"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">ebirdst</span><span class="fu">:::</span><span class="fu">convert_classes</span><span class="op">(</span><span class="va">predictors</span>, pretty <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">predictors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MCD12Q1_LCCS1_FS_C1_1500_ED"</span>, <span class="st">"astwbd_fs_c1_1500_pland"</span>,</span></span>
+<span class="r-in"><span>                <span class="st">"elev_250m_sd"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">ebirdst</span><span class="fu">:::</span><span class="fu">convert_classes</span><span class="op">(</span><span class="va">predictors</span>, pretty <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Barren ED"         "Ocean PLAND"       "Elevation 250m SD"</span>
 </code></pre></div>
     </div>
@@ -112,7 +119,7 @@ with a name for the cover class as whole.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

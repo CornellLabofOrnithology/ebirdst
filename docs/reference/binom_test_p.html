@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.2</span>
       </span>
     </div>
 
@@ -72,24 +72,29 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">binom_test_p</span><span class="op">(</span><span class="va">x</span>, pat_cutoff <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">10</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">binom_test_p</span><span class="op">(</span><span class="va">x</span>, pat_cutoff <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">10</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>numeric; named numeric vector with values for <code>"pat"</code> and <code>"pi_es"</code>.</p></dd>
+
+
 <dt>pat_cutoff</dt>
 <dd><p>numeric; percent above threshold cutoff</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A numeric p-value.</p>
+    
+
+<p>A numeric p-value.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu">ebirdst</span><span class="fu">:::</span><span class="fu">binom_test_p</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>pat <span class="op">=</span> <span class="fl">0.1</span>, pi_es <span class="op">=</span> <span class="fl">75</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">ebirdst</span><span class="fu">:::</span><span class="fu">binom_test_p</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>pat <span class="op">=</span> <span class="fl">0.1</span>, pi_es <span class="op">=</span> <span class="fl">75</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.4791914</span>
 </code></pre></div>
     </div>
@@ -105,7 +110,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

@@ -18,7 +18,7 @@ abundance maps."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.2</span>
       </span>
     </div>
 
@@ -74,30 +74,35 @@ abundance maps.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">abundance_palette</span><span class="op">(</span>
-  <span class="va">n</span>,
-  season <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weekly"</span>, <span class="st">"breeding"</span>, <span class="st">"nonbreeding"</span>, <span class="st">"migration"</span>, <span class="st">"prebreeding_migration"</span>,
-    <span class="st">"postbreeding_migration"</span>, <span class="st">"year_round"</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">abundance_palette</span><span class="op">(</span></span>
+<span>  <span class="va">n</span>,</span>
+<span>  season <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weekly"</span>, <span class="st">"breeding"</span>, <span class="st">"nonbreeding"</span>, <span class="st">"migration"</span>, <span class="st">"prebreeding_migration"</span>,</span>
+<span>    <span class="st">"postbreeding_migration"</span>, <span class="st">"year_round"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>n</dt>
 <dd><p>integer; the number of colors to be in the palette.</p></dd>
+
+
 <dt>season</dt>
 <dd><p>character; the season to generate colors for or "weekly" to
 get the color palette used in the weekly abundance animations.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A character vector of hex color codes.</p>
+    
+
+<p>A character vector of hex color codes.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># breeding season color palette</span></span>
-<span class="r-in"><span class="fu">abundance_palette</span><span class="op">(</span><span class="fl">10</span>, season <span class="op">=</span> <span class="st">"breeding"</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># breeding season color palette</span></span></span>
+<span class="r-in"><span><span class="fu">abundance_palette</span><span class="op">(</span><span class="fl">10</span>, season <span class="op">=</span> <span class="st">"breeding"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "#DFC0BC" "#DBADA7" "#D89A92" "#D5887D" "#D27568" "#CF6252" "#CC503E"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [8] "#BB4938" "#AA4233" "#993C2E"</span>
 </code></pre></div>
@@ -114,7 +119,7 @@ get the color palette used in the weekly abundance animations.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

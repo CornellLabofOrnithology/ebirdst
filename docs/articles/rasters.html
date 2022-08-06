@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.2</span>
       </span>
     </div>
 
@@ -91,7 +91,7 @@
                         <h4 data-toc-skip class="author">Matt
 Strimas-Mackey, Tom Auer, Daniel Fink</h4>
             
-            <h4 data-toc-skip class="date">2022-07-08</h4>
+            <h4 data-toc-skip class="date">2022-08-06</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/HEAD/vignettes/rasters.Rmd" class="external-link"><code>vignettes/rasters.Rmd</code></a></small>
       <div class="hidden name"><code>rasters.Rmd</code></div>
@@ -127,69 +127,69 @@ loading the seasonal relative abundance raster for the example
 Yellow-bellied Sapsucker data. We’ll work with the low resolution data
 in this vignette to ensure fast processing times.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/CornellLabofOrnithology/ebirdst" class="external-link">ebirdst</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/raster" class="external-link">raster</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://isciences.gitlab.io/exactextractr/" class="external-link">exactextractr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ropenscilabs/rnaturalearth" class="external-link">rnaturalearth</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>
-<span class="va">extract</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/raster/man/extract.html" class="external-link">extract</a></span>
-
-<span class="co"># download the example yellow-bellied sapsucker data</span>
-<span class="co"># this simplified dataset doesn't require an access key</span>
-<span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span>
-<span class="co"># alternatively, you can use the following to get the data path</span>
-<span class="co"># if the data package has already been downloaded</span>
-<span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_species_path.html">get_species_path</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span>
-
-<span class="co"># load seasonal mean relative abundance at low res</span>
-<span class="va">abd_seasonal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">path</span>, 
-                           product <span class="op">=</span> <span class="st">"abundance"</span>, 
-                           period <span class="op">=</span> <span class="st">"seasonal"</span>,
-                           metric <span class="op">=</span> <span class="st">"mean"</span>,
-                           resolution <span class="op">=</span> <span class="st">"lr"</span><span class="op">)</span>
-
-<span class="co"># get the seasons corresponding to each layer</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">abd_seasonal</span><span class="op">)</span>
-<span class="co">#&gt; [1] "breeding"               "nonbreeding"            "prebreeding_migration" </span>
-<span class="co">#&gt; [4] "postbreeding_migration"</span>
-
-<span class="co"># extract just the breeding season relative abundance</span>
-<span class="va">abd_breeding</span> <span class="op">&lt;-</span> <span class="va">abd_seasonal</span><span class="op">[[</span><span class="st">"breeding"</span><span class="op">]</span><span class="op">]</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/CornellLabofOrnithology/ebirdst" class="external-link">ebirdst</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/raster" class="external-link">raster</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://isciences.gitlab.io/exactextractr/" class="external-link">exactextractr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ropenscilabs/rnaturalearth" class="external-link">rnaturalearth</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="va">extract</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/terra/man/extract.html" class="external-link">extract</a></span></span>
+<span></span>
+<span><span class="co"># download the example yellow-bellied sapsucker data</span></span>
+<span><span class="co"># this simplified dataset doesn't require an access key</span></span>
+<span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span>
+<span><span class="co"># alternatively, you can use the following to get the data path</span></span>
+<span><span class="co"># if the data package has already been downloaded</span></span>
+<span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_species_path.html">get_species_path</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># load seasonal mean relative abundance at low res</span></span>
+<span><span class="va">abd_seasonal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">path</span>, </span>
+<span>                           product <span class="op">=</span> <span class="st">"abundance"</span>, </span>
+<span>                           period <span class="op">=</span> <span class="st">"seasonal"</span>,</span>
+<span>                           metric <span class="op">=</span> <span class="st">"mean"</span>,</span>
+<span>                           resolution <span class="op">=</span> <span class="st">"lr"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># get the seasons corresponding to each layer</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">abd_seasonal</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "breeding"               "nonbreeding"            "prebreeding_migration" </span></span>
+<span><span class="co">#&gt; [4] "postbreeding_migration"</span></span>
+<span></span>
+<span><span class="co"># extract just the breeding season relative abundance</span></span>
+<span><span class="va">abd_breeding</span> <span class="op">&lt;-</span> <span class="va">abd_seasonal</span><span class="op">[[</span><span class="st">"breeding"</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
 <p>We can get the dates and quality scores associated with each of these
 seasons by filtering the <code>ebirdst_runs</code> data frame.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ebirdst_runs</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="co"># note that the example data are for yellow-bellied sapsucker</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">common_name</span> <span class="op">==</span> <span class="st">"Yellow-bellied Sapsucker"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; Rows: 1</span>
-<span class="co">#&gt; Columns: 23</span>
-<span class="co">#&gt; $ species_code                         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "yebsap"</span>
-<span class="co">#&gt; $ scientific_name                      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Sphyrapicus varius"</span>
-<span class="co">#&gt; $ common_name                          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Yellow-bellied Sapsucker"</span>
-<span class="co">#&gt; $ resident                             <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> FALSE</span>
-<span class="co">#&gt; $ breeding_quality                     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 3</span>
-<span class="co">#&gt; $ breeding_range_modeled               <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> TRUE</span>
-<span class="co">#&gt; $ breeding_start                       <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2020-05-24</span>
-<span class="co">#&gt; $ breeding_end                         <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2020-08-17</span>
-<span class="co">#&gt; $ nonbreeding_quality                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 3</span>
-<span class="co">#&gt; $ nonbreeding_range_modeled            <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> TRUE</span>
-<span class="co">#&gt; $ nonbreeding_start                    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2020-11-23</span>
-<span class="co">#&gt; $ nonbreeding_end                      <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2020-03-08</span>
-<span class="co">#&gt; $ postbreeding_migration_quality       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 3</span>
-<span class="co">#&gt; $ postbreeding_migration_range_modeled <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> TRUE</span>
-<span class="co">#&gt; $ postbreeding_migration_start         <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2020-08-24</span>
-<span class="co">#&gt; $ postbreeding_migration_end           <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2020-11-16</span>
-<span class="co">#&gt; $ prebreeding_migration_quality        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 3</span>
-<span class="co">#&gt; $ prebreeding_migration_range_modeled  <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> TRUE</span>
-<span class="co">#&gt; $ prebreeding_migration_start          <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2020-03-15</span>
-<span class="co">#&gt; $ prebreeding_migration_end            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2020-05-17</span>
-<span class="co">#&gt; $ resident_quality                     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 3</span>
-<span class="co">#&gt; $ resident_start                       <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> NA</span>
-<span class="co">#&gt; $ resident_end                         <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> NA</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">ebirdst_runs</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="co"># note that the example data are for yellow-bellied sapsucker</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">common_name</span> <span class="op">==</span> <span class="st">"Yellow-bellied Sapsucker"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Rows: 1</span></span>
+<span><span class="co">#&gt; Columns: 23</span></span>
+<span><span class="co">#&gt; $ species_code                         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "yebsap"</span></span>
+<span><span class="co">#&gt; $ scientific_name                      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Sphyrapicus varius"</span></span>
+<span><span class="co">#&gt; $ common_name                          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Yellow-bellied Sapsucker"</span></span>
+<span><span class="co">#&gt; $ resident                             <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> FALSE</span></span>
+<span><span class="co">#&gt; $ breeding_quality                     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 3</span></span>
+<span><span class="co">#&gt; $ breeding_range_modeled               <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> TRUE</span></span>
+<span><span class="co">#&gt; $ breeding_start                       <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2020-05-24</span></span>
+<span><span class="co">#&gt; $ breeding_end                         <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2020-08-17</span></span>
+<span><span class="co">#&gt; $ nonbreeding_quality                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 3</span></span>
+<span><span class="co">#&gt; $ nonbreeding_range_modeled            <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> TRUE</span></span>
+<span><span class="co">#&gt; $ nonbreeding_start                    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2020-11-23</span></span>
+<span><span class="co">#&gt; $ nonbreeding_end                      <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2020-03-08</span></span>
+<span><span class="co">#&gt; $ postbreeding_migration_quality       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 3</span></span>
+<span><span class="co">#&gt; $ postbreeding_migration_range_modeled <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> TRUE</span></span>
+<span><span class="co">#&gt; $ postbreeding_migration_start         <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2020-08-24</span></span>
+<span><span class="co">#&gt; $ postbreeding_migration_end           <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2020-11-16</span></span>
+<span><span class="co">#&gt; $ prebreeding_migration_quality        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 3</span></span>
+<span><span class="co">#&gt; $ prebreeding_migration_range_modeled  <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> TRUE</span></span>
+<span><span class="co">#&gt; $ prebreeding_migration_start          <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2020-03-15</span></span>
+<span><span class="co">#&gt; $ prebreeding_migration_end            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2020-05-17</span></span>
+<span><span class="co">#&gt; $ resident_quality                     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 3</span></span>
+<span><span class="co">#&gt; $ resident_start                       <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> NA</span></span>
+<span><span class="co">#&gt; $ resident_end                         <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> NA</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="map">Mapping relative abundance<a class="anchor" aria-label="anchor" href="#map"></a>
@@ -200,10 +200,10 @@ high-quality, publication-ready maps typically requires extra work. It
 many cases, it may be worthwhile designing maps in a traditional GIS
 environment such as QGIS or ArcGIS.</p>
 <p>The simplest way to map the seasonal relative abundance data is to
-use the built in <code><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot()</a></code> function from the
+use the built in <code><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot()</a></code> function from the
 <code>raster</code> package.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_breeding</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_breeding</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rasters_files/figure-html/map_simple-1.png" width="100%" style="display: block; margin: auto;"></p>
 <p>Clearly this approach doesn’t work out of the box! There are a wide
 variety of issues that we’ll tackle one at a time.</p>
@@ -218,17 +218,17 @@ extent for our map. There are a variety of ways to do this, but we’ll
 use the R package <code>rnaturalearth</code> to access a polygon
 boundary for Michigan, which we’ll then use to crop the raster.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># boundary polygon for michigan</span>
-<span class="va">mi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rnaturalearth/man/ne_states.html" class="external-link">ne_states</a></span><span class="op">(</span>iso_a2 <span class="op">=</span> <span class="st">"US"</span>, returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">postal</span> <span class="op">==</span> <span class="st">"MI"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="co"># project to same coordinate reference system as the raster data</span>
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">abd_seasonal</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co"># crop data to michigan</span>
-<span class="va">abd_breeding_mi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/crop.html" class="external-link">crop</a></span><span class="op">(</span><span class="va">abd_breeding</span>, <span class="va">mi</span><span class="op">)</span>
-
-<span class="co"># map the cropped data</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_breeding_mi</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># boundary polygon for michigan</span></span>
+<span><span class="va">mi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rnaturalearth/man/ne_states.html" class="external-link">ne_states</a></span><span class="op">(</span>iso_a2 <span class="op">=</span> <span class="st">"US"</span>, returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">postal</span> <span class="op">==</span> <span class="st">"MI"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="co"># project to same coordinate reference system as the raster data</span></span>
+<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">abd_seasonal</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># crop data to michigan</span></span>
+<span><span class="va">abd_breeding_mi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/crop.html" class="external-link">crop</a></span><span class="op">(</span><span class="va">abd_breeding</span>, <span class="va">mi</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># map the cropped data</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_breeding_mi</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rasters_files/figure-html/map_extent-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
@@ -243,15 +243,15 @@ region that the species occurs within. We can access the projection for
 Yellow-bellied Sapsucker with <code><a href="../reference/load_fac_map_parameters.html">load_fac_map_parameters()</a></code>,
 then transform the raster data to this custom projection.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># load the mapping parameters</span>
-<span class="va">fac_parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_fac_map_parameters.html">load_fac_map_parameters</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span>
-<span class="va">crs</span> <span class="op">&lt;-</span> <span class="va">fac_parameters</span><span class="op">$</span><span class="va">custom_projection</span>
-
-<span class="co"># transform to the custom projection using nearest neighbor resampling</span>
-<span class="va">abd_projected</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projectRaster.html" class="external-link">projectRaster</a></span><span class="op">(</span><span class="va">abd_breeding_mi</span>, crs <span class="op">=</span> <span class="va">crs</span>, method <span class="op">=</span> <span class="st">"ngb"</span><span class="op">)</span>
-
-<span class="co"># map the cropped and projected data</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_projected</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># load the mapping parameters</span></span>
+<span><span class="va">fac_parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_fac_map_parameters.html">load_fac_map_parameters</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
+<span><span class="va">crs</span> <span class="op">&lt;-</span> <span class="va">fac_parameters</span><span class="op">$</span><span class="va">custom_projection</span></span>
+<span></span>
+<span><span class="co"># transform to the custom projection using nearest neighbor resampling</span></span>
+<span><span class="va">abd_projected</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projectRaster.html" class="external-link">projectRaster</a></span><span class="op">(</span><span class="va">abd_breeding_mi</span>, crs <span class="op">=</span> <span class="va">crs</span>, method <span class="op">=</span> <span class="st">"ngb"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># map the cropped and projected data</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_projected</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rasters_files/figure-html/map_projection-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
@@ -266,20 +266,20 @@ color to the zeros. We can also use the function
 <code><a href="../reference/abundance_palette.html">abundance_palette()</a></code> to get the same set of colors we use in
 the legends on the eBird Status and Trends website.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># quantiles of non-zero values</span>
-<span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/getValues.html" class="external-link">values</a></span><span class="op">(</span><span class="va">abd_projected</span><span class="op">)</span>
-<span class="va">v</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">v</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">]</span>
-<span class="va">bins</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">v</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, by <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span>
-<span class="co"># add a bin for 0</span>
-<span class="va">bins</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">bins</span><span class="op">)</span>
-
-<span class="co"># status and trends palette</span>
-<span class="va">pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/abundance_palette.html">abundance_palette</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bins</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>
-<span class="co"># add a color for zero</span>
-<span class="va">pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#e6e6e6"</span>, <span class="va">pal</span><span class="op">)</span>
-
-<span class="co"># map using the quantile bins</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_projected</span>, breaks <span class="op">=</span> <span class="va">bins</span>, col <span class="op">=</span> <span class="va">pal</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># quantiles of non-zero values</span></span>
+<span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/values.html" class="external-link">values</a></span><span class="op">(</span><span class="va">abd_projected</span><span class="op">)</span></span>
+<span><span class="va">v</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">v</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">]</span></span>
+<span><span class="va">bins</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">v</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, by <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># add a bin for 0</span></span>
+<span><span class="va">bins</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">bins</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># status and trends palette</span></span>
+<span><span class="va">pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/abundance_palette.html">abundance_palette</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bins</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="co"># add a color for zero</span></span>
+<span><span class="va">pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#e6e6e6"</span>, <span class="va">pal</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># map using the quantile bins</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_projected</span>, breaks <span class="op">=</span> <span class="va">bins</span>, col <span class="op">=</span> <span class="va">pal</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rasters_files/figure-html/map_bins-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
@@ -289,40 +289,40 @@ the legends on the eBird Status and Trends website.</p>
 context. The R package <code>rnaturalearth</code> is an excellent source
 of attribution free contextual GIS data.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># natural earth boundaries</span>
-<span class="va">countries</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rnaturalearth/man/ne_countries.html" class="external-link">ne_countries</a></span><span class="op">(</span>returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">crs</span><span class="op">)</span>
-<span class="va">states</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rnaturalearth/man/ne_states.html" class="external-link">ne_states</a></span><span class="op">(</span>iso_a2 <span class="op">=</span> <span class="st">"US"</span>, returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">crs</span><span class="op">)</span>
-
-<span class="co"># define the map extent with the michigan polygon</span>
-<span class="va">mi_ext</span> <span class="op">&lt;-</span> <span class="va">mi</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">crs</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mi_ext</span><span class="op">)</span>
-<span class="co"># add basemap</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">countries</span>, col <span class="op">=</span> <span class="st">"#cfcfcf"</span>, border <span class="op">=</span> <span class="st">"#888888"</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co"># add data</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_projected</span>, 
-     breaks <span class="op">=</span> <span class="va">bins</span>, col <span class="op">=</span> <span class="va">pal</span>, 
-     axes <span class="op">=</span> <span class="cn">FALSE</span>, legend <span class="op">=</span> <span class="cn">FALSE</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co"># add boundaries</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">countries</span>, col <span class="op">=</span> <span class="cn">NA</span>, border <span class="op">=</span> <span class="st">"#888888"</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">states</span>, col <span class="op">=</span> <span class="cn">NA</span>, border <span class="op">=</span> <span class="st">"#888888"</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="co"># add legend</span>
-<span class="co"># label the bottom, middle, and top</span>
-<span class="va">labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">bins</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.5</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_projected</span>, zlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, legend.only <span class="op">=</span> <span class="cn">TRUE</span>, 
-     col <span class="op">=</span> <span class="va">pal</span>, breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bins</span><span class="op">)</span><span class="op">)</span>, 
-     legend.shrink <span class="op">=</span> <span class="fl">0.9</span>, legend.width <span class="op">=</span> <span class="fl">2</span>,  
-     axis.args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">labels</span><span class="op">)</span><span class="op">)</span>, 
-                      labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">signif</a></span><span class="op">(</span><span class="va">labels</span>, <span class="fl">3</span><span class="op">)</span>,
-                      col.axis <span class="op">=</span> <span class="st">"black"</span>, fg <span class="op">=</span> <span class="cn">NA</span>,
-                      cex.axis <span class="op">=</span> <span class="fl">0.9</span>, lwd.ticks <span class="op">=</span> <span class="fl">0</span>,
-                      line <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># natural earth boundaries</span></span>
+<span><span class="va">countries</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rnaturalearth/man/ne_countries.html" class="external-link">ne_countries</a></span><span class="op">(</span>returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">crs</span><span class="op">)</span></span>
+<span><span class="va">states</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rnaturalearth/man/ne_states.html" class="external-link">ne_states</a></span><span class="op">(</span>iso_a2 <span class="op">=</span> <span class="st">"US"</span>, returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">crs</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># define the map extent with the michigan polygon</span></span>
+<span><span class="va">mi_ext</span> <span class="op">&lt;-</span> <span class="va">mi</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">crs</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mi_ext</span><span class="op">)</span></span>
+<span><span class="co"># add basemap</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">countries</span>, col <span class="op">=</span> <span class="st">"#cfcfcf"</span>, border <span class="op">=</span> <span class="st">"#888888"</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co"># add data</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_projected</span>, </span>
+<span>     breaks <span class="op">=</span> <span class="va">bins</span>, col <span class="op">=</span> <span class="va">pal</span>, </span>
+<span>     axes <span class="op">=</span> <span class="cn">FALSE</span>, legend <span class="op">=</span> <span class="cn">FALSE</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co"># add boundaries</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">countries</span>, col <span class="op">=</span> <span class="cn">NA</span>, border <span class="op">=</span> <span class="st">"#888888"</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">states</span>, col <span class="op">=</span> <span class="cn">NA</span>, border <span class="op">=</span> <span class="st">"#888888"</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># add legend</span></span>
+<span><span class="co"># label the bottom, middle, and top</span></span>
+<span><span class="va">labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">bins</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.5</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_projected</span>, zlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, legend.only <span class="op">=</span> <span class="cn">TRUE</span>, </span>
+<span>     col <span class="op">=</span> <span class="va">pal</span>, breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bins</span><span class="op">)</span><span class="op">)</span>, </span>
+<span>     legend.shrink <span class="op">=</span> <span class="fl">0.9</span>, legend.width <span class="op">=</span> <span class="fl">2</span>,  </span>
+<span>     axis.args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">labels</span><span class="op">)</span><span class="op">)</span>, </span>
+<span>                      labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">signif</a></span><span class="op">(</span><span class="va">labels</span>, <span class="fl">3</span><span class="op">)</span>,</span>
+<span>                      col.axis <span class="op">=</span> <span class="st">"black"</span>, fg <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>                      cex.axis <span class="op">=</span> <span class="fl">0.9</span>, lwd.ticks <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>                      line <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rasters_files/figure-html/map_basemap-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 </div>
@@ -338,38 +338,38 @@ abundance trajectories.</p>
 <p>Let’s start by loading all the necessary relative abundance
 cubes.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">abd_median</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">path</span>, product <span class="op">=</span> <span class="st">"abundance"</span>, 
-                          metric <span class="op">=</span> <span class="st">"median"</span>, resolution <span class="op">=</span> <span class="st">"lr"</span><span class="op">)</span>
-<span class="va">abd_lower</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">path</span>, product <span class="op">=</span> <span class="st">"abundance"</span>,
-                         metric <span class="op">=</span> <span class="st">"lower"</span>, resolution <span class="op">=</span> <span class="st">"lr"</span><span class="op">)</span>
-<span class="va">abd_upper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">path</span>, product <span class="op">=</span> <span class="st">"abundance"</span>, 
-                         metric <span class="op">=</span> <span class="st">"upper"</span>, resolution <span class="op">=</span> <span class="st">"lr"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">abd_median</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">path</span>, product <span class="op">=</span> <span class="st">"abundance"</span>, </span>
+<span>                          metric <span class="op">=</span> <span class="st">"median"</span>, resolution <span class="op">=</span> <span class="st">"lr"</span><span class="op">)</span></span>
+<span><span class="va">abd_lower</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">path</span>, product <span class="op">=</span> <span class="st">"abundance"</span>,</span>
+<span>                         metric <span class="op">=</span> <span class="st">"lower"</span>, resolution <span class="op">=</span> <span class="st">"lr"</span><span class="op">)</span></span>
+<span><span class="va">abd_upper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">path</span>, product <span class="op">=</span> <span class="st">"abundance"</span>, </span>
+<span>                         metric <span class="op">=</span> <span class="st">"upper"</span>, resolution <span class="op">=</span> <span class="st">"lr"</span><span class="op">)</span></span></code></pre></div>
 <p>Now we’ll extract the values for a fixed location.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># set a point</span>
-<span class="va">pt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st.html" class="external-link">st_point</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">88.1</span>, <span class="fl">46.7</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sfc.html" class="external-link">st_sfc</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="fl">4326</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">abd_median</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="op">)</span>
-
-<span class="co"># extract</span>
-<span class="va">traj_median</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">abd_median</span>, <span class="va">pt</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span>
-<span class="va">traj_upper</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">abd_upper</span>, <span class="va">pt</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span>
-<span class="va">traj_lower</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">abd_lower</span>, <span class="va">pt</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span>
-
-<span class="co"># plot trajectories</span>
-<span class="va">plot_frame</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">traj_median</span><span class="op">)</span>,
-                         y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">traj_median</span><span class="op">)</span>,
-                         lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">traj_lower</span><span class="op">)</span>,
-                         upper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">traj_upper</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">plot_frame</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_frame</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html" class="external-link">geom_ribbon</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_frame</span>, 
-              <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>ymin <span class="op">=</span> <span class="va">lower</span>, ymax <span class="op">=</span> <span class="va">upper</span><span class="op">)</span>, 
-              alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Relative abundance"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Week"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_light</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># set a point</span></span>
+<span><span class="va">pt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st.html" class="external-link">st_point</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">88.1</span>, <span class="fl">46.7</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sfc.html" class="external-link">st_sfc</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="fl">4326</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">abd_median</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># extract</span></span>
+<span><span class="va">traj_median</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">abd_median</span>, <span class="va">pt</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span></span>
+<span><span class="va">traj_upper</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">abd_upper</span>, <span class="va">pt</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span></span>
+<span><span class="va">traj_lower</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">abd_lower</span>, <span class="va">pt</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span></span>
+<span></span>
+<span><span class="co"># plot trajectories</span></span>
+<span><span class="va">plot_frame</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">traj_median</span><span class="op">)</span>,</span>
+<span>                         y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">traj_median</span><span class="op">)</span>,</span>
+<span>                         lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">traj_lower</span><span class="op">)</span>,</span>
+<span>                         upper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">traj_upper</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">plot_frame</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_frame</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html" class="external-link">geom_ribbon</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_frame</span>, </span>
+<span>              <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>ymin <span class="op">=</span> <span class="va">lower</span>, ymax <span class="op">=</span> <span class="va">upper</span><span class="op">)</span>, </span>
+<span>              alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Relative abundance"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Week"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_light</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rasters_files/figure-html/trajectories_extract-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
@@ -411,20 +411,20 @@ Michigan, we’ll calculate the statistics over the counties in Michigan;
 however, this approach can easily be extended to any set of regions.
 Let’s start by downloading county boundaries for Michigan.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mi_counties</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/getData.html" class="external-link">getData</a></span><span class="op">(</span><span class="st">"GADM"</span>, country <span class="op">=</span> <span class="st">"USA"</span>, level <span class="op">=</span> <span class="fl">2</span>, path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">NAME_1</span> <span class="op">==</span> <span class="st">"Michigan"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/raster/man/select.html" class="external-link">select</a></span><span class="op">(</span>county <span class="op">=</span> <span class="va">NAME_2</span>, county_code <span class="op">=</span> <span class="va">HASC_2</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="co"># remove lakes which aren't true counties</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">county_code</span> <span class="op">!=</span> <span class="st">"US.MI.WB"</span><span class="op">)</span>
-<span class="co"># project to sinusoidal</span>
-<span class="va">mi_counties_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">mi_counties</span>, crs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projection.html" class="external-link">projection</a></span><span class="op">(</span><span class="va">abd_median</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">mi_counties</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/getData.html" class="external-link">getData</a></span><span class="op">(</span><span class="st">"GADM"</span>, country <span class="op">=</span> <span class="st">"USA"</span>, level <span class="op">=</span> <span class="fl">2</span>, path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">NAME_1</span> <span class="op">==</span> <span class="st">"Michigan"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/raster/man/select.html" class="external-link">select</a></span><span class="op">(</span>county <span class="op">=</span> <span class="va">NAME_2</span>, county_code <span class="op">=</span> <span class="va">HASC_2</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="co"># remove lakes which aren't true counties</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">county_code</span> <span class="op">!=</span> <span class="st">"US.MI.WB"</span><span class="op">)</span></span>
+<span><span class="co"># project to sinusoidal</span></span>
+<span><span class="va">mi_counties_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">mi_counties</span>, crs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projection.html" class="external-link">projection</a></span><span class="op">(</span><span class="va">abd_median</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>We’ll need the seasonal percent of population cubes and the seasonal
 ranges for these calculations.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pop_seasonal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">path</span>, product <span class="op">=</span> <span class="st">"percent-population"</span>, 
-                            period <span class="op">=</span> <span class="st">"seasonal"</span>, resolution <span class="op">=</span> <span class="st">"lr"</span><span class="op">)</span>
-<span class="va">ranges</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_ranges.html">load_ranges</a></span><span class="op">(</span><span class="va">path</span>, resolution <span class="op">=</span> <span class="st">"lr"</span>, smoothed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">pop_seasonal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">path</span>, product <span class="op">=</span> <span class="st">"percent-population"</span>, </span>
+<span>                            period <span class="op">=</span> <span class="st">"seasonal"</span>, resolution <span class="op">=</span> <span class="st">"lr"</span><span class="op">)</span></span>
+<span><span class="va">ranges</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_ranges.html">load_ranges</a></span><span class="op">(</span><span class="va">path</span>, resolution <span class="op">=</span> <span class="st">"lr"</span>, smoothed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="percent-of-population">Percent of Population<a class="anchor" aria-label="anchor" href="#percent-of-population"></a>
 </h3>
@@ -620,23 +620,23 @@ we simply sum all the raster cells within each region polygon.</p>
 <p>Let’s make a quick map comparing the breeding and non-breeding
 percent of population within counties in Michigan.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># join back to county boundaries</span>
-<span class="va">pctpop_proj</span> <span class="op">&lt;-</span> <span class="va">pctpop</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">season</span> <span class="op"><a href="https://rdrr.io/pkg/raster/man/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"breeding"</span>, <span class="st">"nonbreeding"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">mi_counties</span>, <span class="va">.</span>, by <span class="op">=</span> <span class="st">"county_code"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-  <span class="co"># transform to custom projection for plotting</span>
-  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="va">crs</span><span class="op">)</span>
-
-<span class="co"># plot</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">pctpop_proj</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">percent_population</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_c</a></span><span class="op">(</span>trans <span class="op">=</span> <span class="st">"sqrt"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_colourbar.html" class="external-link">guide_colorbar</a></span><span class="op">(</span>title.position <span class="op">=</span> <span class="st">"top"</span>, barwidth <span class="op">=</span> <span class="fl">15</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">season</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Seasonal percent of population in MI counties"</span>,
-       fill <span class="op">=</span> <span class="st">"Percent of population"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># join back to county boundaries</span></span>
+<span><span class="va">pctpop_proj</span> <span class="op">&lt;-</span> <span class="va">pctpop</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">season</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"breeding"</span>, <span class="st">"nonbreeding"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">mi_counties</span>, <span class="va">.</span>, by <span class="op">=</span> <span class="st">"county_code"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="co"># transform to custom projection for plotting</span></span>
+<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="va">crs</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># plot</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">pctpop_proj</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">percent_population</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_c</a></span><span class="op">(</span>trans <span class="op">=</span> <span class="st">"sqrt"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_colourbar.html" class="external-link">guide_colorbar</a></span><span class="op">(</span>title.position <span class="op">=</span> <span class="st">"top"</span>, barwidth <span class="op">=</span> <span class="fl">15</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">season</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Seasonal percent of population in MI counties"</span>,</span>
+<span>       fill <span class="op">=</span> <span class="st">"Percent of population"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rasters_files/figure-html/stats_pop-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
@@ -648,20 +648,20 @@ county, then calculate the area of intersection between the counties and
 the ranges, and finally divide the two to get the percent of each region
 occupied.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># add the area of each region</span>
-<span class="va">mi_counties</span><span class="op">$</span><span class="va">area</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_measures.html" class="external-link">st_area</a></span><span class="op">(</span><span class="va">mi_counties</span><span class="op">)</span>
-<span class="co"># for each season, intersect with the county boundaries and calculate area</span>
-<span class="va">range_pct_occupied</span> <span class="op">&lt;-</span> <span class="cn">NULL</span>
-<span class="kw">for</span> <span class="op">(</span><span class="va">s</span> <span class="kw">in</span> <span class="va">ranges</span><span class="op">$</span><span class="va">season</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">range_pct_occupied</span> <span class="op">&lt;-</span> <span class="va">ranges</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">season</span> <span class="op">==</span> <span class="va">s</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-    <span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html" class="external-link">st_intersection</a></span><span class="op">(</span><span class="va">mi_counties</span>, <span class="va">.</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>percent_occupied <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_measures.html" class="external-link">st_area</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span> <span class="op">/</span> <span class="va">area</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-    <span class="fu"><a href="https://rdrr.io/pkg/raster/man/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">season</span>, <span class="va">county_code</span>, <span class="va">percent_occupied</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-    <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">range_pct_occupied</span>, <span class="va">.</span><span class="op">)</span>
-    
-<span class="op">}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># add the area of each region</span></span>
+<span><span class="va">mi_counties</span><span class="op">$</span><span class="va">area</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_measures.html" class="external-link">st_area</a></span><span class="op">(</span><span class="va">mi_counties</span><span class="op">)</span></span>
+<span><span class="co"># for each season, intersect with the county boundaries and calculate area</span></span>
+<span><span class="va">range_pct_occupied</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">s</span> <span class="kw">in</span> <span class="va">ranges</span><span class="op">$</span><span class="va">season</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">range_pct_occupied</span> <span class="op">&lt;-</span> <span class="va">ranges</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">season</span> <span class="op">==</span> <span class="va">s</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>    <span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html" class="external-link">st_intersection</a></span><span class="op">(</span><span class="va">mi_counties</span>, <span class="va">.</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>percent_occupied <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_measures.html" class="external-link">st_area</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span> <span class="op">/</span> <span class="va">area</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/raster/man/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">season</span>, <span class="va">county_code</span>, <span class="va">percent_occupied</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>    <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">range_pct_occupied</span>, <span class="va">.</span><span class="op">)</span></span>
+<span>    </span>
+<span><span class="op">}</span></span></code></pre></div>
 </div>
 </div>
   </div>
@@ -683,7 +683,7 @@ occupied.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer>

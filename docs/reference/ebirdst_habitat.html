@@ -21,7 +21,7 @@ operations in the package."><!-- mathjax --><script src="https://cdnjs.cloudflar
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.2</span>
       </span>
     </div>
 
@@ -80,10 +80,10 @@ operations in the package.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">ebirdst_habitat</span><span class="op">(</span><span class="va">path</span>, <span class="va">ext</span>, data <span class="op">=</span> <span class="cn">NULL</span>, stationary_associations <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="co"># S3 method for ebirdst_habitat</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, n_habitat_types <span class="op">=</span> <span class="fl">15</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ebirdst_habitat</span><span class="op">(</span><span class="va">path</span>, <span class="va">ext</span>, data <span class="op">=</span> <span class="cn">NULL</span>, stationary_associations <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for ebirdst_habitat</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, n_habitat_types <span class="op">=</span> <span class="fl">15</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -92,11 +92,15 @@ operations in the package.</p>
 <dd><p>character; directory that the Status and Trends data for a given
 species was downloaded to. This path is returned by <code><a href="ebirdst_download.html">ebirdst_download()</a></code>
 or <code><a href="get_species_path.html">get_species_path()</a></code>.</p></dd>
+
+
 <dt>ext</dt>
 <dd><p><a href="ebirdst_extent.html">ebirdst_extent</a> object; the spatiotemporal extent over which to
 calculate the habitat associations. Note that <strong>temporal component of <code>ext</code>
 is ignored is this function</strong>, habitat associations are always calculated
 for the full year.</p></dd>
+
+
 <dt>data</dt>
 <dd><p>as an alternative to providing the <code>path</code> argument specifying the
 location of the data package, the data required to calculate habitat
@@ -109,6 +113,8 @@ the <code>stixels</code> data frame will be used. Typically stixel weights are t
 proportion of the focal region that the given stixel overlaps. Ignored if
 <code>path</code> is provided. <strong>In most cases, users will want to avoid using these
 arguments and simply provide <code>path</code> instead.</strong></p></dd>
+
+
 <dt>stationary_associations</dt>
 <dd><p>logical; when the habitat association should
 be assumed to vary throughout the year and estimates should be made for
@@ -116,19 +122,28 @@ each week of the year (the default) or habitat associations should be
 assumed constant throughout the year and a single set of estimates made for
 the full year. Annual estimates should only be made when you expect the
 associations to be constant throughout the year, e.g. for resident species.</p></dd>
+
+
 <dt>x</dt>
 <dd><p>ebirdst_habitat object; habitat relationships as calculated by
 <code>ebirdst_habitat()</code>.</p></dd>
+
+
 <dt>n_habitat_types</dt>
 <dd><p>number of habitat types to include in the cake plot.
 The most important set of predictors will be chosen based on the maximum
 weekly importance value across the whole year.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>ignored.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An <code>ebirdst_habitat</code> object, consisting of a data frame giving the
+    
+
+<p>An <code>ebirdst_habitat</code> object, consisting of a data frame giving the
 predictor importance and directionality for each predictor for each week of
 the year. The columns are:</p><ul><li><p><code>predictor</code>: the name of the predictor</p></li>
 <li><p><code>week</code>: the date of the center of the week, expressed as "MM-DD". This
@@ -154,7 +169,7 @@ these are calculated within a 1.5 km radius of each checklist:</p><ul><li><p>Lan
 <li><p>Roads: road density. There are 5 covariates distinguishing between
 different road types; however, these are grouped together for the sake of
 the habitat associations.</p></li>
-</ul><p>The <code><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot()</a></code> method can be used to produce a cake plot, a stacked area chart
+</ul><p>The <code><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot()</a></code> method can be used to produce a cake plot, a stacked area chart
 showing habitat associations in which area indicates the importance of a
 given land cover class and the position above or below the x-axis indicates
 the direction of the relationship.</p>
@@ -162,21 +177,21 @@ the direction of the relationship.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># download example data</span></span>
-<span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span>, tifs_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># or get the path if you already have the data downloaded</span></span>
-<span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_species_path.html">get_species_path</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># define a spatial extent to calculate ppms over</span></span>
-<span class="r-in"><span class="va">e</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_extent.html">ebirdst_extent</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>xmin <span class="op">=</span> <span class="op">-</span><span class="fl">90</span>, xmax <span class="op">=</span> <span class="op">-</span><span class="fl">82</span>, ymin <span class="op">=</span> <span class="fl">41</span>, ymax <span class="op">=</span> <span class="fl">48</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># compute habitat associations</span></span>
-<span class="r-in"><span class="va">habitat</span> <span class="op">&lt;-</span> <span class="fu">ebirdst_habitat</span><span class="op">(</span>path <span class="op">=</span> <span class="va">path</span>, ext <span class="op">=</span> <span class="va">e</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://www.math.uzh.ch/pages/spam/reference/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">habitat</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># produce a cake plot</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">habitat</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># download example data</span></span></span>
+<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span>, tifs_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># or get the path if you already have the data downloaded</span></span></span>
+<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_species_path.html">get_species_path</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># define a spatial extent to calculate ppms over</span></span></span>
+<span class="r-in"><span><span class="va">e</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_extent.html">ebirdst_extent</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>xmin <span class="op">=</span> <span class="op">-</span><span class="fl">90</span>, xmax <span class="op">=</span> <span class="op">-</span><span class="fl">82</span>, ymin <span class="op">=</span> <span class="fl">41</span>, ymax <span class="op">=</span> <span class="fl">48</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># compute habitat associations</span></span></span>
+<span class="r-in"><span><span class="va">habitat</span> <span class="op">&lt;-</span> <span class="fu">ebirdst_habitat</span><span class="op">(</span>path <span class="op">=</span> <span class="va">path</span>, ext <span class="op">=</span> <span class="va">e</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://www.math.uzh.ch/pages/spam/reference/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">habitat</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># produce a cake plot</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">habitat</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -191,7 +206,7 @@ the direction of the relationship.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

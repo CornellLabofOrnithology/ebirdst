@@ -19,7 +19,7 @@ smoothing are provided."><!-- mathjax --><script src="https://cdnjs.cloudflare.c
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.2</span>
       </span>
     </div>
 
@@ -76,35 +76,41 @@ smoothing are provided.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plot_pds</span><span class="op">(</span>
-  <span class="va">pds</span>,
-  <span class="va">predictor</span>,
-  <span class="va">ext</span>,
-  bootstrap_smooth <span class="op">=</span> <span class="cn">TRUE</span>,
-  show_stixel_pds <span class="op">=</span> <span class="cn">FALSE</span>,
-  show_quantiles <span class="op">=</span> <span class="cn">FALSE</span>,
-  n_bs <span class="op">=</span> <span class="fl">100</span>,
-  ss_equivalent <span class="op">=</span> <span class="fl">10</span>,
-  k <span class="op">=</span> <span class="fl">25</span>,
-  ci_alpha <span class="op">=</span> <span class="fl">0.05</span>,
-  gbm_n_trees <span class="op">=</span> <span class="fl">500</span>,
-  ylim <span class="op">=</span> <span class="cn">NULL</span>,
-  plot <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_pds</span><span class="op">(</span></span>
+<span>  <span class="va">pds</span>,</span>
+<span>  <span class="va">predictor</span>,</span>
+<span>  <span class="va">ext</span>,</span>
+<span>  bootstrap_smooth <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  show_stixel_pds <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  show_quantiles <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  n_bs <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  ss_equivalent <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  k <span class="op">=</span> <span class="fl">25</span>,</span>
+<span>  ci_alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  gbm_n_trees <span class="op">=</span> <span class="fl">500</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  plot <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>pds</dt>
 <dd><p>data frame; partial dependence data from <code><a href="load_pds.html">load_pds()</a></code>.</p></dd>
+
+
 <dt>predictor</dt>
 <dd><p>character; single predictor name to plot PD for. For a full
 list of predictors, and their associated definitions, see
 <a href="ebirdst_predictors.html">ebirdst_predictors</a>.</p></dd>
+
+
 <dt>ext</dt>
 <dd><p><a href="ebirdst_extent.html">ebirdst_extent</a> object; the spatiotemporal extent over which to
 calculate PDs. This is required, since results are less meaningful over
 large spatiotemporal extents.</p></dd>
+
+
 <dt>bootstrap_smooth</dt>
 <dd><p>logical; the ideal visualization of the PD data is a
 pointwise GAM smoothing of the individual stixel PD values. This argument
@@ -112,65 +118,86 @@ specifies whether this should be done directly on the full PD dataset
 (<code>bootstrap_smooth = FALSE</code>) or by subsampling and bootstrapping. The
 latter approach deals with the randomness in the data and can be more
 efficient for large datasets.</p></dd>
+
+
 <dt>show_stixel_pds</dt>
 <dd><p>logical; whether to plot the individual stixel PD
 values as semi-transparent lines.</p></dd>
+
+
 <dt>show_quantiles</dt>
 <dd><p>logical; adds a band for the upper (90th) and lower
 (10th) quantiles of the individual stixel PD values. These are calculated
 using quantile regression.</p></dd>
+
+
 <dt>n_bs</dt>
 <dd><p>int; number of GAM bootstrap iterations when estimating PD
 confidence intervals. Ignored if <code>bootstrap_smooth = FALSE</code>.</p></dd>
+
+
 <dt>ss_equivalent</dt>
 <dd><p>int; when bootstrapping to estimate PD confidence
 intervals, this argument specifies the size of the subsample of the
 original data. In particular, <code>ss_equivalent</code> should be an integer
 representing the equivalent sampling size when averaging this number of PD
 estimates.</p></dd>
+
+
 <dt>k</dt>
 <dd><p>integer; number of knots to use in the GAM when smooth the PD
 relationship.</p></dd>
+
+
 <dt>ci_alpha</dt>
 <dd><p>numeric; alpha level of confidence intervals. Default is
 0.05.</p></dd>
+
+
 <dt>gbm_n_trees</dt>
 <dd><p>integer; number of trees to fit in the GBM when estimating
 quantiles. Ignored if <code>show_quantiles = FALSE</code>. Default is 500.</p></dd>
+
+
 <dt>ylim</dt>
 <dd><p>numeric; 2-element vector to pre-define the y-limits of plotting.
 In the format <code>c(ymin, ymax)</code>.</p></dd>
+
+
 <dt>plot</dt>
 <dd><p>logical; whether to plot the PD relationships or just return
 data.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Plots the smoothed partial dependence relationship for the specified
+    
+
+<p>Plots the smoothed partial dependence relationship for the specified
 predictor and returns a data frame of the smoothed curve with confidence
 intervals.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># download example data</span></span>
-<span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span>, tifs_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># or get the path if you already have the data downloaded</span></span>
-<span class="r-in"><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_species_path.html">get_species_path</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># load predictor dependence data</span></span>
-<span class="r-in"><span class="va">pds</span> <span class="op">&lt;-</span> <span class="fu"><a href="load_pds.html">load_pds</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># define a spatiotemporal extent to plot data from</span></span>
-<span class="r-in"><span class="va">bb_vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>xmin <span class="op">=</span> <span class="op">-</span><span class="fl">90</span>, xmax <span class="op">=</span> <span class="op">-</span><span class="fl">82</span>, ymin <span class="op">=</span> <span class="fl">41</span>, ymax <span class="op">=</span> <span class="fl">48</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">e</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_extent.html">ebirdst_extent</a></span><span class="op">(</span><span class="va">bb_vec</span>, t <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"05-01"</span>, <span class="st">"05-31"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># for testing, run with 5 bootstrap iterations for speed</span></span>
-<span class="r-in"><span class="co"># in practice, best to run with the default number of iterations (100)</span></span>
-<span class="r-in"><span class="va">pd_smooth</span> <span class="op">&lt;-</span> <span class="fu">plot_pds</span><span class="op">(</span><span class="va">pds</span>, <span class="st">"solar_noon_diff_mid"</span>, ext <span class="op">=</span> <span class="va">e</span>, n_bs <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">pd_smooth</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># download example data</span></span></span>
+<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span><span class="st">"example_data"</span>, tifs_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># or get the path if you already have the data downloaded</span></span></span>
+<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_species_path.html">get_species_path</a></span><span class="op">(</span><span class="st">"example_data"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># load predictor dependence data</span></span></span>
+<span class="r-in"><span><span class="va">pds</span> <span class="op">&lt;-</span> <span class="fu"><a href="load_pds.html">load_pds</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># define a spatiotemporal extent to plot data from</span></span></span>
+<span class="r-in"><span><span class="va">bb_vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>xmin <span class="op">=</span> <span class="op">-</span><span class="fl">90</span>, xmax <span class="op">=</span> <span class="op">-</span><span class="fl">82</span>, ymin <span class="op">=</span> <span class="fl">41</span>, ymax <span class="op">=</span> <span class="fl">48</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">e</span> <span class="op">&lt;-</span> <span class="fu"><a href="ebirdst_extent.html">ebirdst_extent</a></span><span class="op">(</span><span class="va">bb_vec</span>, t <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"05-01"</span>, <span class="st">"05-31"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># for testing, run with 5 bootstrap iterations for speed</span></span></span>
+<span class="r-in"><span><span class="co"># in practice, best to run with the default number of iterations (100)</span></span></span>
+<span class="r-in"><span><span class="va">pd_smooth</span> <span class="op">&lt;-</span> <span class="fu">plot_pds</span><span class="op">(</span><span class="va">pds</span>, <span class="st">"solar_noon_diff_mid"</span>, ext <span class="op">=</span> <span class="va">e</span>, n_bs <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">pd_smooth</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -185,7 +212,7 @@ intervals.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>
