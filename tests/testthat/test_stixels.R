@@ -10,7 +10,7 @@ stx_sf <- load_stixels(path, return_sf = TRUE)
 test_that("load_stixels", {
   # expectations
   expect_is(stx, "data.frame")
-  expect_equal(ncol(stx), 96)
+  expect_equal(ncol(stx), 76)
   expect_gt(nrow(stx), 0)
   expect_true(all(c("stixel_id", "longitude", "latitude", "day_of_year") %in%
                     names(stx)))
@@ -18,7 +18,7 @@ test_that("load_stixels", {
   # spatial format
   expect_is(stx_sf, "sf")
   expect_is(sf::st_geometry(stx_sf), "sfc_POINT")
-  expect_equal(ncol(stx_sf), 95)
+  expect_equal(ncol(stx_sf), 75)
   expect_gt(nrow(stx_sf), 0)
   expect_true(all(c("stixel_id", "day_of_year") %in% names(stx_sf)))
 
@@ -28,7 +28,6 @@ test_that("load_stixels", {
 
 test_that("stixelize", {
   p <- stixelize(stx)
-  p_sf <- stixelize(stx_sf)
 
   # expectations
   expect_is(p, "sf")
@@ -38,14 +37,21 @@ test_that("stixelize", {
   expect_true(all(c("stixel_id", "longitude", "latitude", "day_of_year") %in%
                     names(p)))
 
-  # spatial format
-  expect_is(p_sf, "sf")
-  expect_is(sf::st_geometry(p_sf), "sfc_POLYGON")
-  expect_equal(ncol(stx) + 1, ncol(p_sf))
-  expect_equal(nrow(stx), nrow(p_sf))
-  expect_true(all(c("stixel_id", "longitude", "latitude", "day_of_year") %in%
-                    names(p_sf)))
-
   # invalid input
   expect_error(stixelize(dplyr::select(stx, -lat)))
+})
+
+test_that("stixelize for dateline crossing stixels", {
+  stix_df <- data.frame(longitude_min = c(-170, -170),
+                        longitude_max = c(170, -160),
+                        latitude_min = c(0, 0),
+                        latitude_max = c(10, 10))
+  p <- stixelize(stix_df)
+
+  # expectations
+  expect_is(p, "sf")
+  expect_equal(as.character(sf::st_geometry_type(p)),
+               c("MULTIPOLYGON", "POLYGON"))
+  expect_equal(ncol(stix_df) + 1, ncol(p))
+  expect_equal(nrow(stix_df), nrow(p))
 })

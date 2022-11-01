@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2021.0</span>
       </span>
     </div>
 
@@ -99,7 +99,159 @@
     
     
 <div class="section level2">
-<h2 id="changelog">2020 Changelog<a class="anchor" aria-label="anchor" href="#changelog"></a>
+<h2 id="changelog">2021 Changelog<a class="anchor" aria-label="anchor" href="#changelog"></a>
+</h2>
+<p><strong>Data Version:</strong> 2021 (available November 2022)</p>
+<strong>Citation:</strong>
+<blockquote>
+Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, S. Ligocki, O.
+Robinson, W. Hochachka, L. Jaromczyk, A. Rodewald, C. Wood, I. Davies,
+A. Spencer. 2022. eBird Status and Trends, Data Version: 2021; Released:
+2022. Cornell Lab of Ornithology, Ithaca, New York. <a href="https://doi.org/10.2173/ebirdst.2021" class="external-link uri">https://doi.org/10.2173/ebirdst.2021</a>
+</blockquote>
+<div class="section level3">
+<h3 id="data-inputs">Data Inputs<a class="anchor" aria-label="anchor" href="#data-inputs"></a>
+</h3>
+<div class="section level4">
+<h4 id="ebird-checklists">eBird Checklists<a class="anchor" aria-label="anchor" href="#ebird-checklists"></a>
+</h4>
+<ul>
+<li>CHANGED: checklists are included for January 1 2007 through December
+31 2021, updated from January 1 2006 through December 31 2020.</li>
+<li>CHANGED: Observations reported as escapees under the new eBird
+exotic species protocols are excluded from analysis.</li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="environmental-covariates">Environmental Covariates<a class="anchor" aria-label="anchor" href="#environmental-covariates"></a>
+</h4>
+<ul>
+<li>UPDATED: Data for 2020 was added for the primary land cover data
+source, MCD12Q1 (<a href="https://lpdaac.usgs.gov/products/mcd12q1v006/" class="external-link uri">https://lpdaac.usgs.gov/products/mcd12q1v006/</a>).</li>
+</ul>
+</div>
+</div>
+<div class="section level3">
+<h3 id="workflow-and-code-changes">Workflow and Code Changes<a class="anchor" aria-label="anchor" href="#workflow-and-code-changes"></a>
+</h3>
+<div class="section level4">
+<h4 id="general">General<a class="anchor" aria-label="anchor" href="#general"></a>
+</h4>
+<ul>
+<li>ADDED: Prediction grid locations for the ocean are now available as
+a choice to model a species as land or water.</li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="spatiotemporal-partitioning">Spatiotemporal Partitioning<a class="anchor" aria-label="anchor" href="#spatiotemporal-partitioning"></a>
+</h4>
+<ul>
+<li>CHANGED: The adaptive partitioning algorithm (AdaSTEM) now grid
+samples the training data before stixels are defined.</li>
+<li>CHANGED: The projection initialization of each stixel iteration is
+now fully randomized, previously it was constrained to keep boundaries
+in the ocean.</li>
+<li>CHANGED: Stixels are now allowed to recurse one size smaller, to
+approximately 90km on a side.</li>
+<li>CHANGED: There is now a separate AdaSTEM partitioning for residents
+that uses the full year of data instead of a 28 day window. The training
+data for these partitions are also grid sampled before definition. The
+stixel parameters are are to allow 65,000 checklists per stixel…</li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="model-ensemble">Model Ensemble<a class="anchor" aria-label="anchor" href="#model-ensemble"></a>
+</h4>
+<ul>
+<li>CHANGED: Models are now run for 200 replicates (folds).</li>
+<li>CHANGED: The percent above threshold (PAT) cutoff has been replaced
+with a data-driven maximization of the MCC-F1 curve (<a href="https://arxiv.org/abs/2006.11278" class="external-link uri">https://arxiv.org/abs/2006.11278</a>), constrained between
+0.05 and 0.25. The training data are grid sampled before optimizing
+using the MCC-F1 curve and 25 realizations are done before taking the
+median PAT value. For migrants, this is done weekly, for residents
+across the whole year.</li>
+<li>CHANGED: The process for selecting the ensemble support cutoff or
+threshold (the number of models required to show predictions) has been
+updated to have the training data grid sampled first, then optimized for
+a true positive rate of 99%, with the cutoff constrained between 0.5 and
+0.9. For migrants, this is done weekly, for residents across the whole
+year. This process is done 25 times and then a median threshold value is
+selected.</li>
+<li>CHANGED: The site selection probability layer has been significantly
+improved. In the binary classification model, prediction grid locations
+that are &gt;= 50% overlapped by a 1.5km buffer of checklist locations
+have been removed. This resolves the previous, erroneously low values in
+dense, urban areas and more accurately reflects the true probability of
+site selection in these areas. This change only impacts species
+estimates in places with a site selection probability value of less than
+0.5%, where species estimates are masked.</li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="base-model">Base Model<a class="anchor" aria-label="anchor" href="#base-model"></a>
+</h4>
+<ul>
+<li>CHANGED: The grid sample method now retains all unique values of
+factor variables (e.g., island).</li>
+<li>CHANGED: The grid sampler oversamples detections to achieve 25%
+detection probability in the training dataset. Previously the grid
+sampler would often overshoot the 25% target and excessively duplicate
+detections. This has been corrected so that oversampling never yields
+detection probabilities greater than 25% and detections are duplicated
+at most 25 times.</li>
+<li>CHANGED: Mean spatial coverage of each stixel is now correctly
+estimated as the proportion of 3 km pixels that contain checklists.</li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="fit-and-predict">Fit and Predict<a class="anchor" aria-label="anchor" href="#fit-and-predict"></a>
+</h4>
+<ul>
+<li>CHANGED: Maximization of partial dependencies for prediction (e.g.,
+CCI) no longer allows selection of the highest and lowest extreme
+quantile values, to prevent extrapolation.</li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="residents">Residents<a class="anchor" aria-label="anchor" href="#residents"></a>
+</h4>
+<ul>
+<li>CHANGED: Along with a resident-specific AdaSTEM partitioning,
+resident models now predict all weeks of the year in a single stixel.
+Previously, resident models used data from the whole year for training,
+but only predicted the four weeks in a stixel, similar to the way
+migrants are modeled.</li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="data-products">Data Products<a class="anchor" aria-label="anchor" href="#data-products"></a>
+</h4>
+<ul>
+<li>CHANGED: The occurrence model prediction values for effort variables
+are now set at 1 hour and 1 kilometer. Previously, the effort variable
+values used for the occurrence model prediction were the same as those
+used for the occurrence model, which sought to maximize detection by
+optimizing the distance and duration effort variables to capture as much
+signal as possible, up to 12 hours (6 hours in this version) and 10
+kilometers. These prediction values are retained for the
+presence/absence estimation.</li>
+<li>CHANGED: The prediction value for Checklist Calibration Index (CCI)
+is now maximized within each stixel using the partial dependencies.
+Previously, the value for was set at a fixed value of 1.85 for all
+species and stixels.</li>
+<li>CHANGED: Partial dependencies are now only generated for the first
+50 folds, to reduce computational cost.</li>
+<li>CHANGED: To show “year-round” on a seasonal map now requires only
+0.1% overlap between breeding and non-breeding seasons. Previously, all
+four seasons and an overlap of greater than 5% was required.</li>
+<li>REMOVED: Habitat plots and numerical summaries have been removed
+from the website.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="changelog-1">2020 Changelog<a class="anchor" aria-label="anchor" href="#changelog-1"></a>
 </h2>
 <p><strong>Data Version:</strong> 2020 (available June 2022)</p>
 <strong>Citation:</strong>
@@ -110,10 +262,10 @@ Seitz. 2021. eBird Status and Trends, Data Version: 2020; Released:
 2021. Cornell Lab of Ornithology, Ithaca, New York. <a href="https://doi.org/10.2173/ebirdst.2020" class="external-link uri">https://doi.org/10.2173/ebirdst.2020</a>
 </blockquote>
 <div class="section level3">
-<h3 id="data-inputs">Data Inputs<a class="anchor" aria-label="anchor" href="#data-inputs"></a>
+<h3 id="data-inputs-1">Data Inputs<a class="anchor" aria-label="anchor" href="#data-inputs-1"></a>
 </h3>
 <div class="section level4">
-<h4 id="ebird-checklists">eBird Checklists<a class="anchor" aria-label="anchor" href="#ebird-checklists"></a>
+<h4 id="ebird-checklists-1">eBird Checklists<a class="anchor" aria-label="anchor" href="#ebird-checklists-1"></a>
 </h4>
 <ul>
 <li>CHANGED: checklists are included for January 1 2006 through December
@@ -132,7 +284,7 @@ effort information had been included. These have now been excluded.</li>
 </ul>
 </div>
 <div class="section level4">
-<h4 id="environmental-covariates">Environmental Covariates<a class="anchor" aria-label="anchor" href="#environmental-covariates"></a>
+<h4 id="environmental-covariates-1">Environmental Covariates<a class="anchor" aria-label="anchor" href="#environmental-covariates-1"></a>
 </h4>
 <ul>
 <li>CHANGED: SRTM15+ <a href="https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2019EA000658" class="external-link">~250m
@@ -160,10 +312,10 @@ had reported classification errors.</li>
 </div>
 </div>
 <div class="section level3">
-<h3 id="workflow-and-code-changes">Workflow and Code Changes<a class="anchor" aria-label="anchor" href="#workflow-and-code-changes"></a>
+<h3 id="workflow-and-code-changes-1">Workflow and Code Changes<a class="anchor" aria-label="anchor" href="#workflow-and-code-changes-1"></a>
 </h3>
 <div class="section level4">
-<h4 id="spatiotemporal-partitioning">Spatiotemporal Partitioning<a class="anchor" aria-label="anchor" href="#spatiotemporal-partitioning"></a>
+<h4 id="spatiotemporal-partitioning-1">Spatiotemporal Partitioning<a class="anchor" aria-label="anchor" href="#spatiotemporal-partitioning-1"></a>
 </h4>
 <ul>
 <li>CHANGED: The adaptive partitioning algorithm (AdaSTEM) now uses an
@@ -174,7 +326,7 @@ from 30.5 days to 28 days.</li>
 </ul>
 </div>
 <div class="section level4">
-<h4 id="model-ensemble">Model Ensemble<a class="anchor" aria-label="anchor" href="#model-ensemble"></a>
+<h4 id="model-ensemble-1">Model Ensemble<a class="anchor" aria-label="anchor" href="#model-ensemble-1"></a>
 </h4>
 <ul>
 <li>CHANGED: The percent above threshold (PAT) cutoff for 3km grid cells
@@ -203,7 +355,7 @@ transformation to allow the model to wrap the year.</li>
 </ul>
 </div>
 <div class="section level4">
-<h4 id="data-products">Data Products<a class="anchor" aria-label="anchor" href="#data-products"></a>
+<h4 id="data-products-1">Data Products<a class="anchor" aria-label="anchor" href="#data-products-1"></a>
 </h4>
 <ul>
 <li>CHANGED: The count model prediction values for effort variables are
@@ -283,7 +435,7 @@ species.</li>
 </div>
 </div>
 <div class="section level2">
-<h2 id="changelog-1">2019 Changelog<a class="anchor" aria-label="anchor" href="#changelog-1"></a>
+<h2 id="changelog-2">2019 Changelog<a class="anchor" aria-label="anchor" href="#changelog-2"></a>
 </h2>
 <p><strong>Data Version:</strong> 2019 (currently available)</p>
 <strong>Citation:</strong>
@@ -294,10 +446,10 @@ eBird Status and Trends, Data Version: 2019; Released: 2020. Cornell Lab
 of Ornithology, Ithaca, New York. <a href="https://doi.org/10.2173/ebirdst.2019" class="external-link uri">https://doi.org/10.2173/ebirdst.2019</a>
 </blockquote>
 <div class="section level3">
-<h3 id="data-inputs-1">Data Inputs<a class="anchor" aria-label="anchor" href="#data-inputs-1"></a>
+<h3 id="data-inputs-2">Data Inputs<a class="anchor" aria-label="anchor" href="#data-inputs-2"></a>
 </h3>
 <div class="section level4">
-<h4 id="ebird-checklists-1">eBird Checklists<a class="anchor" aria-label="anchor" href="#ebird-checklists-1"></a>
+<h4 id="ebird-checklists-2">eBird Checklists<a class="anchor" aria-label="anchor" href="#ebird-checklists-2"></a>
 </h4>
 <ul>
 <li>CHANGED: Checklists are included for January 1, 2005 through April
@@ -312,7 +464,7 @@ correctly.</li>
 </ul>
 </div>
 <div class="section level4">
-<h4 id="environmental-covariates-1">Environmental Covariates<a class="anchor" aria-label="anchor" href="#environmental-covariates-1"></a>
+<h4 id="environmental-covariates-2">Environmental Covariates<a class="anchor" aria-label="anchor" href="#environmental-covariates-2"></a>
 </h4>
 <ul>
 <li>CHANGED: <a href="https://lpdaac.usgs.gov/products/astwbdv001/" class="external-link">ASTER Global Water
@@ -326,10 +478,10 @@ roads.</li>
 </div>
 </div>
 <div class="section level3">
-<h3 id="workflow-and-code-changes-1">Workflow and Code Changes<a class="anchor" aria-label="anchor" href="#workflow-and-code-changes-1"></a>
+<h3 id="workflow-and-code-changes-2">Workflow and Code Changes<a class="anchor" aria-label="anchor" href="#workflow-and-code-changes-2"></a>
 </h3>
 <div class="section level4">
-<h4 id="spatiotemporal-partitioning-1">Spatiotemporal Partitioning<a class="anchor" aria-label="anchor" href="#spatiotemporal-partitioning-1"></a>
+<h4 id="spatiotemporal-partitioning-2">Spatiotemporal Partitioning<a class="anchor" aria-label="anchor" href="#spatiotemporal-partitioning-2"></a>
 </h4>
 <ul>
 <li>CHANGED: The adaptive partitioning algorithm (AdaSTEM) now uses
@@ -348,7 +500,7 @@ side.</li>
 </ul>
 </div>
 <div class="section level4">
-<h4 id="model-ensemble-1">Model Ensemble<a class="anchor" aria-label="anchor" href="#model-ensemble-1"></a>
+<h4 id="model-ensemble-2">Model Ensemble<a class="anchor" aria-label="anchor" href="#model-ensemble-2"></a>
 </h4>
 <ul>
 <li>ADDED: Individual models now report 0 for predictions if the
@@ -380,7 +532,7 @@ previously averaged the entire year.</li>
 </ul>
 </div>
 <div class="section level4">
-<h4 id="data-products-1">Data Products<a class="anchor" aria-label="anchor" href="#data-products-1"></a>
+<h4 id="data-products-2">Data Products<a class="anchor" aria-label="anchor" href="#data-products-2"></a>
 </h4>
 <ul>
 <li>ADDED: There are now 184 species modeled at a fully global extent.

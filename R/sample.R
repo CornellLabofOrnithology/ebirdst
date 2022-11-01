@@ -6,9 +6,8 @@
 #' independently.
 #'
 #' @param x data frame or [sf] object; the points to subsample. If `x` is a data
-#'   frame the coordinates should be provided as columns `lat` and `lon`. The
-#'   day of year should be expressed as a proportion from 0-1 and stored in the
-#'   column `date`.
+#'   frame the coordinates should be provided as columns `latitude` and
+#'   `longitude`. The day of year should be expressed as an integer from 1-366.
 #' @param res numeric; the size in meters of the grid to sample from. This can
 #'   be a 2 element vector indicating the x and y dimensions of the cells.
 #' @param t_res numeric; the temporal resolution for sampling expressed as a
@@ -35,7 +34,7 @@
 #' # test data to sample
 #' preds <- load_predictions(path, return_sf = TRUE)
 #'
-#' # sample on a 250km, 4 month grid
+#' # sample on a 100, 4 month grid
 #' s <- sample_grid(preds, res = 100000, t_res = 1 / 4)
 #' preds_grid <- preds[s, ]
 #'

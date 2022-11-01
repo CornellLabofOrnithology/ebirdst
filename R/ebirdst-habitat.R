@@ -138,7 +138,7 @@ ebirdst_habitat <- function(path, ext, data = NULL,
     # convert stixels to polygons
     stixels <- stixelize(stixels)
     stixels$area <- sf::st_area(stixels)
-    stixels <- dplyr::select(stixels, .data$stixel_id, .data$area)
+    stixels <- dplyr::select(stixels, "stixel_id", "area")
 
     # calculate % of stixel within focal extent
     stixels <- suppressWarnings(suppressMessages(
@@ -147,9 +147,7 @@ ebirdst_habitat <- function(path, ext, data = NULL,
     stixels$area_in_extent <- sf::st_area(stixels)
     stixels$weight <- as.numeric(stixels$area_in_extent / stixels$area)
     stixel_coverage <- sf::st_drop_geometry(stixels)
-    stixel_coverage <- dplyr::select(stixel_coverage,
-                                     .data$stixel_id,
-                                     .data$weight)
+    stixel_coverage <- dplyr::select(stixel_coverage, "stixel_id", "weight")
     rm(stixels)
 
     # load pis and pds, occurrence only
@@ -204,9 +202,9 @@ ebirdst_habitat <- function(path, ext, data = NULL,
   rm(sl)
 
   # temporal smoothing of pds
-  pd_smooth <- dplyr::select(pd_slope, .data$predictor,
-                             x = .data$day_of_year, y = .data$slope,
-                             .data$weight)
+  pd_smooth <- dplyr::select(pd_slope, "predictor",
+                             x = "day_of_year", y = "slope",
+                             "weight")
   if (isTRUE(stationary_associations)) {
     # for stationary assocations, simply calculate the weighted average
     pd_smooth <- dplyr::group_by(pd_smooth, .data$predictor)
@@ -227,7 +225,7 @@ ebirdst_habitat <- function(path, ext, data = NULL,
                                na_value = NA_real_,
                                check_width = 7 / 366)
     pd_smooth$data <- NULL
-    pd_smooth <- tidyr::unnest(pd_smooth, .data$smooth)
+    pd_smooth <- tidyr::unnest(pd_smooth, "smooth")
     names(pd_smooth) <- c("predictor", "week_midpoint", "prob_pos_slope")
   }
 
@@ -239,9 +237,9 @@ ebirdst_habitat <- function(path, ext, data = NULL,
 
   # temporal smoothing of pis
   pi_smooth <- dplyr::inner_join(pis, stixel_coverage, by = "stixel_id")
-  pi_smooth <- dplyr::select(pi_smooth, .data$predictor,
-                             x = .data$day_of_year, y = .data$importance,
-                             .data$weight)
+  pi_smooth <- dplyr::select(pi_smooth, "predictor",
+                             x = "day_of_year", y = "importance",
+                             "weight")
   if (isTRUE(stationary_associations)) {
     # for stationary assocations, simply calculate the weighted average
     pi_smooth <- dplyr::group_by(pi_smooth, .data$predictor)
@@ -264,7 +262,7 @@ ebirdst_habitat <- function(path, ext, data = NULL,
                                na_value = 0,
                                check_width = 7 / 366)
     pi_smooth$data <- NULL
-    pi_smooth <- tidyr::unnest(pi_smooth, .data$smooth)
+    pi_smooth <- tidyr::unnest(pi_smooth, "smooth")
     # back transform
     pi_smooth$y <- exp(pi_smooth$y)
     # scale pis
@@ -447,10 +445,8 @@ train_check <- function(x, x_train, x_range, check_width) {
 subset_top_predictors <- function(x, n_habitat_types = 15) {
   # bring in pretty names
   lc <- dplyr::select(ebirdst::ebirdst_predictors,
-                      predictor = .data$predictor,
-                      .data$predictor_label,
-                      .data$lc_class,
-                      .data$lc_class_label)
+                      predictor = "predictor", "predictor_label",
+                      "lc_class", "lc_class_label")
   x <- dplyr::inner_join(lc, x, by = "predictor")
 
   # multiply importance and direction, fill with zeros

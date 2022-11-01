@@ -7,9 +7,9 @@
 stixelize(x)
 }
 \arguments{
-\item{x}{\code{data.frame} or \link{sf} object; stixel summary data loaded with
-\code{\link[=load_stixels]{load_stixels()}}, or any other data frame with fields \code{lon}, \code{lat},
-\code{stixel_width}, and \code{stixel_hight}.}
+\item{x}{data frame; stixel summary data loaded with \code{\link[=load_stixels]{load_stixels()}}, or any
+other data frame with fields \code{lonitude_min}, \code{lontidue_max},
+\code{latitude_min}, and \code{latitude_max}.}
 }
 \value{
 \link{sf} object with geometry column storing polygons representing the

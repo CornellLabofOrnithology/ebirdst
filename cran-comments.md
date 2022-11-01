@@ -1,4 +1,6 @@
-# ebirdst 1.2020.2
+# ebirdst 1.2021.0
+
+- update for the v2021 eBird Status and Trends data
 
 ## Test environments
 

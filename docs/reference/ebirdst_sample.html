@@ -20,7 +20,7 @@ independently."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/l
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2020.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2021.0</span>
       </span>
     </div>
 
@@ -87,9 +87,8 @@ independently.</p>
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>data frame or <a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf</a> object; the points to subsample. If <code>x</code> is a data
-frame the coordinates should be provided as columns <code>lat</code> and <code>lon</code>. The
-day of year should be expressed as a proportion from 0-1 and stored in the
-column <code>date</code>.</p></dd>
+frame the coordinates should be provided as columns <code>latitude</code> and
+<code>longitude</code>. The day of year should be expressed as an integer from 1-366.</p></dd>
 
 
 <dt>res</dt>
@@ -135,7 +134,7 @@ function is called.</p></dd>
 <span class="r-in"><span><span class="co"># test data to sample</span></span></span>
 <span class="r-in"><span><span class="va">preds</span> <span class="op">&lt;-</span> <span class="fu"><a href="load_predictions.html">load_predictions</a></span><span class="op">(</span><span class="va">path</span>, return_sf <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># sample on a 250km, 4 month grid</span></span></span>
+<span class="r-in"><span><span class="co"># sample on a 100, 4 month grid</span></span></span>
 <span class="r-in"><span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu">sample_grid</span><span class="op">(</span><span class="va">preds</span>, res <span class="op">=</span> <span class="fl">100000</span>, t_res <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">4</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">preds_grid</span> <span class="op">&lt;-</span> <span class="va">preds</span><span class="op">[</span><span class="va">s</span>, <span class="op">]</span></span></span>
 <span class="r-in"><span></span></span>

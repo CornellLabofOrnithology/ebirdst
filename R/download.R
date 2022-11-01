@@ -75,8 +75,8 @@ ebirdst_download <- function(species,
   # example data or a real run
   if (is_example) {
     api_url <- paste0("https://raw.githubusercontent.com/",
-                     "CornellLabofOrnithology/",
-                     "ebirdst/dev_erd2021/example-data/")
+                     "ebird/ebirdst_example-data/main/",
+                     "example-data/")
     # file list
     fl <- system.file("extdata", "example-data_file-list.txt",
                       package = "ebirdst")
@@ -288,7 +288,7 @@ ebirdst_data_dir <- function() {
 #' @examples
 #' ebirdst_version()
 ebirdst_version <- function() {
-  list(version_year = 2020,
-       release_year = 2021,
-       access_end_date = as.Date("2023-05-31"))
+  list(version_year = 2021,
+       release_year = 2022,
+       access_end_date = as.Date("2023-11-30"))
 }
