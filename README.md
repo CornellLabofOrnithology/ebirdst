@@ -19,7 +19,7 @@ project](https://science.ebird.org/en/status-and-trends) project at the
 [Cornell Lab of Ornithology](https://www.birds.cornell.edu/) uses
 machine-learning models to produce estimates of range boundaries,
 occurrence rate, and relative abundance at high spatial and temporal
-resolution across the full annual cycle of 1,204 bird species globally.
+resolution across the full annual cycle of 1,007 bird species globally.
 These models learn the relationships between bird observations collected
 through [eBird](https://ebird.org/) and a suite of remotely sensed
 habitat variables, while accounting for the noise and bias inherent in
@@ -104,16 +104,7 @@ A. Spencer. 2022. eBird Status and Trends, Data Version: 2021; Released:
 </blockquote>
 
 [Download
-BibTeX](https://raw.githubusercontent.com/CornellLabofOrnithology/ebirdst/main/ebirdst-bibtex.bib).
-
-    @report{eBirdStatusTrends2022,
-      title = {eBird Status and Trends},
-      author = {Fink, Daniel and Auer, Tom and Johnston, Alison and Strimas-Mackey, Matt and Robinson, Orin and Ligocki, Shawn and Hochachka, Wesley and Jaromczyk, Lauren and Rodewald, Amanda and Wood, Chris and Davies, Ian and Spencer, Andrew},
-      year = {2022},
-      publisher = {Cornell Lab of Ornithology},
-      doi = {10.2173/ebirdst.2021},
-      langid = {english}
-    }
+BibTeX](https://raw.githubusercontent.com/CornellLabofOrnithology/ebirdst/main/ebirdst-citation.bib).
 
 ## Vignettes
 

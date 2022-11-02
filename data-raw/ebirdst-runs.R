@@ -57,4 +57,7 @@ ebirdst_runs <- runs %>%
          prebreeding_migration_start, prebreeding_migration_end,
          resident_quality, resident_start, resident_end)
 
+# these were included mistakely
+ebirdst_runs <- filter(ebirdst_runs, !species_code %in% c("gobwar2", "auspip1"))
+
 usethis::use_data(ebirdst_runs, overwrite = TRUE)
