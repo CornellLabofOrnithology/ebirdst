@@ -103,7 +103,8 @@ A. Spencer. 2022. eBird Status and Trends, Data Version: 2021; Released:
 <a href="https://doi.org/10.2173/ebirdst.2021" class="uri">https://doi.org/10.2173/ebirdst.2021</a>
 </blockquote>
 
-Or use the following BibTeX citation:
+[Download
+BibTeX](https://raw.githubusercontent.com/CornellLabofOrnithology/ebirdst/main/ebirdst-bibtex.bib).
 
     @report{eBirdStatusTrends2022,
       title = {eBird Status and Trends},

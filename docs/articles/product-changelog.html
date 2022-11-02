@@ -152,11 +152,16 @@ samples the training data before stixels are defined.</li>
 now fully randomized, previously it was constrained to keep boundaries
 in the ocean.</li>
 <li>CHANGED: Stixels are now allowed to recurse one size smaller, to
-approximately 90km on a side.</li>
+approximately 90km on a side, and remain one size larger (3000km on a
+side), except for resident-specific stixels where the maximum remains
+1500km on a side, for computational reasons.</li>
 <li>CHANGED: There is now a separate AdaSTEM partitioning for residents
 that uses the full year of data instead of a 28 day window. The training
 data for these partitions are also grid sampled before definition. The
-stixel parameters are are to allow 65,000 checklists per stixel…</li>
+stixel parameters are set to have a maximum of 65,000 checklists per
+stixel over the full year, after grid sampling, and a minimum of 6,500
+checklists per stixel (e.g., stixels are not allowed to be subdivided if
+they contain less than this amount).</li>
 </ul>
 </div>
 <div class="section level4">
