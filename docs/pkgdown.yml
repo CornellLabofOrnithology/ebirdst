@@ -1,0 +1,12 @@
+pandoc: '2.18'
+pkgdown: 2.0.5
+pkgdown_sha: ~
+articles:
+  ebirdst: ebirdst.html
+  product-changelog: product-changelog.html
+  rasters: rasters.html
+last_built: 2022-11-07T21:16Z
+urls:
+  reference: https://cornelllabofornithology.github.io/ebirdst/reference
+  article: https://cornelllabofornithology.github.io/ebirdst/articles
+
