@@ -19,7 +19,7 @@ project](https://science.ebird.org/en/status-and-trends) project at the
 [Cornell Lab of Ornithology](https://www.birds.cornell.edu/) uses
 machine-learning models to produce estimates of range boundaries,
 occurrence rate, and relative abundance at high spatial and temporal
-resolution across the full annual cycle of 1,007 bird species globally.
+resolution across the full annual cycle of 1,202 bird species globally.
 These models learn the relationships between bird observations collected
 through [eBird](https://ebird.org/) and a suite of remotely sensed
 habitat variables, while accounting for the noise and bias inherent in

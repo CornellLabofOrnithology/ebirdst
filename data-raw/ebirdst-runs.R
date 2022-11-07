@@ -6,12 +6,13 @@ library(jsonlite)
 pred_year <- file.path("data-raw", "config.json") %>%
   read_json(simplifyVector = TRUE) %>%
   pluck("SRD_PRED_YEAR")
+species_codes <- read_lines("data-raw/species-list.txt")
 
 runs <- read_csv("data-raw/seasons.csv") %>%
   rename_all(tolower) %>%
   filter(full_year_quality > 0) %>%
   rename(resident_quality = full_year_quality) %>%
-  filter(!is.na(species_code))
+  filter(!is.na(species_code), species_code %in% species_codes)
 
 # correctly na season dates
 seasons <- c("breeding", "nonbreeding",
