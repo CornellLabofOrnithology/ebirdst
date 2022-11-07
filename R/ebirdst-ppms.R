@@ -77,8 +77,8 @@ ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 7) {
 
   # load configuration file
   p <- load_config(path)
-  p_es_cutoff <- stats::setNames(p[["es_cutoff"]][["cutoff"]],
-                                 p[["es_cutoff"]][["week"]])
+  p_es_cutoff <- stats::setNames(p[["es_threshold"]][["threshold"]],
+                                 p[["es_threshold"]][["week"]])
 
   if (missing(es_cutoff)) {
     # get dynamic es cutoff
@@ -191,12 +191,12 @@ ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 7) {
 
   for (i_mc in seq_len(n_mc)) {
     # case control sampling
-    sampled <- sample_grid(preds,
-                           res = c(3000, 3000),
-                           t_res = 7 / 365,
-                           n = 1,
-                           jitter = TRUE,
-                           replace = FALSE)
+    sampled <- sample_case_control(preds,
+                                   res = c(3000, 3000),
+                                   t_res = 7 / 365,
+                                   n = 1,
+                                   jitter = TRUE,
+                                   replace = FALSE)
 
     # index back to full vector
     test_sample <- preds[sampled, ]
@@ -223,7 +223,7 @@ ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 7) {
 
       obs_positive <- test_sample$obs > 0
       if (any(obs_positive)) {
-        binary_curve <- precrec::evalmod(scores = test_sample$pat,
+        binary_curve <- precrec::evalmod(scores = test_sample$pat_mean,
                                          labels = as.numeric(obs_positive))
         bs$pr_auc[i_mc] <- precrec::auc(binary_curve)$aucs[2]
       } else {
@@ -683,10 +683,10 @@ bernoulli_dev <- function(obs, pred) {
 #' @examples
 #' ebirdst:::binom_test_p(c(pat = 0.1, pi_es = 75))
 binom_test_p <- function(x, pat_cutoff = 1 / 10) {
-  if (is.na(x["pat"]) | is.na(x["pi_es"])) {
+  if (is.na(x["pat_mean"]) | is.na(x["pi_es"])) {
     return(NA)
   }
-  pat_pi_es <- round(as.numeric(x["pat"]) * as.numeric(x["pi_es"]), 0)
+  pat_pi_es <- round(as.numeric(x["pat_mean"]) * as.numeric(x["pi_es"]), 0)
   p <- stats::binom.test(pat_pi_es, as.numeric(x["pi_es"]),
                          p = pat_cutoff,
                          alternative = "greater")

@@ -10,9 +10,9 @@
 #' each stixel and attaches them to the original data in the form of an [sf]
 #' object.
 #'
-#' @param x `data.frame` or [sf] object; stixel summary data loaded with
-#'   [load_stixels()], or any other data frame with fields `lon`, `lat`,
-#'   `stixel_width`, and `stixel_hight`.
+#' @param x data frame; stixel summary data loaded with [load_stixels()], or any
+#'   other data frame with fields `lonitude_min`, `lontidue_max`,
+#'   `latitude_min`, and `latitude_max`.
 #'
 #' @return [sf] object with geometry column storing polygons representing the
 #'   stixels boundaries.
@@ -32,47 +32,31 @@
 #' stixelize(stixels)
 #' }
 stixelize <- function(x) {
-  UseMethod("stixelize")
-}
-
-
-#' @export
-stixelize.data.frame <- function(x) {
-  stopifnot(all(c("longitude", "latitude",
-                  "stixel_width", "stixel_height") %in% names(x)))
-
-  # drop empty stixels
-  x <- x[x$stixel_width > 0 & x$stixel_height > 0, ]
+  stopifnot(all(c("longitude_min", "longitude_max",
+                  "latitude_min", "latitude_max") %in% names(x)))
 
   # function to make a single stixel
-  f <- function(lon, lat, w, h) {
-    bb <- sf::st_bbox(c(xmin = max(lon - w / 2, -180),
-                        xmax = min(lon + w / 2, 180),
-                        ymin = max(lat - h / 2, -90),
-                        ymax = min(lat + h / 2, 90)))
-    sf::st_as_sfc(bb)
+  f <- function(lon_min, lon_max, lat_min, lat_max) {
+    # if stixel crosses dateline, split it into two
+    if (lon_min < 0 && lon_max > 0) {
+      bb_west <- sf::st_bbox(c(xmin = -179.9999, xmax = lon_min,
+                               ymin = lat_min, ymax = lat_max))
+      bb_east <- sf::st_bbox(c(xmin = lon_max, xmax = 179.9999,
+                               ymin = lat_min, ymax = lat_max))
+      bb <- c(sf::st_as_sfc(bb_west), sf::st_as_sfc(bb_east))
+      bb <- sf::st_combine(bb)
+    } else {
+      bb <- sf::st_bbox(c(xmin = lon_min, xmax = lon_max,
+                          ymin = lat_min, ymax = lat_max))
+      bb <- sf::st_as_sfc(bb)
+    }
+    return(sf::st_make_valid(bb))
   }
   stx <- sf::st_sfc(mapply(f,
-                           x$longitude, x$latitude,
-                           x$stixel_width, x$stixel_height),
+                           x$longitude_min, x$longitude_max,
+                           x$latitude_min, x$latitude_max),
                     crs = 4326)
 
   # combine with data
-  sf::st_make_valid(sf::st_sf(x, geometry = stx))
-}
-
-#' @export
-stixelize.sf <- function(x) {
-  stopifnot(all(c("stixel_width", "stixel_height") %in% names(x)))
-  stopifnot(all(sf::st_geometry_type(x) == "POINT"))
-
-  x <- sf::st_transform(x, crs = 4326)
-
-  # ensure coordinates are in df
-  ll <- sf::st_coordinates(x)
-  if (!all(c("longitude", "latitude") %in% names(x))) {
-    x$longitude <- ll[, 1, drop = TRUE]
-    x$latitude <- ll[, 2, drop = TRUE]
-  }
-  stixelize.data.frame(sf::st_set_geometry(x, NULL))
+  sf::st_sf(x, geometry = stx)
 }

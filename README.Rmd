@@ -57,8 +57,10 @@ The Status and Trends Data Products provide estimates of relative abundance, and
 If you use the the eBird Status & Trends data please cite it with: 
 
 <blockquote>
-Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. Hochachka, L. Jaromczyk, C. Wood, I. Davies, M. Iliff, L. Seitz. 2021. eBird Status and Trends, Data Version: 2020; Released: 2021. Cornell Lab of Ornithology, Ithaca, New York. <a href="https://doi.org/10.2173/ebirdst.2020" class="uri">https://doi.org/10.2173/ebirdst.2020</a>
+Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, S. Ligocki, O. Robinson, W. Hochachka, L. Jaromczyk, A. Rodewald, C. Wood, I. Davies, A. Spencer. 2022. eBird Status and Trends, Data Version: 2021; Released: 2022. Cornell Lab of Ornithology, Ithaca, New York. <a href="https://doi.org/10.2173/ebirdst.2021" class="uri">https://doi.org/10.2173/ebirdst.2021</a>
 </blockquote>
+
+[Download BibTeX](https://raw.githubusercontent.com/CornellLabofOrnithology/ebirdst/main/ebirdst-citation.bib).
 
 ## Vignettes
 
@@ -89,7 +91,7 @@ abd <- load_raster(path = path, resolution = "lr")
 # load species specific mapping parameters
 pars <- load_fac_map_parameters(path)
 # custom coordinate reference system
-crs <- pars$custom_projection
+crs <- st_crs(pars$custom_projection)
 # legend breaks
 breaks <- pars$weekly_bins
 # legend labels for top, middle, and bottom
@@ -104,7 +106,7 @@ abd <- abd[[26]]
 
 # project to species specific coordinates
 # the nearest neighbor method preserves cell values across projections
-abd_prj <- projectRaster(abd, crs = crs, method = "ngb")
+abd_prj <- projectRaster(trim(abd), crs = crs$wkt, method = "ngb")
 
 # get reference data from the rnaturalearth package
 # the example data currently shows only the US state of Michigan

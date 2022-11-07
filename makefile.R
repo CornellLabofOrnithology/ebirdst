@@ -5,9 +5,8 @@ unlink(list.files("man", full.names = TRUE))
 devtools::document()
 pak::local_install()
 
-# local tests and checks
+# local tests
 devtools::test()
-devtools::check()
 
 # vignettes, readme, site
 devtools::clean_vignettes()
@@ -17,6 +16,9 @@ rmarkdown::render("README.Rmd")
 unlink("README.html")
 pkgdown::build_site()
 Sys.unsetenv("BUILD_VIGNETTES")
+
+# local checks
+devtools::check()
 
 # checks
 devtools::check_win_devel()

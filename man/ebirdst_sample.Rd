@@ -11,9 +11,8 @@ sample_case_control(x, res, t_res, n = 1, replace = FALSE, jitter = TRUE)
 }
 \arguments{
 \item{x}{data frame or \link{sf} object; the points to subsample. If \code{x} is a data
-frame the coordinates should be provided as columns \code{lat} and \code{lon}. The
-day of year should be expressed as a proportion from 0-1 and stored in the
-column \code{date}.}
+frame the coordinates should be provided as columns \code{latitude} and
+\code{longitude}. The day of year should be expressed as an integer from 1-366.}
 
 \item{res}{numeric; the size in meters of the grid to sample from. This can
 be a 2 element vector indicating the x and y dimensions of the cells.}
@@ -49,7 +48,7 @@ path <- get_species_path("example_data")
 # test data to sample
 preds <- load_predictions(path, return_sf = TRUE)
 
-# sample on a 250km, 4 month grid
+# sample on a 100, 4 month grid
 s <- sample_grid(preds, res = 100000, t_res = 1 / 4)
 preds_grid <- preds[s, ]
 

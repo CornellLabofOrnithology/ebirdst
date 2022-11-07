@@ -8,6 +8,59 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
 ---
 
+## 2021 Changelog
+
+**Data Version:** 2021 (available November 2022)
+
+**Citation:**
+<blockquote>
+Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, S. Ligocki, O. Robinson, W. Hochachka, L. Jaromczyk, A. Rodewald, C. Wood, I. Davies, A. Spencer. 2022. eBird Status and Trends, Data Version: 2021; Released: 2022. Cornell Lab of Ornithology, Ithaca, New York. https://doi.org/10.2173/ebirdst.2021
+</blockquote>
+
+### Data Inputs
+#### eBird Checklists
+- CHANGED: checklists are included for January 1 2007 through December 31 2021, updated from January 1 2006 through December 31 2020.
+- CHANGED: Observations reported as escapees under the new eBird exotic species protocols are excluded from analysis.
+
+#### Environmental Covariates
+- UPDATED: Data for 2020 was added for the primary land cover data source, MCD12Q1 (https://lpdaac.usgs.gov/products/mcd12q1v006/).
+
+### Workflow and Code Changes
+#### General
+- ADDED: Prediction grid locations for the ocean are now available as a choice to model a species as land or water.
+
+#### Spatiotemporal Partitioning
+- CHANGED: The adaptive partitioning algorithm (AdaSTEM) now grid samples the training data before stixels are defined.
+- CHANGED: The projection initialization of each stixel iteration is now fully randomized, previously it was constrained to keep boundaries in the ocean.
+- CHANGED: Stixels are now allowed to recurse one size smaller, to approximately 90km on a side, and remain one size larger (3000km on a side), except for resident-specific stixels where the maximum remains 1500km on a side, for computational reasons.
+- CHANGED: There is now a separate AdaSTEM partitioning for residents that uses the full year of data instead of a 28 day window. The training data for these partitions are also grid sampled before definition. The stixel parameters are set to have a maximum of  65,000 checklists per stixel over the full year, after grid sampling, and a minimum of 6,500 checklists per stixel (e.g., stixels are not allowed to be subdivided if they contain less than this amount).
+
+#### Model Ensemble
+- CHANGED: Models are now run for 200 replicates (folds).
+- CHANGED: The percent above threshold (PAT) cutoff has been replaced with a data-driven maximization of the MCC-F1 curve (https://arxiv.org/abs/2006.11278), constrained between 0.05 and 0.25. The training data are grid sampled before optimizing using the MCC-F1 curve and 25 realizations are done before taking the median PAT value. For migrants, this is done weekly, for residents across the whole year.
+- CHANGED: The process for selecting the ensemble support cutoff or threshold (the number of models required to show predictions) has been updated to have the training data grid sampled first, then optimized for a true positive rate of 99%, with the cutoff constrained between 0.5 and 0.9. For migrants, this is done weekly, for residents across the whole year. This process is done 25 times and then a median threshold value is selected.
+- CHANGED: The site selection probability layer has been significantly improved. In the binary classification model, prediction grid locations that are >= 50% overlapped by a 1.5km buffer of checklist locations have been removed. This resolves the previous, erroneously low values in dense, urban areas and more accurately reflects the true probability of site selection in these areas. This change only impacts species estimates in places with a site selection probability value of less than 0.5%, where species estimates are masked.
+
+#### Base Model
+- CHANGED: The grid sample method now retains all unique values of factor variables (e.g., island).
+- CHANGED: The grid sampler oversamples detections to achieve 25% detection probability in the training dataset. Previously the grid sampler would often overshoot the 25% target and excessively duplicate detections. This has been corrected so that oversampling never yields detection probabilities greater than 25% and detections are duplicated at most 25 times.
+- CHANGED: Mean spatial coverage of each stixel is now correctly estimated as the proportion of 3 km pixels that contain checklists.
+
+#### Fit and Predict
+- CHANGED: Maximization of partial dependencies for prediction (e.g., CCI) no longer allows selection of the highest and lowest extreme quantile values, to prevent extrapolation.
+
+#### Residents
+- CHANGED: Along with a resident-specific AdaSTEM partitioning, resident models now predict all weeks of the year in a single stixel. Previously, resident models used data from the whole year for training, but only predicted the four weeks in a stixel, similar to the way migrants are modeled.
+
+#### Data Products
+- CHANGED: The occurrence model prediction values for effort variables are now set at 1 hour and 1 kilometer. Previously, the effort variable values used for the occurrence model prediction were the same as those used for the occurrence model, which sought to maximize detection by optimizing the distance and duration effort variables to capture as much signal as possible, up to 12 hours (6 hours in this version) and 10 kilometers. These prediction values are retained for the presence/absence estimation.
+- CHANGED: The prediction value for Checklist Calibration Index (CCI) is now maximized within each stixel using the partial dependencies. Previously, the value for was set at a fixed value of 1.85 for all species and stixels. 
+- CHANGED: Partial dependencies are now only generated for the first 50 folds, to reduce computational cost.
+- CHANGED: To show “year-round” on a seasonal map now requires only 0.1% overlap between breeding and non-breeding seasons. Previously, all four seasons and an overlap of greater than 5% was required.
+- REMOVED: Habitat plots and numerical summaries have been removed from the website.
+
+
+
 ## 2020 Changelog
 
 **Data Version:** 2020 (available June 2022)
@@ -72,7 +125,6 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, O. Robinson, S. Ligocki, W. H
 
 #### Expert Review
 - CHANGED: Animations are no longer being reviewed for resident species.
-
 
 
 
