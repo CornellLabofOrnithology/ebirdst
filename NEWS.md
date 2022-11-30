@@ -1,6 +1,10 @@
-# ebirdst 1.2020.2
+# ebirdst 1.2021.1
 
-- 
+- fix bug with extent in `load_fac_map_parameters()`, GitHub issue #40
+
+# ebirdst 1.2021.0
+
+- update for the v2021 eBird Status and Trends data
 
 # ebirdst 1.2020.1
 

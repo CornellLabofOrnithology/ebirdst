@@ -3,7 +3,7 @@ unlink(list.files("man", full.names = TRUE))
 
 # rebuild docs and install
 devtools::document()
-pak::local_install()
+pak::pak()
 
 # local tests
 devtools::test()

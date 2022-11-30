@@ -39,7 +39,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2021.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2021.1</span>
       </span>
     </div>
 
@@ -121,7 +121,7 @@
 <div class="section level2">
 <h2 id="versions">Versions<a class="anchor" aria-label="anchor" href="#versions"></a>
 </h2>
-<p>The Status and Trends Data Products provide estimates of relative abundance, and other variables, for a particular year. This estimation year is used to identify the version of the data products. Each version of this R package is associated with a particular version of the data. For example, the current version of the R package is 1.2021.0 and, as indicated by the year in the version number, it is designed to work with the 2021 data products. Every year, typically in November, the Status and Trends Data Products are updated, and users are encouraged to update this R package and transition to using the new version of the data products. After the data products are updated, there will be a brief period where access to the previous version is also provided, allowing users to finish any analyses with this previous version. If you intended to continue using the older data products during this period you must not update the R package.</p>
+<p>The Status and Trends Data Products provide estimates of relative abundance, and other variables, for a particular year. This estimation year is used to identify the version of the data products. Each version of this R package is associated with a particular version of the data. For example, the current version of the R package is 1.2021.1 and, as indicated by the year in the version number, it is designed to work with the 2021 data products. Every year, typically in November, the Status and Trends Data Products are updated, and users are encouraged to update this R package and transition to using the new version of the data products. After the data products are updated, there will be a brief period where access to the previous version is also provided, allowing users to finish any analyses with this previous version. If you intended to continue using the older data products during this period you must not update the R package.</p>
 </div>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
@@ -173,13 +173,14 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, S. Ligocki, O. Robinson, W. H
 <span><span class="co"># get a date vector specifying which week each raster layer corresponds to</span></span>
 <span><span class="va">weeks</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/parse_raster_dates.html">parse_raster_dates</a></span><span class="op">(</span><span class="va">abd</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://www.math.uzh.ch/pages/spam/reference/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">weeks</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "2021-01-04" "2021-01-11" "2021-01-18" "2021-01-25" "2021-02-01" "2021-02-08" "2021-02-15" "2021-02-22"</span></span>
-<span><span class="co">#&gt;  [9] "2021-03-01" "2021-03-08" "2021-03-15" "2021-03-22" "2021-03-29" "2021-04-05" "2021-04-12" "2021-04-19"</span></span>
-<span><span class="co">#&gt; [17] "2021-04-26" "2021-05-03" "2021-05-10" "2021-05-17" "2021-05-24" "2021-05-31" "2021-06-07" "2021-06-14"</span></span>
-<span><span class="co">#&gt; [25] "2021-06-21" "2021-06-28" "2021-07-06" "2021-07-13" "2021-07-20" "2021-07-27" "2021-08-03" "2021-08-10"</span></span>
-<span><span class="co">#&gt; [33] "2021-08-17" "2021-08-24" "2021-08-31" "2021-09-07" "2021-09-14" "2021-09-21" "2021-09-28" "2021-10-05"</span></span>
-<span><span class="co">#&gt; [41] "2021-10-12" "2021-10-19" "2021-10-26" "2021-11-02" "2021-11-09" "2021-11-16" "2021-11-23" "2021-11-30"</span></span>
-<span><span class="co">#&gt; [49] "2021-12-07" "2021-12-14" "2021-12-21" "2021-12-28"</span></span>
+<span><span class="co">#&gt;  [1] "2021-01-04" "2021-01-11" "2021-01-18" "2021-01-25" "2021-02-01" "2021-02-08" "2021-02-15"</span></span>
+<span><span class="co">#&gt;  [8] "2021-02-22" "2021-03-01" "2021-03-08" "2021-03-15" "2021-03-22" "2021-03-29" "2021-04-05"</span></span>
+<span><span class="co">#&gt; [15] "2021-04-12" "2021-04-19" "2021-04-26" "2021-05-03" "2021-05-10" "2021-05-17" "2021-05-24"</span></span>
+<span><span class="co">#&gt; [22] "2021-05-31" "2021-06-07" "2021-06-14" "2021-06-21" "2021-06-28" "2021-07-06" "2021-07-13"</span></span>
+<span><span class="co">#&gt; [29] "2021-07-20" "2021-07-27" "2021-08-03" "2021-08-10" "2021-08-17" "2021-08-24" "2021-08-31"</span></span>
+<span><span class="co">#&gt; [36] "2021-09-07" "2021-09-14" "2021-09-21" "2021-09-28" "2021-10-05" "2021-10-12" "2021-10-19"</span></span>
+<span><span class="co">#&gt; [43] "2021-10-26" "2021-11-02" "2021-11-09" "2021-11-16" "2021-11-23" "2021-11-30" "2021-12-07"</span></span>
+<span><span class="co">#&gt; [50] "2021-12-14" "2021-12-21" "2021-12-28"</span></span>
 <span></span>
 <span><span class="co"># select a week in the middle of the year</span></span>
 <span><span class="va">abd</span> <span class="op">&lt;-</span> <span class="va">abd</span><span class="op">[[</span><span class="fl">26</span><span class="op">]</span><span class="op">]</span></span>

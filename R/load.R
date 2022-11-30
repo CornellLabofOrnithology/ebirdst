@@ -662,17 +662,16 @@ load_fac_map_parameters <- function(path) {
 
   # load configuration file
   p <- load_config(path)
+  ext_order <- unlist(p$bbox_sinu)[c("xmin", "xmax", "ymin", "ymax")]
 
-  seasonal_bins <-
-
-  list(custom_projection = p$projection$crs,
-       fa_extent = raster::extent(p$projection$extent),
-       res = p$projection$res,
-       fa_extent_sinu = raster::extent(unlist(p$bbox_sinu)),
-       weekly_bins = p$bins$hr$breaks,
-       weekly_labels = p$bins$hr$labels,
-       seasonal_bins = p$bins_seasonal$hr$breaks,
-       seasonal_labels = p$bins_seasonal$hr$labels)
+  seasonal_bins <- list(custom_projection = p$projection$crs,
+                        fa_extent = raster::extent(p$projection$extent),
+                        res = p$projection$res,
+                        fa_extent_sinu = raster::extent(ext_order),
+                        weekly_bins = p$bins$hr$breaks,
+                        weekly_labels = p$bins$hr$labels,
+                        seasonal_bins = p$bins_seasonal$hr$breaks,
+                        seasonal_labels = p$bins_seasonal$hr$labels)
 }
 
 
