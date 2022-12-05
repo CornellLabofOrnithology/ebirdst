@@ -74,7 +74,7 @@ Status and Trends model of a given species within a spatiotemporal extent.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ebirdst_ppms</span><span class="op">(</span><span class="va">path</span>, <span class="va">ext</span>, <span class="va">es_cutoff</span>, pat_cutoff <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">7</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ebirdst_ppms</span><span class="op">(</span><span class="va">path</span>, <span class="va">ext</span>, <span class="va">es_cutoff</span>, <span class="va">pat_cutoff</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for ebirdst_ppms</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
@@ -103,7 +103,11 @@ species-specific model-based values.</strong></p></dd>
 
 
 <dt>pat_cutoff</dt>
-<dd><p>numeric between 0-1; percent above threshold.</p></dd>
+<dd><p>numeric between 0-1; percent above threshold. Optimal PAT
+cutoff values are calculated for each week during the modeling process and
+stored in the data package for each species. <strong>In general, you should not
+specify a value for <code>pat_cutoff</code> and instead allow the function to use the
+species-specific model-based values.</strong></p></dd>
 
 
 <dt>x</dt>

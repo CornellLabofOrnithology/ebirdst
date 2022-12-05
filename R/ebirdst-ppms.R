@@ -14,7 +14,11 @@
 #'   stored in the data package for each species. **In general, you should not
 #'   specify a value for `es_cutoff` and instead allow the function to use the
 #'   species-specific model-based values.**
-#' @param pat_cutoff numeric between 0-1; percent above threshold.
+#' @param pat_cutoff numeric between 0-1; percent above threshold. Optimal PAT
+#'   cutoff values are calculated for each week during the modeling process and
+#'   stored in the data package for each species. **In general, you should not
+#'   specify a value for `pat_cutoff` and instead allow the function to use the
+#'   species-specific model-based values.**
 #'
 #' @details During the eBird Status and Trends modeling process, a subset of
 #'   observations (the "test data") are held out from model fitting to be used
@@ -67,27 +71,39 @@
 #' ppms <- ebirdst_ppms(path = path, ext = e)
 #' plot(ppms)
 #' }
-ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 7) {
+ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff) {
   stopifnot(is.character(path), length(path) == 1, dir.exists(path))
-  stopifnot(is.numeric(pat_cutoff), length(pat_cutoff) == 1,
-            pat_cutoff > 0, pat_cutoff < 1)
   if (!missing(ext)) {
     stopifnot(inherits(ext, "ebirdst_extent"))
   }
 
   # load configuration file
   p <- load_config(path)
-  p_es_cutoff <- stats::setNames(p[["es_threshold"]][["threshold"]],
-                                 p[["es_threshold"]][["week"]])
 
+  # es cutoff
+  p_es <- stats::setNames(p[["es_threshold"]][["threshold"]],
+                          p[["es_threshold"]][["week"]])
   if (missing(es_cutoff)) {
     # get dynamic es cutoff
-    es_cutoff <- dplyr::coalesce(p_es_cutoff, 0.75)
+    es_cutoff <- dplyr::coalesce(p_es, 0.75)
   } else {
     stopifnot(is.numeric(es_cutoff), length(es_cutoff) == 1,
               es_cutoff > 0, es_cutoff < 1)
     es_cutoff <- rep(es_cutoff, times = 52)
     names(es_cutoff) <- format(ebirdst::ebirdst_weeks$date, "%m-%d")
+  }
+
+  # pat cutoff
+  p_pat <- stats::setNames(p[["pat_threshold"]][["threshold"]],
+                           p[["pat_threshold"]][["week"]])
+  if (missing(pat_cutoff)) {
+    # get dynamic pat cutoff
+    pat_cutoff <- dplyr::coalesce(p_pat, 1 / 7)
+  } else {
+    stopifnot(is.numeric(pat_cutoff), length(pat_cutoff) == 1,
+              pat_cutoff > 0, pat_cutoff < 1)
+    pat_cutoff <- rep(pat_cutoff, times = 52)
+    names(pat_cutoff) <- format(ebirdst::ebirdst_weeks$date, "%m-%d")
   }
 
   # load the test data and assign names
@@ -115,7 +131,25 @@ ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 7) {
   date_frac <- preds$day_of_year / 366
   for (i in seq_along(es_cutoff)) {
     preds_week[[i]] <- preds[date_frac > ws[i] & date_frac <= we[i], ]
-    preds_week[[i]][["es_cutoff"]] <- es_cutoff[i]
+    preds_week[[i]][["es_cutoff"]] <- es_cutoff[[i]]
+  }
+  preds <- dplyr::bind_rows(preds_week)
+  rm(preds_week, date_frac)
+
+  # add weekly pat cutoffs
+  weeks <- ebirdst::ebirdst_weeks
+  weeks <- weeks[format(weeks$date, "%m-%d") %in% names(pat_cutoff), ]
+  ws <- weeks$week_start
+  we <- weeks$week_end
+  if (length(pat_cutoff) == 52) {
+    ws[1] <- -Inf
+    we[length(we)] <- Inf
+  }
+  preds_week <- list()
+  date_frac <- preds$day_of_year / 366
+  for (i in seq_along(pat_cutoff)) {
+    preds_week[[i]] <- preds[date_frac > ws[i] & date_frac <= we[i], ]
+    preds_week[[i]][["pat_cutoff"]] <- pat_cutoff[[i]]
   }
   preds <- dplyr::bind_rows(preds_week)
   rm(preds_week, date_frac)
@@ -157,7 +191,7 @@ ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 7) {
   }
 
   # false discovery rate (fdr)
-  p_values <- apply(preds, 1, binom_test_p, pat_cutoff = pat_cutoff)
+  p_values <- apply(preds, 1, binom_test_p)
   p_adj <- stats::p.adjust(p_values, "fdr")
   # add binary prediction
   preds$binary <- as.numeric(p_adj < 0.01)
@@ -302,7 +336,7 @@ ebirdst_ppms <- function(path, ext, es_cutoff, pat_cutoff = 1 / 7) {
                                             method = "spearman")
       cs$pearson_count_log[i_mc] <- stats::cor(log(test_cnt$mu_median + 1),
                                                log(test_cnt$obs + 1),
-                                           method = "pearson")
+                                               method = "pearson")
     }
   }
   structure(list(binary_ppms = dplyr::tibble(type = "binary", bs),
@@ -675,20 +709,20 @@ bernoulli_dev <- function(obs, pred) {
 
 #' Binomial test for ensemble support
 #'
-#' @param x numeric; named numeric vector with values for `"pat"` and `"pi_es"`.
-#' @param pat_cutoff numeric; percent above threshold cutoff
+#' @param x numeric; named numeric vector with values for `pat`, `pi_es`, and
+#'   `pat_cutoff`.
 #'
 #' @return A numeric p-value.
 #'
 #' @examples
 #' ebirdst:::binom_test_p(c(pat = 0.1, pi_es = 75))
-binom_test_p <- function(x, pat_cutoff = 1 / 10) {
+binom_test_p <- function(x) {
   if (is.na(x["pat_mean"]) | is.na(x["pi_es"])) {
     return(NA)
   }
   pat_pi_es <- round(as.numeric(x["pat_mean"]) * as.numeric(x["pi_es"]), 0)
   p <- stats::binom.test(pat_pi_es, as.numeric(x["pi_es"]),
-                         p = pat_cutoff,
+                         p = x["pat_cutoff"],
                          alternative = "greater")
   p <- p$p.value
   return(p)

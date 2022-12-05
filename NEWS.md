@@ -1,6 +1,7 @@
 # ebirdst 1.2021.1
 
 - fix bug with extent in `load_fac_map_parameters()`, GitHub issue #40
+- use dynamic PAT cutoff in PPM calculations
 
 # ebirdst 1.2021.0
 

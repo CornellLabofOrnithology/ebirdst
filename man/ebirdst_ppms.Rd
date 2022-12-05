@@ -5,7 +5,7 @@
 \alias{plot.ebirdst_ppms}
 \title{eBird Status and Trends predictive performance metrics (PPMs)}
 \usage{
-ebirdst_ppms(path, ext, es_cutoff, pat_cutoff = 1/7)
+ebirdst_ppms(path, ext, es_cutoff, pat_cutoff)
 
 \method{plot}{ebirdst_ppms}(x, ...)
 }
@@ -24,7 +24,11 @@ stored in the data package for each species. \strong{In general, you should not
 specify a value for \code{es_cutoff} and instead allow the function to use the
 species-specific model-based values.}}
 
-\item{pat_cutoff}{numeric between 0-1; percent above threshold.}
+\item{pat_cutoff}{numeric between 0-1; percent above threshold. Optimal PAT
+cutoff values are calculated for each week during the modeling process and
+stored in the data package for each species. \strong{In general, you should not
+specify a value for \code{pat_cutoff} and instead allow the function to use the
+species-specific model-based values.}}
 
 \item{x}{\link{ebirdst_ppms} object; PPMs as calculated by \code{\link[=ebirdst_ppms]{ebirdst_ppms()}}.}
 

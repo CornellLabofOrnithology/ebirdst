@@ -4,12 +4,11 @@
 \alias{binom_test_p}
 \title{Binomial test for ensemble support}
 \usage{
-binom_test_p(x, pat_cutoff = 1/10)
+binom_test_p(x)
 }
 \arguments{
-\item{x}{numeric; named numeric vector with values for \code{"pat"} and \code{"pi_es"}.}
-
-\item{pat_cutoff}{numeric; percent above threshold cutoff}
+\item{x}{numeric; named numeric vector with values for \code{pat}, \code{pi_es}, and
+\code{pat_cutoff}.}
 }
 \value{
 A numeric p-value.
