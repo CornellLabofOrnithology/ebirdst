@@ -2,6 +2,7 @@
 
 - fix bug with extent in `load_fac_map_parameters()`, GitHub issue #40
 - use dynamic PAT cutoff in PPM calculations
+- update species list to account for second release of eBird data this year
 
 ## Test environments
 
