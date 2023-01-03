@@ -113,6 +113,12 @@ ebirdst_download <- function(species,
     # remove web_download folder
     web_down <- stringr::str_detect(dirname(files), pattern = "web_download")
     files <- files[!web_down]
+
+    # remove additional species cause by bug in API
+    # e.g. leafly will also return leafly2
+    only_target <- stringr::str_detect(dirname(files),
+                                       pattern = paste0("/", species, "/"))
+    files <- files[only_target]
   }
 
   if (length(files) == 0) {
