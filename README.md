@@ -19,7 +19,7 @@ project](https://science.ebird.org/en/status-and-trends) project at the
 [Cornell Lab of Ornithology](https://www.birds.cornell.edu/) uses
 machine-learning models to produce estimates of range boundaries,
 occurrence rate, and relative abundance at high spatial and temporal
-resolution across the full annual cycle of 1,202 bird species globally.
+resolution across the full annual cycle of 2,070 bird species globally.
 These models learn the relationships between bird observations collected
 through [eBird](https://ebird.org/) and a suite of remotely sensed
 habitat variables, while accounting for the noise and bias inherent in
@@ -80,7 +80,7 @@ The Status and Trends Data Products provide estimates of relative
 abundance, and other variables, for a particular year. This estimation
 year is used to identify the version of the data products. Each version
 of this R package is associated with a particular version of the data.
-For example, the current version of the R package is 1.2021.1 and, as
+For example, the current version of the R package is 1.2021.2 and, as
 indicated by the year in the version number, it is designed to work with
 the 2021 data products. Every year, typically in November, the Status
 and Trends Data Products are updated, and users are encouraged to update
@@ -162,13 +162,14 @@ labels <- pars$weekly_labels
 # get a date vector specifying which week each raster layer corresponds to
 weeks <- parse_raster_dates(abd)
 print(weeks)
-#>  [1] "2021-01-04" "2021-01-11" "2021-01-18" "2021-01-25" "2021-02-01" "2021-02-08" "2021-02-15" "2021-02-22"
-#>  [9] "2021-03-01" "2021-03-08" "2021-03-15" "2021-03-22" "2021-03-29" "2021-04-05" "2021-04-12" "2021-04-19"
-#> [17] "2021-04-26" "2021-05-03" "2021-05-10" "2021-05-17" "2021-05-24" "2021-05-31" "2021-06-07" "2021-06-14"
-#> [25] "2021-06-21" "2021-06-28" "2021-07-06" "2021-07-13" "2021-07-20" "2021-07-27" "2021-08-03" "2021-08-10"
-#> [33] "2021-08-17" "2021-08-24" "2021-08-31" "2021-09-07" "2021-09-14" "2021-09-21" "2021-09-28" "2021-10-05"
-#> [41] "2021-10-12" "2021-10-19" "2021-10-26" "2021-11-02" "2021-11-09" "2021-11-16" "2021-11-23" "2021-11-30"
-#> [49] "2021-12-07" "2021-12-14" "2021-12-21" "2021-12-28"
+#>  [1] "2021-01-04" "2021-01-11" "2021-01-18" "2021-01-25" "2021-02-01" "2021-02-08" "2021-02-15"
+#>  [8] "2021-02-22" "2021-03-01" "2021-03-08" "2021-03-15" "2021-03-22" "2021-03-29" "2021-04-05"
+#> [15] "2021-04-12" "2021-04-19" "2021-04-26" "2021-05-03" "2021-05-10" "2021-05-17" "2021-05-24"
+#> [22] "2021-05-31" "2021-06-07" "2021-06-14" "2021-06-21" "2021-06-28" "2021-07-06" "2021-07-13"
+#> [29] "2021-07-20" "2021-07-27" "2021-08-03" "2021-08-10" "2021-08-17" "2021-08-24" "2021-08-31"
+#> [36] "2021-09-07" "2021-09-14" "2021-09-21" "2021-09-28" "2021-10-05" "2021-10-12" "2021-10-19"
+#> [43] "2021-10-26" "2021-11-02" "2021-11-09" "2021-11-16" "2021-11-23" "2021-11-30" "2021-12-07"
+#> [50] "2021-12-14" "2021-12-21" "2021-12-28"
 
 # select a week in the middle of the year
 abd <- abd[[26]]

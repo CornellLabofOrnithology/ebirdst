@@ -1,7 +1,10 @@
 # ebirdst 2.2021.0
 
-- transition from using raster to terra for rasters
-- fix bug causing species with same base code to be downloaded together, e.g. leafly also downloads leafly2, GitHub issue #43
+- transition from using raster to terra for handling raster data
+
+# ebirdst 1.2021.2
+
+- fix bug causing species with same base code to be downloaded together, e.g. leafly also downloads leafly2 [issue #43]
 
 # ebirdst 1.2021.1
 
