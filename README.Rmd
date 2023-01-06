@@ -77,7 +77,7 @@ This quick start guide shows how to download data and plot abundance values simi
 
 ```{r quick_start}
 library(ebirdst)
-library(raster)
+library(terra)
 library(sf)
 library(fields)
 library(rnaturalearth)
@@ -97,7 +97,7 @@ breaks <- pars$weekly_bins
 # legend labels for top, middle, and bottom
 labels <- pars$weekly_labels
 
-# get a date vector specifying which week each raster layer corresponds to
+# the date that each raster layer corresponds to is stored within the labels
 weeks <- parse_raster_dates(abd)
 print(weeks)
 
@@ -106,7 +106,7 @@ abd <- abd[[26]]
 
 # project to species specific coordinates
 # the nearest neighbor method preserves cell values across projections
-abd_prj <- projectRaster(trim(abd), crs = crs$wkt, method = "ngb")
+abd_prj <- project(trim(abd), crs$wkt, method = "near")
 
 # get reference data from the rnaturalearth package
 # the example data currently shows only the US state of Michigan

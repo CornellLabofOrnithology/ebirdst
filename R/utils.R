@@ -1,73 +1,12 @@
-#' Label data cubes with the week date for each band
+#' Parse weekly dates from raster layer names
 #'
-#' The data cubes are saved as GeoTIFFs, which don't allow for band labels. For
-#' convenience, this function labels the layers of a data cube once it has been
-#' loaded with the week dates for each band.
+#' The dates corresponding to each layer of a weekly data cube are stored as
+#' the layer names. This function converts these to Date objects.
 #'
-#' @param x `RasterStack` or `RasterBrick`; eBird Status and Trends data cube,
-#'   typically with 52 bands, one for each week.
-#' @param weeks vector of dates corresponding to the weeks of each layer in `x`.
-#'   This argument should be used only rarely, when you're labelling a cube with
-#'   fewer that the usual 52 weeks of predictions.
-#'
-#' @return A `RasterStack` or `RasterBrick` with names assigned for the dates in
-#'   the format of "wYYYY.MM.DD" per raster package constraints. The `Raster*`
-#'   objects do not allow the names to start with a number, nor are they allowed
-#'   to contain "-", so it is not possible to store the date in an ISO compliant
-#'   format. Use `parse_raster_dates()` to convert the layer names to dates.
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' # download example data
-#' path <- ebirdst_download("example_data")
-#' # or get the path if you already have the data downloaded
-#' path <- get_species_path("example_data")
-#'
-#' # weekly relative abundance
-#' # note that only low resolution (lr) data are available for the example data
-#' abd <- load_raster(path, "abundance", resolution = "lr")
-#'
-#' # label
-#' abd <- label_raster_stack(abd)
-#' names(abd)
-#' }
-label_raster_stack <- function(x, weeks = NULL) {
-  stopifnot(inherits(x, "Raster"))
-
-  if (is.null(weeks)) {
-    if((raster::nlayers(x) != 52)) {
-      stop("The input Raster* object must be a full cube of 52 weeks unless ",
-           "a weeks argument is provided to label_raster_stack().")
-    }
-    weeks <- ebirdst::ebirdst_weeks$date
-  }
-  stopifnot(inherits(weeks, "Date"))
-
-  # check lengths
-  if (raster::nlayers(x) != length(weeks)) {
-    stop("The number of raster layers must match the number of weeks.")
-  }
-
-  date_names <- format(weeks, "w%Y.%m.%d")
-  names(x) <- date_names
-
-  return(x)
-}
-
-
-#' Parse data cube layer names into dates
-#'
-#' [label_raster_stack()] labels the layers of a data cube with the associated
-#' week dates in the format of "wYYYY.MM.DD", because of constraints in the
-#' `raster` package. This function converts that character vector into an ISO
-#' compliant Date vector.
-#'
-#' @param x `Raster` object; labeled Status and Trends data cube.
+#' @param x [SpatRaster][terra::SpatRaster] object; weekly Status and Trends
+#'   data cube.
 #'
 #' @return Date vector.
-#'
 #' @export
 #'
 #' @examples
@@ -78,21 +17,20 @@ label_raster_stack <- function(x, weeks = NULL) {
 #' path <- get_species_path("example_data")
 #'
 #' # weekly relative abundance
-#' # note that only low resolution (lr) data are available for the example data
-#' abd <- load_raster(path, "abundance", resolution = "lr")
+#' abd_weekly <- load_raster(path, "abundance", resolution = "lr")
 #'
-#' # parse dates
-#' parse_raster_dates(abd)
+#' # dates corresponding to each week
+#' parse_raster_dates(abd_weekly)
 #' }
 parse_raster_dates <- function(x) {
-  stopifnot(inherits(x, "Raster"))
-  if (!all(grepl("w[0-9]{4}\\.[0-9]{2}\\.[0-9]{2}", names(x)))) {
-    stop("Raster names not in correct format, call label_raster_stack() first.")
+  stopifnot(inherits(x, "SpatRaster"))
+  dates <- as.Date(names(x), format = "%Y-%m-%d")
+  if (any(is.na(dates))) {
+    stop("Problem parsing dates stored in input raster layer names. ",
+         "Layer names must be formatted 'YYYY-MM-DD'.")
   }
-
-  as.Date(names(x), format = "w%Y.%m.%d")
+  return(dates)
 }
-
 
 #' Get the Status and Trends week that a date falls into
 #'

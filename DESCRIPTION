@@ -1,7 +1,7 @@
 Type: Package
 Package: ebirdst
 Title: Access and Analyze eBird Status and Trends Data
-Version: 1.2021.2
+Version: 2.2021.0
 Authors@R: c(
     person("Matthew", "Strimas-Mackey", , "mes335@cornell.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-8929-7776")),
@@ -36,19 +36,17 @@ Imports:
     mgcv,
     precrec,
     PresenceAbsence,
-    raster (>= 3.1-5),
-    rgdal,
     rlang,
     RSQLite,
     sf (>= 1.0-0),
     stats,
     stringr,
+    terra,
     tidyr (>= 1.0.0),
     tools,
     utils,
     viridisLite
 Suggests: 
-    exactextractr,
     fields,
     knitr,
     rmarkdown,

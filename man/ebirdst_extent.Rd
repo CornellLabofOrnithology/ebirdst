@@ -46,7 +46,7 @@ the spatial extent \code{extent}, the temporal extent \code{t}, and \code{type} 
 }
 \description{
 \code{ebirdst_extent} object are used to subset the eBird Status and Trends data
-spatially and temporally. This function constructs these objects.
+spatially and/or temporally. This function constructs these objects.
 }
 \details{
 The spatial extent, \code{x}, can be either a rectangular bounding box or

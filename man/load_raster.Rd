@@ -39,17 +39,17 @@ default is to load the native ~3 km resolution (\code{"hr"}); however, for some
 applications 9 km (\code{"mr"}) or 27 km (\code{"lr"}) data may be suitable.}
 }
 \value{
-For the weekly cubes, a \code{RasterStack} with 52 layers for the given
-product, labeled by week. Seasonal cubes will have up to four layers
-labeled according to the seasons. The full-year products will have a single
-layer.
+For the weekly cubes, a \link[terra:SpatRaster-class]{SpatRaster} with 52
+layers for the given product, labeled by week. Seasonal cubes will have up
+to four layers labeled according to the seasons. The full-year products
+will have a single layer.
 }
 \description{
 Each of the eBird Status and Trends raster products is packaged as a GeoTIFF
 file representing predictions on a regular grid. The core products are
 occurrence, count, relative abundance, and percent of population. This
-function loads one of the available data products into R as a \code{RasterStack}
-object.
+function loads one of the available data products into R as a
+\link[terra:SpatRaster-class]{SpatRaster} object.
 }
 \details{
 The core Status and Trends data products provide weekly estimates
@@ -93,7 +93,10 @@ path <- get_species_path("example_data")
 # weekly relative abundance
 # note that only low resolution (lr) data are available for the example data
 abd_weekly <- load_raster(path, "abundance", resolution = "lr")
-# identify the weeks for each layer
+
+# the weeks for each layer are stored in the layer names
+names(abd_weekly)
+# and can be converted to Date objects with
 parse_raster_dates(abd_weekly)
 
 # max seasonal abundance

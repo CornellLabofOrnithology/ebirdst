@@ -2,21 +2,20 @@
 % Please edit documentation in R/utils.R
 \name{parse_raster_dates}
 \alias{parse_raster_dates}
-\title{Parse data cube layer names into dates}
+\title{Parse weekly dates from raster layer names}
 \usage{
 parse_raster_dates(x)
 }
 \arguments{
-\item{x}{\code{Raster} object; labeled Status and Trends data cube.}
+\item{x}{\link[terra:SpatRaster-class]{SpatRaster} object; weekly Status and Trends
+data cube.}
 }
 \value{
 Date vector.
 }
 \description{
-\code{\link[=label_raster_stack]{label_raster_stack()}} labels the layers of a data cube with the associated
-week dates in the format of "wYYYY.MM.DD", because of constraints in the
-\code{raster} package. This function converts that character vector into an ISO
-compliant Date vector.
+The dates corresponding to each layer of a weekly data cube are stored as
+the layer names. This function converts these to Date objects.
 }
 \examples{
 \dontrun{
@@ -26,10 +25,9 @@ path <- ebirdst_download("example_data")
 path <- get_species_path("example_data")
 
 # weekly relative abundance
-# note that only low resolution (lr) data are available for the example data
-abd <- load_raster(path, "abundance", resolution = "lr")
+abd_weekly <- load_raster(path, "abundance", resolution = "lr")
 
-# parse dates
-parse_raster_dates(abd)
+# dates corresponding to each week
+parse_raster_dates(abd_weekly)
 }
 }

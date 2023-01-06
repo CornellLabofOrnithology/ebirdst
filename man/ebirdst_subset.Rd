@@ -4,7 +4,7 @@
 \alias{ebirdst_subset}
 \alias{ebirdst_subset.data.frame}
 \alias{ebirdst_subset.sf}
-\alias{ebirdst_subset.Raster}
+\alias{ebirdst_subset.SpatRaster}
 \title{Subset eBird Status and Trends data spatiotemporally}
 \usage{
 ebirdst_subset(x, ext)
@@ -13,12 +13,12 @@ ebirdst_subset(x, ext)
 
 \method{ebirdst_subset}{sf}(x, ext)
 
-\method{ebirdst_subset}{Raster}(x, ext)
+\method{ebirdst_subset}{SpatRaster}(x, ext)
 }
 \arguments{
-\item{x}{eBird Status and Trends data to subset; either a \code{RasterStack}
-object with 52 layers (one for each week) or a data frame with PI or PD
-data.}
+\item{x}{eBird Status and Trends data to subset; either a
+\link[terra:SpatRaster-class]{SpatRaster} object with 52 layers (one for each week)
+or a data frame with PI or PD data.}
 
 \item{ext}{\link{ebirdst_extent} object; the spatiotemporal extent to filter the
 data to.}
@@ -37,7 +37,7 @@ The spatiotemporal extent should be defined using \code{\link[=ebirdst_extent]{e
 
 \item \code{ebirdst_subset(sf)}: PI or PD data as an \code{sf} object
 
-\item \code{ebirdst_subset(Raster)}: Status and Trends rasters
+\item \code{ebirdst_subset(SpatRaster)}: Status and Trends rasters
 
 }}
 \examples{

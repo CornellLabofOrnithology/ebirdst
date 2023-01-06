@@ -25,13 +25,13 @@ test_that("load_fac_map_parameters", {
 
   # check components
   # projection
-  expect_is(raster::projection(p$custom_projection), "character")
+  expect_is(terra::crs(p$custom_projection), "character")
   # extent
-  expect_is(p$fa_extent, "Extent")
+  expect_is(p$fa_extent, "SpatExtent")
   # resolution
   expect_is(p$res, c("numeric", "integer"))
   # sinusoidal extent
-  expect_is(p$fa_extent_sinu, "Extent")
+  expect_is(p$fa_extent_sinu, "SpatExtent")
   # bins
   expect_is(p$weekly_bins, "numeric")
   expect_is(p$seasonal_bins, "numeric")

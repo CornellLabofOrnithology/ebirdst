@@ -39,18 +39,18 @@ knitr::opts_chunk$set(eval = nzchar(Sys.getenv("BUILD_VIGNETTES")))
 
 # Loading raster data {#load}
 
-As covered in the [Get Started vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst.html), the function `load_raster()` loads raster data products in R as `RasterStack` objects, which we can work with using the `raster` package. Let's start by loading the seasonal relative abundance raster for the example Yellow-bellied Sapsucker data. We'll work with the low resolution data in this vignette to ensure fast processing times.
+As covered in the [Get Started vignette](https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst.html), the function `load_raster()` loads raster data products in R as `SpatRaster` objects, which we can work with using the `terra` package. Let's start by loading the seasonal relative abundance raster for the example Yellow-bellied Sapsucker data. We'll work with the low resolution data in this vignette to ensure fast processing times.
 
 ```{r load}
 library(ebirdst)
-library(raster)
+library(terra)
 library(sf)
-library(exactextractr)
 library(dplyr)
 library(tidyr)
 library(rnaturalearth)
 library(ggplot2)
-extract <- raster::extract
+library(fields)
+extract <- terra::extract
 
 # download the example yellow-bellied sapsucker data
 # this simplified dataset doesn't require an access key
@@ -125,7 +125,7 @@ fac_parameters <- load_fac_map_parameters(path)
 crs <- fac_parameters$custom_projection
 
 # transform to the custom projection using nearest neighbor resampling
-abd_projected <- projectRaster(abd_breeding_mi, crs = crs, method = "ngb")
+abd_projected <- project(abd_breeding_mi, crs, method = "near")
 
 # map the cropped and projected data
 plot(abd_projected, axes = FALSE)
@@ -145,7 +145,7 @@ bins <- quantile(v, seq(0, 1, by = 0.1))
 bins <- c(0, bins)
 
 # status and trends palette
-pal <- abundance_palette(length(bins) - 1)
+pal <- abundance_palette(length(bins) - 2)
 # add a color for zero
 pal <- c("#e6e6e6", pal)
 
@@ -179,20 +179,21 @@ plot(abd_projected,
      breaks = bins, col = pal, 
      axes = FALSE, legend = FALSE, add = TRUE)
 # add boundaries
-plot(countries, col = NA, border = "#888888", add = TRUE)
+plot(countries, col = NA, border = "#888888", lwd = 3, add = TRUE)
 plot(states, col = NA, border = "#888888", add = TRUE)
 
-# add legend
+# add legend using the fields package
 # label the bottom, middle, and top
 labels <- quantile(bins, c(0, 0.5, 1))
-plot(abd_projected, zlim = c(0, 1), legend.only = TRUE, 
-     col = pal, breaks = seq(0, 1, length.out = length(bins)), 
-     legend.shrink = 0.9, legend.width = 2,  
-     axis.args = list(at = seq(0, 1, length.out = length(labels)), 
-                      labels = signif(labels, 3),
-                      col.axis = "black", fg = NA,
-                      cex.axis = 0.9, lwd.ticks = 0,
-                      line = -0.5))
+label_breaks <- seq(0, 1, length.out = length(bins))
+image.plot(zlim = c(0, 1), breaks = label_breaks, col = pal,
+           smallplot = c(0.90, 0.93, 0.15, 0.85),
+           legend.only = TRUE,
+           axis.args = list(at = c(0, 0.5, 1), 
+                            labels = round(labels, 2),
+                            col.axis = "black", fg = NA,
+                            cex.axis = 0.9, lwd.ticks = 0,
+                            line = -0.5))
 ```
 
 # Extracting trajectories with uncertainty {#trajectories}
@@ -220,12 +221,12 @@ pt <- st_point(c(-88.1, 46.7)) %>%
   st_coordinates()
 
 # extract
-traj_median <- extract(abd_median, pt, fun = mean, na.rm = TRUE)[1, ]
-traj_upper <- extract(abd_upper, pt, fun = mean, na.rm = TRUE)[1, ]
-traj_lower <- extract(abd_lower, pt, fun = mean, na.rm = TRUE)[1, ]
+traj_median <- as.matrix(extract(abd_median, pt))[1, ]
+traj_upper <- as.matrix(extract(abd_upper, pt))[1, ]
+traj_lower <- as.matrix(extract(abd_lower, pt))[1, ]
 
 # plot trajectories
-plot_frame <- data.frame(x = 1:length(traj_median),
+plot_frame <- data.frame(x = seq_len(length(traj_median)),
                          y = unname(traj_median),
                          lower = unname(traj_lower),
                          upper = unname(traj_upper))
@@ -261,7 +262,7 @@ mi_counties <- getData("GADM", country = "USA", level = 2, path = tempdir()) %>%
   # remove lakes which aren't true counties
   filter(county_code != "US.MI.WB")
 # project to sinusoidal
-mi_counties_proj <- st_transform(mi_counties, crs = projection(abd_median))
+mi_counties_proj <- st_transform(mi_counties, crs = st_crs(abd_median))
 ```
 
 We'll need the seasonal percent of population cubes and the seasonal ranges for these calculations.
@@ -277,13 +278,13 @@ ranges <- load_ranges(path, resolution = "lr", smoothed = FALSE)
 Percent of population in regions is one of the simplest statistics to calculate since a raster of percent of population is already provided; we simply sum all the raster cells within each region polygon. 
 
 ```{r mean-rel-abd}
-pctpop <- exact_extract(pop_seasonal, mi_counties_proj, fun = "sum", 
-                        progress = FALSE) %>% 
+pctpop <- extract(pop_seasonal, mi_counties_proj, fun = sum, na.rm = TRUE) %>% 
   # attach county attributes
   mutate(county_code = mi_counties$county_code) %>% 
   # transpose to long format, one season per row
+  select(-ID) %>% 
   pivot_longer(cols = -county_code, 
-               names_to = "season", names_prefix = "sum.",
+               names_to = "season",
                values_to = "percent_population")
 head(pctpop)
 ```
@@ -329,4 +330,5 @@ for (s in ranges$season) {
     bind_rows(range_pct_occupied, .)
     
 }
+head(range_pct_occupied)
 ```

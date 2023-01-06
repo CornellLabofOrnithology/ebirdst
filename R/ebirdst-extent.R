@@ -1,7 +1,7 @@
 #' Construct a spatiotemporal extent object to subset Status and Trends data
 #'
 #' `ebirdst_extent` object are used to subset the eBird Status and Trends data
-#' spatially and temporally. This function constructs these objects.
+#' spatially and/or temporally. This function constructs these objects.
 #'
 #' @param x the spatial extent; either a rectangular bounding box (defined as a
 #'   vector of numbers representing the coordinates of the boundaries or an

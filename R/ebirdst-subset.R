@@ -3,9 +3,9 @@
 #' Spatiotemporally subset the raster or tabular eBird Status and Trends data.
 #' The spatiotemporal extent should be defined using [ebirdst_extent()].
 #'
-#' @param x eBird Status and Trends data to subset; either a `RasterStack`
-#'   object with 52 layers (one for each week) or a data frame with PI or PD
-#'   data.
+#' @param x eBird Status and Trends data to subset; either a
+#'   [SpatRaster][terra::SpatRaster] object with 52 layers (one for each week)
+#'   or a data frame with PI or PD data.
 #' @param ext [ebirdst_extent] object; the spatiotemporal extent to filter the
 #'   data to.
 #'
@@ -112,15 +112,14 @@ ebirdst_subset.sf <- function(x, ext) {
 
 #' @export
 #' @describeIn ebirdst_subset Status and Trends rasters
-ebirdst_subset.Raster <- function(x, ext) {
-  if((raster::nlayers(x) != 52)) {
-    stop(paste("The input Raster object must be full stack or brick of 52",
-               "layers as originally provided."))
+ebirdst_subset.SpatRaster <- function(x, ext) {
+  if((terra::nlyr(x) != 52)) {
+    stop(paste("The input raster object must be a full cube of 52 layers as ",
+               "originally provided."))
   }
   stopifnot(inherits(ext, "ebirdst_extent"))
 
   # temporal filtering
-  x <- label_raster_stack(x)
   if (!identical(ext$t, c(0, 1))) {
     r_dates <- to_srd_date(parse_raster_dates(x))
     if (ext$t[1] <= ext$t[2]) {
@@ -134,13 +133,13 @@ ebirdst_subset.Raster <- function(x, ext) {
   # spatial filtering
   e_ll <- project_extent(ext, crs = sf::st_crs(x))
   if (ext$type == "bbox") {
-    x <- raster::crop(x, bbox_to_extent(e_ll$extent))
+    x <- terra::crop(x, bbox_to_extent(e_ll$extent))
   } else if (ext$type == "polygon") {
-    x <- raster::trim(
-      raster::mask(
-        raster::crop(x, bbox_to_extent(sf::st_bbox(e_ll$extent))),
-        sf::st_sf(e_ll$extent)),
-      values = NA)
+    x <- terra::trim(
+      terra::mask(
+        terra::crop(x, bbox_to_extent(sf::st_bbox(e_ll$extent))),
+        sf::st_sf(e_ll$extent))
+    )
   } else {
     stop("Invalid ebirdst_extent object.")
   }
@@ -151,5 +150,5 @@ ebirdst_subset.Raster <- function(x, ext) {
 # internal ----
 
 bbox_to_extent <- function(x) {
-  raster::extent(x[["xmin"]], x[["xmax"]], x[["ymin"]], x[["ymax"]])
+  terra::ext(x[["xmin"]], x[["xmax"]], x[["ymin"]], x[["ymax"]])
 }

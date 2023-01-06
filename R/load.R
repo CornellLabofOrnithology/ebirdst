@@ -3,8 +3,8 @@
 #' Each of the eBird Status and Trends raster products is packaged as a GeoTIFF
 #' file representing predictions on a regular grid. The core products are
 #' occurrence, count, relative abundance, and percent of population. This
-#' function loads one of the available data products into R as a `RasterStack`
-#' object.
+#' function loads one of the available data products into R as a
+#' [SpatRaster][terra::SpatRaster] object.
 #'
 #' @param path character; directory that the Status and Trends data for a given
 #'   species was downloaded to. This path is returned by `ebirdst_download()`
@@ -57,12 +57,11 @@
 #' non-breeding season failed expert review for a given species, the full-year
 #' summary for that species will not include the weeks that would fall within
 #' the non-breeding season.
-
 #'
-#' @return For the weekly cubes, a `RasterStack` with 52 layers for the given
-#'   product, labeled by week. Seasonal cubes will have up to four layers
-#'   labeled according to the seasons. The full-year products will have a single
-#'   layer.
+#' @return For the weekly cubes, a [SpatRaster][terra::SpatRaster] with 52
+#'   layers for the given product, labeled by week. Seasonal cubes will have up
+#'   to four layers labeled according to the seasons. The full-year products
+#'   will have a single layer.
 #'
 #' @export
 #'
@@ -76,7 +75,10 @@
 #' # weekly relative abundance
 #' # note that only low resolution (lr) data are available for the example data
 #' abd_weekly <- load_raster(path, "abundance", resolution = "lr")
-#' # identify the weeks for each layer
+#'
+#' # the weeks for each layer are stored in the layer names
+#' names(abd_weekly)
+#' # and can be converted to Date objects with
 #' parse_raster_dates(abd_weekly)
 #'
 #' # max seasonal abundance
@@ -105,9 +107,10 @@ load_raster <- function(path,
   resolution <- match.arg(resolution)
 
   # check that the geotiff driver is installed
-  drv <- rgdal::gdalDrivers()
-  if (!drv[["create"]][drv[["name"]] == "GTiff"]) {
-    stop("rgdal does not have GeoTIFF support. GeoTIFF support is required to ",
+  drv <- terra::gdal(drivers = TRUE)
+  drv <- drv$name[stringr::str_detect(drv$can, "read")]
+  if (!"GTiff" %in% drv) {
+    stop("GDAL does not have GeoTIFF support. GeoTIFF support is required to ",
          "load Status and Trends raster data.")
   }
 
@@ -168,17 +171,8 @@ load_raster <- function(path,
     stop("The file for the requested product does not exist: \n  ", file)
   }
 
-  # load raster stack
-  r <- suppressWarnings(raster::stack(file))
-
-  # name with weeks
-  if (period == "weekly") {
-    weeks <- paste0(p$srd_pred_year, "-", p$date_names)
-    weeks <- as.Date(weeks, "%Y-%m-%d")
-    r <- label_raster_stack(r, weeks = weeks)
-  }
-
-  return(r)
+  # load and return raster stack
+  return(terra::rast(file))
 }
 
 
@@ -635,10 +629,10 @@ load_config <- function(path) {
 #' @return A list containing elements:
 #' - `custom_projection`: a custom projection optimized for the given species'
 #'    full annual cycle
-#' - `fa_extent`: an `Extent` object storing the spatial extent of non-zero
-#'    data for the given species in the custom projection
+#' - `fa_extent`: a [SpatExtent][terra::ext()] object storing the spatial extent of non-zero
+#' data for the given species in the custom projection
 #' - `res`: a numeric vector with 2 elements giving the target resolution of
-#'    raster in the custom projection.
+#'    raster in the custom projection
 #' - `fa_extent_sinu`: the extent in sinusoidal projection
 #' - `weekly_bins`/`weekly_labels`: weekly abundance bins and labels for the
 #' full annual cycle
@@ -665,9 +659,9 @@ load_fac_map_parameters <- function(path) {
   ext_order <- unlist(p$bbox_sinu)[c("xmin", "xmax", "ymin", "ymax")]
 
   seasonal_bins <- list(custom_projection = p$projection$crs,
-                        fa_extent = raster::extent(p$projection$extent),
+                        fa_extent = terra::ext(p$projection$extent),
                         res = p$projection$res,
-                        fa_extent_sinu = raster::extent(ext_order),
+                        fa_extent_sinu = terra::ext(ext_order),
                         weekly_bins = p$bins$hr$breaks,
                         weekly_labels = p$bins$hr$labels,
                         seasonal_bins = p$bins_seasonal$hr$breaks,

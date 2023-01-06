@@ -55,7 +55,7 @@ Throughout the package vignettes, a simplified example dataset is used consistin
 
 ```{r access}
 library(ebirdst)
-library(raster)
+library(terra)
 library(sf)
 library(dplyr)
 
@@ -85,9 +85,9 @@ Reviewers also examine the model estimates for each season to assess the amount 
 
 A rating of 0 implies this season failed review and model results should not be used at all for this period. Ratings of 1-3 correspond to a gradient of more to less extrapolation and/or omission, and we often use a traffic light analogy when referring to them:
 
-1. **Red light**: low quality, extensive extrapolation and/or omission and noise, but at least some regions have estimates that are accurate; can be used with caution in certain regions.
-2. **Yellow light**: medium quality, some extrapolation and/or omission; use with caution.
-3. **Green light**: high quality, very little or no extrapolation and/or omission; these seasons can be safely used.
+1. **Red light (1)**: low quality, extensive extrapolation and/or omission and noise, but at least some regions have estimates that are accurate; can be used with caution in certain regions.
+2. **Yellow light (2)**: medium quality, some extrapolation and/or omission; use with caution.
+3. **Green light (3)**: high quality, very little or no extrapolation and/or omission; these seasons can be safely used.
 
 # Data types and structure {#types}
 
@@ -156,7 +156,7 @@ The seasonal GeoTIFFs use the following naming convention:
 
 `seasonal/<species_code>_<product>_seasonal_<metric>_<resolution>_<year>.tif`
 
-where `metric` is either `mean` or `max`. The function `load_raster(period = "seasonal")` is used to load these data into R and takes arguments for `product`, `metric` and `resolution`. For example,
+where `metric` is either `mean` or `max`. The function `load_raster(period = "seasonal")` is used to load these data into R and takes arguments for `product`, `metric` and `resolution`. The data are loaded into R as `SpatRaster` objects from the `terra` package. For example,
 
 ```{r types_seasonal}
 # seasonal, low res, mean relative abundance
