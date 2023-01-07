@@ -116,7 +116,7 @@ ebirdst_download <- function(species,
 
     # remove additional species cause by bug in API
     # e.g. leafly will also return leafly2
-    only_target <- stringr::str_detect(dirname(files),
+    only_target <- stringr::str_detect(files,
                                        pattern = paste0("/", species, "/"))
     files <- files[only_target]
   }
