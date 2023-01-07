@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2021.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2021.0</span>
       </span>
     </div>
 
@@ -121,21 +121,22 @@ uncertainty</a></li>
 </h2>
 <p>As covered in the <a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst.html">Get
 Started vignette</a>, the function <code><a href="../reference/load_raster.html">load_raster()</a></code> loads
-raster data products in R as <code>RasterStack</code> objects, which we
-can work with using the <code>raster</code> package. Let’s start by
+raster data products in R as <code>SpatRaster</code> objects, which we
+can work with using the <code>terra</code> package. Let’s start by
 loading the seasonal relative abundance raster for the example
 Yellow-bellied Sapsucker data. We’ll work with the low resolution data
 in this vignette to ensure fast processing times.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/CornellLabofOrnithology/ebirdst" class="external-link">ebirdst</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/raster" class="external-link">raster</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/terra/" class="external-link">terra</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://isciences.gitlab.io/exactextractr/" class="external-link">exactextractr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ropenscilabs/rnaturalearth" class="external-link">rnaturalearth</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">geodata</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
-<span><span class="va">extract</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/terra/man/extract.html" class="external-link">extract</a></span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/dnychka/fieldsRPackage" class="external-link">fields</a></span><span class="op">)</span></span>
+<span><span class="va">extract</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/terra/man/extract.html" class="external-link">extract</a></span></span>
 <span></span>
 <span><span class="co"># download the example yellow-bellied sapsucker data</span></span>
 <span><span class="co"># this simplified dataset doesn't require an access key</span></span>
@@ -200,10 +201,10 @@ high-quality, publication-ready maps typically requires extra work. It
 many cases, it may be worthwhile designing maps in a traditional GIS
 environment such as QGIS or ArcGIS.</p>
 <p>The simplest way to map the seasonal relative abundance data is to
-use the built in <code><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot()</a></code> function from the
+use the built in <code><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot()</a></code> function from the
 <code>raster</code> package.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_breeding</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_breeding</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rasters_files/figure-html/map_simple-1.png" width="100%" style="display: block; margin: auto;"></p>
 <p>Clearly this approach doesn’t work out of the box! There are a wide
 variety of issues that we’ll tackle one at a time.</p>
@@ -228,7 +229,7 @@ boundary for Michigan, which we’ll then use to crop the raster.</p>
 <span><span class="va">abd_breeding_mi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/crop.html" class="external-link">crop</a></span><span class="op">(</span><span class="va">abd_breeding</span>, <span class="va">mi</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># map the cropped data</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_breeding_mi</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_breeding_mi</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rasters_files/figure-html/map_extent-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
@@ -248,10 +249,10 @@ then transform the raster data to this custom projection.</p>
 <span><span class="va">crs</span> <span class="op">&lt;-</span> <span class="va">fac_parameters</span><span class="op">$</span><span class="va">custom_projection</span></span>
 <span></span>
 <span><span class="co"># transform to the custom projection using nearest neighbor resampling</span></span>
-<span><span class="va">abd_projected</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projectRaster.html" class="external-link">projectRaster</a></span><span class="op">(</span><span class="va">abd_breeding_mi</span>, crs <span class="op">=</span> <span class="va">crs</span>, method <span class="op">=</span> <span class="st">"ngb"</span><span class="op">)</span></span>
+<span><span class="va">abd_projected</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/project.html" class="external-link">project</a></span><span class="op">(</span><span class="va">abd_breeding_mi</span>, <span class="va">crs</span>, method <span class="op">=</span> <span class="st">"near"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># map the cropped and projected data</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_projected</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_projected</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rasters_files/figure-html/map_projection-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
@@ -269,17 +270,17 @@ the legends on the eBird Status and Trends website.</p>
 <code class="sourceCode R"><span><span class="co"># quantiles of non-zero values</span></span>
 <span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/values.html" class="external-link">values</a></span><span class="op">(</span><span class="va">abd_projected</span><span class="op">)</span></span>
 <span><span class="va">v</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">v</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">]</span></span>
-<span><span class="va">bins</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">v</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, by <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">bins</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">v</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, by <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># add a bin for 0</span></span>
 <span><span class="va">bins</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">bins</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># status and trends palette</span></span>
-<span><span class="va">pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/abundance_palette.html">abundance_palette</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bins</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/abundance_palette.html">abundance_palette</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bins</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co"># add a color for zero</span></span>
 <span><span class="va">pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#e6e6e6"</span>, <span class="va">pal</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># map using the quantile bins</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_projected</span>, breaks <span class="op">=</span> <span class="va">bins</span>, col <span class="op">=</span> <span class="va">pal</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_projected</span>, breaks <span class="op">=</span> <span class="va">bins</span>, col <span class="op">=</span> <span class="va">pal</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rasters_files/figure-html/map_bins-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
@@ -301,28 +302,29 @@ of attribution free contextual GIS data.</p>
 <span><span class="va">mi_ext</span> <span class="op">&lt;-</span> <span class="va">mi</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">crs</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mi_ext</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mi_ext</span><span class="op">)</span></span>
 <span><span class="co"># add basemap</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">countries</span>, col <span class="op">=</span> <span class="st">"#cfcfcf"</span>, border <span class="op">=</span> <span class="st">"#888888"</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">countries</span>, col <span class="op">=</span> <span class="st">"#cfcfcf"</span>, border <span class="op">=</span> <span class="st">"#888888"</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co"># add data</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_projected</span>, </span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_projected</span>, </span>
 <span>     breaks <span class="op">=</span> <span class="va">bins</span>, col <span class="op">=</span> <span class="va">pal</span>, </span>
 <span>     axes <span class="op">=</span> <span class="cn">FALSE</span>, legend <span class="op">=</span> <span class="cn">FALSE</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co"># add boundaries</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">countries</span>, col <span class="op">=</span> <span class="cn">NA</span>, border <span class="op">=</span> <span class="st">"#888888"</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">states</span>, col <span class="op">=</span> <span class="cn">NA</span>, border <span class="op">=</span> <span class="st">"#888888"</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">countries</span>, col <span class="op">=</span> <span class="cn">NA</span>, border <span class="op">=</span> <span class="st">"#888888"</span>, lwd <span class="op">=</span> <span class="fl">3</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">states</span>, col <span class="op">=</span> <span class="cn">NA</span>, border <span class="op">=</span> <span class="st">"#888888"</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># add legend</span></span>
+<span><span class="co"># add legend using the fields package</span></span>
 <span><span class="co"># label the bottom, middle, and top</span></span>
-<span><span class="va">labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">bins</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.5</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_projected</span>, zlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, legend.only <span class="op">=</span> <span class="cn">TRUE</span>, </span>
-<span>     col <span class="op">=</span> <span class="va">pal</span>, breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bins</span><span class="op">)</span><span class="op">)</span>, </span>
-<span>     legend.shrink <span class="op">=</span> <span class="fl">0.9</span>, legend.width <span class="op">=</span> <span class="fl">2</span>,  </span>
-<span>     axis.args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">labels</span><span class="op">)</span><span class="op">)</span>, </span>
-<span>                      labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">signif</a></span><span class="op">(</span><span class="va">labels</span>, <span class="fl">3</span><span class="op">)</span>,</span>
-<span>                      col.axis <span class="op">=</span> <span class="st">"black"</span>, fg <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>                      cex.axis <span class="op">=</span> <span class="fl">0.9</span>, lwd.ticks <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>                      line <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">bins</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.5</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">label_breaks</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bins</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/fields/man/image.plot.html" class="external-link">image.plot</a></span><span class="op">(</span>zlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, breaks <span class="op">=</span> <span class="va">label_breaks</span>, col <span class="op">=</span> <span class="va">pal</span>,</span>
+<span>           smallplot <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.90</span>, <span class="fl">0.93</span>, <span class="fl">0.15</span>, <span class="fl">0.85</span><span class="op">)</span>,</span>
+<span>           legend.only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>           axis.args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.5</span>, <span class="fl">1</span><span class="op">)</span>, </span>
+<span>                            labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">labels</span>, <span class="fl">2</span><span class="op">)</span>,</span>
+<span>                            col.axis <span class="op">=</span> <span class="st">"black"</span>, fg <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>                            cex.axis <span class="op">=</span> <span class="fl">0.9</span>, lwd.ticks <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>                            line <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rasters_files/figure-html/map_basemap-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 </div>
@@ -353,12 +355,12 @@ cubes.</p>
 <span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># extract</span></span>
-<span><span class="va">traj_median</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">abd_median</span>, <span class="va">pt</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span></span>
-<span><span class="va">traj_upper</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">abd_upper</span>, <span class="va">pt</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span></span>
-<span><span class="va">traj_lower</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">abd_lower</span>, <span class="va">pt</span>, fun <span class="op">=</span> <span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span></span>
+<span><span class="va">traj_median</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/coerce.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">abd_median</span>, <span class="va">pt</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span></span>
+<span><span class="va">traj_upper</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/coerce.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">abd_upper</span>, <span class="va">pt</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span></span>
+<span><span class="va">traj_lower</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/coerce.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">abd_lower</span>, <span class="va">pt</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span></span>
 <span></span>
 <span><span class="co"># plot trajectories</span></span>
-<span><span class="va">plot_frame</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">traj_median</span><span class="op">)</span>,</span>
+<span><span class="va">plot_frame</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">traj_median</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                         y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">traj_median</span><span class="op">)</span>,</span>
 <span>                         lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">traj_lower</span><span class="op">)</span>,</span>
 <span>                         upper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">traj_upper</span><span class="op">)</span><span class="op">)</span></span>
@@ -411,14 +413,14 @@ Michigan, we’ll calculate the statistics over the counties in Michigan;
 however, this approach can easily be extended to any set of regions.
 Let’s start by downloading county boundaries for Michigan.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mi_counties</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/getData.html" class="external-link">getData</a></span><span class="op">(</span><span class="st">"GADM"</span>, country <span class="op">=</span> <span class="st">"USA"</span>, level <span class="op">=</span> <span class="fl">2</span>, path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<code class="sourceCode R"><span><span class="va">mi_counties</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/geodata/man/gadm.html" class="external-link">gadm</a></span><span class="op">(</span>country <span class="op">=</span> <span class="st">"USA"</span>, level <span class="op">=</span> <span class="fl">2</span>, path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">NAME_1</span> <span class="op">==</span> <span class="st">"Michigan"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/raster/man/select.html" class="external-link">select</a></span><span class="op">(</span>county <span class="op">=</span> <span class="va">NAME_2</span>, county_code <span class="op">=</span> <span class="va">HASC_2</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span>county <span class="op">=</span> <span class="va">NAME_2</span>, county_code <span class="op">=</span> <span class="va">HASC_2</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="co"># remove lakes which aren't true counties</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">county_code</span> <span class="op">!=</span> <span class="st">"US.MI.WB"</span><span class="op">)</span></span>
 <span><span class="co"># project to sinusoidal</span></span>
-<span><span class="va">mi_counties_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">mi_counties</span>, crs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projection.html" class="external-link">projection</a></span><span class="op">(</span><span class="va">abd_median</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">mi_counties_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">mi_counties</span>, crs <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">abd_median</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>We’ll need the seasonal percent of population cubes and the seasonal
 ranges for these calculations.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
@@ -432,30 +434,30 @@ ranges for these calculations.</p>
 calculate since a raster of percent of population is already provided;
 we simply sum all the raster cells within each region polygon.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pctpop</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://isciences.gitlab.io/exactextractr/reference/exact_extract.html" class="external-link">exact_extract</a></span><span class="op">(</span><span class="va">pop_seasonal</span>, <span class="va">mi_counties_proj</span>, fun <span class="op">=</span> <span class="st">"sum"</span>, </span>
-<span>                        progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<code class="sourceCode R"><span><span class="va">pctpop</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">pop_seasonal</span>, <span class="va">mi_counties_proj</span>, fun <span class="op">=</span> <span class="va">sum</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="co"># attach county attributes</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>county_code <span class="op">=</span> <span class="va">mi_counties</span><span class="op">$</span><span class="va">county_code</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="co"># transpose to long format, one season per row</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">ID</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="op">-</span><span class="va">county_code</span>, </span>
-<span>               names_to <span class="op">=</span> <span class="st">"season"</span>, names_prefix <span class="op">=</span> <span class="st">"sum."</span>,</span>
+<span>               names_to <span class="op">=</span> <span class="st">"season"</span>,</span>
 <span>               values_to <span class="op">=</span> <span class="st">"percent_population"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">pctpop</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">pctpop</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span></span>
 <span><span class="co">#&gt;   county_code season                 percent_population</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> US.MI.AC    breeding                         0.000<span style="text-decoration: underline;">942</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> US.MI.AC    nonbreeding                      0       </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> US.MI.AC    prebreeding_migration            0.000<span style="text-decoration: underline;">634</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> US.MI.AC    postbreeding_migration           0.000<span style="text-decoration: underline;">816</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> US.MI.AG    breeding                         0.001<span style="text-decoration: underline;">20</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> US.MI.AG    nonbreeding                      0</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> US.MI.AC    breeding                          0.001<span style="text-decoration: underline;">56</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> US.MI.AC    nonbreeding                       0      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> US.MI.AC    prebreeding_migration             0.001<span style="text-decoration: underline;">05</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> US.MI.AC    postbreeding_migration            0.001<span style="text-decoration: underline;">34</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> US.MI.AG    breeding                          0.001<span style="text-decoration: underline;">78</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> US.MI.AG    nonbreeding                       0</span></span></code></pre></div>
 <p>Let’s make a quick map comparing the breeding and non-breeding
 percent of population within counties in Michigan.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># join back to county boundaries</span></span>
 <span><span class="va">pctpop_proj</span> <span class="op">&lt;-</span> <span class="va">pctpop</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">season</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"breeding"</span>, <span class="st">"nonbreeding"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">season</span> <span class="op"><a href="https://rdrr.io/pkg/terra/man/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"breeding"</span>, <span class="st">"nonbreeding"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">mi_counties</span>, <span class="va">.</span>, by <span class="op">=</span> <span class="st">"county_code"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="co"># transform to custom projection for plotting</span></span>
 <span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="va">crs</span><span class="op">)</span></span>
@@ -490,11 +492,19 @@ occupied.</p>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">season</span> <span class="op">==</span> <span class="va">s</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>    <span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html" class="external-link">st_intersection</a></span><span class="op">(</span><span class="va">mi_counties</span>, <span class="va">.</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>percent_occupied <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_measures.html" class="external-link">st_area</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span> <span class="op">/</span> <span class="va">area</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/raster/man/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">season</span>, <span class="va">county_code</span>, <span class="va">percent_occupied</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">season</span>, <span class="va">county_code</span>, <span class="va">percent_occupied</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>    <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">range_pct_occupied</span>, <span class="va">.</span><span class="op">)</span></span>
 <span>    </span>
-<span><span class="op">}</span></span></code></pre></div>
+<span><span class="op">}</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">range_pct_occupied</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     season county_code percent_occupied</span></span>
+<span><span class="co">#&gt; 1 breeding    US.MI.AC        1.0000000</span></span>
+<span><span class="co">#&gt; 2 breeding    US.MI.AG        1.0000000</span></span>
+<span><span class="co">#&gt; 3 breeding    US.MI.AL        0.9686342</span></span>
+<span><span class="co">#&gt; 4 breeding    US.MI.AP        1.0000000</span></span>
+<span><span class="co">#&gt; 5 breeding    US.MI.AN        1.0000000</span></span>
+<span><span class="co">#&gt; 6 breeding    US.MI.AR        1.0000000</span></span></code></pre></div>
 </div>
 </div>
   </div>

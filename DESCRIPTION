@@ -48,6 +48,7 @@ Imports:
     viridisLite
 Suggests: 
     fields,
+    geodata,
     knitr,
     rmarkdown,
     rnaturalearth,

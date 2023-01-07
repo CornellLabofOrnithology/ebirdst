@@ -18,7 +18,7 @@ Status and Trends model of a given species within a spatiotemporal extent."><!--
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2021.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2021.0</span>
       </span>
     </div>
 
@@ -77,7 +77,7 @@ Status and Trends model of a given species within a spatiotemporal extent.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ebirdst_ppms</span><span class="op">(</span><span class="va">path</span>, <span class="va">ext</span>, <span class="va">es_cutoff</span>, <span class="va">pat_cutoff</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for ebirdst_ppms</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -137,7 +137,7 @@ low. In these cases, try increasing the size of the <a href="ebirdst_extent.html
 <p>object.</p>
 
 
-<p><code><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot()</a></code> can be called on the returned <code>ebirdst_ppms</code> object to produce a
+<p><code><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot()</a></code> can be called on the returned <code>ebirdst_ppms</code> object to produce a
 boxplot of PPMs in all three categories: Binary Occurrence, Occurrence
 Probability, and Abundance.</p>
     </div>
@@ -174,7 +174,7 @@ iterations resulting in 25 estimates of each PPM.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># compute predictive performance metrics</span></span></span>
 <span class="r-in"><span><span class="va">ppms</span> <span class="op">&lt;-</span> <span class="fu">ebirdst_ppms</span><span class="op">(</span>path <span class="op">=</span> <span class="va">path</span>, ext <span class="op">=</span> <span class="va">e</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ppms</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ppms</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>

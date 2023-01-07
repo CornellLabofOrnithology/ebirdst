@@ -18,7 +18,7 @@ The spatiotemporal extent should be defined using ebirdst_extent()."><!-- mathja
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2021.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2021.0</span>
       </span>
     </div>
 
@@ -82,16 +82,16 @@ The spatiotemporal extent should be defined using <code><a href="ebirdst_extent.
 <span><span class="co"># S3 method for sf</span></span>
 <span><span class="fu">ebirdst_subset</span><span class="op">(</span><span class="va">x</span>, <span class="va">ext</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for Raster</span></span>
+<span><span class="co"># S3 method for SpatRaster</span></span>
 <span><span class="fu">ebirdst_subset</span><span class="op">(</span><span class="va">x</span>, <span class="va">ext</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>x</dt>
-<dd><p>eBird Status and Trends data to subset; either a <code>RasterStack</code>
-object with 52 layers (one for each week) or a data frame with PI or PD
-data.</p></dd>
+<dd><p>eBird Status and Trends data to subset; either a
+<a href="https://rdrr.io/pkg/terra/man/SpatRaster-class.html" class="external-link">SpatRaster</a> object with 52 layers (one for each week)
+or a data frame with PI or PD data.</p></dd>
 
 
 <dt>ext</dt>
@@ -111,7 +111,7 @@ but subset in space and time.</p>
     
 <ul><li><p><code>ebirdst_subset(data.frame)</code>: PI or PD data</p></li>
 <li><p><code>ebirdst_subset(sf)</code>: PI or PD data as an <code>sf</code> object</p></li>
-<li><p><code>ebirdst_subset(Raster)</code>: Status and Trends rasters</p></li>
+<li><p><code>ebirdst_subset(SpatRaster)</code>: Status and Trends rasters</p></li>
 </ul></div>
 
     <div id="ref-examples">

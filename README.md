@@ -80,7 +80,7 @@ The Status and Trends Data Products provide estimates of relative
 abundance, and other variables, for a particular year. This estimation
 year is used to identify the version of the data products. Each version
 of this R package is associated with a particular version of the data.
-For example, the current version of the R package is 1.2021.2 and, as
+For example, the current version of the R package is 2.2021.0 and, as
 indicated by the year in the version number, it is designed to work with
 the 2021 data products. Every year, typically in November, the Status
 and Trends Data Products are updated, and users are encouraged to update
@@ -139,7 +139,7 @@ structure will cause errors with this package.
 
 ``` r
 library(ebirdst)
-library(raster)
+library(terra)
 library(sf)
 library(fields)
 library(rnaturalearth)
@@ -159,7 +159,7 @@ breaks <- pars$weekly_bins
 # legend labels for top, middle, and bottom
 labels <- pars$weekly_labels
 
-# get a date vector specifying which week each raster layer corresponds to
+# the date that each raster layer corresponds to is stored within the labels
 weeks <- parse_raster_dates(abd)
 print(weeks)
 #>  [1] "2021-01-04" "2021-01-11" "2021-01-18" "2021-01-25" "2021-02-01" "2021-02-08" "2021-02-15"
@@ -176,7 +176,7 @@ abd <- abd[[26]]
 
 # project to species specific coordinates
 # the nearest neighbor method preserves cell values across projections
-abd_prj <- projectRaster(trim(abd), crs = crs$wkt, method = "ngb")
+abd_prj <- project(trim(abd), crs$wkt, method = "near")
 
 # get reference data from the rnaturalearth package
 # the example data currently shows only the US state of Michigan
@@ -217,4 +217,4 @@ image.plot(zlim = c(0, 1), breaks = label_breaks, col = pal,
                             cex.axis = 0.9, lwd.ticks = 0))
 ```
 
-<img src="man/figures/README-quick_start-1.png" width="100%" />
+<img src="man/figures/README-quick_start-1.png" width="100%" style="display: block; margin: auto;" />

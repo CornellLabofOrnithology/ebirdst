@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ebirdst</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2021.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2021.0</span>
       </span>
     </div>
 
@@ -176,7 +176,7 @@ key. The following will download the example dataset to you
 computer:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/CornellLabofOrnithology/ebirdst" class="external-link">ebirdst</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/raster" class="external-link">raster</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/terra/" class="external-link">terra</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
@@ -266,14 +266,14 @@ a gradient of more to less extrapolation and/or omission, and we often
 use a traffic light analogy when referring to them:</p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Red light</strong>: low quality, extensive extrapolation
+<strong>Red light (1)</strong>: low quality, extensive extrapolation
 and/or omission and noise, but at least some regions have estimates that
 are accurate; can be used with caution in certain regions.</li>
 <li>
-<strong>Yellow light</strong>: medium quality, some extrapolation
-and/or omission; use with caution.</li>
+<strong>Yellow light (2)</strong>: medium quality, some
+extrapolation and/or omission; use with caution.</li>
 <li>
-<strong>Green light</strong>: high quality, very little or no
+<strong>Green light (3)</strong>: high quality, very little or no
 extrapolation and/or omission; these seasons can be safely used.</li>
 </ol>
 </div>
@@ -386,14 +386,15 @@ load these data into R and takes arguments for <code>product</code>,
 <code class="sourceCode R"><span><span class="co"># weekly, low res, median occurrence</span></span>
 <span><span class="va">occ_lr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">path</span>, product <span class="op">=</span> <span class="st">"occurrence"</span>, resolution <span class="op">=</span> <span class="st">"lr"</span><span class="op">)</span></span>
 <span><span class="va">occ_lr</span></span>
-<span><span class="co">#&gt; class      : RasterStack </span></span>
-<span><span class="co">#&gt; dimensions : 626, 1502, 940252, 52  (nrow, ncol, ncell, nlayers)</span></span>
-<span><span class="co">#&gt; resolution : 26665.26, 26665.28  (x, y)</span></span>
-<span><span class="co">#&gt; extent     : -20015109, 20036111, -6684911, 10007555  (xmin, xmax, ymin, ymax)</span></span>
-<span><span class="co">#&gt; crs        : +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +R=6371007.181 +units=m +no_defs </span></span>
-<span><span class="co">#&gt; names      : w2021.01.04, w2021.01.11, w2021.01.18, w2021.01.25, w2021.02.01, w2021.02.08, w2021.02.15, w2021.02.22, w2021.03.01, w2021.03.08, w2021.03.15, w2021.03.22, w2021.03.29, w2021.04.05, w2021.04.12, ... </span></span>
-<span><span class="co">#&gt; min values :           0,           0,           0,           0,           0,           0,           0,           0,           0,           0,           0,           0,           0,           0,           0, ... </span></span>
-<span><span class="co">#&gt; max values : 0.012316062, 0.008908954, 0.005192222, 0.005261947, 0.008574143, 0.014774577, 0.018329952, 0.013035353, 0.007518290, 0.005063397, 0.004252218, 0.005209569, 0.010943777, 0.050108384, 0.208685473, ...</span></span>
+<span><span class="co">#&gt; class       : SpatRaster </span></span>
+<span><span class="co">#&gt; dimensions  : 626, 1502, 52  (nrow, ncol, nlyr)</span></span>
+<span><span class="co">#&gt; resolution  : 26665.26, 26665.28  (x, y)</span></span>
+<span><span class="co">#&gt; extent      : -20015109, 20036111, -6684911, 10007555  (xmin, xmax, ymin, ymax)</span></span>
+<span><span class="co">#&gt; coord. ref. : +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +R=6371007.181 +units=m +no_defs </span></span>
+<span><span class="co">#&gt; source      : yebsap-example_occurrence_median_lr_2021.tif </span></span>
+<span><span class="co">#&gt; names       : 2021-01-04,  2021-01-11,  2021-01-18,  2021-01-25,  2021-02-01, 2021-02-08, ... </span></span>
+<span><span class="co">#&gt; min values  : 0.00000000, 0.000000000, 0.000000000, 0.000000000, 0.000000000, 0.00000000, ... </span></span>
+<span><span class="co">#&gt; max values  : 0.01231606, 0.008908954, 0.005192222, 0.005261947, 0.008574143, 0.01477458, ...</span></span>
 <span><span class="co"># use parse_raster_dates() to get the date associated which each raster layer</span></span>
 <span><span class="fu"><a href="../reference/parse_raster_dates.html">parse_raster_dates</a></span><span class="op">(</span><span class="va">occ_lr</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  [1] "2021-01-04" "2021-01-11" "2021-01-18" "2021-01-25" "2021-02-01"</span></span>
@@ -435,7 +436,9 @@ seasons with a score of 0 are not provided.</p>
 <code>max</code>. The function
 <code>load_raster(period = "seasonal")</code> is used to load these data
 into R and takes arguments for <code>product</code>, <code>metric</code>
-and <code>resolution</code>. For example,</p>
+and <code>resolution</code>. The data are loaded into R as
+<code>SpatRaster</code> objects from the <code>terra</code> package. For
+example,</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># seasonal, low res, mean relative abundance</span></span>
 <span><span class="va">abd_seasonal_mean</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">path</span>, product <span class="op">=</span> <span class="st">"abundance"</span>, </span>
@@ -447,15 +450,15 @@ and <code>resolution</code>. For example,</p>
 <span><span class="co">#&gt; [4] "postbreeding_migration"</span></span>
 <span><span class="co"># just the breeding season layer</span></span>
 <span><span class="va">abd_seasonal_mean</span><span class="op">[[</span><span class="st">"breeding"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; class      : RasterLayer </span></span>
-<span><span class="co">#&gt; band       : 1  (of  4  bands)</span></span>
-<span><span class="co">#&gt; dimensions : 626, 1502, 940252  (nrow, ncol, ncell)</span></span>
-<span><span class="co">#&gt; resolution : 26665.26, 26665.28  (x, y)</span></span>
-<span><span class="co">#&gt; extent     : -20015109, 20036111, -6684911, 10007555  (xmin, xmax, ymin, ymax)</span></span>
-<span><span class="co">#&gt; crs        : +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +R=6371007.181 +units=m +no_defs </span></span>
-<span><span class="co">#&gt; source     : yebsap-example_abundance_seasonal_mean_lr_2021.tif </span></span>
-<span><span class="co">#&gt; names      : breeding </span></span>
-<span><span class="co">#&gt; values     : 0, 0.8364842  (min, max)</span></span>
+<span><span class="co">#&gt; class       : SpatRaster </span></span>
+<span><span class="co">#&gt; dimensions  : 626, 1502, 1  (nrow, ncol, nlyr)</span></span>
+<span><span class="co">#&gt; resolution  : 26665.26, 26665.28  (x, y)</span></span>
+<span><span class="co">#&gt; extent      : -20015109, 20036111, -6684911, 10007555  (xmin, xmax, ymin, ymax)</span></span>
+<span><span class="co">#&gt; coord. ref. : +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +R=6371007.181 +units=m +no_defs </span></span>
+<span><span class="co">#&gt; source      : yebsap-example_abundance_seasonal_mean_lr_2021.tif </span></span>
+<span><span class="co">#&gt; name        :  breeding </span></span>
+<span><span class="co">#&gt; min value   : 0.0000000 </span></span>
+<span><span class="co">#&gt; max value   : 0.8364842</span></span>
 <span></span>
 <span><span class="co"># seasonal, low res, max occurrence</span></span>
 <span><span class="va">occ_seasonal_max</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_raster.html">load_raster</a></span><span class="op">(</span><span class="va">path</span>, product <span class="op">=</span> <span class="st">"occurrence"</span>, </span>

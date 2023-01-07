@@ -48,6 +48,7 @@ library(sf)
 library(dplyr)
 library(tidyr)
 library(rnaturalearth)
+library(geodata)
 library(ggplot2)
 library(fields)
 extract <- terra::extract
@@ -255,7 +256,7 @@ These statistics can be downloaded from the Status and Trends website for all re
 Since the example data used in this vignette is restricted to Michigan, we'll calculate the statistics over the counties in Michigan; however, this approach can easily be extended to any set of regions. Let's start by downloading county boundaries for Michigan.
 
 ```{r stats_counties}
-mi_counties <- getData("GADM", country = "USA", level = 2, path = tempdir()) %>% 
+mi_counties <- gadm(country = "USA", level = 2, path = tempdir()) %>% 
   st_as_sf() %>% 
   filter(NAME_1 == "Michigan") %>% 
   select(county = NAME_2, county_code = HASC_2) %>% 
