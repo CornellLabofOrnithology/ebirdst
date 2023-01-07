@@ -10,7 +10,7 @@ test_that("load_raster", {
 
   # check labellling
   expect_match(names(abd), "^[0-9]{4}-[0-9]{2}-[0-9]{2}")
-  expect_is(parse_raster_dates(abd))
+  expect_is(parse_raster_dates(abd), "Date")
 
   # seasonal
   abd <- load_raster(path, "abundance", period = "seasonal", resolution = "lr")
