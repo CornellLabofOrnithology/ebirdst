@@ -1,4 +1,4 @@
-# ebirdst 1.2021.2
+# ebirdst 1.2021.3
 
 - fix missing top-level files from download, introduced by last bug fix [issue #44]
 

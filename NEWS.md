@@ -1,3 +1,7 @@
+# ebirdst 1.2021.3
+
+- fix missing top-level files from download, introduced by last bug fix [issue #44]
+
 # ebirdst 1.2021.2
 
 - fix bug causing species with same base code to be downloaded together, e.g. leafly also downloads leafly2 [issue #43]
