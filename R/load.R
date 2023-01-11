@@ -292,7 +292,9 @@ load_pis <- function(path, ext, model = c("occurrence", "count"),
 
   db_file <- file.path(path, "stixel_summary.db")
   if(!file.exists(db_file)) {
-    stop("The file 'stixel_summary.db' does not exist in: ", path)
+    stop("The file 'stixel_summary.db' does not exist in: ", path, "\n",
+         "To download this file you must use `tifs_only = FALSE` when calling ",
+         "`ebirdst_download()`")
   }
 
   # connect to db
@@ -396,7 +398,9 @@ load_pds <- function(path, ext, model = c("occurrence", "count"),
 
   db_file <- file.path(path, "stixel_summary.db")
   if(!file.exists(db_file)) {
-    stop("The file 'stixel_summary.db' does not exist in: ", path)
+    stop("The file 'stixel_summary.db' does not exist in: ", path, "\n",
+         "To download this file you must use `tifs_only = FALSE` when calling ",
+         "`ebirdst_download()`")
   }
 
   # connect to db
@@ -488,7 +492,9 @@ load_stixels <- function(path, ext, return_sf = FALSE) {
 
   db_file <- file.path(path, "stixel_summary.db")
   if(!file.exists(db_file)) {
-    stop("The file 'stixel_summary.db' does not exist in: ", path)
+    stop("The file 'stixel_summary.db' does not exist in: ", path, "\n",
+         "To download this file you must use `tifs_only = FALSE` when calling ",
+         "`ebirdst_download()`")
   }
 
   # connect to db
@@ -563,7 +569,9 @@ load_predictions <- function(path, return_sf = FALSE) {
 
   db_file <- file.path(path, "predictions.db")
   if(!file.exists(db_file)) {
-    stop("The file 'predictions.db' does not exist in: ", path)
+    stop("The file 'predictions.db' does not exist in: ", path, "\n",
+         "To download this file you must use `tifs_only = FALSE` when calling ",
+         "`ebirdst_download()`")
   }
 
   # connect to db

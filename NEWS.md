@@ -4,7 +4,7 @@
 
 # ebirdst 1.2021.3
 
-- fix missing top-level files from download, introduced by last bug fix [issue #44]
+- patch to fix a bug introduced in last release causing missing config files from data downloads [issue #44]
 
 # ebirdst 1.2021.2
 
