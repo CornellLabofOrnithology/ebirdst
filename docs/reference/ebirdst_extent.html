@@ -64,7 +64,7 @@ spatially and temporally. This function constructs these objects."><!-- mathjax 
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Construct a spatiotemporal extent object to subset Status and Trends data</h1>
-    <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/HEAD/R/ebirdst-extent.R" class="external-link"><code>R/ebirdst-extent.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/ebird/ebirdst/blob/HEAD/R/ebirdst-extent.R" class="external-link"><code>R/ebirdst-extent.R</code></a></small>
     <div class="hidden name"><code>ebirdst_extent.Rd</code></div>
     </div>
 
@@ -94,7 +94,7 @@ spatially and temporally. This function constructs these objects.</p>
     <dl><dt>x</dt>
 <dd><p>the spatial extent; either a rectangular bounding box (defined as a
 vector of numbers representing the coordinates of the boundaries or an
-<code><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox()</a></code> object) or a polygon (an <a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf</a> object). See Details for further
+<code>st_bbox()</code> object) or a polygon (an sf object). See Details for further
 explanation of the format of x.</p></dd>
 
 
@@ -114,7 +114,7 @@ full year of data.</strong></p></dd>
 
 <dt>crs</dt>
 <dd><p>coordinate reference system, provided as a <code>crs</code> object or
-argument to <code><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs()</a></code>. Defaults to unprojected, lat/long coordinates (crs
+argument to <code>st_crs()</code>. Defaults to unprojected, lat/long coordinates (crs
 = 4326). <strong>Only required if x is given as a numeric vector defining the
 bounding box, ignored in all other cases.</strong></p></dd>
 
@@ -131,15 +131,15 @@ the spatial extent <code>extent</code>, the temporal extent <code>t</code>, and 
     <h2>Details</h2>
     <p>The spatial extent, <code>x</code>, can be either a rectangular bounding box or
 a set of spatial polygons. The bounding box can be defined either as an
-<code><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox()</a></code> object or by providing the coordinates of the rectangle edges
+<code>st_bbox()</code> object or by providing the coordinates of the rectangle edges
 directly as a named vector with elements xmin, xmax, ymin, and ymax (note
 that latitude and longitude correspond to y and x, respectively). In this
 latter case, a coordinate reference system must be provided explicitly via
 the <code>crs</code> argument (<code>crs = 4326</code> is the default and is a short form for
 unprojected lat/long coordinates). For a polygon spatial extent, <code>x</code> should
-be either an <a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf</a> or <a href="https://r-spatial.github.io/sf/reference/sfc.html" class="external-link">sfc</a> object (with feature type <code>POLYGON</code> or
+be either an sf or sfc object (with feature type <code>POLYGON</code> or
 <code>MULTIPOLYGON</code>) from the <code>sf</code> package. To import data from a Shapefile or
-GeoPackage into this format, use <code><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">read_sf()</a></code>.</p>
+GeoPackage into this format, use <code>read_sf()</code>.</p>
 <p>The temporal extent defines the start and end dates of the time period.
 These are most easily provided as Date objects or date strings in ISO
 format ("YYYY-MM-DD"). If dates are defined as strings, the year can be
@@ -152,10 +152,10 @@ or January.</p>
     <div id="methods-by-class-">
     <h2>Methods (by class)</h2>
     
-<ul><li><p><code>ebirdst_extent(bbox)</code>: bounding box created with <code><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox()</a></code></p></li>
+<ul><li><p><code>ebirdst_extent(bbox)</code>: bounding box created with <code>st_bbox()</code></p></li>
 <li><p><code>ebirdst_extent(numeric)</code>: bounding box given as edges</p></li>
-<li><p><code>ebirdst_extent(sfc)</code>: polygons as <a href="https://r-spatial.github.io/sf/reference/sfc.html" class="external-link">sfc</a> spatial feature column</p></li>
-<li><p><code>ebirdst_extent(sf)</code>: polygons as <a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf</a> object</p></li>
+<li><p><code>ebirdst_extent(sfc)</code>: polygons as sfc spatial feature column</p></li>
+<li><p><code>ebirdst_extent(sf)</code>: polygons as sf object</p></li>
 </ul></div>
 
     <div id="ref-examples">

@@ -95,139 +95,12 @@
 <div class="section level1">
 <div class="page-header"><h1 id="ebirdst-access-and-analyze-ebird-status-and-trends-data">ebirdst: Access and Analyze eBird Status and Trends Data<a class="anchor" aria-label="anchor" href="#ebirdst-access-and-analyze-ebird-status-and-trends-data"></a>
 </h1></div>
-<!-- badges: start -->
-
-<div class="section level2">
-<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
-</h2>
-<p>The <a href="https://science.ebird.org/en/status-and-trends" class="external-link">eBird Status and Trends project</a> project at the <a href="https://www.birds.cornell.edu/" class="external-link">Cornell Lab of Ornithology</a> uses machine-learning models to produce estimates of range boundaries, occurrence rate, and relative abundance at high spatial and temporal resolution across the full annual cycle of 2,070 bird species globally. These models learn the relationships between bird observations collected through <a href="https://ebird.org/" class="external-link">eBird</a> and a suite of remotely sensed habitat variables, while accounting for the noise and bias inherent in community science datasets, including variation in observer behavior and effort. Interactive maps and visualizations of these model estimates can be explored <a href="https://science.ebird.org/en/status-and-trends" class="external-link">online</a>, and the <a href="https://science.ebird.org/en/status-and-trends/download-data" class="external-link">Status and Trends Data Products</a> provide access to the data behind these maps and visualizations. The <code>ebirdst</code> R package provides a set of tools for downloading these data products, loading them into R, and using them for visualizing and analysis.</p>
-</div>
-<div class="section level2">
-<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
-</h2>
-<p>Install <code>ebirdst</code> from GitHub with:</p>
+<p>This R package has moved. Visit the new website at <a href="https://ebird.github.io/ebirdst/" class="external-link uri">https://ebird.github.io/ebirdst/</a> or install the latest version using:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"cornelllabofornithology/ebirdst"</span>, build <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p>This version of <code>ebirdst</code> is designed to work with the eBird Status Data Products estimated for the year 2021, with visualizations being released on the web in November 2021, and data access being made available in June 2022 <strong>Users are strongly discouraged from comparing Status and Trends results between years due to methodological differences between versions.</strong> If you have accessed and used previous versions and/or may need access to previous versions for reasons related to reproducibility, please contact <a href="mailto:ebird@cornell.edu" class="email">ebird@cornell.edu</a> and your request will be considered.</p>
-</div>
-<div class="section level2">
-<h2 id="data-access">Data access<a class="anchor" aria-label="anchor" href="#data-access"></a>
-</h2>
-<p>Data access is granted through an Access Request Form at: <a href="https://ebird.org/st/request" class="external-link uri">https://ebird.org/st/request</a>. Access with this form generates a key to be used with this R package and is provided immediately (as long as commercial use is not requested). Our terms of use have been designed to be quite permissive in many cases, particularly academic and research use. When requesting data access, please be sure to carefully read the terms of use and ensure that your intended use is not restricted.</p>
-<p>After completing the Access Request Form, you will be provided a Status and Trends access key, which you will need when downloading data. To store the key so the package can access it when downloading data, use the function <code>set_ebirdst_access_key("XXXXX")</code>, where <code>"XXXXX"</code> is the access key provided to you. <strong>Restart R after setting the access key.</strong></p>
-<p><strong>For those interested in accessing these data outside of R</strong>, the most widely used data products are available for direct download through the <a href="%5Bhttps://science.ebird.org/en/status-and-trends" class="external-link">Status and Trends website</a>. Spatial data are accessible in widely adopted GeoTIFF and GeoPackage formats, which can be opened in QGIS, ArcGIS, or other GIS software.</p>
-</div>
-<div class="section level2">
-<h2 id="versions">Versions<a class="anchor" aria-label="anchor" href="#versions"></a>
-</h2>
-<p>The Status and Trends Data Products provide estimates of relative abundance, and other variables, for a particular year. This estimation year is used to identify the version of the data products. Each version of this R package is associated with a particular version of the data. For example, the current version of the R package is 1.2021.3 and, as indicated by the year in the version number, it is designed to work with the 2021 data products. Every year, typically in November, the Status and Trends Data Products are updated, and users are encouraged to update this R package and transition to using the new version of the data products. After the data products are updated, there will be a brief period where access to the previous version is also provided, allowing users to finish any analyses with this previous version. If you intended to continue using the older data products during this period you must not update the R package.</p>
-</div>
-<div class="section level2">
-<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
-</h2>
-<p>If you use the the eBird Status &amp; Trends data please cite it with:</p>
-<blockquote>
-Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, S. Ligocki, O. Robinson, W. Hochachka, L. Jaromczyk, A. Rodewald, C. Wood, I. Davies, A. Spencer. 2022. eBird Status and Trends, Data Version: 2021; Released: 2022. Cornell Lab of Ornithology, Ithaca, New York. <a href="https://doi.org/10.2173/ebirdst.2021" class="external-link uri">https://doi.org/10.2173/ebirdst.2021</a>
-</blockquote>
-<p><a href="https://raw.githubusercontent.com/CornellLabofOrnithology/ebirdst/main/ebirdst-citation.bib" class="external-link">Download BibTeX</a>.</p>
-</div>
-<div class="section level2">
-<h2 id="vignettes">Vignettes<a class="anchor" aria-label="anchor" href="#vignettes"></a>
-</h2>
-<p>For full package documentation, including a series of vignettes covering the full spectrum from introductory to advanced usage, please see the package <a href="https://cornelllabofornithology.github.io/ebirdst">website</a>. The available vignettes are:</p>
-<ul>
-<li>
-<a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst.html">Introduction to eBird Status &amp; Trends Data</a>: covers data access, available data products, and structure and format of data files.</li>
-<li>
-<a href="https://cornelllabofornithology.github.io/ebirdst/articles/rasters.html">Working with Raster Data</a>: loading and analyzing the raster data products.</li>
-</ul>
-</div>
-<div class="section level2">
-<h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
-</h2>
-<p>This quick start guide shows how to download data and plot abundance values similar to how they are plotted for the <a href="https://ebird.org/science/status-and-trends/yebsap/abundance-map-weekly" class="external-link">eBird Status and Trends weekly abundance animations</a>. In this guide, and throughout all package documentation, a simplified example dataset is used consisting of Yellow-bellied Sapsucker in Michigan. For a full list of the species available for download, look at the data frame <code>ebirst_runs</code>, which is included in this package.</p>
-<p><strong>Important note: after downloading the results, do not change the file structure.</strong> All functionality in this package relies on the structure inherent in the delivered results. Changing the folder and file structure will cause errors with this package.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/CornellLabofOrnithology/ebirdst" class="external-link">ebirdst</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/raster" class="external-link">raster</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/dnychka/fieldsRPackage" class="external-link">fields</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ropenscilabs/rnaturalearth" class="external-link">rnaturalearth</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># download example data, yellow-bellied sapsucker in michigan</span></span>
-<span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ebirdst_download.html">ebirdst_download</a></span><span class="op">(</span>species <span class="op">=</span> <span class="st">"example_data"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># load relative abundance raster stack with 52 layers, one for each week</span></span>
-<span><span class="va">abd</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_raster.html">load_raster</a></span><span class="op">(</span>path <span class="op">=</span> <span class="va">path</span>, resolution <span class="op">=</span> <span class="st">"lr"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># load species specific mapping parameters</span></span>
-<span><span class="va">pars</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_fac_map_parameters.html">load_fac_map_parameters</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
-<span><span class="co"># custom coordinate reference system</span></span>
-<span><span class="va">crs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">pars</span><span class="op">$</span><span class="va">custom_projection</span><span class="op">)</span></span>
-<span><span class="co"># legend breaks</span></span>
-<span><span class="va">breaks</span> <span class="op">&lt;-</span> <span class="va">pars</span><span class="op">$</span><span class="va">weekly_bins</span></span>
-<span><span class="co"># legend labels for top, middle, and bottom</span></span>
-<span><span class="va">labels</span> <span class="op">&lt;-</span> <span class="va">pars</span><span class="op">$</span><span class="va">weekly_labels</span></span>
-<span></span>
-<span><span class="co"># get a date vector specifying which week each raster layer corresponds to</span></span>
-<span><span class="va">weeks</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/parse_raster_dates.html">parse_raster_dates</a></span><span class="op">(</span><span class="va">abd</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://www.math.uzh.ch/pages/spam/reference/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">weeks</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "2021-01-04" "2021-01-11" "2021-01-18" "2021-01-25" "2021-02-01" "2021-02-08" "2021-02-15"</span></span>
-<span><span class="co">#&gt;  [8] "2021-02-22" "2021-03-01" "2021-03-08" "2021-03-15" "2021-03-22" "2021-03-29" "2021-04-05"</span></span>
-<span><span class="co">#&gt; [15] "2021-04-12" "2021-04-19" "2021-04-26" "2021-05-03" "2021-05-10" "2021-05-17" "2021-05-24"</span></span>
-<span><span class="co">#&gt; [22] "2021-05-31" "2021-06-07" "2021-06-14" "2021-06-21" "2021-06-28" "2021-07-06" "2021-07-13"</span></span>
-<span><span class="co">#&gt; [29] "2021-07-20" "2021-07-27" "2021-08-03" "2021-08-10" "2021-08-17" "2021-08-24" "2021-08-31"</span></span>
-<span><span class="co">#&gt; [36] "2021-09-07" "2021-09-14" "2021-09-21" "2021-09-28" "2021-10-05" "2021-10-12" "2021-10-19"</span></span>
-<span><span class="co">#&gt; [43] "2021-10-26" "2021-11-02" "2021-11-09" "2021-11-16" "2021-11-23" "2021-11-30" "2021-12-07"</span></span>
-<span><span class="co">#&gt; [50] "2021-12-14" "2021-12-21" "2021-12-28"</span></span>
-<span></span>
-<span><span class="co"># select a week in the middle of the year</span></span>
-<span><span class="va">abd</span> <span class="op">&lt;-</span> <span class="va">abd</span><span class="op">[[</span><span class="fl">26</span><span class="op">]</span><span class="op">]</span></span>
-<span></span>
-<span><span class="co"># project to species specific coordinates</span></span>
-<span><span class="co"># the nearest neighbor method preserves cell values across projections</span></span>
-<span><span class="va">abd_prj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projectRaster.html" class="external-link">projectRaster</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/trim.html" class="external-link">trim</a></span><span class="op">(</span><span class="va">abd</span><span class="op">)</span>, crs <span class="op">=</span> <span class="va">crs</span><span class="op">$</span><span class="va">wkt</span>, method <span class="op">=</span> <span class="st">"ngb"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># get reference data from the rnaturalearth package</span></span>
-<span><span class="co"># the example data currently shows only the US state of Michigan</span></span>
-<span><span class="va">wh_states</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rnaturalearth/man/ne_states.html" class="external-link">ne_states</a></span><span class="op">(</span>country <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"United States of America"</span>, <span class="st">"Canada"</span><span class="op">)</span>,</span>
-<span>                       returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span>crs <span class="op">=</span> <span class="va">crs</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># start plotting</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># use raster bounding box to set the spatial extent for the plot</span></span>
-<span><span class="va">bb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sfc.html" class="external-link">st_as_sfc</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/trim.html" class="external-link">trim</a></span><span class="op">(</span><span class="va">abd_prj</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bb</span>, col <span class="op">=</span> <span class="st">"white"</span>, border <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></span>
-<span><span class="co"># add background reference data</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">wh_states</span>, col <span class="op">=</span> <span class="st">"#cfcfcf"</span>, border <span class="op">=</span> <span class="cn">NA</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># plot zeroes as light gray</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_prj</span>, col <span class="op">=</span> <span class="st">"#e6e6e6"</span>, maxpixels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">ncell</a></span><span class="op">(</span><span class="va">abd_prj</span><span class="op">)</span>,</span>
-<span>     axes <span class="op">=</span> <span class="cn">FALSE</span>, legend <span class="op">=</span> <span class="cn">FALSE</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># define color palette</span></span>
-<span><span class="va">pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/abundance_palette.html">abundance_palette</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">breaks</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>, <span class="st">"weekly"</span><span class="op">)</span></span>
-<span><span class="co"># plot abundance</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abd_prj</span>, col <span class="op">=</span> <span class="va">pal</span>, breaks <span class="op">=</span> <span class="va">breaks</span>, maxpixels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">ncell</a></span><span class="op">(</span><span class="va">abd_prj</span><span class="op">)</span>,</span>
-<span>     axes <span class="op">=</span> <span class="cn">FALSE</span>, legend <span class="op">=</span> <span class="cn">FALSE</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># state boundaries</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">wh_states</span>, add <span class="op">=</span> <span class="cn">TRUE</span>, col <span class="op">=</span> <span class="cn">NA</span>, border <span class="op">=</span> <span class="st">"white"</span>, lwd <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># legend</span></span>
-<span><span class="va">label_breaks</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">breaks</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/fields/man/image.plot.html" class="external-link">image.plot</a></span><span class="op">(</span>zlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, breaks <span class="op">=</span> <span class="va">label_breaks</span>, col <span class="op">=</span> <span class="va">pal</span>,</span>
-<span>           smallplot <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.90</span>, <span class="fl">0.93</span>, <span class="fl">0.15</span>, <span class="fl">0.85</span><span class="op">)</span>,</span>
-<span>           legend.only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>           axis.args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.5</span>, <span class="fl">1</span><span class="op">)</span>, </span>
-<span>                            labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">labels</span>, <span class="fl">2</span><span class="op">)</span>,</span>
-<span>                            cex.axis <span class="op">=</span> <span class="fl">0.9</span>, lwd.ticks <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-quick_start-1.png" width="100%"></p>
-</div>
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"remotes"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ebird/ebirdst"</span><span class="op">)</span></span></code></pre></div>
 </div>
   </div>
 
@@ -236,8 +109,8 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, S. Ligocki, O. Robinson, W. H
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
 <li><a href="https://cloud.r-project.org/package=ebirdst" class="external-link">View on CRAN</a></li>
-<li><a href="https://github.com/CornellLabofOrnithology/ebirdst/" class="external-link">Browse source code</a></li>
-<li><a href="https://github.com/CornellLabofOrnithology/ebirdst/issues" class="external-link">Report a bug</a></li>
+<li><a href="https://github.com/ebird/ebirdst/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/ebird/ebirdst/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 
@@ -277,14 +150,7 @@ Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, S. Ligocki, O. Robinson, W. H
 </ul>
 </div>
 
-<div class="dev-status">
-<h2 data-toc-skip>Dev status</h2>
-<ul class="list-unstyled">
-<li><a href="http://www.gnu.org/licenses/gpl-3.0" class="external-link"><img src="https://img.shields.io/badge/License-GPL%20v3-blue.svg" alt="License: GPL v3"></a></li>
-<li><a href="https://github.com/CornellLabofOrnithology/ebirdst/actions" class="external-link"><img src="https://github.com/CornellLabofOrnithology/ebirdst/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
-<li><a href="https://cran.r-project.org/package=ebirdst" class="external-link"><img src="https://www.r-pkg.org/badges/version/ebirdst" alt="CRAN status"></a></li>
-</ul>
-</div>
+
 
   </div>
 </div>

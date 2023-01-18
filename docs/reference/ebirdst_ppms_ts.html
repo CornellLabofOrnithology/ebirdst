@@ -66,7 +66,7 @@ eBird Status and Trends PPMs consult the help for ebirdst_ppms."><!-- mathjax --
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Time series of eBird Status and Trends PPMs summarized temporally</h1>
-    <small class="dont-index">Source: <a href="https://github.com/CornellLabofOrnithology/ebirdst/blob/HEAD/R/ebirdst-ppms.R" class="external-link"><code>R/ebirdst-ppms.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/ebird/ebirdst/blob/HEAD/R/ebirdst-ppms.R" class="external-link"><code>R/ebirdst-ppms.R</code></a></small>
     <div class="hidden name"><code>ebirdst_ppms_ts.Rd</code></div>
     </div>
 
@@ -81,7 +81,7 @@ eBird Status and Trends PPMs consult the help for <a href="ebirdst_ppms.html">eb
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ebirdst_ppms_ts</span><span class="op">(</span><span class="va">path</span>, <span class="va">ext</span>, summarize_by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weeks"</span>, <span class="st">"months"</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for ebirdst_ppms_ts</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"binary"</span>, <span class="st">"occurrence"</span>, <span class="st">"abundance"</span><span class="op">)</span>, metric <span class="op">=</span> <span class="st">"kappa"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"binary"</span>, <span class="st">"occurrence"</span>, <span class="st">"abundance"</span><span class="op">)</span>, metric <span class="op">=</span> <span class="st">"kappa"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -141,7 +141,7 @@ probability PPMs, and <code>abd_ppms</code> contains within-range abundance PPMs
 some cases, PPMs may be missing, either because there isn't a large enough
 test set within the spatiotemporal extent or because average occurrence or
 abundance is too low. In these cases, try increasing the size of the
-<a href="ebirdst_extent.html">ebirdst_extent</a> object. <code><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot()</a></code> can be called on the returned
+<a href="ebirdst_extent.html">ebirdst_extent</a> object. <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> can be called on the returned
 <code>ebirdst_pppms_ts</code> object to plot a time series of a single PPM.</p>
     </div>
 
@@ -161,11 +161,11 @@ abundance is too low. In these cases, try increasing the size of the
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># plot time series</span></span></span>
 <span class="r-in"><span><span class="co"># binary, kappa</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ppms</span>, type <span class="op">=</span> <span class="st">"binary"</span>, metric <span class="op">=</span> <span class="st">"kappa"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ppms</span>, type <span class="op">=</span> <span class="st">"binary"</span>, metric <span class="op">=</span> <span class="st">"kappa"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># occurrence, sensitivity</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ppms</span>, type <span class="op">=</span> <span class="st">"occurrence"</span>, metric <span class="op">=</span> <span class="st">"sensitivity"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ppms</span>, type <span class="op">=</span> <span class="st">"occurrence"</span>, metric <span class="op">=</span> <span class="st">"sensitivity"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co">#' # abundance, poisson deviance</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ppms</span>, type <span class="op">=</span> <span class="st">"abundance"</span>, metric <span class="op">=</span> <span class="st">"poisson_dev_abd"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ppms</span>, type <span class="op">=</span> <span class="st">"abundance"</span>, metric <span class="op">=</span> <span class="st">"poisson_dev_abd"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>

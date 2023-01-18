@@ -20,8 +20,8 @@ Description: Tools to download, load, plot, and analyze eBird Status and
     data to model global bird abundances, range boundaries, and habitat
     associations at a high spatial and temporal resolution.
 License: GPL-3
-URL: https://github.com/CornellLabofOrnithology/ebirdst
-BugReports: https://github.com/CornellLabofOrnithology/ebirdst/issues
+URL: https://github.com/ebird/ebirdst
+BugReports: https://github.com/ebird/ebirdst/issues
 Depends: 
     R (>= 4.0.0)
 Imports: 
